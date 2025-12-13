@@ -16,6 +16,7 @@ import { NotFound } from '~/components/NotFound'
 import { seo } from '~/utils/seo'
 import appCss from '/app.css?url'
 import resetCss from '/reset.css?url'
+import { MainLayout } from '~/components/MainLayout/MainLayout'
 
 export const Route = createRootRouteWithContext<{
     queryClient: QueryClient
@@ -56,6 +57,10 @@ export const Route = createRootRouteWithContext<{
             },
             { rel: 'manifest', href: '/site.webmanifest', color: '#fffff' },
             { rel: 'icon', href: '/favicon.ico' },
+            { 
+                href: "https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Orbitron:wght@400..900&family=Press+Start+2P&display=swap",
+                rel: "stylesheet"
+            }
         ],
     }),
     errorComponent: (props) => {
@@ -85,60 +90,9 @@ function RootDocument({ children }: { children: Solid.JSX.Element }) {
             </head>
             <body>
                 <HeadContent />
-                <div class="p-2 flex gap-2 text-lg">
-                    <Link
-                        to="/"
-                        activeProps={{
-                            class: 'font-bold',
-                        }}
-                        activeOptions={{ exact: true }}
-                    >
-                        Home
-                    </Link>{' '}
-                    <Link
-                        to="/posts"
-                        activeProps={{
-                            class: 'font-bold',
-                        }}
-                    >
-                        Posts
-                    </Link>{' '}
-                    <Link
-                        to="/users"
-                        activeProps={{
-                            class: 'font-bold',
-                        }}
-                    >
-                        Users
-                    </Link>{' '}
-                    <Link
-                        to="/route-a"
-                        activeProps={{
-                            class: 'font-bold',
-                        }}
-                    >
-                        Pathless Layout
-                    </Link>{' '}
-                    <Link
-                        to="/deferred"
-                        activeProps={{
-                            class: 'font-bold',
-                        }}
-                    >
-                        Deferred
-                    </Link>{' '}
-                    <Link
-                        // @ts-expect-error
-                        to="/this-route-does-not-exist"
-                        activeProps={{
-                            class: 'font-bold',
-                        }}
-                    >
-                        This Route Does Not Exist
-                    </Link>
-                </div>
-                <hr />
-                {children}
+                <MainLayout>
+                    {children}
+                </MainLayout>
                 <TanStackRouterDevtools position="bottom-right" />
                 <SolidQueryDevtools buttonPosition="bottom-left" />
                 <Scripts />

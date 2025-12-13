@@ -1,0 +1,144 @@
+.root {
+    --nav-size: 0rem;
+    --icon-width: 3rem;
+
+
+    @media (width >=768px) {
+
+        --nav-size: var(--icon-width);
+
+        &.navOpen {
+            --nav-size: 12.5rem;
+        }
+    }
+}
+
+@media (width < 768px) {
+    .navOpen .nav {
+        width: 70vw;
+    }
+}
+
+.topItem {
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+
+    >aside {
+        font-family: "Press Start 2P", system-ui;
+        flex: 1;
+        text-align: center;
+        color: #00ff7f;
+
+        &::first-letter {
+            color: #F0F;
+        }
+    }
+
+}
+
+.nav {
+    position: fixed;
+    left: 0;
+    height: 100%;
+    background-color: var(--bg-clr);
+    z-index: 50;
+    overflow: hidden;
+    transition: width 200ms ease;
+
+    @media (width >=768px) {
+        width: var(--nav-size);
+        height: 100%;
+    }
+
+    @media (width < 768px) {
+        width: 0;
+    }
+}
+
+.main {
+    padding: 0.5rem;
+    @media (width >=768px) {
+        transition: margin-left 200ms ease;
+        margin-left: var(--nav-size);
+    }
+}
+
+.navItem {
+    display: flex;
+    align-items: center;
+    height: 2.5rem;
+    border-radius: 0.5rem;
+    transition: background-color 250ms ease;
+
+    >svg {
+        width: var(--icon-width);
+        flex-shrink: 0;
+    }
+
+    &:hover {
+        background-color: #222;
+        @media (prefers-color-scheme: light) {
+            color: wheat;
+        }
+    }
+}
+
+.toggleBtn {
+    position: fixed;
+    flex-shrink: 0;
+    width: var(--icon-width);
+    background: var(--bg-clr);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+
+    @media (width >=768px) {
+        position: relative;
+        background: none;
+    }
+
+    @media (width < 768px) {
+        transform: translate(2, 2);
+    }
+}
+
+.search {
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    >div {
+        border-radius: 5rem;
+        overflow: hidden;
+        display: flex;
+        height: 80%;
+        margin-left: auto;
+        margin-right: auto;
+        width: 70%;
+        max-width: 600px;
+        > button {
+            background-color: light-dark(gray, #ffffff14);
+            width: var(--icon-width);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        >input {
+            all: unset;
+            width: 100%;
+            border: 1px solid gray;
+            background-color: light-dark(hsl(0, 0%, 85%), hsl(0, 0%, 15%));
+            padding-left: 0.5rem;
+        }
+    }
+}
+
+.active {
+    >.navItem {
+        border-bottom: #00ff7f 2px solid;
+    }
+}
