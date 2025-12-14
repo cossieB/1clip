@@ -2,6 +2,8 @@
   font-size: clamp(12px, calc(12px + 1vw), 16px);
   --bg-clr: light-dark(whitesmoke, #121212);
   --txt-clr: light-dark(#333, #f1f1f1);
+  --neon-pink: #F0F;
+  --neon-green: #00ff7f;
 }
 
 body {
@@ -10,10 +12,15 @@ body {
   background-color: var(--bg-clr);
   color: var(--txt-clr);
   height: 100vh;
-  width: 100vw;
+  width: 100%;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: 'Press Start 2p', system-ui;
 }
 
@@ -27,8 +34,8 @@ a {
 }
 
 a[href^="http"]:not([href*="gg.cossie.dev"])::after {
-  content: "↗"; 
-  margin-inline-start: 0.2rem; 
+  content: "↗";
+  margin-inline-start: 0.2rem;
   color: initial;
 }
 
@@ -45,4 +52,16 @@ button {
   p {
     max-width: none;
   }
+}
+
+.hide-scrollbar {
+  /* For Firefox */
+  scrollbar-width: none;
+  /* For Internet Explorer and Edge (legacy) */
+  -ms-overflow-style: none;
+}
+
+/* For Chrome, Safari, Opera, and other WebKit-based browsers */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }

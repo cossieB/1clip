@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/solid-query'
 import { createFileRoute } from '@tanstack/solid-router'
 import { Suspense } from 'solid-js'
+import { GamePage } from '~/components/GamePage/GamePage'
 import { NotFound } from '~/components/NotFound'
 import { getGameFn } from '~/services/gamesService'
 
@@ -32,7 +33,8 @@ function RouteComponent() {
 
     return (
         <Suspense>
-            {result.data?.title}
+            <GamePage game={result.data!} />
         </Suspense>
     )
 }
+

@@ -1,12 +1,10 @@
-'use server'
-
 import { and, eq, getColumns, SQL, sql } from "drizzle-orm";
 import { db } from "~/drizzle/db";
 import { actors, developersView, gameActors, gamePlatforms, gamesView, gameTags, platforms, publishersView } from "~/drizzle/schema";
 import { sleep } from "~/lib/sleep";
 import type { ActorView, PlatformView } from "~/models";
 
-function games(obj?: { filters?: SQL[] }) {
+function gameUtil(obj?: { filters?: SQL[] }) {
     const { developerId, publisherId, ...gamesColumns } = getColumns(gamesView)
     const actorQuery = db.$with("aq").as(
         db.select({
@@ -60,7 +58,7 @@ function games(obj?: { filters?: SQL[] }) {
         })
         .from(gamesView)
         .innerJoin(developersView, eq(gamesView.developerId, developersView.developerId))
-        .innerJoin(publishersView, eq(gamesView.developerId, publishersView.publisherId))
+        .innerJoin(publishersView, eq(gamesView.publisherId, publishersView.publisherId))
         .leftJoin(actorQuery, eq(gamesView.gameId, actorQuery.gameId))
         .leftJoin(platformQuery, eq(gamesView.gameId, platformQuery.gameId))
         .leftJoin(tagQuery, eq(gamesView.gameId, tagQuery.gameId))
@@ -71,7 +69,7 @@ function games(obj?: { filters?: SQL[] }) {
 
 export async function findAll() {
     try {
-        return games()
+        return gameUtil()
     } catch (error) {
         console.error(error)
         throw error
@@ -79,6 +77,6 @@ export async function findAll() {
 }
 
 export async function findById(gameId: number) {
-    const list = await games({ filters: [eq(gamesView.gameId, gameId)] })
+    const list = await gameUtil({ filters: [eq(gamesView.gameId, gameId)] })
     return list.at(0)
 }

@@ -1,7 +1,7 @@
 import { createSignal, onMount, type JSXElement } from "solid-js";
 import styles from "./MainLayout.module.css"
 import { Nav } from "./Nav";
-import { SearchIcon } from "lucide-solid";
+import { SearchBar } from "./Searchbar";
 
 export function MainLayout(props: { children: JSXElement }) {
     const [showNav, setShowNav] = createSignal(false)
@@ -11,27 +11,11 @@ export function MainLayout(props: { children: JSXElement }) {
     })
     return (
         <div id="gl" class={styles.root} classList={{ [styles.navOpen]: showNav() }}>
-
             <Nav toggleNav={toggleNav} />
-            <section class={styles.mid}>
-                <SearchBar />
-                <main class={styles.main}>
-                    {props.children}
-                </main>
-            </section>
-        </div>
-    )
-}
-
-function SearchBar() {
-    return (
-        <div class={styles.search}>
-            <div>
-                <input type="search" />
-                <button>
-                    <SearchIcon />
-                </button>
-            </div>
+            <SearchBar />
+            <main class={styles.main}>
+                {props.children}
+            </main>
         </div>
     )
 }

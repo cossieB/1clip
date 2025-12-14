@@ -29,7 +29,7 @@ export const games = pgTable("games", {
     summary: text("summary").notNull().default(""),
     developerId: integer("developer_id").notNull().references(() => developers.developerId),
     publisherId: integer("publisher_id").notNull().references(() => publishers.publisherId),
-    releaseDate: timestamp("release_date", {mode: "string", withTimezone: true}).notNull(),
+    releaseDate: timestamp("release_date", {mode: "date", withTimezone: true}).notNull(),
     cover: text("cover").notNull(),
     banner: text("banner").notNull(),
     trailer: text("trailer"),
