@@ -6,7 +6,21 @@ import { DefaultCatchBoundary } from './components/DefaultCatchBoundary'
 import { NotFound } from './components/NotFound'
 
 export function getRouter() {
-    const queryClient = new QueryClient()
+    const queryClient = new QueryClient({
+        defaultOptions: {
+            queries: {
+                gcTime: Infinity,
+                refetchOnMount: false,
+                retry: false,
+                // retry(failureCount, error) {
+                //     return failureCount < 3
+                // },
+                refetchOnWindowFocus: false,
+                staleTime: Infinity,
+                throwOnError: true,
+            },
+        }
+    })
 
     const router = createRouter({
         routeTree,

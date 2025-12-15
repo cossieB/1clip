@@ -27,6 +27,11 @@
         text-align: center;
         background-color: #222;
         padding: 0.25rem;
+        flex-direction: column;
+        >span {
+            font-size: 0.75rem;
+            color: var(--neon-green);
+        }
     }
 
 

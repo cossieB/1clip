@@ -4,17 +4,40 @@ import { actors, developersView, gameActors, gamePlatforms, gamesView, gameTags,
 import { sleep } from "~/lib/sleep";
 import type { ActorView, PlatformView } from "~/models";
 
+export async function findAll() {
+    try {
+        return gameUtil()
+    } catch (error) {
+        console.error(error)
+        throw error
+    }
+}
+
+export async function findById(gameId: number) {
+    const list = await gameUtil({ filters: [eq(gamesView.gameId, gameId)] })
+    return list.at(0)
+}
+
+export async function findByDeveloper(developerId: number) {
+    return gameUtil({filters: [eq(gamesView.developerId, developerId)]})
+}
+
+export async function findByPublisher(publisherId: number) {
+    return gameUtil({filters: [eq(gamesView.publisherId, publisherId)]})
+}
+
 function gameUtil(obj?: { filters?: SQL[] }) {
     const { developerId, publisherId, ...gamesColumns } = getColumns(gamesView)
     const actorQuery = db.$with("aq").as(
         db.select({
             gameId: gameActors.gameId,
-            actorArr: sql`ARRAY_AGG(JSON_BUILD_OBJECT(
+            actorArr: sql`JSONB_AGG(JSONB_BUILD_OBJECT(
+            'character', character,
             'actorId', ${actors.actorId},
             'name', ${actors.name},
             'photo', ${actors.photo},
             'bio', ${actors.bio}
-        ))`.as("a_arr")
+        ) ORDER BY role_type)`.as("a_arr")
         })
             .from(gameActors)
             .innerJoin(actors, eq(gameActors.actorId, actors.actorId))
@@ -24,7 +47,7 @@ function gameUtil(obj?: { filters?: SQL[] }) {
     const platformQuery = db.$with("pq").as(
         db.select({
             gameId: gamePlatforms.gameId,
-            platformArr: sql`ARRAY_AGG(JSON_BUILD_OBJECT(
+            platformArr: sql`JSONB_AGG(JSONB_BUILD_OBJECT(
             'platformId', ${platforms.platformId},
             'name', ${platforms.name},
             'logo', ${platforms.logo},
@@ -54,7 +77,7 @@ function gameUtil(obj?: { filters?: SQL[] }) {
             developer: { ...getColumns(developersView) },
             tags: sql<string[]>`COALESCE(${tagQuery.tags}, '{}')`,
             platforms: sql<PlatformView[]>`COALESCE(${platformQuery.platformArr}, '{}')`,
-            actors: sql<ActorView[]>`COALESCE(${actorQuery.actorArr}, '{}')`
+            actors: sql<(ActorView & {character: string})[]>`COALESCE(${actorQuery.actorArr}, '{}')`
         })
         .from(gamesView)
         .innerJoin(developersView, eq(gamesView.developerId, developersView.developerId))
@@ -65,18 +88,4 @@ function gameUtil(obj?: { filters?: SQL[] }) {
         .where(and(...(obj?.filters ?? [])))
 
     return gamesQuery
-}
-
-export async function findAll() {
-    try {
-        return gameUtil()
-    } catch (error) {
-        console.error(error)
-        throw error
-    }
-}
-
-export async function findById(gameId: number) {
-    const list = await gameUtil({ filters: [eq(gamesView.gameId, gameId)] })
-    return list.at(0)
 }

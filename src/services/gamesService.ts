@@ -14,3 +14,17 @@ export const getGameFn = createServerFn()
         if (!game) throw notFound()
         return game
     })
+
+export const getGamesByDeveloperFn = createServerFn()
+    .inputValidator((id: number) => id)
+    .handler(async ({ data }) => {
+        if (data < 1) return []
+        return gamesRepository.findByDeveloper(data)
+    })
+
+export const getGamesByPublisherFn = createServerFn()
+    .inputValidator((id: number) => id)
+    .handler(async ({ data }) => {
+        if (data < 1) return [];
+        return gamesRepository.findByPublisher(data)
+    })

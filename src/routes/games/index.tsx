@@ -1,21 +1,20 @@
 import { useQueryClient, useQuery } from '@tanstack/solid-query'
 import { createFileRoute } from '@tanstack/solid-router'
-import { createEffect, Suspense, Switch, Match } from 'solid-js'
-import { GamesList } from '~/components/GamesList/GamesList'
+import { createEffect } from 'solid-js'
+import { PhotoCardGrid } from '~/components/CardLink/PhotoCardLink'
 import { getGamesFn } from '~/services/gamesService'
 
 export const Route = createFileRoute('/games/')({
     component: RouteComponent,
-    loader: async ({context}) => {
+    loader: async ({ context }) => {
         return await context.queryClient.ensureQueryData({
             queryKey: ["games"],
             queryFn: () => getGamesFn()
         })
-    } 
+    }
 })
 
 function RouteComponent() {
-    // const gamesFetcher = useServerFn(getGames)
     const queryClient = useQueryClient()
     const result = useQuery(() => ({
         queryKey: ["games"],
@@ -24,26 +23,23 @@ function RouteComponent() {
     }))
 
     createEffect(() => {
-        
+
         if (result.data)
             for (const game of result.data) {
-                queryClient.setQueryData(["game", game.gameId], game)
-                queryClient.setQueryData(["developer", game.developer.developerId], game.developer)
-                queryClient.setQueryData(["publisher", game.publisher.publisherId], game.publisher)
-                queryClient.setQueryData(["publisher", game.publisher.publisherId], game.publisher)
+                queryClient.setQueryData(["games", game.gameId], game)
+                queryClient.setQueryData(["developers", game.developer.developerId], game.developer)
+                queryClient.setQueryData(["publishers", game.publisher.publisherId], game.publisher)
+                queryClient.setQueryData(["publishers", game.publisher.publisherId], game.publisher)
             }
     })
 
     return (
-        <Suspense>
-            <Switch>
-                <Match when={result.data}>
-                    <GamesList games={result.data!} />
-                </Match>
-                <Match when={result.isLoading}>
-                    <span>TODO: make loading spinner</span>
-                </Match>
-            </Switch>
-        </Suspense>
+        <PhotoCardGrid
+            arr={result.data!}
+            getLabel={game => game.title}
+            getPic={game => game.cover}
+            getParam={game => ({ gameId: game.gameId })}
+            to="/games/$gameId"
+        />
     )
 }

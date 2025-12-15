@@ -4,7 +4,7 @@ import { LogoLink } from "../LogoLink/LogoLink"
 import { For, Show } from "solid-js"
 import { YouTubeIframe } from "../YoutubeIframe"
 import { Link } from "@tanstack/solid-router"
-import { PhotoCardGrid, PhotoCardLink } from "../CardLink/PhotoCardLink"
+import { PhotoCardGrid } from "../CardLink/PhotoCardLink"
 
 
 type Props = {
@@ -23,7 +23,7 @@ export function GamePage(props: Props) {
             </div>
             <div class={styles.body}>
                 <div class={styles.columns}>
-                    <div class={styles.main} innerHTML={props.game.summary} />
+                    <div class={`${styles.main} paras`} innerHTML={props.game.summary} />
                     <LogoLink
                         href="developer"
                         item={{
@@ -74,27 +74,15 @@ export function GamePage(props: Props) {
                     </div>
                 </Show>
                 <Show when={props.game.actors.length > 0}>
+                    <h2>Cast</h2>
                     <PhotoCardGrid
                         arr={props.game.actors}
                         getLabel={actor => actor.name}
                         getPic={actor => actor.photo ?? ""}
+                        getSublabel={actor => actor.character}
                         to="/actors/$actorId"
                         getParam={actor => ({actorId: actor.actorId})}
                     />
-                    {/* <div class={styles.actors}>
-                        <For each={props.game.actors}>
-                            {actor =>
-                                <PhotoCardLink
-                                    label={actor.name}
-                                    picture={actor.photo ?? ""}
-                                    to="/actors/$actorId"
-                                    params={{
-                                        actorId: actor.actorId
-                                    }}
-                                />
-                            }
-                        </For>
-                    </div> */}
                 </Show>
             </div>
         </div>

@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/solid-query'
+import { useQuery, useQueryClient } from '@tanstack/solid-query'
 import { createFileRoute } from '@tanstack/solid-router'
-import { Suspense } from 'solid-js'
+import { createEffect, Suspense } from 'solid-js'
 import { GamePage } from '~/components/GamePage/GamePage'
 import { NotFound } from '~/components/NotFound'
 import { getGameFn } from '~/services/gamesService'
@@ -25,11 +25,19 @@ export const Route = createFileRoute('/games/$gameId')({
 })
 
 function RouteComponent() {
+    const queryClient = useQueryClient()
     const params = Route.useParams()
     const result = useQuery(() => ({
         queryKey: ["games", params().gameId],
         queryFn: () => getGameFn({ data: params().gameId })
     }))
+
+    createEffect(() => {
+        if (result?.data) {
+            queryClient.setQueryData(["developers", result.data.developer.developerId], result.data.developer)
+            queryClient.setQueryData(["publishers", result.data.publisher.publisherId], result.data.publisher)
+        }
+    })
 
     return (
         <Suspense>
@@ -37,4 +45,3 @@ function RouteComponent() {
         </Suspense>
     )
 }
-

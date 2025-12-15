@@ -1,0 +1,16 @@
+.header {
+    width: 100%;
+    background-color: aliceblue;
+    height: 15rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    >img {
+        max-height: 50%;
+    }
+}
+
+.main {
+    width: min(90%, 1200px);
+    margin: 0.5rem auto;
+}
