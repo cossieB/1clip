@@ -1,6 +1,5 @@
 .game {
     width: 100%;
-    --gray1: light-dark(hsl(0, 2%, 90%),hsl(0, 2%, 17%));
 
     h2 {
         text-align: center;

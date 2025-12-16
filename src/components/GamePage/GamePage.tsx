@@ -5,6 +5,7 @@ import { For, Show } from "solid-js"
 import { YouTubeIframe } from "../YoutubeIframe"
 import { Link } from "@tanstack/solid-router"
 import { PhotoCardGrid } from "../CardLink/PhotoCardLink"
+import { Carousel } from "../Carousel"
 
 
 type Props = {
@@ -12,6 +13,7 @@ type Props = {
 }
 
 export function GamePage(props: Props) {
+
     return (
         <div class={styles.game}>
             <div class={styles.header}>
@@ -81,8 +83,12 @@ export function GamePage(props: Props) {
                         getPic={actor => actor.photo ?? ""}
                         getSublabel={actor => actor.character}
                         to="/actors/$actorId"
-                        getParam={actor => ({actorId: actor.actorId})}
+                        getParam={actor => ({ actorId: actor.actorId })}
                     />
+                </Show>
+                <Show when={props.game.images.length > 1}>
+                    <h2>Screenshots</h2>
+                <Carousel images={props.game.images} showNextBtn showPrevBtn />
                 </Show>
             </div>
         </div>

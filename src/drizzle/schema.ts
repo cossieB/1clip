@@ -1,5 +1,5 @@
 import { getColumns } from "drizzle-orm";
-import { timestamp, integer, pgTable, text, varchar, primaryKey, pgEnum, pgView } from "drizzle-orm/pg-core";
+import { timestamp, integer, pgTable, text, varchar, primaryKey, pgEnum, pgView, jsonb } from "drizzle-orm/pg-core";
 
 export const developers = pgTable("developers", {
     developerId: integer("developer_id").primaryKey().generatedAlwaysAsIdentity(),
@@ -33,6 +33,7 @@ export const games = pgTable("games", {
     cover: text("cover").notNull(),
     banner: text("banner").notNull(),
     trailer: text("trailer"),
+    images: text('images').array().notNull().default([]),
     dateAdded: timestamp("date_added", {mode: "string", withTimezone: true}).notNull().defaultNow(),
     dateModified: timestamp("date_modified", {mode: "string", withTimezone: true}),
 });

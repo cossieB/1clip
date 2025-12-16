@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/solid-query'
 import { createFileRoute } from '@tanstack/solid-router'
 import { createEffect, Suspense } from 'solid-js'
+import { Carousel } from '~/components/Carousel'
 import { GamePage } from '~/components/GamePage/GamePage'
 import { NotFound } from '~/components/NotFound'
 import { getGameFn } from '~/services/gamesService'
@@ -36,9 +37,13 @@ function RouteComponent() {
         if (result?.data) {
             queryClient.setQueryData(["developers", result.data.developer.developerId], result.data.developer)
             queryClient.setQueryData(["publishers", result.data.publisher.publisherId], result.data.publisher)
+
+            result.data.platforms.forEach(plat => {
+                queryClient.setQueryData(["platforms", plat.platformId], plat)
+            })
         }
     })
-
+  
     return (
         <Suspense>
             <GamePage game={result.data!} />

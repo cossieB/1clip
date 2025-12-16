@@ -22,7 +22,7 @@
 .topItem {
     height: 2.5rem;
     display: flex;
-    align-items: center;    
+    align-items: center;
 
     >aside {
         font-family: "Press Start 2P", system-ui;
@@ -58,6 +58,7 @@
 .main {
     height: 100vh;
     padding-top: 3rem;
+
     @media (width >=768px) {
         transition: margin-left 200ms ease;
         margin-left: var(--nav-size);
@@ -118,6 +119,7 @@
     width: 100%;
     background-color: var(--bg-clr);
     z-index: 100;
+
     >div {
         border-radius: 5rem;
         overflow: hidden;
@@ -149,5 +151,35 @@
 .active {
     >.navItem {
         border-bottom: #00ff7f 2px solid;
+    }
+}
+
+.footer {
+    hr {
+        border: none;
+        border-top: 1px solid #ccc;
+        height: 1px;
+        margin-bottom: 1rem;
+    }
+    padding: 1rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    svg {
+        display: inline;
+        height: 1.5rem;
+        width: 1.5rem;
+    }
+    
+    a {
+        font-weight: bold;
+        margin-left: 0.5rem;
+        text-decoration: underline;
+        &::after {
+            content: "dkd";
+            text-decoration: none;
+        }
     }
 }
