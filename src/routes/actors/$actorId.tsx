@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/solid-query'
 import { createFileRoute } from '@tanstack/solid-router'
 import { Suspense } from 'solid-js'
-import { PhotoCardGrid } from '~/components/CardLink/PhotoCardLink'
 import { CompanyPage } from '~/components/CompanyPage/CompanyPage'
+import { GamesList } from '~/components/GamesList'
 import { getActorFn } from '~/services/actorService'
 import { getGamesByActorFn } from '~/services/gamesService'
 
@@ -27,13 +27,8 @@ export const Route = createFileRoute('/actors/$actorId')({
 function RouteComponent() {
     const params = Route.useParams()
     const devResult = useQuery(() => ({
-            queryKey: ["actors", params().actorId],
-            queryFn: () => getActorFn({ data: params().actorId })
-        }))
-
-    const gamesResult = useQuery(() => ({
-        queryKey: ["games", "withActor", params().actorId],
-        queryFn: () => getGamesByActorFn({ data: params().actorId })
+        queryKey: ["actors", params().actorId],
+        queryFn: () => getActorFn({ data: params().actorId })
     }))
 
     return (
@@ -47,14 +42,11 @@ function RouteComponent() {
                     showName
                 />
             </Suspense>
-            <PhotoCardGrid
-                arr={gamesResult.data!}
-                getLabel={game => game.title}
-                getPic={game => game.cover}
-                getParam={game => ({
-                    gameId: game.gameId
+            <GamesList
+                query={() => ({
+                    queryKey: ["games", "withActor", params().actorId],
+                    queryFn: () => getGamesByActorFn({ data: params().actorId })
                 })}
-                to='/games/$gameId'
             />
         </>
     )

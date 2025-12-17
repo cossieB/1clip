@@ -52,6 +52,20 @@ export async function findByPlatform(platformId: number) {
     })
 }
 
+export async function findByTag(tag: string) {
+    return gameUtil({
+        filters: [
+            inArray(
+                gamesView.gameId,
+                db
+                    .select({gameId: gameTags.gameId})
+                    .from(gameTags)
+                    .where(eq(gameTags.tagName, tag))
+            )
+        ]
+    })
+}
+
 function gameUtil(obj?: { filters?: SQL[] }) {
     const { developerId, publisherId, ...gamesColumns } = getColumns(gamesView)
     const actorQuery = db.$with("aq").as(
