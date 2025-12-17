@@ -11,11 +11,10 @@
 .cover {
     position: absolute;
     z-index: 2;
-    box-shadow: black 0px 0px 20px 10px;
     top: 50%;
     left: 50%;
     translate: -50% -50%;
-    border-radius: 0.5rem;
+    
 }
 
 .hero {
@@ -44,6 +43,8 @@
 .header {
     position: relative;
     height: 75vh;
+    filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.5));
+
 }
 
 .title {
@@ -55,8 +56,7 @@
     color: var(--neon-green);
     text-wrap: wrap;
     padding: 1rem;
-    backdrop-filter: blur(10px) grayscale(50%);
-    border-radius: 0.5rem;
+    backdrop-filter: blur(10px) grayscale(50%);    
     box-shadow: 0 0 25px black;
     top: 100%;
     left: 50%;
@@ -101,7 +101,7 @@
     align-items: center;
     justify-content: space-between;
     font-size: larger;
-    border-radius: 0.5rem;
+    
 }
 
 .platforms,
@@ -133,7 +133,7 @@
         align-items: center;
         padding: 0.5rem;
         background-color: var(--gray1);
-        border-radius: 0.5rem;
+        
         flex-grow: 1;
         box-shadow: 0 0 10px black;
         position: relative;

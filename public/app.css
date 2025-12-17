@@ -37,9 +37,17 @@ a {
 
 .paras {
   box-shadow: 0 0 10px black;
-  border-radius: 0.5rem;
   padding: 0.25rem 1rem;
   background-color: var(--content-bg);
+}
+
+.cutout {
+  --x: 1rem;
+  clip-path: polygon(var(--x) 0%, 0% var(--x), 0% 100%, calc(100% - var(--x)) 100%, 100% calc(100% - var(--x)), 100% 0%);
+}
+
+.cutout-wrapper {
+  filter: drop-shadow(0 0 20px black);
 }
 
 .pulse {

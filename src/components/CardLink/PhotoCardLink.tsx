@@ -13,8 +13,8 @@ export function PhotoCardLink(props: Props) {
 
     return (
         <div class={styles.card}>
-            <div class={styles.imgWrapper}><img src={props.picture} loading="lazy" alt="" /></div>
-            <label>
+            <div class={`${styles.imgWrapper} cutout`}><img src={props.picture} loading="lazy" alt="" /></div>
+            <label class="cutout">
                 {props.label}
                 <span>{props.sublabel}</span>
             </label>

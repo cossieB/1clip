@@ -49,8 +49,8 @@ type NavItemProps = {
 
 function NavItem(props: NavItemProps) {
     return (
-        <Link to={props.href}  activeProps={{class: styles.active}} >
-            <li class={styles.navItem}>
+        <Link to={props.href} activeProps={{class: styles.active}} >
+            <li class={`${styles.navItem}`}>
                 {props.icon}
                 <span> {props.label} </span>
             </li>

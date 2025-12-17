@@ -13,9 +13,7 @@
     display: grid;
     grid-template-rows: subgrid;
     grid-row: span 2;
-    border-radius: 0.5rem;
     overflow: hidden;
-    box-shadow: 0 0 10px black;
 
     @media (prefers-color-scheme: light) {
         color: wheat;

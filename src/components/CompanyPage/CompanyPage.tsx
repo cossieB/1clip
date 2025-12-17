@@ -16,9 +16,13 @@ export function CompanyPage(props: Props) {
                 <Show when={props.showName}>
                     <h1>{props.name}</h1>
                 </Show>
-                <img classList={{[styles.isActor]: props.showName}} src={props.logo ?? ""} alt="" />
+                <div class="cutout-wrapper">
+                    <img class="cutout" classList={{ [styles.isActor]: props.showName }} src={props.logo ?? ""} alt="" />
+                </div>
             </div>
-            <div class={`${styles.main} paras`} innerHTML={props.summary} />
+            <div class={`${styles.main} cutout-wrapper`}>
+                <div class={`cutout paras`} innerHTML={props.summary} />
+            </div>
         </div>
     )
 }

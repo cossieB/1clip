@@ -24,7 +24,7 @@ export function LogoLink(props: P) {
     const icon = map[props.href]
     const param = props.href+"Id" as `${P['href']}Id`
     return (
-        <div class={`${props.className} ${styles.logo}`} title={`${titleCase(props.href)}: ${props.item.name}`}>
+        <div class={`${props.className} ${styles.logo} cutout`} title={`${titleCase(props.href)}: ${props.item.name}`}>
             <Dynamic component={icon} />
             <img src={props.item.logo} alt="" />   
             {/* @ts-expect-error */}

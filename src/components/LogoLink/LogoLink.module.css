@@ -1,13 +1,12 @@
 .logo {
     height: 150px;
     background-color: aliceblue;
-    border-radius: 1rem;
     transition: background-color 200ms ease;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-        box-shadow: 0 0 10px black;
+    box-shadow: 0 0 10px black;
 
     &:hover {
         background-color: lavender;

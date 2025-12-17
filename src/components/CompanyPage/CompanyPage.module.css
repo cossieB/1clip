@@ -6,11 +6,16 @@
     align-items: center;
     justify-content: center;
     gap: 1rem;
+    >div {
+        height: 100%;
+        display: flex;
+        align-items: center;
+    }
     h1 {
         font-size: 2.5rem;
     }
-    >img:not(.isActor) {
-        max-height: 50%;
+    img {
+        max-height: 95%;
     }
     color: black;
 }
@@ -18,10 +23,4 @@
 .main {
     width: min(90%, 1200px);
     margin: 0.5rem auto;
-}
-
-.isActor {
-    height: 95%;
-    box-shadow: 0 0 20px 5px black;
-    border-radius: 0.5rem;
 }

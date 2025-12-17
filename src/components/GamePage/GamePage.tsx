@@ -17,15 +17,17 @@ export function GamePage(props: Props) {
     return (
         <div class={styles.game}>
             <div class={styles.header}>
-                <h1 class={styles.title}>{props.game.title}</h1>
+                <h1 class={`${styles.title}`}>{props.game.title}</h1>
                 <div class={styles.hero}>
                     <img src={props.game.banner} alt="" />
                 </div>
-                <img class={styles.cover} src={props.game.cover} alt="" />
+                <div class={`${styles.cover} cutout-wrapper`}>
+                    <img class={`cutout`} src={props.game.cover} alt="" />
+                </div>
             </div>
             <div class={styles.body}>
                 <div class={styles.columns}>
-                    <div class={`${styles.main} paras`} innerHTML={props.game.summary} />
+                    <div class={`${styles.main} paras cutout`} innerHTML={props.game.summary} />
                     <LogoLink
                         href="developer"
                         item={{
@@ -62,7 +64,7 @@ export function GamePage(props: Props) {
                     <div class={styles.tags}>
                         <For each={props.game.tags}>
                             {tag =>
-                                <div>
+                                <div class="cutout">
                                     {tag}
                                     <Link to="/games/tags/$tag" params={{ tag }} />
                                 </div>
@@ -98,7 +100,7 @@ export function GamePage(props: Props) {
 function ReleaseDate(props: { date: Date }) {
 
     return (
-        <div class={styles.date}>
+        <div class={`${styles.date} cutout`}>
             <span> {props.date.getDate()} </span>
             <span> {props.date.toLocaleString("default", { month: "long" })} </span>
             <span> {props.date.getFullYear()} </span>
