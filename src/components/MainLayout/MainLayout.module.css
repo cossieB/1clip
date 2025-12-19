@@ -44,7 +44,7 @@
     z-index: 1000;
     overflow: hidden;
     transition: width 200ms ease;
-
+    
     @media (width >=768px) {
         width: var(--nav-size);
         height: 100%;
@@ -72,9 +72,20 @@
     border-radius: 0.5rem;
     transition: background-color 250ms ease;
     
-    >svg {
+    >svg,img {
         width: var(--icon-width);
+        height: 100%;
         flex-shrink: 0;
+    }
+
+    img {
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    span {
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 
     &:hover {

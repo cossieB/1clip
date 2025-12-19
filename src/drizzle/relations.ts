@@ -1,7 +1,8 @@
 import { defineRelations } from "drizzle-orm";
-import * as schema from "./schema";
+import * as schema from "./schema/schema";
+import * as auth from "./schema/auth";
 
-export const relations = defineRelations(schema, (r) => ({
+export const relations = defineRelations({...schema, ...auth}, (r) => ({
 	actors: {
 		games: r.many.games({
 			from: r.actors.actorId.through(r.gameActors.actorId),
@@ -10,6 +11,14 @@ export const relations = defineRelations(schema, (r) => ({
 	},
 	games: {
 		actors: r.many.actors(),
+		developer: r.one.developers({
+			from: r.games.developerId,
+			to: r.developers.developerId
+		}),
+		publisher: r.one.publishers({
+			from: r.games.publisherId,
+			to: r.publishers.publisherId
+		}),
 		platforms: r.many.platforms({
 			from: r.games.gameId.through(r.gamePlatforms.gameId),
 			to: r.platforms.platformId.through(r.gamePlatforms.platformId)

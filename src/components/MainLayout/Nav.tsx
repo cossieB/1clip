@@ -1,9 +1,11 @@
-import { House, Dice5, BriefcaseBusiness, Code, Menu } from "lucide-solid";
+import { House, Dice5, BriefcaseBusiness, Code, Menu, UnlockIcon, LockOpenIcon } from "lucide-solid";
 import styles from "./MainLayout.module.css"
-import type { JSXElement } from "solid-js";
+import { createEffect, createResource, Show, type JSXElement } from "solid-js";
 import { Link } from "@tanstack/solid-router";
+import { authClient } from "~/utils/authClient";
+import { unwrap } from "solid-js/store";
 
-export function Nav(props: {toggleNav(): void}) {
+export function Nav(props: { toggleNav(): void }) {
 
     return (
         <nav class={styles.nav} >
@@ -36,6 +38,7 @@ export function Nav(props: {toggleNav(): void}) {
                     label="Publishers"
                     icon={<BriefcaseBusiness />}
                 />
+                <UserComponent />
             </ul>
         </nav>
     )
@@ -49,11 +52,35 @@ type NavItemProps = {
 
 function NavItem(props: NavItemProps) {
     return (
-        <Link to={props.href} activeProps={{class: styles.active}} >
+        <Link to={props.href} activeProps={{ class: styles.active }} >
             <li class={`${styles.navItem}`}>
                 {props.icon}
                 <span> {props.label} </span>
             </li>
         </Link>
+    )
+}
+
+function UserComponent() {
+    const session = authClient.useSession()
+    
+    return (
+        <Show
+            when={session().data?.user}
+            fallback={
+                <NavItem
+                    href="/auth/signin"
+                    icon={<LockOpenIcon />}
+                    label="Login"
+                />
+            }>
+            {user =>
+                <NavItem
+                    href="/profile"
+                    icon={<img src={user().image ?? "/favicon.ico"} />}
+                    label={user().name}
+                />
+            }
+        </Show>
     )
 }

@@ -1,4 +1,4 @@
-import { betterAuth } from "better-auth";
+import { APIError, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { username } from "better-auth/plugins";
 import { db } from "~/drizzle/db";
@@ -19,8 +19,15 @@ export const auth = betterAuth({
                 input: false,       
                 required: true,
                 defaultValue: "user"     
+            },
+            banner: {
+                fieldName: "banner",
+                type: "string",
+                input: true,
+                required: false,
             }
-        }
+        },
+        
     },
     emailAndPassword: {
         enabled: true
@@ -28,10 +35,31 @@ export const auth = betterAuth({
     plugins: [username({
         minUsernameLength: 3,
         maxUsernameLength: 15,
+        usernameValidator(username) {
+            return /^[a-zA-Z]\w{2,14}$/.test(username)
+        },
     })],
     advanced: {
         database: {
             generateId: "uuid"
+        }
+    },
+    databaseHooks: {
+        user: {
+            create: {
+                before: async (user) => {
+                    const u = await db.query.users.findFirst({
+                        columns: {
+                            id: true
+                        },
+                        where: {
+                            username: user.username!
+                        }
+                    })
+                    if (u) throw new APIError("BAD_REQUEST", {message: "Username is taken"})
+                    return true
+                },
+            }
         }
     }
 });
