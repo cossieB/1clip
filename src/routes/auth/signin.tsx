@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/solid-router'
+import { createSignal } from 'solid-js'
 import { createStore } from 'solid-js/store'
 import { Form } from '~/components/Forms/Form'
 import { FormProvider } from '~/components/Forms/FormContext'
@@ -11,6 +12,7 @@ export const Route = createFileRoute('/auth/signin')({
 
 function RouteComponent() {
     const navigate = useNavigate()
+    const [isSubmitting, setIsSubmitting] = createSignal(false)
     const [input, setInput] = createStore({
         username: "",
         password: ""
@@ -19,6 +21,7 @@ function RouteComponent() {
     
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault();
+        setIsSubmitting(true)
         await authClient.signIn.username({
             username: input.username,
             password: input.password
@@ -28,9 +31,10 @@ function RouteComponent() {
                     text: context.error.message,
                     type: "error"
                 })
+                setIsSubmitting(false)
             },
             onSuccess() {
-                navigate({ to: "/profile" })
+                navigate({ to: "/settings/profile" })
             }
         })
     }
@@ -38,7 +42,7 @@ function RouteComponent() {
     return (
         <div class='page flexCenter'>
             <FormProvider>
-                <Form disabled={!input.username || !input.password} onSubmit={handleSubmit}>
+                <Form disabled={!input.username || !input.password || isSubmitting()} onSubmit={handleSubmit}>
                     <h1>Login</h1>
                     <aside>
                         Don't have an account? <Link to='/auth/signup'>Click here to register</Link>

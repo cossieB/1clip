@@ -46,7 +46,7 @@ function RouteComponent() {
                                     text: "Successfully created your account. Click the link in your email to verify your account",
                                     autoFades: false
                                 })
-                                navigate({ to: "/profile" })
+                                navigate({ to: "/settings/profile" })
                             }
                         })
                     }}

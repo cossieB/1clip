@@ -1,8 +1,9 @@
 import { House, Dice5, BriefcaseBusiness, Code, Menu, LockOpenIcon } from "lucide-solid";
 import styles from "./MainLayout.module.css"
 import { Show, type JSXElement } from "solid-js";
-import { Link } from "@tanstack/solid-router";
+import { Link, LinkComponentProps } from "@tanstack/solid-router";
 import { authClient } from "~/utils/authClient";
+import { Require } from "~/lib/utilityTypes";
 
 export function Nav(props: { toggleNav(): void }) {
 
@@ -18,22 +19,22 @@ export function Nav(props: { toggleNav(): void }) {
             </div>
             <ul>
                 <NavItem
-                    href="/"
+                    to="/"
                     label="Home"
                     icon={<House />}
                 />
                 <NavItem
-                    href="/games"
+                    to="/games"
                     label="Games"
                     icon={<Dice5 />}
                 />
                 <NavItem
-                    href="/developers"
+                    to="/developers"
                     label="Developers"
                     icon={<Code />}
                 />
                 <NavItem
-                    href="/publishers"
+                    to="/publishers"
                     label="Publishers"
                     icon={<BriefcaseBusiness />}
                 />
@@ -46,12 +47,11 @@ export function Nav(props: { toggleNav(): void }) {
 type NavItemProps = {
     label: string
     icon: JSXElement
-    href: string
-}
+} &  Require<LinkComponentProps, 'to'>
 
 function NavItem(props: NavItemProps) {
     return (
-        <Link to={props.href} activeProps={{ class: styles.active }} >
+        <Link to={props.to} activeProps={{ class: styles.active }} >
             <li class={`${styles.navItem}`}>
                 {props.icon}
                 <span> {props.label} </span>
@@ -68,14 +68,14 @@ function UserComponent() {
             when={session().data?.user}
             fallback={
                 <NavItem
-                    href="/auth/signin"
+                    to="/auth/signin"
                     icon={<LockOpenIcon />}
                     label="Login"
                 />
             }>
             {user =>
                 <NavItem
-                    href="/profile"
+                    to="/settings/profile"
                     icon={<img src={user().image ?? "/favicon.ico"} />}
                     label={user().name}
                 />

@@ -1,0 +1,31 @@
+.nav {
+    display: flex;
+    height: 2.5rem;    
+    --count: 1;
+    --i: 0;
+    position: relative;
+
+    &::after {
+        content: "";
+        position: absolute;
+        --width: calc(100% / var(--count)); 
+        width: var(--width);
+        height: 2px;
+        background-color: var(--neon-green);
+        bottom: 0;
+        left: calc(var(--i) * var(--width));
+        transition: left 200ms ease-in-out;
+    }
+}
+
+.tab {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    >a {
+        position: absolute;
+        inset: 0;
+    }
+}

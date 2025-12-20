@@ -1,15 +1,22 @@
-import { createSignal, onMount, type JSXElement } from "solid-js";
+import { createEffect, createSignal, on, onMount, type JSXElement } from "solid-js";
 import styles from "./MainLayout.module.css"
 import { Nav } from "./Nav";
 import { SearchBar } from "./Searchbar";
 import { ToastContainer } from "../Toast/Toast";
+import { useLocation } from "@tanstack/solid-router";
 
 export function MainLayout(props: { children: JSXElement }) {
     const [showNav, setShowNav] = createSignal(false)
     const toggleNav = () => setShowNav(prev => !prev);
+    const location = useLocation()
     onMount(() => {
         if (window.innerWidth >= 768) setShowNav(true)
     })
+
+    createEffect(on(location, () => {
+        if (window.innerWidth < 768) setShowNav(false)
+    }))
+
     return (
         <div id="gl" class={styles.root} classList={{ [styles.navOpen]: showNav() }}>
             <Nav toggleNav={toggleNav} />
