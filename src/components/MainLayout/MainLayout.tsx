@@ -2,7 +2,7 @@ import { createSignal, onMount, type JSXElement } from "solid-js";
 import styles from "./MainLayout.module.css"
 import { Nav } from "./Nav";
 import { SearchBar } from "./Searchbar";
-import { Linkedin } from "lucide-solid";
+import { ToastContainer } from "../Toast/Toast";
 
 export function MainLayout(props: { children: JSXElement }) {
     const [showNav, setShowNav] = createSignal(false)
@@ -18,6 +18,7 @@ export function MainLayout(props: { children: JSXElement }) {
                 {props.children}
                 <Footer />
             </main>
+            <ToastContainer />
         </div>
     )
 }

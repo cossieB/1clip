@@ -17,6 +17,7 @@ import { seo } from '~/utils/seo'
 import appCss from '/app.css?url'
 import resetCss from '/reset.css?url'
 import { MainLayout } from '~/components/MainLayout/MainLayout'
+import { ToastProvider } from '~/components/Toast/ToastProvider'
 
 export const Route = createRootRouteWithContext<{
     queryClient: QueryClient
@@ -76,9 +77,11 @@ export const Route = createRootRouteWithContext<{
 
 function RootComponent() {
     return (
-        <RootDocument>
-            <Outlet />
-        </RootDocument>
+        <ToastProvider>
+            <RootDocument>
+                <Outlet />
+            </RootDocument>
+        </ToastProvider>
     )
 }
 

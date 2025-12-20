@@ -1,9 +1,9 @@
-import { createFileRoute, useNavigate } from '@tanstack/solid-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/solid-router'
 import { createSignal } from 'solid-js'
 import { createStore } from 'solid-js/store'
 import { Form } from '~/components/Forms/Form'
 import { FormProvider } from '~/components/Forms/FormContext'
-import { Popover } from '~/components/Popover/Popover'
+import { useToastContext } from '~/hooks/useToastContext'
 
 import { authClient } from '~/utils/authClient'
 
@@ -20,9 +20,10 @@ function RouteComponent() {
         username: ""
     })
     const [submitting, setSubmitting] = createSignal(false)
-    const [submitError, setSubmitError] = createSignal("")
+    const { addToast } = useToastContext()
     const navigate = useNavigate()
     const emptyInput = () => Object.values(input).some(val => !val)
+
     return (
         <div class="page flexCenter">
             <FormProvider>
@@ -31,16 +32,29 @@ function RouteComponent() {
                     onSubmit={async e => {
                         e.preventDefault()
                         setSubmitting(true)
-                        const { data, error } = await authClient.signUp.email({ ...input, name: input.username })
-                        if (error) {
-                            setSubmitError(error.message ?? "Something went wrong. Please try again later")
-                            setSubmitting(false)
-                            return btn.click()
-                        }
-                        if (data)
-                            navigate({to: "/profile"})
+                        await authClient.signUp.email({
+                            ...input,
+                            name: input.username
+                        }, {
+                            onError(context) {
+                                addToast({ type: "error", text: context.error.message })
+                                setSubmitting(false)
+                            },
+                            onSuccess() {
+                                addToast({
+                                    type: "info",
+                                    text: "Successfully created your account. Click the link in your email to verify your account",
+                                    autoFades: false
+                                })
+                                navigate({ to: "/profile" })
+                            }
+                        })
                     }}
                 >
+                    <h1>Register</h1>
+                    <aside>
+                        Already have an account? <Link to='/auth/signin'>Click here to login</Link>
+                    </aside>
                     <Form.Input<typeof input>
                         field="email"
                         setter={val => setInput('email', val)}
@@ -89,9 +103,6 @@ function RouteComponent() {
 
                 </Form>
             </FormProvider>
-            <Popover>
-                {submitError()}
-            </Popover>
             <button class='cutout' ref={btn} popoverTarget='autoPopover' hidden />
         </div>
     )
