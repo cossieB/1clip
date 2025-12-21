@@ -2,6 +2,7 @@ import { APIError, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { username } from "better-auth/plugins";
 import { db } from "~/drizzle/db";
+import { redis } from "./redis";
 
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
@@ -15,9 +16,9 @@ export const auth = betterAuth({
         additionalFields: {
             role: {
                 type: "string",
-                input: false,       
+                input: false,
                 required: true,
-                defaultValue: "user"     
+                defaultValue: "user"
             },
             banner: {
                 type: "string",
@@ -25,14 +26,14 @@ export const auth = betterAuth({
                 required: false,
             }
         },
-        
+
     },
     emailAndPassword: {
         enabled: true
     },
     emailVerification: {
         sendOnSignUp: true,
-        sendVerificationEmail: async ({user, url, token}) => {
+        sendVerificationEmail: async ({ user, url, token }) => {
             console.log(url, "\n", token)
         },
         autoSignInAfterVerification: true,
@@ -61,11 +62,25 @@ export const auth = betterAuth({
                             username: user.username!
                         }
                     })
-                    if (u) throw new APIError("BAD_REQUEST", {message: "Username is taken"})
+                    if (u) throw new APIError("BAD_REQUEST", { message: "Username is taken" })
                     return true
                 },
             }
         }
+    },
+    secondaryStorage: {
+        set(key, value, ttl) {
+            if (ttl)
+                redis.setEx(key, ttl, value)
+            else
+                redis.set(key, value)
+        },
+        delete(key) {
+            redis.del(key)
+        },
+        get(key) {
+            return redis.get(key)
+        },
     }
 });
 
