@@ -1,9 +1,7 @@
-import { notFound, redirect } from "@tanstack/solid-router";
+import { notFound } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start";
-import { getRequestHeaders } from "@tanstack/solid-start/server";
 import z from "zod";
 import * as userRepository from "~/repositories/userRepository"
-import { auth } from "~/utils/auth";
 import { getCurrentUserId, revokeSession } from "./authService";
 
 export const getLoggedInUser = createServerFn()

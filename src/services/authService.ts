@@ -1,8 +1,8 @@
-import { notFound, redirect } from "@tanstack/solid-router"
+import { redirect } from "@tanstack/solid-router"
 import { createIsomorphicFn, createServerFn } from "@tanstack/solid-start"
 import { getRequestHeaders } from "@tanstack/solid-start/server"
-import { auth } from "~/utils/auth"
-import { authClient } from "~/utils/authClient"
+import { auth } from "~/auth/server"
+import { authClient } from "~/auth/authClient"
 import * as userRepository from "~/repositories/userRepository"
 
 export const checkSessionFn = createIsomorphicFn().server(async () => {

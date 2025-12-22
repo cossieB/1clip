@@ -2,7 +2,7 @@ import { BriefcaseBusiness, LockOpenIcon, MenuIcon, CodeIcon, Dice5Icon, HouseIc
 import styles from "./MainLayout.module.css"
 import { Show, type JSXElement } from "solid-js";
 import { Link, LinkComponentProps } from "@tanstack/solid-router";
-import { authClient } from "~/utils/authClient";
+import { authClient } from "~/auth/authClient";
 import { Require } from "~/lib/utilityTypes";
 
 export function Nav(props: { toggleNav(): void }) {

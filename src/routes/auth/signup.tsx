@@ -5,7 +5,7 @@ import { Form } from '~/components/Forms/Form'
 import { FormProvider } from '~/components/Forms/FormContext'
 import { useToastContext } from '~/hooks/useToastContext'
 
-import { authClient } from '~/utils/authClient'
+import { authClient } from '~/auth/authClient'
 
 export const Route = createFileRoute('/auth/signup')({
     component: RouteComponent,

@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/solid-router'
-import { auth } from '~/utils/auth'
+import { auth } from '~/auth/server'
 
 export const Route = createFileRoute('/api/auth/$')({
     server: {

@@ -1,4 +1,4 @@
-import { authClient } from "~/utils/authClient";
+import { authClient } from "~/auth/authClient";
 import { useToastContext } from "./useToastContext";
 import { useNavigate } from "@tanstack/solid-router";
 

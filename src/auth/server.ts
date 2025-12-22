@@ -2,7 +2,8 @@ import { APIError, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { username } from "better-auth/plugins";
 import { db } from "~/drizzle/db";
-import { redis } from "./redis";
+import { emailService } from "~/services/emailService";
+import { redis } from "~/utils/redis";
 
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
@@ -26,7 +27,27 @@ export const auth = betterAuth({
                 required: false,
             }
         },
-
+        changeEmail: {
+            enabled: true,
+            updateEmailWithoutVerification: true,
+            sendChangeEmailConfirmation: async ({ newEmail, url, token }) => {
+                void emailService.sendMail({
+                    to: newEmail,
+                    subject: "Verify your email address",
+                    text: `Click the link to verify your email: ${url}`,
+                })
+            },
+        },
+        deleteUser: {
+            enabled: true,
+            sendDeleteAccountVerification: async ({url, user}) => {
+                void emailService.sendMail({
+                    to: user.email,
+                    subject: "Confirm account deletion",
+                    text: `Click the link to confirm that you want to delete your account: ${url}`
+                })
+            }
+        }
     },
     emailAndPassword: {
         enabled: true
@@ -34,7 +55,11 @@ export const auth = betterAuth({
     emailVerification: {
         sendOnSignUp: true,
         sendVerificationEmail: async ({ user, url, token }) => {
-            console.log(url, "\n", token)
+            void emailService.sendMail({
+                to: user.email,
+                subject: "Verify your email address",
+                text: `Click the link to verify your email: ${url}`,
+            })
         },
         autoSignInAfterVerification: true,
     },
@@ -43,9 +68,10 @@ export const auth = betterAuth({
         maxUsernameLength: 15,
         usernameValidator(username) {
             return /^[a-zA-Z]\w{2,14}$/.test(username)
-        },
+        },        
     })],
     advanced: {
+        cookiePrefix: "spectre",
         database: {
             generateId: "uuid"
         }
@@ -65,6 +91,20 @@ export const auth = betterAuth({
                     if (u) throw new APIError("BAD_REQUEST", { message: "Username is taken" })
                     return true
                 },
+            },
+            update: {
+                before: async (user) => {
+                    const u = await db.query.users.findFirst({
+                        columns: {
+                            id: true
+                        },
+                        where: {
+                            username: user.username!
+                        }
+                    })
+                    if (u) throw new APIError("BAD_REQUEST", { message: "Username is taken" })
+                    return true                    
+                }
             }
         }
     },
@@ -81,6 +121,11 @@ export const auth = betterAuth({
         get(key) {
             return redis.get(key)
         },
+    },
+    rateLimit: {
+        enabled: true,
+        window: 60,
+        max: 3
     }
 });
 
