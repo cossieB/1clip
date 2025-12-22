@@ -92,20 +92,6 @@ export const auth = betterAuth({
                     return true
                 },
             },
-            update: {
-                before: async (user) => {
-                    const u = await db.query.users.findFirst({
-                        columns: {
-                            id: true
-                        },
-                        where: {
-                            username: user.username!
-                        }
-                    })
-                    if (u) throw new APIError("BAD_REQUEST", { message: "Username is taken" })
-                    return true                    
-                }
-            }
         }
     },
     secondaryStorage: {
@@ -124,8 +110,6 @@ export const auth = betterAuth({
     },
     rateLimit: {
         enabled: true,
-        window: 60,
-        max: 3
     }
 });
 

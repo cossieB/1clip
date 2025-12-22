@@ -25,17 +25,17 @@ export function Profile(props: { user: Awaited<ReturnType<typeof getLoggedInUser
             queryClient.setQueryData(["users", user.userId], user)
             queryClient.setQueryData(["you"], user)
         },
-        onError(error, variables, onMutateResult, context) {console.log(error)
+        onError(error) {
             addToast({ text: error.message, type: "error" })
         },
     }))
-
+    
     const [user, setUser] = createStore<typeof props.user>(JSON.parse(JSON.stringify(props.user)))
 
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault();
         const obj = objectDifference(user, props.user);
-        if (Object.keys(obj).length == 0) return;
+        if (Object.keys(obj).length == 0) return addToast({text: "Nothing to update", type: "warning"});
         const res = await mutation.mutateAsync({ data: obj })
  
     }
@@ -81,7 +81,7 @@ export function Profile(props: { user: Awaited<ReturnType<typeof getLoggedInUser
                     />
                 </Form>
             </FormProvider>
-            <button popoverTarget="autoPopover" data-func="logout">
+            <button class={styles.dangerBtn} popoverTarget="autoPopover">
                 Logout
             </button>
 

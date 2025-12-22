@@ -45,4 +45,9 @@
         padding: 0.5rem 1rem;
         background-color: var(--neon-pink);
     }
+
+    span + div {
+        margin-top: 2rem;
+    }
+
 }

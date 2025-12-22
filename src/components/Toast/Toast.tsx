@@ -4,6 +4,7 @@ import { type TToast } from "./ToastProvider"
 import styles from "./Toast.module.css"
 import errorWavSrc from "./error.mp3?url"
 import infoWavSrc from "./info.mp3?url"
+import warningWavSrc from "./warning.mp3?url"
 import { XIcon } from "lucide-solid"
 
 export function ToastContainer() {
@@ -25,6 +26,7 @@ export function Toast(props: { toast: TToast, i: number }) {
     let ref!: HTMLDivElement
     const errorAudio = new Audio(errorWavSrc)
     const infoAudio = new Audio(infoWavSrc)
+    const warningAudio = new Audio(warningWavSrc)
     const { removeToast } = useToastContext()
 
     function close () {
@@ -34,7 +36,7 @@ export function Toast(props: { toast: TToast, i: number }) {
 
     onMount(() => {
         ref.showPopover()
-        const audio = props.toast.type == "error" ? errorAudio : infoAudio
+        const audio = props.toast.type == "error" ? errorAudio : props.toast.type == "warning"? warningAudio : infoAudio
         audio.play()
         let id: number;
         if (props.toast.autoFades)

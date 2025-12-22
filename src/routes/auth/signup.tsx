@@ -82,6 +82,7 @@ function RouteComponent() {
                                 errs.push("Username must start with a letter")
                             return errs
                         }}
+                        maxLength={15}
                     />
                     <Form.Input<typeof input>
                         field='password'

@@ -6,13 +6,6 @@
     >form {
         margin: 0 auto;
     }
-
-    button[data-func="logout"] {
-        background-color: hsl(0, 69%, 57%);
-        padding: 0.5rem 1rem;
-        border-radius: 0.25rem;
-        margin: 1rem auto;
-    }
 }
 
 .images {
@@ -41,6 +34,7 @@
 
     div {
         position: relative;
+
         &::after {
             content: "";
             position: absolute;
@@ -63,4 +57,11 @@
         width: 100%;
         object-fit: cover;
     }
+}
+
+.dangerBtn {
+    background-color: hsl(0, 69%, 57%);
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    margin: 1rem auto;
 }

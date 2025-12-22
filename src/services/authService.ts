@@ -24,21 +24,6 @@ export const checkSessionFn = createIsomorphicFn().server(async () => {
     })
 })
 
-export const getSessionFn = createIsomorphicFn().server(async () => {
-    const headers = getRequestHeaders()
-    const session = await auth.api.getSession({
-        headers
-    })
-    if (!session) throw redirect({ to: "/auth/signin" })
-    return session.user
-
-}).client(async () => {
-    const session = authClient.useSession()
-    const data = session().data
-    if (!data) throw redirect({ to: "/auth/signin" })
-    return data.user
-})
-
 export const getProfileFn = createServerFn().handler(async () => {
     const headers = getRequestHeaders();
     const session = await auth.api.getSession({
@@ -47,21 +32,7 @@ export const getProfileFn = createServerFn().handler(async () => {
     if (!session) throw redirect({ to: "/auth/signin" })
     const user = (await userRepository.findById(session.user.id)).at(0);
     if (!user) {
-        await auth.api.revokeSession({
-            headers,
-            body: {
-                token: session.session.token
-            }
-        })
-        throw redirect({
-            to: "/auth/signin", search: {
-                toasts: [{
-                    text: "Please login again",
-                    type: "warning",
-                    autoFade: false
-                }]
-            }
-        })
+        return forceLogin()
     }
     return user
 })
@@ -89,4 +60,20 @@ export const revokeSession = createServerFn()
                     token: session.session.token
                 }
             })
+    })
+
+export const forceLogin = createServerFn()
+    .handler(async () => {
+        await revokeSession()
+        throw redirect({
+            to: "/auth/signin",
+            search: {
+                toasts: [{
+                    text: "Please login again",
+                    type: "warning",
+                    autoFade: false
+                }]
+            },
+            reloadDocument: true
+        })
     })

@@ -1,15 +1,17 @@
-import { notFound } from "@tanstack/solid-router";
+import { notFound, redirect } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start";
 import z from "zod";
 import * as userRepository from "~/repositories/userRepository"
-import { getCurrentUserId, revokeSession } from "./authService";
+import { forceLogin, getCurrentUserId } from "./authService";
 
 export const getLoggedInUser = createServerFn()
     .handler(async () => {
         const id = await getCurrentUserId()
         if (!id) throw notFound()
         const user = (await userRepository.findById(id)).at(0)
-        if (!user) throw notFound()
+        if (!user) {
+            return forceLogin()
+        }
         return user
     })
 
@@ -39,17 +41,12 @@ export const updateCurrentUser = createServerFn()
     .handler(async ({ data }) => {
         const id = await getCurrentUserId()
         if (!id) {
-            await revokeSession()
-            throw Response.json({error: "User not found"}, { status: 400 })
+            return forceLogin()
         }
         if (Object.keys(data).length === 0) throw Response.json({error: "Nothing to update"}, { status: 400 })
 
         try {
-            const result = await userRepository.updateUser(id, data);
-            if (result.rowCount === 0) {
-                await revokeSession();
-                return Response.json({error: "Please login again"})
-            }
+            await userRepository.updateUser(id, data);
             return new Response(null, { status: 200 })
         } 
         catch (error) {
