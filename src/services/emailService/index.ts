@@ -1,5 +1,5 @@
 import { ConsoleService } from "./ConsoleService"
-import { NodemailService } from "./nodeMailerService"
+import { NodemailService } from "./NodeMailerService"
 
 export type EmailOptions = {
     to: string

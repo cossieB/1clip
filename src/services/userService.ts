@@ -2,13 +2,14 @@ import { notFound, redirect } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start";
 import z from "zod";
 import * as userRepository from "~/repositories/userRepository"
-import { forceLogin, getCurrentUserId } from "./authService";
+import { forceLogin, getCurrentUser as getCurrentUser } from "./authService";
+import { uploadFromServer } from "./uploadService/vercelUploadService";
 
 export const getLoggedInUser = createServerFn()
     .handler(async () => {
-        const id = await getCurrentUserId()
-        if (!id) throw notFound()
-        const user = (await userRepository.findById(id)).at(0)
+        const session = await getCurrentUser()
+        if (!session) throw notFound()
+        const user = (await userRepository.findById(session.id)).at(0)
         if (!user) {
             return forceLogin()
         }
@@ -29,27 +30,46 @@ export const getUserByIdFn = createServerFn()
     })
     .handler(async ({ data }) => userRepository.findById(data))
 
-export const updateCurrentUser = createServerFn()
-    .inputValidator(z.object({
-        displayName: z.string().min(3).max(15).optional(),
-        bio: z.string().max(255).optional(),
-        image: z.url().optional(),
-        banner: z.url().optional(),
-        dob: z.iso.date().nullish(),
-        location: z.string().max(100).nullish()
-    }))
+export const updateCurrentUser = createServerFn({ method: "POST" })
+    .inputValidator((fd: unknown) => {
+        if (fd instanceof FormData) return fd
+        throw new Response(null, { status: 400 })
+    })
     .handler(async ({ data }) => {
-        const id = await getCurrentUserId()
-        if (!id) {
-            return forceLogin()
-        }
-        if (Object.keys(data).length === 0) throw Response.json({error: "Nothing to update"}, { status: 400 })
+
+        const user = await getCurrentUser()
+        if (!user) throw new Response(null, { status: 401 })
+
+        const UserUpdateSchema = z.object({
+            displayName: z.string().min(3).max(15).optional(),
+            bio: z.string().max(255).optional(),
+            image: z.instanceof(File)
+                .refine(file => file.type.startsWith("image/"))
+                .refine(file => file.size < 2500000, "File too large")
+                .optional(),
+            banner: z.instanceof(File)
+                .refine(file => file.type.startsWith("image/"))
+                .refine(file => file.size < 2500000, "File too large")
+                .optional(),
+            dob: z.iso.date().nullish(),
+            location: z.string().max(100).nullish()
+        })
+        const obj = Object.fromEntries(data.entries())
+        const parsed = UserUpdateSchema.parse(obj)
+        if (Object.keys(parsed).length === 0) throw Response.json({ error: "Nothing to update" }, { status: 400 })
+
+        const prom1 = parsed.image && uploadFromServer(parsed.image, `users/${user.id}/avatars/${parsed.image.name}`)
+        const prom2 = parsed.banner && uploadFromServer(parsed.banner, `users/${user.id}/banners/${parsed.banner.name}`)
 
         try {
-            await userRepository.updateUser(id, data);
+            const [avatar, banner] = await Promise.all([prom1, prom2])
+            await userRepository.updateUser(user.id, {
+                ...parsed, image: avatar?.url, banner: banner?.url
+            });
             return new Response(null, { status: 200 })
-        } 
+        }
         catch (error) {
-            throw Response.json({error: "Something went wrong"}, { status: 500 })
+            console.log(error)
+            throw Response.json({ error: "Something went wrong" }, { status: 500 })
         }
     })

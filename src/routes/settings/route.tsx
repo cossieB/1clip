@@ -3,12 +3,12 @@ import { createServerFn } from '@tanstack/solid-start'
 import { Show } from 'solid-js'
 import { authClient } from '~/auth/authClient'
 import { NavTabs } from '~/components/NavTabs/NavTabs'
-import { checkSessionFn, getCurrentUserId } from '~/services/authService'
+import { checkSessionFn, getCurrentUser } from '~/services/authService'
 
 const getSessionFn = createServerFn()
     .inputValidator((str: string) => str)
     .handler(async ({ data }) => {
-        const id = await getCurrentUserId()
+        const id = await getCurrentUser()
         if (!id) throw redirect({ to: "/auth/signin", search: { redirect: data }, reloadDocument: true })
     })
 

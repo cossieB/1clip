@@ -11,12 +11,18 @@ import { updateCurrentUser } from "~/services/userService";
 import { useServerFn } from "@tanstack/solid-start";
 import { useMutation, useQueryClient } from "@tanstack/solid-query";
 import { useLogout } from "~/hooks/useLogout";
+import { onCleanup } from "solid-js";
 
 export function Profile(props: { user: Awaited<ReturnType<typeof getLoggedInUser>> }) {
     const action = useServerFn(updateCurrentUser);
     const { addToast } = useToastContext()
     const queryClient = useQueryClient()
     const logout = useLogout()
+    const abortController = new AbortController()
+
+    onCleanup(() => {
+        abortController.abort()
+    })
 
     const mutation = useMutation(() => ({
         mutationFn: action,
@@ -29,15 +35,23 @@ export function Profile(props: { user: Awaited<ReturnType<typeof getLoggedInUser
             addToast({ text: error.message, type: "error" })
         },
     }))
-    
+
     const [user, setUser] = createStore<typeof props.user>(JSON.parse(JSON.stringify(props.user)))
+    const [files, setFiles] = createStore<{avatar?: File, banner?: File}>({})
 
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault();
+
         const obj = objectDifference(user, props.user);
-        if (Object.keys(obj).length == 0) return addToast({text: "Nothing to update", type: "warning"});
-        const res = await mutation.mutateAsync({ data: obj })
- 
+        if (Object.keys(obj).length == 0) return addToast({ text: "Nothing to update", type: "warning" });
+        const fd = new FormData()
+        console.log(files.avatar, files.banner)
+        files.avatar && fd.append("image", files.avatar)
+        files.banner && fd.append("banner", files.banner)
+        const res = await mutation.mutateAsync({ 
+            data: fd, 
+            signal: abortController.signal })
+
     }
 
     return (
@@ -54,12 +68,18 @@ export function Profile(props: { user: Awaited<ReturnType<typeof getLoggedInUser
                     <div class={styles.images}>
                         <UploadBox
                             label="Avatar"
-                            onSuccess={src => setUser({ image: src })}
+                            onSuccess={(src, file) => {
+                                setUser({ image: src })
+                                setFiles({avatar: file})
+                            }}
                             maxSize={1}
                         />
                         <UploadBox
                             label="Banner"
-                            onSuccess={src => setUser({ banner: src })}
+                            onSuccess={(src, file) => {
+                                setUser({ banner: src })
+                                setFiles({banner: file})
+                            }}
                             maxSize={1}
                         />
                         <div class={styles.preview}>
@@ -78,6 +98,12 @@ export function Profile(props: { user: Awaited<ReturnType<typeof getLoggedInUser
                         field="location"
                         setter={val => setUser({ location: val })}
                         value={user.location ?? ""}
+                    />
+                    <Form.Input<typeof user>
+                        field="dob"
+                        setter={val => setUser({ dob: val })}
+                        value={user.dob ?? ""}
+                        type="date"
                     />
                 </Form>
             </FormProvider>

@@ -37,14 +37,14 @@ export const getProfileFn = createServerFn().handler(async () => {
     return user
 })
 
-export const getCurrentUserId = createServerFn()
+export const getCurrentUser = createServerFn()
     .handler(async () => {
         const headers = getRequestHeaders();
         const session = await auth.api.getSession({
             headers
         })
         if (!session) return null
-        return session.user.id
+        return session.user
     })
 
 export const revokeSession = createServerFn()

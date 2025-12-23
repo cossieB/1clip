@@ -1,16 +1,24 @@
 import { UploadIcon } from "lucide-solid"
 import { useToastContext } from "~/hooks/useToastContext"
 import styles from "./UploadBox.module.css"
+import { upload } from "@vercel/blob/client"
+import { onCleanup } from "solid-js"
 
 type P = {
     label: string
-    onSuccess: (src: string) => void
+    onSuccess: (objectUrl: string, file: File) => void
     /**in MB */
     maxSize: number
 }
 
 export function UploadBox(props: P) {
     const { addToast } = useToastContext()
+    const objectUrls: string[] = []
+
+    onCleanup(() => {
+        objectUrls.forEach(url => URL.revokeObjectURL(url))
+    })
+
     return (
         <div
             class={styles.uploadBox}            
@@ -19,9 +27,8 @@ export function UploadBox(props: P) {
                 if (!e.dataTransfer) return
                 const file = e.dataTransfer.files.item(0)
                 if (!file) return
-                console.log(file.type)
             }}
-            ondrop={e => {
+            ondrop={async e => {
                 e.preventDefault()
                 if (!e.dataTransfer) return
                 const file = e.dataTransfer.files.item(0)
@@ -30,8 +37,11 @@ export function UploadBox(props: P) {
                     return addToast({ text: "Invalid Image", type: "error" })
                 if (file.size > props.maxSize * 1024 * 1024)
                     return addToast({ text: "Image too large", type: "error" })
-                const url = e.dataTransfer.getData("URL")
-                if (url) return props.onSuccess(url)
+                
+                const objUrl = URL.createObjectURL(file)
+                props.onSuccess(objUrl, file)
+                objectUrls.push(objUrl)
+
             }}
         >
             <label>{props.label}</label>

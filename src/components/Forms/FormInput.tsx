@@ -1,6 +1,5 @@
-import { createSignal, For, Show, splitProps, type ComponentProps, type Setter } from "solid-js"
+import { For, splitProps, type ComponentProps } from "solid-js"
 import styles from "./Forms.module.css"
-import { CircleQuestionMarkIcon } from "lucide-solid"
 import { useFormContext } from "~/hooks/useFormContext"
 import titleCase from "~/lib/titleCase"
 
