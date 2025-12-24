@@ -1,7 +1,8 @@
 import { and, eq, getColumns, inArray, SQL, sql } from "drizzle-orm";
 import { db } from "~/drizzle/db";
-import { actors, developersView, gameActors, gamePlatforms, games, gamesView, gameTags, platforms, publishersView } from "~/drizzle/schema/schema";
 import type { ActorView, PlatformView } from "~/drizzle/models";
+import { gameActors, gamePlatforms, gameGenres, actors, platforms } from "~/drizzle/schema/schema";
+import { gamesView, publishersView, developersView } from "~/drizzle/schema/views";
 
 export async function findAll() {
     try {
@@ -58,9 +59,9 @@ export async function findByTag(tag: string) {
             inArray(
                 gamesView.gameId,
                 db
-                    .select({gameId: gameTags.gameId})
-                    .from(gameTags)
-                    .where(eq(gameTags.tagName, tag))
+                    .select({gameId: gameGenres.gameId})
+                    .from(gameGenres)
+                    .where(eq(gameGenres.genre, tag))
             )
         ]
     })
@@ -102,11 +103,11 @@ function gameUtil(obj?: { filters?: SQL[] }) {
 
     const tagQuery = db.$with("tq").as(
         db.select({
-            gameId: gameTags.gameId,
+            gameId: gameGenres.gameId,
             tags: sql`ARRAY_AGG(game_tags.tag_name ORDER BY game_tags.tag_name)`.as("tags")
         })
-            .from(gameTags)
-            .groupBy(gameTags.gameId)
+            .from(gameGenres)
+            .groupBy(gameGenres.gameId)
     )
 
     const gamesQuery = db

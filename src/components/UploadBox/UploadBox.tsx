@@ -23,9 +23,6 @@ export function UploadBox(props: P) {
             class={styles.uploadBox}            
             onDragOver={e => {
                 e.preventDefault()
-                if (!e.dataTransfer) return
-                const file = e.dataTransfer.files.item(0)
-                if (!file) return
             }}
             ondrop={async e => {
                 e.preventDefault()
@@ -40,7 +37,6 @@ export function UploadBox(props: P) {
                 const objUrl = URL.createObjectURL(file)
                 props.onSuccess(objUrl, file)
                 objectUrls.push(objUrl)
-
             }}
         >
             <label>{props.label}</label>
