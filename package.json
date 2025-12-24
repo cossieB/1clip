@@ -11,13 +11,15 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.957.0",
+    "@aws-sdk/lib-storage": "^3.958.0",
+    "@aws-sdk/s3-request-presigner": "^3.958.0",
     "@tanstack/solid-query": "^5.90.9",
     "@tanstack/solid-query-devtools": "^5.90.0",
     "@tanstack/solid-router": "^1.141.1",
     "@tanstack/solid-router-devtools": "^1.141.1",
     "@tanstack/solid-router-ssr-query": "^1.141.1",
     "@tanstack/solid-start": "^1.141.1",
-    "@vercel/blob": "^2.0.0",
     "better-auth": "^1.4.7",
     "drizzle-orm": "^1.0.0-beta.2-b782ae1",
     "lucide-solid": "^0.562.0",

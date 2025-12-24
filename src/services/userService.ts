@@ -3,7 +3,8 @@ import { createServerFn } from "@tanstack/solid-start";
 import z from "zod";
 import * as userRepository from "~/repositories/userRepository"
 import { forceLogin, getCurrentUser as getCurrentUser } from "./authService";
-import { uploadFromServer } from "./uploadService/vercelUploadService";
+import * as uploadService from "~/services/uploadService/cloudflareUploadService"
+import assert from "node:assert";
 
 export const getLoggedInUser = createServerFn()
     .handler(async () => {
@@ -36,7 +37,8 @@ export const updateCurrentUser = createServerFn({ method: "POST" })
         throw new Response(null, { status: 400 })
     })
     .handler(async ({ data }) => {
-
+        const r2Domain = process.env.R2_DOMAIN
+        assert(r2Domain)
         const user = await getCurrentUser()
         if (!user) throw new Response(null, { status: 401 })
 
@@ -58,13 +60,16 @@ export const updateCurrentUser = createServerFn({ method: "POST" })
         const parsed = UserUpdateSchema.parse(obj)
         if (Object.keys(parsed).length === 0) throw Response.json({ error: "Nothing to update" }, { status: 400 })
 
-        const prom1 = parsed.image && uploadFromServer(parsed.image, `users/${user.id}/avatars/${parsed.image.name}`)
-        const prom2 = parsed.banner && uploadFromServer(parsed.banner, `users/${user.id}/banners/${parsed.banner.name}`)
+        const prom1 = parsed.image && uploadService.uploadFromServer(parsed.image, `users/${user.id}/avatars/`)
+        const prom2 = parsed.banner && uploadService.uploadFromServer(parsed.banner, `users/${user.id}/banners/`)
 
         try {
             const [avatar, banner] = await Promise.all([prom1, prom2])
+
             await userRepository.updateUser(user.id, {
-                ...parsed, image: avatar?.url, banner: banner?.url
+                ...parsed, 
+                image: avatar ? r2Domain+avatar.Key : undefined, 
+                banner: banner ? r2Domain + banner.Key : undefined
             });
             return new Response(null, { status: 200 })
         }

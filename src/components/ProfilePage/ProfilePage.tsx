@@ -56,6 +56,7 @@ export function Profile(props: { user: Awaited<ReturnType<typeof getLoggedInUser
 
     return (
         <div class={`${styles.profile} flexCenter`}>
+            <img src="https://r2.cossie.dev/users/019b4b5c-d7db-7e08-9afb-86af0733445c/avatars/v83849tobz7f1.jpeg" alt="" />
             <FormProvider>
                 <Form onSubmit={handleSubmit} isPending={mutation.isPending}>
                     <Form.Input<typeof user>

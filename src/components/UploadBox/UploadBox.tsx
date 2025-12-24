@@ -1,7 +1,6 @@
 import { UploadIcon } from "lucide-solid"
 import { useToastContext } from "~/hooks/useToastContext"
 import styles from "./UploadBox.module.css"
-import { upload } from "@vercel/blob/client"
 import { onCleanup } from "solid-js"
 
 type P = {
