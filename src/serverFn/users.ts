@@ -2,7 +2,7 @@ import { notFound, redirect } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start";
 import z from "zod";
 import * as userRepository from "~/repositories/userRepository"
-import { forceLogin, getCurrentUser as getCurrentUser } from "./authService";
+import { forceLogin, getCurrentUser as getCurrentUser } from "./auth";
 import * as uploadService from "~/services/uploadService/cloudflareUploadService"
 import assert from "node:assert";
 import { authedMiddleware } from "~/middleware/authorization";

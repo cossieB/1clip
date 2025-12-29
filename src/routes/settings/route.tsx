@@ -3,7 +3,7 @@ import { createServerFn } from '@tanstack/solid-start'
 import { Show } from 'solid-js'
 import { authClient } from '~/auth/authClient'
 import { NavTabs } from '~/components/NavTabs/NavTabs'
-import { checkSessionFn, getCurrentUser } from '~/services/authService'
+import { checkSessionFn, getCurrentUser } from '~/serverFn/auth'
 
 const getSessionFn = createServerFn()
     .inputValidator((str: string) => str)

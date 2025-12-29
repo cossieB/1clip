@@ -1,4 +1,4 @@
-import { type getGameFn } from "~/services/gamesService"
+import { type getGameFn } from "~/serverFn/games"
 import styles from "./GamePage.module.css"
 import { LogoLink } from "../LogoLink/LogoLink"
 import { For, Show } from "solid-js"

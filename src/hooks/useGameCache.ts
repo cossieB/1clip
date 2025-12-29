@@ -1,6 +1,6 @@
 import { useQueryClient, UseQueryResult } from "@tanstack/solid-query"
 import { createEffect } from "solid-js"
-import { type getGamesFn } from "~/services/gamesService"
+import { type getGamesFn } from "~/serverFn/games"
 
 export function useGamesCache(result: UseQueryResult<Awaited<ReturnType<typeof getGamesFn>>> ) {
     const queryClient = useQueryClient()

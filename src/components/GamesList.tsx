@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/solid-query"
-import type { getGamesFn } from "~/services/gamesService"
+import type { getGamesFn } from "~/serverFn/games"
 import { PhotoCardGrid } from "./CardLink/PhotoCardLink"
 import { useGamesCache } from "~/hooks/useGameCache"
 

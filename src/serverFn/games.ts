@@ -1,5 +1,5 @@
 import { notFound } from "@tanstack/solid-router";
-import { createServerFn } from "@tanstack/solid-start";
+import { createServerFn } from "@tanstack/solid-start"
 import * as gamesRepository from "~/repositories/gamesRepository";
 
 export const getGamesFn = createServerFn().handler(() => gamesRepository.findAll())

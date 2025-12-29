@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/solid-query'
 import { createFileRoute } from '@tanstack/solid-router'
 import { Suspense, For, createEffect } from 'solid-js'
 import { LogoLink } from '~/components/LogoLink/LogoLink'
-import { getPlatformsFn } from '~/services/platformService'
+import { getPlatformsFn } from '~/serverFn/platforms'
 import styles from "~/lists.module.css"
 
 export const Route = createFileRoute('/platforms/')({

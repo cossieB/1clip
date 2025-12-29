@@ -6,8 +6,8 @@ import { Form } from '~/components/Forms/Form'
 import { FormProvider } from '~/components/Forms/FormContext'
 import { UploadBox } from '~/components/UploadBox/UploadBox'
 import { useGamesCache } from '~/hooks/useGameCache'
-import { getCurrentUser } from '~/services/authService'
-import { getGamesFn } from '~/services/gamesService'
+import { getCurrentUser } from '~/serverFn/auth'
+import { getGamesFn } from '~/serverFn/games'
 
 export const Route = createFileRoute('/create')({
     component: RouteComponent,

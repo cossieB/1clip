@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/solid-router'
 import { GamesList } from '~/components/GamesList'
-import { getGamesByGenreFn } from '~/services/gamesService'
+import { getGamesByGenreFn } from '~/serverFn/games'
 
 export const Route = createFileRoute('/games/genres/$genre')({
     component: RouteComponent,

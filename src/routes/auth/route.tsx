@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet } from '@tanstack/solid-router'
 import z from 'zod'
-import { checkSessionFn } from '~/services/authService'
+import { checkSessionFn } from '~/serverFn/auth'
 
 export const Route = createFileRoute('/auth')({
     component: RouteComponent,

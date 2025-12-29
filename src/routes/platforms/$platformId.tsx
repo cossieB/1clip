@@ -4,8 +4,8 @@ import { Suspense } from 'solid-js'
 import { CompanyPage } from '~/components/CompanyPage/CompanyPage'
 import { GamesList } from '~/components/GamesList'
 import { NotFound } from '~/components/NotFound'
-import { getGamesByPlatformFn } from '~/services/gamesService'
-import { getPlatformFn } from '~/services/platformService'
+import { getGamesByPlatformFn } from '~/serverFn/games'
+import { getPlatformFn } from '~/serverFn/platforms'
 
 export const Route = createFileRoute('/platforms/$platformId')({
     component: RouteComponent,

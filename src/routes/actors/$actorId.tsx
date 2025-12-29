@@ -3,8 +3,9 @@ import { createFileRoute } from '@tanstack/solid-router'
 import { Suspense } from 'solid-js'
 import { CompanyPage } from '~/components/CompanyPage/CompanyPage'
 import { GamesList } from '~/components/GamesList'
-import { getActorFn } from '~/services/actorService'
-import { getGamesByActorFn } from '~/services/gamesService'
+import { getActorFn } from '~/serverFn/actors'
+import { getGamesByActorFn } from '~/serverFn/games'
+
 
 export const Route = createFileRoute('/actors/$actorId')({
     component: RouteComponent,

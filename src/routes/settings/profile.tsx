@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/solid-query'
 import { createFileRoute } from '@tanstack/solid-router'
 import { createEffect, Show, Suspense } from 'solid-js'
 import { Profile } from '~/components/ProfilePage/ProfilePage'
-import { getLoggedInUser } from '~/services/userService'
+import { getLoggedInUser } from '~/serverFn/users'
 
 export const Route = createFileRoute('/settings/profile')({
     component: RouteComponent,

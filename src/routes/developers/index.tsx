@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/solid-query'
 import { createFileRoute } from '@tanstack/solid-router'
 import { createEffect, For, Suspense } from 'solid-js'
 import { LogoLink } from '~/components/LogoLink/LogoLink'
-import { getDevelopersFn } from '~/services/developerService'
+import { getDevelopersFn } from '~/serverFn/developers'
 import styles from "~/lists.module.css"
 
 export const Route = createFileRoute('/developers/')({

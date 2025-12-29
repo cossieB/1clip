@@ -1,5 +1,5 @@
 import { createMiddleware } from "@tanstack/solid-start"
-import { getCurrentUser } from "~/services/authService"
+import { getCurrentUser } from "~/serverFn/auth"
 
 export const authedMiddleware = createMiddleware()
     .server(async ({ next }) => {

@@ -1,5 +1,5 @@
 import { createStore, unwrap } from "solid-js/store";
-import { getLoggedInUser } from "~/services/userService";
+import { getLoggedInUser } from "~/serverFn/users";
 import { Form } from "../Forms/Form";
 import { FormProvider } from "../Forms/FormContext";
 import styles from "./ProfilePage.module.css"
@@ -7,7 +7,7 @@ import { ConfirmPopover } from "../Popover/Popover";
 import { useToastContext } from "~/hooks/useToastContext";
 import { UploadBox } from "../UploadBox/UploadBox";
 import { objectDifference } from "~/lib/objectDifference";
-import { updateCurrentUser } from "~/services/userService";
+import { updateCurrentUser } from "~/serverFn/users";
 import { useServerFn } from "@tanstack/solid-start";
 import { useMutation, useQueryClient } from "@tanstack/solid-query";
 import { useLogout } from "~/hooks/useLogout";
@@ -73,8 +73,11 @@ export function Profile(props: { user: Awaited<ReturnType<typeof getLoggedInUser
             if (keys.banner) setUser('banner', keys.banner)
             if (keys.image) setUser('image', keys.image)
 
-            await mutation.mutateAsync({data: user, signal: abortController.signal},)
-        } 
+            const obj = objectDifference(user, props.user)
+            if (Object.keys(obj).length === 0) return addToast({text: "Nothing to update", type: "warning"})
+
+            await mutation.mutateAsync({ data: obj, signal: abortController.signal },)
+        }
         catch (error) {
             addToast({ text: "Something went wrong. Please try again later", type: "error" })
         }

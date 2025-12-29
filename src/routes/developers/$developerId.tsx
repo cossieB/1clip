@@ -4,8 +4,8 @@ import { Suspense } from 'solid-js'
 import { CompanyPage } from '~/components/CompanyPage/CompanyPage'
 import { GamesList } from '~/components/GamesList'
 import { NotFound } from '~/components/NotFound'
-import { getDeveloperFn } from '~/services/developerService'
-import { getGamesByDeveloperFn } from '~/services/gamesService'
+import { getDeveloperFn } from '~/serverFn/developers'
+import { getGamesByDeveloperFn } from '~/serverFn/games'
 
 export const Route = createFileRoute('/developers/$developerId')({
     component: RouteComponent,
