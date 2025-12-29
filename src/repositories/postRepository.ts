@@ -12,12 +12,12 @@ type PostInsert = {
 
 export function createPost(obj: PostInsert) {
     return db.transaction(async tx => {
-        const insert = await tx.insert(posts).values(obj).returning({postId: posts.postId})
-        const postId = insert[0].postId
+        const insert = await tx.insert(posts).values(obj).returning()
+        const post = insert[0]
         if (obj.tags.length > 0)
-            await tx.insert(postTags).values(obj.tags.map(tag => ({postId, tag})))
-        return postId
-    })
+            await tx.insert(postTags).values(obj.tags.map(tag => ({postId: post.postId, tag})))
+        return post
+    })    
 }
 
 export function findAll() {
@@ -25,4 +25,13 @@ export function findAll() {
 
     })
     .from(posts)
+}
+
+export function findById(postId: number) {
+    return db.query.posts.findFirst({
+        where: {
+            postId
+        },
+        
+    })
 }

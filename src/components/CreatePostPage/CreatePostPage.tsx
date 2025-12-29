@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from "@tanstack/solid-query"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/solid-query"
 import { useServerFn } from "@tanstack/solid-start"
 import { onCleanup, createSignal, For, Suspense } from "solid-js"
 import { createStore } from "solid-js/store"
@@ -11,8 +11,13 @@ import { FormProvider } from "../Forms/FormContext"
 import { UploadBox } from "../UploadBox/UploadBox"
 import { Form } from "../Forms/Form"
 import styles from "./CreatePostPage.module.css"
+import { useToastContext } from "~/hooks/useToastContext"
+import { useNavigate } from "@tanstack/solid-router"
 
 export function CreatePostPage() {
+    const {addToast} = useToastContext()
+    const queryClient = useQueryClient()
+    const navigate = useNavigate()
     const result = useQuery(() => ({
         queryKey: ["games"],
         queryFn: () => getGamesFn()
@@ -49,14 +54,23 @@ export function CreatePostPage() {
                 ...rest,
                 gameId: input.game?.gameId,
                 media: files.map(f => import.meta.env.VITE_STORAGE_DOMAIN + f.key),
-            }
+            },
+            signal: abortController.signal
+        }, {
+            onError(error, variables, onMutateResult, context) {
+                addToast({text: error.message, type: "error"})
+            },
+            onSuccess(response, variables) {
+                queryClient.setQueryData(["posts", response.postId], response)
+                navigate({to: "/posts/$postId", params: {postId: response.postId}})
+            },
         })
     }
     return (
         <div class='flexCenter'>
             <FormProvider>
                 <Form
-                    disabled={!input.title}
+                    disabled={!input.title || input.text.length + input.media.length == 0}
                     isPending={mutation.isPending || isUploading()}
                     onSubmit={handleSubmit}
                 >
