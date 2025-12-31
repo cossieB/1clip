@@ -13,9 +13,10 @@ import { Form } from "../Forms/Form"
 import styles from "./CreatePostPage.module.css"
 import { useToastContext } from "~/hooks/useToastContext"
 import { useNavigate } from "@tanstack/solid-router"
+import { sanitizeText } from "~/utils/sanitizeText"
 
 export function CreatePostPage() {
-    const {addToast} = useToastContext()
+    const { addToast } = useToastContext()
     const queryClient = useQueryClient()
     const navigate = useNavigate()
     const result = useQuery(() => ({
@@ -43,28 +44,37 @@ export function CreatePostPage() {
 
     let files: { file: File, signedUrl: string, key: string }[] = []
     const [isUploading, setIsUploading] = createSignal(false)
+    const [preview, setPreview] = createSignal("")
     async function handleSubmit(e: SubmitEvent) {
         const { game, ...rest } = input
         e.preventDefault();
-        setIsUploading(true)
-        await Promise.all(files.map(file => uploadToSignedUrl(file.signedUrl, file.file, { signal: abortController.signal })))
-        setIsUploading(false)
-        mutation.mutateAsync({
-            data: {
-                ...rest,
-                gameId: input.game?.gameId,
-                media: files.map(f => import.meta.env.VITE_STORAGE_DOMAIN + f.key),
-            },
-            signal: abortController.signal
-        }, {
-            onError(error, variables, onMutateResult, context) {
-                addToast({text: error.message, type: "error"})
-            },
-            onSuccess(response, variables) {
-                queryClient.setQueryData(["posts", response.postId], response)
-                navigate({to: "/posts/$postId", params: {postId: response.postId}})
-            },
-        })
+        try {
+            setIsUploading(true)
+            await Promise.all(files.map(file => uploadToSignedUrl(file.signedUrl, file.file, { signal: abortController.signal })))
+            setIsUploading(false)
+            mutation.mutate({
+                data: {
+                    ...rest,
+                    gameId: input.game?.gameId,
+                    media: files.map(f => ({
+                        contentType: f.file.type,
+                        key: f.key
+                    })),
+                },
+                signal: abortController.signal
+            }, {
+                onError(error, variables, onMutateResult, context) {
+                    addToast({ text: error.message, type: "error" })
+                },
+                onSuccess(response, variables) {
+                    queryClient.invalidateQueries({ queryKey: ["posts"] })
+                    navigate({ to: "/posts/$postId", params: { postId: response.postId } })
+                },
+            })
+        } 
+        catch (error) {
+            addToast({text: "Something went wrong. Please try again later", type: "error"})
+        }
     }
     return (
         <div class='flexCenter'>
@@ -112,10 +122,14 @@ export function CreatePostPage() {
                     </div>
                     <Form.Textarea<typeof input>
                         field="text"
-                        setter={val => setInput({ text: val })}
+                        setter={val => {
+                            setInput({ text: val });
+                            sanitizeText(val).then(str => setPreview(str))
+                        }}
                         value={input.text}
                         maxLength={255}
                     />
+                    <div innerHTML={preview()} />
                     <Suspense>
                         <Form.FormSelect<typeof input>
                             selected={input.game ? { label: input.game.title, value: input.game.gameId } : null}
@@ -131,7 +145,7 @@ export function CreatePostPage() {
                     <Form.TagsInput
                         tagLimit={5}
                         tags={() => input.tags}
-                        setTags={tags => setInput({ tags })}
+                        setTags={tags => setInput('tags', tags)}
                     />
                 </Form>
             </FormProvider>

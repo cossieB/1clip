@@ -26,6 +26,14 @@ h6 {
   font-family: 'Press Start 2p', system-ui;
 }
 
+strong {
+  font-weight: bold;
+}
+
+em {
+  font-style: italic;
+}
+
 a {
   text-decoration: none;
   color: unset;

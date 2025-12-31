@@ -5,21 +5,20 @@ import styles from "./TagsInput.module.css"
 type Props = {
     tagLimit?: number
     tags: Accessor<string[]>
-    setTags: (tags: string[]) => void
+    setTags: Setter<string[]>
 }
 
 export function TagsInput(initialProps: Props) {
     const props = mergeProps({ tagLimit: Infinity }, initialProps)
     let inputEl!: HTMLInputElement
     const [input, setInput] = createSignal("")
-    const [tags, setTags] = createSignal<string[]>([])
 
-    const isDisabled = () => tags().length >= props.tagLimit
+    const isDisabled = () => props.tags().length >= props.tagLimit
 
     function addTag(val: string) {
         if (isDisabled()) return
-        if (val.length == 0 || tags().includes(val)) return
-        setTags(prev => [...prev, val])
+        if (val.length == 0 || props.tags().includes(val)) return
+        props.setTags(prev => [...prev, val])
         setInput("")
         inputEl.focus()
     }
@@ -49,10 +48,10 @@ export function TagsInput(initialProps: Props) {
                 }
             }}
         >
-            <For each={tags()}>
+            <For each={props.tags()}>
                 {tag => <Tag
                     tag={tag}
-                    removeTag={() => setTags(prev => prev.filter(x => x != tag))}
+                    removeTag={() => props.setTags(prev => prev.filter(x => x != tag))}
                 />}
             </For>
             <input

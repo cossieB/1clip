@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/solid-query'
 import { createFileRoute } from '@tanstack/solid-router'
 import { Suspense } from 'solid-js'
+import { Carousel } from '~/components/Carousel'
 import { getPostFn } from '~/serverFn/posts'
 
 export const Route = createFileRoute('/posts/$postId')({
@@ -28,7 +29,15 @@ function RouteComponent() {
         <Suspense>
             <div>
                 <h1> {result.data!.title} </h1>
-                <p>{result.data!.text}</p>
+                <div innerHTML={result.data!.text} />
+                <Carousel
+                    media={result.data!.media.map(m => ({
+                        url: import.meta.env.VITE_STORAGE_DOMAIN + m.key,
+                        contentType: m.contentType
+                    }))}
+                    showNextBtn
+                    showPrevBtn
+                />
             </div>
         </Suspense>
     )

@@ -2,9 +2,7 @@
     position: relative;
     overflow: hidden;
     display: flex;
-    gap: 0.5rem;
     --idx: 0;
-    --start: 0%;
 
     >div {
         aspect-ratio: 16 / 9;
@@ -16,9 +14,14 @@
         border-radius: 1rem;
         overflow: hidden;
         box-shadow: 0 0 10px 1px black;
+        display: flex;
+        justify-content: center;
+        background-color: var(--gray1);
     }
 
     @media (width > 1024px) {
+        gap: 0.5rem;
+
         >div {
             width: 50%;
             translate: calc(50% - var(--idx) * 100%);

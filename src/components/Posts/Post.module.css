@@ -1,0 +1,121 @@
+.container {
+    width: min(90%, 800px);
+    margin: 1rem auto;
+    display: flex;
+    flex-direction: column;
+
+    @media (width > 768px) {
+        flex-direction: row;
+    }
+
+    h2 {
+        flex: 1;
+        text-overflow: ellipsis;
+    }
+
+}
+
+.user {
+    display: flex;
+    flex-direction: row;
+    width: 2.5rem;
+    flex-shrink: 0;
+    font-size: small;
+    align-items: center;
+    gap: 0.5rem;
+    @media (width > 768px) {
+        flex-direction: column;
+        width: 5rem;
+    }
+
+    >img {
+        width: 100%;
+        aspect-ratio: 1;
+    }
+}
+
+.tags {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    font-size: 0.6rem;
+    
+    >div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: var(--gray1);
+        padding: 0.75rem;
+        box-shadow: 0 0 10px black;
+        position: relative;
+        cursor: pointer;
+        z-index: 5;
+
+        &:hover {
+            background-color: rgb(68, 67, 67);
+        }
+    }
+
+    a {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+    }
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    position: relative;
+    flex: 1;
+
+    &:hover {
+        background-color: rgba(0 0 0 / 20%);
+    }
+
+    h2 {
+        display: inline;
+    }
+
+    .a {
+        position: absolute;
+        inset: 0;
+    }
+
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-between;
+    >div {
+        border-radius: 0.5rem;
+        width: fit-content;
+        padding: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    button {
+        z-index: 5;
+        transition: color 200ms ease;
+        &:hover {
+            color: var(--neon-green);
+        }
+        &:is(button:nth-child(2)):hover {
+            color: red
+        }
+    }
+}
+
+.header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+
+    span {
+        font-size: small;
+    }
+}

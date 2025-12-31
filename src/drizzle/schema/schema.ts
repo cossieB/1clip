@@ -1,5 +1,5 @@
 import { getColumns, sql } from "drizzle-orm";
-import { timestamp, integer, pgTable, text, varchar, primaryKey, pgEnum, pgView, jsonb, check, uuid } from "drizzle-orm/pg-core";
+import { timestamp, integer, pgTable, text, varchar, primaryKey, pgEnum, pgView, jsonb, check, uuid, foreignKey } from "drizzle-orm/pg-core";
 import { users } from "./auth";
 
 export const developers = pgTable("developers", {
@@ -92,10 +92,9 @@ export const gameGenres = pgTable("game_genres", {
 export const posts = pgTable('posts', {
     postId: integer("post_id").primaryKey().generatedAlwaysAsIdentity(),
     userId: uuid("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
-    title: varchar("title", { length: 50 }).notNull(),
-    media: text("media").array().notNull().default([]),
+    title: varchar("title", { length: 20 }).notNull(),
     gameId: integer("game_id").references(() => games.gameId, { onDelete: "set null" }),
-    text: varchar("text", { length: 255 }).notNull().default(""),
+    text: varchar("text", { length: 1000 }).notNull().default(""),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     editedOn: timestamp("edited_on", { withTimezone: true }).notNull().$onUpdateFn(() => new Date())
 })
@@ -104,39 +103,47 @@ export const comments = pgTable("comments", {
     commentId: integer("comment_id").primaryKey().generatedAlwaysAsIdentity(),
     postId: integer("post_id").primaryKey().references(() => posts.postId, { onDelete: "cascade" }),
     userId: uuid("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
-    text: varchar("text", { length: 255 }).notNull()
+    text: varchar("text", { length: 255 }).notNull(),
+    replyTo: integer("reply_to")
 }, t => [
-    check("comment_min_length", sql`LENGTH(${t.text}) > 1`)
+    check("comment_min_length", sql`LENGTH(${t.text}) > 1`),
+    foreignKey({
+        columns: [t.replyTo],
+        foreignColumns: [t.commentId]
+    })
 ])
 
 export const reactionType = pgEnum("reaction_type", ["like", "dislike"])
 
-export const reactions = pgTable("post_reactions", {
+export const postReactions = pgTable("post_reactions", {
     userId: uuid("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
     postId: integer("post_id").references(() => posts.postId, { onDelete: "cascade" }),
-    commentId: integer("comment_id").references(() => comments.commentId, {onDelete: "cascade"}),
     date: timestamp("date", { withTimezone: true }).notNull().defaultNow(),
     reaction: reactionType("reaction").notNull()
 }, t => [
     primaryKey({ columns: [t.postId, t.userId] })
 ])
 
+export const commentReactions = pgTable("comment_reactions", {
+    userId: uuid("user_id").notNull().references(() => users.id, {onDelete: 'cascade'}),
+    commentId: integer("comment_id").notNull().references(() => comments.commentId),
+    date: timestamp("date", {withTimezone: true}).notNull().defaultNow(),
+    reaction: reactionType("reaction").notNull()
+}, t => [
+    primaryKey({ columns: [t.commentId, t.userId] })
+])
+
 export const media = pgTable("media", {
     key: text("key").primaryKey(),
     contentType: varchar("content_type").notNull(),
-    postId: integer("post_id").references(() => posts.postId),
-    gameId: integer("game_id").references(() => games.gameId),
+    postId: integer("post_id").references(() => posts.postId, {onDelete: "set null"}),
+    gameId: integer("game_id").references(() => games.gameId, {onDelete: "set null"}),
     metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull().default({})
 })
 
-export const tags = pgTable("tags", {
-    tagId: integer("tag_id").primaryKey().generatedAlwaysAsIdentity(),
-    tagName: varchar("tag_name", { length: 20 }).notNull().unique(),
-})
-
 export const postTags = pgTable("post_tags", {
-    tagId: integer("tag_id").references(() => tags.tagId),
+    tagName: varchar("tag_name", {length: 10}).notNull().primaryKey(),
     postId: integer("post_id").references(() => posts.postId),
 }, table => [
-    primaryKey({ columns: [table.tagId, table.postId] })
+    primaryKey({ columns: [table.tagName, table.postId] })
 ])
