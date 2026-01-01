@@ -42,6 +42,7 @@ function RouteComponent() {
                     logo={platformResult.data!.logo}
                     name={platformResult.data!.name}
                     summary={platformResult.data!.summary}
+                    type="platform"
                 />
             </Suspense>
             <GamesList

@@ -29,6 +29,7 @@ export function getRouter() {
         defaultPreloadStaleTime: 0,
         defaultErrorComponent: DefaultCatchBoundary,
         defaultNotFoundComponent: () => <NotFound />,
+        defaultViewTransition: true
     })
     setupRouterSsrQueryIntegration({
         router,

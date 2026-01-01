@@ -1,5 +1,6 @@
 import { Show } from "solid-js"
 import styles from "./CompanyPage.module.css"
+import { useLocation } from "@tanstack/solid-router"
 
 type Props = {
     id: number,
@@ -7,9 +8,11 @@ type Props = {
     logo: string | null,
     summary: string
     showName?: boolean
+    type: "developer" | "publisher" | "platform" | "actor"
 }
 
 export function CompanyPage(props: Props) {
+    
     return (
         <div>
             <div class={styles.header} >
@@ -17,7 +20,13 @@ export function CompanyPage(props: Props) {
                     <h1>{props.name}</h1>
                 </Show>
                 <div class="cutout-wrapper">
-                    <img class="cutout" classList={{ [styles.isActor]: props.showName }} src={props.logo ?? ""} alt="" />
+                    <img 
+                    style={{"view-transition-name": `${props.type}Id${props.id}` }}
+                    class="cutout" 
+                    classList={{ [styles.isActor]: props.showName }} 
+                    src={props.logo ?? ""} 
+                    alt="" 
+                    />
                 </div>
             </div>
             <div class={`${styles.main} cutout-wrapper`}>

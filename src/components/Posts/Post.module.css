@@ -12,14 +12,19 @@
         flex: 1;
         text-overflow: ellipsis;
     }
-    a:not(.a), img, video, button, audio {
+
+    a:not(.a),
+    img,
+    video,
+    button,
+    audio,
+    [data-func="carousel"],
+    span {
         z-index: 5;
     }
+
     button {
         padding: 0.5rem;
-    }
-    [data-func="carousel"] {
-        z-index: 5;
     }
 }
 
@@ -31,6 +36,7 @@
     font-size: small;
     align-items: center;
     gap: 0.5rem;
+
     @media (width > 768px) {
         flex-direction: column;
         width: 5rem;
@@ -48,7 +54,7 @@
     gap: 0.5rem;
     flex-wrap: wrap;
     font-size: 0.6rem;
-    
+
     >div {
         display: flex;
         justify-content: center;
@@ -98,6 +104,7 @@
 .buttons {
     display: flex;
     justify-content: space-between;
+
     >div {
         border-radius: 0.5rem;
         width: fit-content;
@@ -106,12 +113,17 @@
         align-items: center;
         gap: 0.25rem;
     }
+
     button {
         transition: color 200ms ease;
-        &:hover, &.liked {
+
+        &:hover,
+        &.liked {
             color: var(--neon-green);
         }
-        &:is(button:nth-child(2)):hover, &.disliked {
+
+        &:is(button:nth-child(2)):hover,
+        &.disliked {
             color: red
         }
     }

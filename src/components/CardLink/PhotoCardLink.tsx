@@ -10,15 +10,24 @@ type Props = {
 } & Require<LinkComponentProps, 'to' | 'params'>
 
 export function PhotoCardLink(props: Props) {
-
+    const key = Object.keys(props.params)[0];
+    // @ts-expect-error
+    const value = props.params[key];
     return (
         <div class={styles.card}>
-            <div class={`${styles.imgWrapper} cutout`}><img src={props.picture} loading="lazy" alt="" /></div>
+            <div class={`${styles.imgWrapper} cutout`}>
+                <img
+                    style={{ "view-transition-name": key + value }}
+                    src={props.picture}
+                    loading="lazy"
+                    alt=""
+                />
+            </div>
             <label class="cutout">
                 {props.label}
                 <span>{props.sublabel}</span>
             </label>
-            <Link class={styles.a} to={props.to} params={props.params} />
+            <Link viewTransition class={styles.a} to={props.to} params={props.params} />
         </div>
     )
 }

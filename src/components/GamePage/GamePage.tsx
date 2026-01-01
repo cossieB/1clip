@@ -22,7 +22,11 @@ export function GamePage(props: Props) {
                     <img src={props.game.banner} alt="" />
                 </div>
                 <div class={`${styles.cover} cutout-wrapper`}>
-                    <img class={`cutout`} src={props.game.cover} alt="" />
+                    <img
+                        style={{ "view-transition-name": "gameId"+props.game.gameId }}
+                        class={`cutout`}
+                        src={props.game.cover} alt=""
+                    />
                 </div>
             </div>
             <div class={styles.body}>

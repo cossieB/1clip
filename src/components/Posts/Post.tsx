@@ -2,7 +2,7 @@ import { getPostFn, reactToPost } from '~/serverFn/posts'
 import { Carousel } from '../Carousel'
 import styles from "./Post.module.css"
 import { For, Show } from 'solid-js'
-import { CircleAlertIcon, MessageCircleIcon, ThumbsDownIcon, ThumbsUpIcon } from 'lucide-solid'
+import { MessageCircleIcon, ThumbsDownIcon, ThumbsUpIcon } from 'lucide-solid'
 import { getRelativeTime } from '~/lib/getRelativeTime'
 import { formatDate } from '~/lib/formatDate'
 import { Link } from '@tanstack/solid-router'
@@ -18,7 +18,7 @@ export function PostBlock(props: Props) {
     const mutation = useMutation(() => ({
         mutationFn: react
     }))
-    console.log(props.post.yourReaction)
+
     function fn(reaction: "like" | "dislike") {
         return function () {
             mutation.mutate({

@@ -50,18 +50,17 @@ export async function findByTag(tag: string, obj: Filters = {filters: []}, userI
 
 export async function reactToPost(postId: number, userId: string, reaction: "like" | "dislike") {
     return db.execute(sql`
-            WITH deleted AS (
-                DELETE FROM post_reactions
-                WHERE post_id = ${postId} AND user_id = ${userId}
-                RETURNING reaction
-            )
-            INSERT INTO post_reactions (post_id, user_id, reaction)
-            SELECT ${postId}, ${userId}, ${reaction}
-            WHERE NOT EXISTS (
-                SELECT 1 FROM deleted WHERE reaction = ${reaction}
-            );
-        `)
-        
+        WITH deleted AS (
+            DELETE FROM post_reactions
+            WHERE post_id = ${postId} AND user_id = ${userId}
+            RETURNING reaction
+        )
+        INSERT INTO post_reactions (post_id, user_id, reaction)
+        SELECT ${postId}, ${userId}, ${reaction}
+        WHERE NOT EXISTS (
+            SELECT 1 FROM deleted WHERE reaction = ${reaction}
+        );
+    `)        
 }
 
 function detailedPosts(obj: Filters = { filters: [] }, userId?: string) {
@@ -135,7 +134,7 @@ function detailedPosts(obj: Filters = { filters: [] }, userId?: string) {
         },
         comments: sql<number>`COALESCE(${commentsQuery.numComments}, 0)`.as("num_comments"),
         ...userId && ({
-            yourReaction: userReactionQuery.reaction
+            yourReaction: userReactionQuery.reaction as any as SQL.Aliased<"like" | "dislike" | undefined>
         })
     })
         .from(posts)

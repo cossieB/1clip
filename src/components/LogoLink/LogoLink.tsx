@@ -26,9 +26,9 @@ export function LogoLink(props: P) {
     return (
         <div class={`${props.className} ${styles.logo} cutout`} title={`${titleCase(props.href)}: ${props.item.name}`}>
             <Dynamic component={icon} />
-            <img src={props.item.logo} alt="" />   
+            <img style={{"view-transition-name": `${param}${props.item.id}`}} src={props.item.logo} alt="" />   
             {/* @ts-expect-error */}
-            <Link to={`/${props.href}s/$${param}`} params={{[param]: props.item.id}}/>         
+            <Link viewTransition to={`/${props.href}s/$${param}`} params={{[param]: props.item.id}}/>         
         </div>
     )
 }

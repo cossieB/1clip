@@ -42,6 +42,7 @@ function RouteComponent() {
                     logo={devResult.data!.logo}
                     name={devResult.data!.name}
                     summary={devResult.data!.summary}
+                    type='developer'
                 />
             </Suspense>
             <GamesList

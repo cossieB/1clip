@@ -41,6 +41,7 @@ function RouteComponent() {
                     logo={devResult.data!.photo}
                     name={devResult.data!.name}
                     summary={devResult.data!.bio}
+                    type='actor'
                     showName
                 />
             </Suspense>

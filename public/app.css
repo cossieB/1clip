@@ -72,6 +72,10 @@ a {
   animation: pulse 3s ease-in-out 0s infinite alternate;
 }
 
+@view-transition {
+  navigation: auto;
+}
+
 @keyframes pulse {
   from {
     background-color: #333;
