@@ -4,7 +4,7 @@ import { createSignal, Suspense } from 'solid-js'
 import { Carousel } from '~/components/Carousel'
 import { Form } from '~/components/Forms/Form'
 import { FormProvider } from '~/components/Forms/FormContext'
-import { PostBlock } from '~/components/Posts/Post'
+import { PostBlock } from '~/components/Posts/PostBlock'
 import { PostId } from '~/components/Posts/PostId'
 import { getPostFn } from '~/serverFn/posts'
 

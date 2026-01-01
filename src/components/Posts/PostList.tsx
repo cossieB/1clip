@@ -1,6 +1,6 @@
 import { For } from "solid-js";
 import { type getPostsByTag } from "~/serverFn/posts";
-import { PostBlock } from "./Post";
+import { PostBlock } from "./PostBlock";
 
 type Props = {
     posts: Awaited<ReturnType<typeof getPostsByTag>>

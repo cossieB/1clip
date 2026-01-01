@@ -1,5 +1,5 @@
 import { FormProvider } from "../Forms/FormContext";
-import { PostBlock } from "./Post";
+import { PostBlock } from "./PostBlock";
 import { Form } from "../Forms/Form";
 import { type getAllPostsFn } from "~/serverFn/posts";
 import { createSignal } from "solid-js";
