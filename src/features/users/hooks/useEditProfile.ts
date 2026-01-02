@@ -6,12 +6,11 @@ import { useToastContext } from "~/hooks/useToastContext";
 import { useUpload } from "~/hooks/useUpload";
 import { objectDifference } from "~/lib/objectDifference";
 import { getLoggedInUser, updateCurrentUser } from "~/serverFn/users";
-import { getProfileSignedUrl } from "~/services/uploadService";
 
 export function useEditProfile(props: { user: Awaited<ReturnType<typeof getLoggedInUser>> }) {
     const updateUser = useServerFn(updateCurrentUser);
     const abortController = useAbortController()
-    const { getSignedUrl, state: uploadState, setFiles, upload } = useUpload(getProfileSignedUrl, abortController)
+    const { setFiles, upload, isUploading } = useUpload(["users"], abortController)
 
     const { addToast } = useToastContext()
     const queryClient = useQueryClient()
@@ -34,19 +33,21 @@ export function useEditProfile(props: { user: Awaited<ReturnType<typeof getLogge
         e.preventDefault();
 
         try {
-            await upload();
-            const newAvatar = uploadState.images.at(0)
-            const newBanner = uploadState.images.at(1)
+            const uploadResult = await upload();
+            const newAvatar = uploadResult.find(x => x.field === "avatar")
+            const newBanner = uploadResult.find(x => x.field === "banner")
             setUser({
                 ...newAvatar && { image: newAvatar.key },
                 ...newBanner && { banner: newBanner.key }
             })
-            const obj = objectDifference(user, props.user)
+
+            const obj = objectDifference(user, props.user);
 
             if (Object.keys(obj).length === 0) return addToast({ text: "Nothing to update", type: "warning" })
             await mutation.mutateAsync({ data: obj, signal: abortController.signal },)
         }
         catch (error) {
+            console.error(error)
             addToast({ text: "Something went wrong. Please try again later", type: "error" })
         }
     }
@@ -55,8 +56,7 @@ export function useEditProfile(props: { user: Awaited<ReturnType<typeof getLogge
         mutation,
         setUser,
         user,
-        getSignedUrl,
-        uploadState,
-        setFiles
+        setFiles,
+        isUploading
     }
 }

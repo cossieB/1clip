@@ -12,17 +12,16 @@ export function Profile(props: { user: Awaited<ReturnType<typeof getLoggedInUser
         handleSubmit,
         mutation,
         setUser,
-        getSignedUrl,
-        uploadState,
         user,
-        setFiles
+        setFiles,
+        isUploading
     } = useEditProfile(props)
 
     const logout = useLogout()
-    setFiles(new Array(2))
+
     return (
         <div class={`${styles.profile} flexCenter`}>
-            <Form onSubmit={handleSubmit} isPending={mutation.isPending || uploadState.isUploading}>
+            <Form onSubmit={handleSubmit} isPending={mutation.isPending || isUploading()}>
                 <Form.Input<typeof user>
                     field="displayName"
                     label='Display Name'
@@ -37,15 +36,7 @@ export function Profile(props: { user: Awaited<ReturnType<typeof getLoggedInUser
                             const file = files.at(0)
                             if (!file) return
                             setUser({ image: file.objectUrl })
-                            const obj = await getSignedUrl({
-                                data: {
-                                    contentLength: file.file.size,
-                                    contentType: file.file.type,
-                                    filename: file.file.name
-                                }
-                            })
-                            const updated = uploadState.images.toSpliced(0, 1, { ...obj, file: file.file })
-                            setFiles(updated)
+                            setFiles(prev => [...prev.filter(x => x.field != "avatar"), { file: file.file, field: "avatar" }])
                         }}
                         maxSize={1}
                         limit={1}
@@ -61,15 +52,7 @@ export function Profile(props: { user: Awaited<ReturnType<typeof getLoggedInUser
                             const file = files.at(0)
                             if (!file) return
                             setUser({ banner: file.objectUrl })
-                            const obj = await getSignedUrl({
-                                data: {
-                                    contentLength: file.file.size,
-                                    contentType: file.file.type,
-                                    filename: file.file.name
-                                }
-                            })
-                            const updated = uploadState.images.toSpliced(1, 1, { ...obj, file: file.file })
-                            setFiles(updated)
+                            setFiles(prev => [...prev.filter(x => x.field != "banner"), { file: file.file, field: "banner" }])
                         }}
                         maxSize={1}
                         limit={1}

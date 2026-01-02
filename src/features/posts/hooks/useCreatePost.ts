@@ -9,7 +9,6 @@ import { useToastContext } from "~/hooks/useToastContext"
 import { useUpload } from "~/hooks/useUpload"
 import { getGamesFn } from "~/serverFn/games"
 import { createPostFn } from "~/serverFn/posts"
-import { getPostSignedUrl } from "~/services/uploadService"
 
 export function useCreatePost() {
     const { addToast } = useToastContext()
@@ -22,7 +21,7 @@ export function useCreatePost() {
     
     const abortController = useAbortController()
 
-    const { getSignedUrl, state: uploadState, setFiles, upload } = useUpload(getPostSignedUrl, abortController)
+    const { isUploading, setFiles, upload } = useUpload(["media"], abortController)
     const createAction = useServerFn(createPostFn)
 
     const mutation = useMutation(() => ({
@@ -43,12 +42,12 @@ export function useCreatePost() {
         const { game, ...rest } = input
         e.preventDefault();
         try {
-            await upload()
+            const uploadResult = await upload()
             mutation.mutate({
                 data: {
                     ...rest,
                     gameId: input.game?.gameId,
-                    media: uploadState.images.map(f => ({
+                    media: uploadResult.map(f => ({
                         contentType: f.file.type,
                         key: f.key
                     })),
@@ -74,11 +73,10 @@ export function useCreatePost() {
         input,
         setInput,
         handleSubmit,
-        isUploading: () => uploadState.isUploading,
+        isUploading,
         abortController,
         setPreview,
         mutation,
-        getSignedUrl,
         preview,
         result,
         setFiles

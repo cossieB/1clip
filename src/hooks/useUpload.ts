@@ -1,23 +1,40 @@
 import { useServerFn } from "@tanstack/solid-start";
 import { createStore } from "solid-js/store";
-import { getPostSignedUrl } from "~/services/uploadService";
+import { getSignedUrls } from "~/services/uploadService";
 import { uploadToSignedUrl } from "~/utils/uploadToSignedUrl";
+import { useToastContext } from "./useToastContext";
+import { mergeObjectArrays, zip } from "~/lib/zip";
 
 export function useUpload(
-    signedUrlFn: typeof getPostSignedUrl,
+    pathSegments: string[],
     abortController?: AbortController
 ) {
-    const getSignedUrl = useServerFn(signedUrlFn)
+    const getUrls = useServerFn(getSignedUrls)
+    const {addToast} = useToastContext()
     const [state, setState] = createStore({
         isUploading: false,
-        images: [] as (Data)[]
+        files: [] as {file: File, field: string}[]
     })
 
     async function upload() {
         try {
+            const toUpload = state.files.filter(x => x)
+            if (toUpload.length === 0) return [];
             setState('isUploading', true)
-            const promises = state.images.filter(x => !!x).map(img => uploadToSignedUrl(img.signedUrl, img.file, {signal: abortController?.signal}))
+            const urls = await getUrls({data: {
+                paths: pathSegments,
+                files: toUpload.map(f =>  ({
+                    contentLength: f.file.size,
+                    contentType: f.file.type,
+                    filename: f.file.name
+                }))
+            }})
+            if (urls.length != toUpload.length) 
+                throw addToast({text: "Something went wrong. Please try again later", type: "error"})
+
+            const promises = toUpload.map((f, i) => uploadToSignedUrl(urls[i].signedUrl, f.file, {signal: abortController?.signal}))
             await Promise.all(promises)
+            return mergeObjectArrays(state.files, urls)
         } 
         catch (error) {
             throw error
@@ -26,19 +43,13 @@ export function useUpload(
             setState('isUploading', false)            
         }
     }
-
-    const setFiles = (data: Data[]) => setState({images: data})
+    type T = Parameters<typeof setState>
+    const setFiles = (files: typeof state.files | ((prev: typeof state.files) => typeof state.files)) => setState('files', files)
     
     return {
-        getSignedUrl,
         upload,
         setFiles,
-        state
+        isUploading: () => state.isUploading,
+        files: () => state.files
     }
-}
-
-type Data = {
-    file: File,
-    key: string,
-    signedUrl: string
 }

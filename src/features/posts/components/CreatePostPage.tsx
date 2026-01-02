@@ -11,8 +11,6 @@ export function CreatePostPage() {
         isUploading,
         setInput,
         mutation,
-        abortController,
-        getSignedUrl,
         preview,
         setPreview,
         result,
@@ -37,15 +35,7 @@ export function CreatePostPage() {
                     maxSize={2}
                     onSuccess={async (array) => {
                         setInput('media', array.map(file => file.objectUrl))
-                        const response = await Promise.all(array.map(file => getSignedUrl({
-                            data: {
-                                contentLength: file.file.size,
-                                contentType: file.file.type,
-                                filename: file.file.name
-                            },
-                            signal: abortController.signal
-                        })))
-                        setFiles(array.map((item, i) => ({ ...item, ...response[i] })))
+                        setFiles(array.map(x => ({field: "media", file: x.file})))
                     }}
                     style={{ height: "10rem" }}
                     accept={{
