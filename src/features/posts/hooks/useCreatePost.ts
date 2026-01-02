@@ -6,10 +6,10 @@ import { createStore } from "solid-js/store"
 import { useGamesQuery } from "~/features/games/hooks/useGameQuery"
 import { useAbortController } from "~/hooks/useAbortController"
 import { useToastContext } from "~/hooks/useToastContext"
+import { useUpload } from "~/hooks/useUpload"
 import { getGamesFn } from "~/serverFn/games"
 import { createPostFn } from "~/serverFn/posts"
 import { getPostSignedUrl } from "~/services/uploadService"
-import { uploadToSignedUrl } from "~/utils2/uploadToSignedUrl"
 
 export function useCreatePost() {
     const { addToast } = useToastContext()
@@ -22,8 +22,8 @@ export function useCreatePost() {
     
     const abortController = useAbortController()
 
+    const { getSignedUrl, state: uploadState, setFiles, upload } = useUpload(getPostSignedUrl, abortController)
     const createAction = useServerFn(createPostFn)
-    const getSignedUrls = useServerFn(getPostSignedUrl)
 
     const mutation = useMutation(() => ({
         mutationFn: createAction
@@ -36,25 +36,19 @@ export function useCreatePost() {
         game: null as { gameId: number, title: string } | null,
         tags: [] as string[],
     })
-
-    let files: { file: File, signedUrl: string, key: string }[] = []
-    const [isUploading, setIsUploading] = createSignal(false)
+    
     const [preview, setPreview] = createSignal("")
-
-    const setFiles = (f: typeof files) => (files = f)
 
     async function handleSubmit(e: SubmitEvent) {
         const { game, ...rest } = input
         e.preventDefault();
         try {
-            setIsUploading(true)
-            await Promise.all(files.map(file => uploadToSignedUrl(file.signedUrl, file.file, { signal: abortController.signal })))
-            setIsUploading(false)
+            await upload()
             mutation.mutate({
                 data: {
                     ...rest,
                     gameId: input.game?.gameId,
-                    media: files.map(f => ({
+                    media: uploadState.images.map(f => ({
                         contentType: f.file.type,
                         key: f.key
                     })),
@@ -62,6 +56,7 @@ export function useCreatePost() {
                 signal: abortController.signal
             }, {
                 onError(error, variables, onMutateResult, context) {
+                    console.error(error)
                     addToast({ text: error.message, type: "error" })
                 },
                 onSuccess(response, variables) {
@@ -79,12 +74,11 @@ export function useCreatePost() {
         input,
         setInput,
         handleSubmit,
-        isUploading,
+        isUploading: () => uploadState.isUploading,
         abortController,
-        files,
         setPreview,
         mutation,
-        getSignedUrls,
+        getSignedUrl,
         preview,
         result,
         setFiles

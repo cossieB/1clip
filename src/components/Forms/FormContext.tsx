@@ -1,5 +1,5 @@
-import { createContext, type JSXElement } from "solid-js";
-import { createStore, type SetStoreFunction, type Store } from "solid-js/store";
+import { createContext } from "solid-js";
+import { SetStoreFunction, Store } from "solid-js/store";
 
 type FormCtx = {
     errors: Store<Record<string, string[]>>
@@ -8,11 +8,3 @@ type FormCtx = {
 
 export const FormContext = createContext<FormCtx>()
 
-export function FormProvider(props: {children: JSXElement}) {
-    const [errors, setErrors] = createStore<Record<string, string[]>>({})
-    return (
-        <FormContext.Provider value={{errors, setErrors}}>
-            {props.children}
-        </FormContext.Provider>
-    )
-}

@@ -3,7 +3,7 @@ import { createServerFn } from "@tanstack/solid-start";
 import z from "zod";
 import { verifiedOnlyMiddleware } from "~/middleware/authorization";
 import * as postRepository from "~/repositories/postRepository"
-import { sanitizeText } from "~/utils2/sanitizeText";
+import { sanitizeText } from "~/utils/sanitizeText";
 import { getCurrentUser } from "./auth";
 
 export const createPostFn = createServerFn({ method: "POST" })
@@ -50,7 +50,7 @@ export const getPostsByTag = createServerFn()
         return postRepository.findByTag(data, undefined, user?.id)
     })
 
-export const reactToPost = createServerFn() 
+export const reactToPost = createServerFn({method: "POST"}) 
     .middleware([verifiedOnlyMiddleware])
     .inputValidator(z.object({
         postId: z.number(),

@@ -126,7 +126,7 @@ export const postReactions = pgTable("post_reactions", {
 
 export const commentReactions = pgTable("comment_reactions", {
     userId: uuid("user_id").notNull().references(() => users.id, {onDelete: 'cascade'}),
-    commentId: integer("comment_id").notNull().references(() => comments.commentId),
+    commentId: integer("comment_id").notNull().references(() => comments.commentId, {onDelete: "cascade"}),
     date: timestamp("date", {withTimezone: true}).notNull().defaultNow(),
     reaction: reactionType("reaction").notNull()
 }, t => [
@@ -142,8 +142,8 @@ export const media = pgTable("media", {
 })
 
 export const postTags = pgTable("post_tags", {
-    tagName: varchar("tag_name", {length: 10}).notNull().primaryKey(),
-    postId: integer("post_id").references(() => posts.postId),
+    tagName: varchar("tag_name", {length: 25}).notNull().primaryKey(),
+    postId: integer("post_id").references(() => posts.postId, {onDelete: "cascade"}),
 }, table => [
     primaryKey({ columns: [table.tagName, table.postId] })
 ])

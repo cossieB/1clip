@@ -3,7 +3,6 @@ import { createSignal } from 'solid-js'
 import { createStore } from 'solid-js/store'
 import z from 'zod'
 import { Form } from '~/components/Forms/Form'
-import { FormProvider } from '~/components/Forms/FormContext'
 import { useToastContext } from '~/hooks/useToastContext'
 import { authClient } from '~/auth/authClient'
 
@@ -46,30 +45,28 @@ function RouteComponent() {
 
     return (
         <div class='page flexCenter'>
-            <FormProvider>
-                <Form
-                    isPending={isSubmitting()}
-                    disabled={!input.username || !input.password}
-                    onSubmit={handleSubmit}
-                >
-                    <h1>Login</h1>
-                    <aside>
-                        Don't have an account? <Link to='/auth/signup'>Click here to register</Link>
-                    </aside>
-                    <Form.Input<typeof input>
-                        field="username"
-                        setter={val => setInput('username', val)}
-                        value={input.username}
-                        type="text"
-                    />
-                    <Form.Input<typeof input>
-                        field="password"
-                        setter={val => setInput('password', val)}
-                        value={input.password}
-                        type="password"
-                    />
-                </Form>
-            </FormProvider>
+            <Form
+                isPending={isSubmitting()}
+                disabled={!input.username || !input.password}
+                onSubmit={handleSubmit}
+            >
+                <h1>Login</h1>
+                <aside>
+                    Don't have an account? <Link to='/auth/signup'>Click here to register</Link>
+                </aside>
+                <Form.Input<typeof input>
+                    field="username"
+                    setter={val => setInput('username', val)}
+                    value={input.username}
+                    type="text"
+                />
+                <Form.Input<typeof input>
+                    field="password"
+                    setter={val => setInput('password', val)}
+                    value={input.password}
+                    type="password"
+                />
+            </Form>
         </div>
     )
 }

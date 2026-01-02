@@ -47,3 +47,12 @@ export function FormInput<T>(props: Props<T>) {
         </div>
     )
 }
+
+export function StandaloneInput(props: Props) {
+    return (
+        <div class={styles.formControl}>
+            <input onchange={e => props.setter(e.currentTarget.value)} />
+            <label > {props.label} </label>
+        </div>
+    )
+}

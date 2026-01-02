@@ -1,7 +1,7 @@
 import { createEffect, createSignal, Show, type JSXElement } from "solid-js";
 import styles from "./Popover.module.css"
-import { FormInput } from "../Forms/FormInput";
-import { FormProvider } from "../Forms/FormContext";
+import { FormInput, StandaloneInput } from "../Forms/FormInput";
+import { Form } from "../Forms/Form";
 
 type NewType = {
     children: JSXElement;
@@ -45,16 +45,14 @@ export function ConfirmPopover(props: Props) {
         >
             <span style={{ "margin-bottom": "1rem" }}>{props.text}</span>
             <Show when={props.setChallengeAnswer}>
-                <FormProvider>
-                    <FormInput
-                        field="challengeAnswer"
-                        setter={props.setChallengeAnswer!}
-                        value={props.challengeAnswer!}
-                        label={props.label}
-                        type={props.type}
-                        autofocus
-                    />
-                </FormProvider>
+                <StandaloneInput
+                    field="challengeAnswer"
+                    setter={props.setChallengeAnswer!}
+                    value={props.challengeAnswer!}
+                    label={props.label}
+                    type={props.type}
+                    autofocus
+                />
             </Show>
             <button
                 disabled={props.setChallengeAnswer && !props.challengeAnswer}

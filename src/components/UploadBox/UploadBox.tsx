@@ -2,7 +2,7 @@ import { UploadIcon } from "lucide-solid"
 import { useToastContext } from "~/hooks/useToastContext"
 import styles from "./UploadBox.module.css"
 import { ComponentProps, mergeProps, onCleanup, splitProps } from "solid-js"
-import { MIME_TYPES } from "~/utils2/MIME"
+import { MIME_TYPES } from "~/utils/MIME"
 
 type P = {
     label: string

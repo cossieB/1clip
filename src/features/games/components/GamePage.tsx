@@ -6,6 +6,7 @@ import { LogoLink } from "~/components/LogoLink/LogoLink"
 import { PhotoCardGrid } from "~/components/CardLink/PhotoCardLink"
 import { Carousel } from "~/components/Carousel/Carousel"
 import { YouTubeIframe } from "~/components/YoutubeIframe"
+import { STORAGE_DOMAIN } from "~/utils/env"
 
 type Props = {
     game: Awaited<ReturnType<typeof getGameFn>>
@@ -98,7 +99,7 @@ export function GamePage(props: Props) {
                     <Carousel
                         media={props.game.media.map(m => ({
                             contentType: m.contentType,
-                            url: import.meta.env.VITE_STORAGE_DOMAIN + m.key
+                            url: STORAGE_DOMAIN + m.key
                         }))}
                         showNextBtn
                         showPrevBtn

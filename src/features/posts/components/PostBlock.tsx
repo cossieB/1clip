@@ -9,6 +9,7 @@ import { useServerFn } from '@tanstack/solid-start'
 import { useMutation, useQueryClient } from '@tanstack/solid-query'
 import { Carousel } from '~/components/Carousel/Carousel'
 import { modifyCache } from '../utils/modifyCache'
+import { STORAGE_DOMAIN } from '~/utils/env'
 
 type Props = {
     post: Awaited<ReturnType<typeof getPostFn>>
@@ -18,7 +19,7 @@ export function PostBlock(props: Props) {
     const react = useServerFn(reactToPost);
     const queryClient = useQueryClient()
     const mutation = useMutation(() => ({
-        mutationFn: react
+        mutationFn: react,
     }))
 
     function fn(reaction: "like" | "dislike") {
@@ -48,7 +49,7 @@ export function PostBlock(props: Props) {
     return (
         <div class={styles.container}>
             <div class={styles.user}>
-                <img src={props.post.user.image} />
+                <img src={STORAGE_DOMAIN + props.post.user.image} />
                 {props.post.user.displayUsername}
             </div>
 
@@ -63,7 +64,7 @@ export function PostBlock(props: Props) {
                     <Carousel
                         media={props.post.media.map(m => ({
                             contentType: m.contentType,
-                            url: import.meta.env.VITE_STORAGE_DOMAIN + m.key
+                            url: STORAGE_DOMAIN + m.key
                         }))}
                         showNextBtn
                         showPrevBtn

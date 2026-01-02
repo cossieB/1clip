@@ -1,6 +1,6 @@
 import { For, Suspense } from "solid-js"
 import styles from "./CreatePostPage.module.css"
-import { sanitizeText } from "~/utils2/sanitizeText"
+import { sanitizeText } from "~/utils/sanitizeText"
 import { Form } from "~/components/Forms/Form"
 import { UploadBox } from "~/components/UploadBox/UploadBox"
 import { useCreatePost } from "../hooks/useCreatePost"
@@ -12,11 +12,12 @@ export function CreatePostPage() {
         setInput,
         mutation,
         abortController,
-        getSignedUrls,
+        getSignedUrl,
         preview,
         setPreview,
         result,
-        setFiles } = useCreatePost()
+        setFiles,
+     } = useCreatePost()
 
     return (
         <div class='flexCenter'>
@@ -36,7 +37,7 @@ export function CreatePostPage() {
                     maxSize={2}
                     onSuccess={async (array) => {
                         setInput('media', array.map(file => file.objectUrl))
-                        const response = await Promise.all(array.map(file => getSignedUrls({
+                        const response = await Promise.all(array.map(file => getSignedUrl({
                             data: {
                                 contentLength: file.file.size,
                                 contentType: file.file.type,
@@ -85,6 +86,7 @@ export function CreatePostPage() {
                 </Suspense>
                 <Form.TagsInput
                     tagLimit={5}
+                    tagLength={15}
                     tags={() => input.tags}
                     setTags={tags => setInput('tags', tags)}
                 />

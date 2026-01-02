@@ -4,6 +4,7 @@ import { Show, splitProps, type JSXElement } from "solid-js";
 import { Link, LinkComponentProps } from "@tanstack/solid-router";
 import { authClient } from "~/auth/authClient";
 import { Require } from "~/lib/utilityTypes";
+import { STORAGE_DOMAIN } from "~/utils/env";
 
 export function Nav(props: { toggleNav(): void }) {
     const session = authClient.useSession()
@@ -85,7 +86,7 @@ function UserComponent() {
             {user =>
                 <NavItem
                     to="/settings/profile"
-                    icon={<img src={user().image ?? "/favicon.ico"} />}
+                    icon={<img src={STORAGE_DOMAIN + user().image} />}
                     label={user().displayUsername!}
                 />
             }

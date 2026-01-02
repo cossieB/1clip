@@ -17,8 +17,8 @@ export const users = pgTable("users", {
     displayName: varchar("display_name", { length: 15 }).notNull(),
     email: text("email").notNull().unique(),
     emailVerified: boolean("email_verified").default(false).notNull(),
-    image: text("image").notNull().default("/favicon.ico"),
-    banner: text("banner").notNull().default("/image1.jpg"),
+    image: text("image").notNull().default("users/default_avatar.png"),
+    banner: text("banner").notNull().default("users/default_banner.jpg"),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
         .defaultNow()

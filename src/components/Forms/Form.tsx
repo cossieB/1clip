@@ -1,11 +1,11 @@
 import { createMemo, Show, type JSXElement } from "solid-js";
+import { createStore } from "solid-js/store";
 import styles from "./Forms.module.css"
 import { FormInput } from "./FormInput";
-import { useFormContext } from "~/hooks/useFormContext";
 import { Formtextarea } from "./FormTextarea";
 import { FormSelect } from "./Select";
 import { TagsInput } from "./TagsInput";
-import { FormProvider } from "./FormContext";
+import { FormContext } from "./FormContext";
 
 type Props = {
     children: JSXElement;
@@ -15,23 +15,23 @@ type Props = {
 };
 
 export function Form(props: Props) {
-        const {errors} = useFormContext()
-        const allErrors = createMemo(() => {
-            return Object.values(errors).flat(1)
-        })
+    const [errors, setErrors] = createStore<Record<string, string[]>>({})
+    const allErrors = createMemo(() => {
+        return Object.values(errors).flat(1)
+    })
     return (
-        <FormProvider>
-        <form class={styles.form} onsubmit={props.onSubmit}>
-            {props.children}
-            <button disabled={props.isPending || props.disabled || allErrors().length > 0} type="submit">
-                <Show when={props.isPending} fallback={"Submit"}>
-                    <div class={styles.dot} style={{"--delay": "0.5s"}} />
-                    <div class={styles.dot} style={{"--delay": "1s"}} />
-                    <div class={styles.dot} style={{"--delay": "1.5s"}} />
-                </Show>
-            </button>
-        </form>
-        </FormProvider>
+        <FormContext.Provider value={{ errors, setErrors }}>
+            <form class={styles.form} onsubmit={props.onSubmit}>
+                {props.children}
+                <button disabled={props.isPending || props.disabled || allErrors().length > 0} type="submit">
+                    <Show when={props.isPending} fallback={"Submit"}>
+                        <div class={styles.dot} style={{ "--delay": "0.5s" }} />
+                        <div class={styles.dot} style={{ "--delay": "1s" }} />
+                        <div class={styles.dot} style={{ "--delay": "1.5s" }} />
+                    </Show>
+                </button>
+            </form>
+        </FormContext.Provider>
     )
 }
 

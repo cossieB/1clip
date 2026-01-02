@@ -4,6 +4,7 @@ import styles from "./TagsInput.module.css"
 
 type Props = {
     tagLimit?: number
+    tagLength?: number
     tags: Accessor<string[]>
     setTags: Setter<string[]>
 }
@@ -61,7 +62,7 @@ export function TagsInput(initialProps: Props) {
                 type="text"
                 placeholder="Add tag..."
                 disabled={isDisabled()}
-                maxLength={15}
+                maxLength={props.tagLength}
             />
             <button
                 class={styles.addBtn}
