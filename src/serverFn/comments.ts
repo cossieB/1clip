@@ -16,10 +16,13 @@ export const addComment = createServerFn({method: "POST"})
     })
 
 export const getCommentsByPostId = createServerFn()
-    .inputValidator(z.number())
+    .inputValidator(z.object({
+        postId: z.number(),
+        replyTo: z.number().optional()
+    }))
     .handler(async ({data}) => {
         const user = await getCurrentUser()
-        return commentsRepository.findCommentsByPostId(data, user?.id)
+        return commentsRepository.findCommentsByPostId(data.postId, data.replyTo, user?.id)
     })
 
 export const reactToComment = createServerFn({method: "POST"}) 

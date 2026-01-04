@@ -1,0 +1,48 @@
+.commentArea {
+    width: min(90%, 800px);
+    margin: 0 auto 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    background: #00000050;
+
+    >div:first-child {
+        width: 100%;
+    }
+
+    #cmt {
+        background: none;
+        min-height: 1lh;
+        width: 100%;
+        
+    }
+
+    >div {
+        margin: 0;
+    }
+    button {
+        padding: 0 1rem;
+        height: 100%;
+        background-color: firebrick;
+        &[type="submit"] {
+            background-color: var(--neon-green);
+            &:disabled {
+                background-color: gray;
+            }
+        }
+    }
+
+    .btns {
+        height: 0;
+        overflow: hidden;
+        transition: height 200ms ease;
+        display: flex;
+        align-items: center;
+        justify-content: end;
+        gap: 0.5rem;
+    }
+    &:has(textarea:focus) .btns, &.nonEmpty .btns {
+        height: 2rem;
+    }
+}

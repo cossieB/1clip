@@ -5,7 +5,7 @@ type Comment = Awaited<ReturnType<typeof getCommentsByPostId>>[number]
 
 export function modifyCommentCache(queryClient: QueryClient, postId: number, commentId: number, reaction: "dislike" | "like") {
 
-    queryClient.setQueryData(["comments", "byPost", postId], (data: Comment[] | undefined) => {
+    queryClient.setQueriesData({queryKey: ["comments"]}, (data: Comment[] | undefined) => {
         if (!data) return undefined;
         const i = data.findIndex(x => x.commentId == commentId);
         if (i == -1) return data;

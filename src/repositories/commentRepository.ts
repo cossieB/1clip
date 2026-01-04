@@ -6,7 +6,7 @@ export function addComment(comment: InferInsertModel<typeof comments>) {
     return db.insert(comments).values(comment)
 }
 
-export function findCommentsByPostId(postId: number, userId?: string) {
+export function findCommentsByPostId(postId: number, replyTo?: number, userId?: string) {
     const reactionQuery = db.$with("rq").as(
         db.select({
             commentId: commentReactions.commentId,
@@ -33,6 +33,9 @@ export function findCommentsByPostId(postId: number, userId?: string) {
             .from(comments)
             .groupBy(comments.replyTo)
     )
+
+    const filter = replyTo ? eq(comments.replyTo, replyTo) : isNull(comments.replyTo);
+    console.log(!!filter)
 
     const query = db.with(reactionQuery, userReactionQuery, repliesQuery).select({
         ...getColumns(comments),
@@ -62,7 +65,7 @@ export function findCommentsByPostId(postId: number, userId?: string) {
         .leftJoin(repliesQuery, eq(comments.commentId, repliesQuery.commentId))
         .where(and(
             eq(comments.postId, postId),
-            isNull(comments.replyTo)
+            filter
         ))
         .orderBy(desc(comments.createdAt))
 

@@ -3,10 +3,15 @@ import { For, Suspense } from "solid-js";
 import { getCommentsByPostId } from "~/serverFn/comments";
 import { CommentBlock } from "./CommentBlock";
 
-export function CommentList(props: { postId: number }) {
+export function CommentList(props: { postId: number, replyTo?: number, queryKey: any[] }) {
     const result = useQuery(() => ({
-        queryKey: ["comments", "byPost", props.postId],
-        queryFn: () => getCommentsByPostId({ data: props.postId })
+        queryKey: props.queryKey,
+        queryFn: () => getCommentsByPostId({
+            data: {
+                postId: props.postId,
+                replyTo: props.replyTo
+            }
+        })
     }))
     return (
         <Suspense>

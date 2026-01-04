@@ -9,7 +9,7 @@ type Props = {
 export function SubmitBtn(props: Props & ComponentProps<"button">) {
     const [_, rest] = splitProps(props, ['isPending', 'disabled'])
     return (
-        <button {...rest} disabled={props.isPending || props.disabled} type="submit" >
+        <button class={styles.btn} {...rest} disabled={props.isPending || props.disabled} type="submit" >
             <Show when={props.isPending} fallback={"Submit"}>
                 <div class={styles.dot} style={{ "--delay": "0.5s" }} />
                 <div class={styles.dot} style={{ "--delay": "1s" }} />
