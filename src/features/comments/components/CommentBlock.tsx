@@ -1,74 +1,49 @@
 import { getRelativeTime } from "~/lib/getRelativeTime";
-import { addComment, getCommentsByPostId, reactToComment } from "~/serverFn/comments";
+import { getCommentsByPostIdFn } from "~/serverFn/comments";
 import { STORAGE_DOMAIN } from "~/utils/env";
-import { MessageCircleIcon, ThumbsUpIcon, ThumbsDownIcon } from "lucide-solid";
-import { useServerFn } from "@tanstack/solid-start";
-import { useQueryClient, useMutation } from "@tanstack/solid-query";
-import { authClient } from "~/auth/authClient";
-import { useToastContext } from "~/hooks/useToastContext";
-import { modifyCommentCache } from "../utils/modifyCommentCache";
+import { MessageCircleIcon, ThumbsUpIcon, ThumbsDownIcon, EllipsisVerticalIcon } from "lucide-solid";
 import { CommentInput } from "./CommentInput";
-import { createStore } from "solid-js/store";
 import { Show } from "solid-js";
 import styles from "./Comments.module.css"
 import { CommentList } from "./CommentList";
 import { Link } from "@tanstack/solid-router";
+import { useReactToComment } from "../hooks/useReactToComment";
+import { useReplyToComment } from "../hooks/useReplyToComment";
+import { MenuPopover } from "~/components/Popover/MenuPopover";
+import { useDeleteComment } from "../hooks/useDeleteComment";
+import { ConfirmPopover, ConfirmPopoverWithButton } from "~/components/Popover/Popover";
+import { authClient } from "~/auth/authClient";
 
-export function CommentBlock(props: { comment: Awaited<ReturnType<typeof getCommentsByPostId>>[number], postId: number }) {
-    const react = useServerFn(reactToComment);
-    const reply = useServerFn(addComment)
-    const { addToast } = useToastContext()
-    const queryClient = useQueryClient()
-    const reactMutation = useMutation(() => ({
-        mutationFn: react,
-    }))
-    const replyMutation = useMutation(() => ({
-        mutationFn: reply,
-        onSuccess() {
-            queryClient.invalidateQueries({
-                queryKey: ["comments"]
-            })
-        }
-    }))
-    const session = authClient.useSession();
+type Props = {
+    comment: Awaited<ReturnType<typeof getCommentsByPostIdFn>>[number];
+    postId: number;
+    replyTo?: number
+};
 
-    const [commentState, setCommentState] = createStore({
-        showInput: false,
-        comment: "",
-        showReplies: false
-    })
+export function CommentBlock(props: Props) {
 
-    function fn(reaction: "like" | "dislike") {
-        return function () {
-            if (!session().data) return addToast({ text: "Please login first", type: "warning" })
-            if (!session().data?.user.emailVerified) return addToast({ text: "Please verify your account", type: "warning" })
-            reactMutation.mutate({
-                data: {
-                    commentId: props.comment.commentId,
-                    reaction
-                }
-            }, {
-                onSuccess(data, variables, onMutateResult, context) {
-                    modifyCommentCache(queryClient, props.postId, props.comment.commentId, reaction)
-                },
-                onError(error, variables, onMutateResult, context) {
-                    addToast({ text: error.message, type: "error" })
-                },
-            })
-        }
-    }
+    const { fn } = useReactToComment(props.comment, props.postId);
+    const { setCommentState, commentState, replyMutation } = useReplyToComment(props.comment, props.postId)
+    const session = authClient.useSession()
+    const { deleteMutation } = useDeleteComment(props.comment, props.postId, props.replyTo)
 
     return (
-        <div class={styles.comment}>
+        <div
+            data-commentId={props.comment.commentId}
+            class={styles.comment}
+        >
             <div class={styles.user}>
                 <img
                     src={STORAGE_DOMAIN + props.comment.user.image}
                     alt={`Avatar of ${props.comment.user.username}`}
                 />
-                <Link to="/users/$username" params={{username: props.comment.user.username!}}>
+                <Link to="/users/$username" params={{ username: props.comment.user.username! }}>
                     <span>{props.comment.user.username}</span>
                 </Link>
                 <span class={styles.createdAt}>{getRelativeTime(props.comment.createdAt)}</span>
+                <button style={{ "--anchor-name": "--commentMenuBtn" }} popoverTarget={'comment-popover'+props.comment.commentId}>
+                    <EllipsisVerticalIcon />
+                </button>
             </div>
             <div class={styles.text}> {props.comment.text} </div>
             <div class={styles.buttons}>
@@ -108,19 +83,42 @@ export function CommentBlock(props: { comment: Awaited<ReturnType<typeof getComm
                 />
             </Show>
             <Show when={commentState.showReplies == false && props.comment.replies > 0}>
-                <button style={{"color": "var(--neon-pink)"}} onclick={() => setCommentState({ showReplies: true })}>
+                <button style={{ "color": "var(--neon-pink)" }} onclick={() => setCommentState({ showReplies: true })}>
                     Load replies
                 </button>
             </Show>
-            <Show when={commentState.showReplies}>
-                <div class={styles.replies}>
-                    <CommentList
-                        postId={props.postId}
-                        replyTo={props.comment.commentId}
-                        queryKey={["comments", "replies", props.comment.commentId]}
-                    />
-                </div>
-            </Show>
+            <div class={styles.replies}>
+                <CommentList
+                    postId={props.postId}
+                    replyTo={props.comment.commentId}
+                    enabled={commentState.showReplies}
+                />
+            </div>
+            <MenuPopover
+                id={"comment-popover" + props.comment.commentId}
+                style={{ "position-anchor": "postMenuBtn", "position-area": "bottom left" }}
+            >
+                <ul>
+                    <Show when={session().data && session().data!.user.id === props.comment.userId}>
+                        <li>
+                            <ConfirmPopoverWithButton
+                                popover={{
+                                    id: `del-comment-${props.comment.commentId}`,
+                                    text: "Delete Comment?" + props.comment.text,
+                                    onConfirm: () => deleteMutation.mutate({
+                                        data: {
+                                            commentId: props.comment.commentId
+                                        }
+                                    })
+                                }}
+                                button={{
+                                    children: "Delete"+ props.comment.text
+                                }}
+                            />
+                        </li>
+                    </Show>
+                </ul>
+            </MenuPopover>
         </div>
     )
 }

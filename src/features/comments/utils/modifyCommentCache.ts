@@ -1,7 +1,7 @@
 import { type QueryClient } from "@tanstack/solid-query";
-import { type getCommentsByPostId } from "~/serverFn/comments";
+import { type getCommentsByPostIdFn } from "~/serverFn/comments";
 
-type Comment = Awaited<ReturnType<typeof getCommentsByPostId>>[number]
+type Comment = Awaited<ReturnType<typeof getCommentsByPostIdFn>>[number]
 
 export function modifyCommentCache(queryClient: QueryClient, postId: number, commentId: number, reaction: "dislike" | "like") {
 

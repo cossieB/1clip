@@ -63,6 +63,14 @@ export async function reactToPost(postId: number, userId: string, reaction: "lik
     `)        
 }
 
+export async function deletePost(postId: number, userId: string) {
+    return db.delete(posts).where(and(
+        eq(posts.postId, postId),
+        eq(posts.userId, userId)
+    ))
+    .returning({postId: posts.postId})
+}
+
 function detailedPosts(obj: Filters = { filters: [] }, userId?: string) {
     const mediaQuery = db.$with("mq").as(
         db.select({

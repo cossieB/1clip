@@ -1,9 +1,10 @@
 import { InferInsertModel, SQL, and, count, desc, eq, getColumns, isNull, sql } from "drizzle-orm";
 import { db } from "~/drizzle/db";
 import { commentReactions, comments, users } from "~/drizzle/schema";
+import { sleep } from "~/lib/sleep";
 
-export function addComment(comment: InferInsertModel<typeof comments>) {
-    return db.insert(comments).values(comment)
+export async function addComment(comment: InferInsertModel<typeof comments>) {
+    return db.insert(comments).values(comment).returning()
 }
 
 export function findCommentsByPostId(postId: number, replyTo?: number, userId?: string) {
@@ -35,7 +36,6 @@ export function findCommentsByPostId(postId: number, replyTo?: number, userId?: 
     )
 
     const filter = replyTo ? eq(comments.replyTo, replyTo) : isNull(comments.replyTo);
-    console.log(!!filter)
 
     const query = db.with(reactionQuery, userReactionQuery, repliesQuery).select({
         ...getColumns(comments),
@@ -73,6 +73,14 @@ export function findCommentsByPostId(postId: number, replyTo?: number, userId?: 
             query.leftJoin(userReactionQuery, eq(userReactionQuery.commentId, comments.commentId))
 
         return query
+}
+
+export async function deleteComment(commentId: number, userId: string) {
+    return db.delete(comments).where(and(
+        eq(comments.commentId, commentId),
+        eq(comments.userId, userId)
+    ))
+    .returning({commentId: comments.commentId})
 }
 
 export async function reactToComment(commentId: number, userId: string, reaction: "like" | "dislike") {

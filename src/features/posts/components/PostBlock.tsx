@@ -1,58 +1,35 @@
-import { getPostFn, reactToPost } from '~/serverFn/posts'
+import { getPostFn } from '~/serverFn/posts'
 import styles from "./Post.module.css"
 import { For, Show } from 'solid-js'
-import { MessageCircleIcon, ThumbsDownIcon, ThumbsUpIcon } from 'lucide-solid'
+import { EllipsisVerticalIcon, MessageCircleIcon, ThumbsDownIcon, ThumbsUpIcon } from 'lucide-solid'
 import { getRelativeTime } from '~/lib/getRelativeTime'
 import { formatDate } from '~/lib/formatDate'
 import { Link } from '@tanstack/solid-router'
-import { useServerFn } from '@tanstack/solid-start'
-import { useMutation, useQueryClient } from '@tanstack/solid-query'
 import { Carousel } from '~/components/Carousel/Carousel'
-import { modifyPostCache } from '../utils/modifyCache'
 import { STORAGE_DOMAIN } from '~/utils/env'
-import { useToastContext } from '~/hooks/useToastContext'
 import { authClient } from '~/auth/authClient'
+import { MenuPopover } from '~/components/Popover/MenuPopover'
+import { useReactToPost } from '../hooks/useReactToPost'
+import { useDeletePost } from '../hooks/useDeletePost'
+import { ConfirmPopover, ConfirmPopoverWithButton } from '~/components/Popover/Popover'
 
 type Props = {
     post: Awaited<ReturnType<typeof getPostFn>>
 }
 
 export function PostBlock(props: Props) {
-    const react = useServerFn(reactToPost);
-    const {addToast} = useToastContext()
-    const queryClient = useQueryClient()
-    const mutation = useMutation(() => ({
-        mutationFn: react,
-    }))
-    const session = authClient.useSession()
 
-    function fn(reaction: "like" | "dislike") {
-        return function () {
-            if (!session().data) return addToast({text: "Please login first", type: "warning"})
-            if (!session().data?.user.emailVerified) return addToast({text: "Please verify your account", type: "warning"})
-            mutation.mutate({
-                data: {
-                    postId: props.post.postId,
-                    reaction
-                }
-            }, {
-                onSuccess(data, variables, onMutateResult, context) {
-                    modifyPostCache(queryClient, props.post.postId, reaction)
-                },
-                onError(error, variables, onMutateResult, context) {
-                    addToast({text: error.message, type: "error"})
-                },
-            })
-        }
-    }
+    const session = authClient.useSession()
+    const { fn } = useReactToPost(props.post)
+    const { deleteMutation } = useDeletePost(props.post)
 
     return (
         <div class={styles.postContainer}>
             <div class={styles.user}>
                 <div>
-                <img src={STORAGE_DOMAIN + props.post.user.image} />
-                {props.post.user.displayUsername}
-                <Link to='/users/$username' params={{username: props.post.user.username!}} />
+                    <img src={STORAGE_DOMAIN + props.post.user.image} />
+                    {props.post.user.displayUsername}
+                    <Link to='/users/$username' params={{ username: props.post.user.username! }} />
                 </div>
             </div>
 
@@ -62,6 +39,9 @@ export function PostBlock(props: Props) {
                     <span title={formatDate(props.post.createdAt)}>
                         {getRelativeTime(props.post.createdAt)}
                     </span>
+                    <button style={{ "--anchor-name": "--postMenuBtn" }} popoverTarget='post-popover'>
+                        <EllipsisVerticalIcon />
+                    </button>
                 </div>
                 <Show when={props.post.media.length > 0}>
                     <Carousel
@@ -107,6 +87,32 @@ export function PostBlock(props: Props) {
                 </div>
                 <Link class={styles.a} to='/posts/$postId' params={{ postId: props.post.postId }} />
             </div>
+            <MenuPopover
+                id='post-popover'
+                style={{ "position-anchor": "postMenuBtn", "position-area": "bottom left" }}
+            >
+                <ul>
+                    <Show when={session().data && session().data!.user.id === props.post.userId}>
+                        <li>
+                            <ConfirmPopoverWithButton
+                                popover={{
+                                    id: "del-post-warn",
+                                    text: 'Delete Post?',
+                                    onConfirm: () => deleteMutation.mutate({ data: { postId: props.post.postId } })
+                                }}
+                                button={{
+                                    children: "Delete"
+                                }}
+                            />
+                        </li>
+                    </Show>
+                    <li>
+                        <button>
+                            Save
+                        </button>
+                    </li>
+                </ul>
+            </MenuPopover>
         </div>
     )
 }

@@ -108,11 +108,11 @@ export const comments = pgTable("comments", {
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     editedOn: timestamp("edited_on", { withTimezone: true }).notNull().$onUpdateFn(() => new Date())
 }, t => [
-    check("comment_min_length", sql`LENGTH(${t.text}) > 1`),
+    check("comment_min_length", sql`LENGTH(${t.text}) > 0`),
     foreignKey({
         columns: [t.replyTo],
-        foreignColumns: [t.commentId]
-    })
+        foreignColumns: [t.commentId],
+    }).onDelete("cascade")
 ])
 
 export const reactionType = pgEnum("reaction_type", ["like", "dislike"])

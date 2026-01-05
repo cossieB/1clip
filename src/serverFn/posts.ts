@@ -44,14 +44,14 @@ export const getAllPostsFn = createServerFn()
         return postRepository.findAll(undefined, user?.id)
     })
 
-export const getPostsByTag = createServerFn()
+export const getPostsByTagFn = createServerFn()
     .inputValidator((tag: string) => tag)
     .handler(async ({data}) => {
         const user = await getCurrentUser()
         return postRepository.findByTag(data, undefined, user?.id)
     })
 
-export const reactToPost = createServerFn({method: "POST"}) 
+export const reactToPostFn = createServerFn({method: "POST"}) 
     .middleware([verifiedOnlyMiddleware])
     .inputValidator(z.object({
         postId: z.number(),
@@ -59,4 +59,14 @@ export const reactToPost = createServerFn({method: "POST"})
     }))
     .handler(async ({data, context}) => {
         postRepository.reactToPost(data.postId, context.user.id, data.reaction)
+    })
+
+export const deletePostFn = createServerFn({method: "POST"})
+    .middleware([verifiedOnlyMiddleware])
+    .inputValidator(z.object({
+        postId: z.number()
+    }))
+    .handler(async ({data, context}) => {
+        const result = await postRepository.deletePost(data.postId, context.user.id);
+        if (result.length == 0) throw new AppError("Failed to delete", 400)
     })

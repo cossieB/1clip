@@ -1,16 +1,16 @@
-import { createEffect, createSignal, Show, type JSXElement } from "solid-js";
+import { ComponentProps, createEffect, createSignal, Show, type JSXElement } from "solid-js";
 import styles from "./Popover.module.css"
-import { FormInput, StandaloneInput } from "../Forms/FormInput";
-import { Form } from "../Forms/Form";
+import { StandaloneInput } from "../Forms/FormInput";
 
 type NewType = {
     children: JSXElement;
+    id: string
     ref?: HTMLDivElement | ((ref: HTMLDivElement) => void);
 };
 
 export function Popover(props: NewType) {
     return (
-        <div ref={props.ref} class={styles.popover + " cutout"} popover id="autoPopover">
+        <div ref={props.ref} class={styles.popover + " cutout"} popover id={props.id ?? "autoPopover"}>
             {props.children}
         </div>
     )
@@ -21,11 +21,12 @@ type BaseProps = {
     onConfirm: () => void
     type?: HTMLInputElement['type']
     label?: string
+    id: string
 };
 
 type ValueProps =
     | { challengeAnswer: string; setChallengeAnswer: (val: string) => void; }
-    | { challengeAnswer?: never; setChallengeAnswer?: never; isPassword?: never; label?: never };
+    | { challengeAnswer?: never; setChallengeAnswer?: never; isPassword?: never; label?: never; };
 
 type Props = BaseProps & ValueProps;
 
@@ -42,6 +43,7 @@ export function ConfirmPopover(props: Props) {
     return (
         <Popover
             ref={setRef}
+            id={props.id}
         >
             <span style={{ "margin-bottom": "1rem" }}>{props.text}</span>
             <Show when={props.setChallengeAnswer}>
@@ -64,5 +66,17 @@ export function ConfirmPopover(props: Props) {
                 Confirm
             </button>
         </Popover>
+    )
+}
+
+export function ConfirmPopoverWithButton(props: {popover: Props} & {button?: ComponentProps<'button'>}) {
+    return (
+        <>
+            <button {...props.button} popoverTarget={props.popover.id} />
+            <ConfirmPopover
+                {...props.popover}
+                id={props.popover.id}                
+            />
+        </>
     )
 }

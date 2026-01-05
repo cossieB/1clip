@@ -1,0 +1,17 @@
+.menu {
+    border: none;
+    position: absolute;
+    background-color: var(--gray1);
+
+    &:popover-open {
+        display: flex;
+        flex-direction: column;
+    }
+    li {
+        cursor: pointer;
+        padding: 0.5rem;
+        &:hover {
+            background-color: slategray;
+        }
+    }
+}

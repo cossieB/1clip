@@ -5,7 +5,7 @@ import { Form } from '~/components/Forms/Form'
 import { useToastContext } from '~/hooks/useToastContext'
 import styles from "./ProfilePage.module.css"
 import { useNavigate } from '@tanstack/solid-router'
-import { ConfirmPopover } from '~/components/Popover/Popover'
+import { ConfirmPopover, ConfirmPopoverWithButton } from '~/components/Popover/Popover'
 
 export function SecurityPage() {
     const { addToast } = useToastContext()
@@ -160,17 +160,21 @@ export function SecurityPage() {
                     maxLength={15}
                 />
             </Form>
-            <button class={styles.dangerBtn} popoverTarget="autoPopover">
-                Delete Account
-            </button>
 
-            <ConfirmPopover
-                text="This is irreversible. All your posts and data will be deleted forever. Enter your password to confirm"
-                setChallengeAnswer={val => setInput({ challengeAnswer: val })}
-                challengeAnswer={input.challengeAnswer}
-                onConfirm={deleteAccount}
-                type='password'
-                label='Password'
+            <ConfirmPopoverWithButton
+                popover={{
+                    text: "This is irreversible. All your posts and data will be deleted forever. Enter your password to confirm",
+                    setChallengeAnswer: val => setInput({ challengeAnswer: val }),
+                    challengeAnswer: input.challengeAnswer,
+                    onConfirm: deleteAccount,
+                    type: 'password',
+                    label: 'Password',
+                    id: 'del-account-warn',
+                }}
+                button={{
+                    class: styles.dangerBtn,
+                    children: "Delete Account"
+                }}
             />
 
         </div>

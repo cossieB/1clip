@@ -3,8 +3,9 @@ import z from "zod";
 import { verifiedOnlyMiddleware } from "~/middleware/authorization";
 import * as commentsRepository from "~/repositories/commentRepository"
 import { getCurrentUser } from "./auth";
+import { AppError } from "~/utils/AppError";
 
-export const addComment = createServerFn({method: "POST"})
+export const addCommentFn = createServerFn({method: "POST"})
     .middleware([verifiedOnlyMiddleware])
     .inputValidator(z.object({
         text: z.string().trim(),
@@ -12,10 +13,14 @@ export const addComment = createServerFn({method: "POST"})
         replyTo: z.number().nullish()
     }))
     .handler(async ({data, context: {user}}) => {
-        const p = await commentsRepository.addComment({...data, userId: user.id})
+        try {
+            return await commentsRepository.addComment({...data, userId: user.id});
+        } catch (error) {
+            throw new AppError("Something went wrong", 500)
+        }
     })
 
-export const getCommentsByPostId = createServerFn()
+export const getCommentsByPostIdFn = createServerFn()
     .inputValidator(z.object({
         postId: z.number(),
         replyTo: z.number().optional()
@@ -25,7 +30,7 @@ export const getCommentsByPostId = createServerFn()
         return commentsRepository.findCommentsByPostId(data.postId, data.replyTo, user?.id)
     })
 
-export const reactToComment = createServerFn({method: "POST"}) 
+export const reactToCommentFn = createServerFn({method: "POST"}) 
     .middleware([verifiedOnlyMiddleware])
     .inputValidator(z.object({
         commentId: z.number(),
@@ -34,3 +39,13 @@ export const reactToComment = createServerFn({method: "POST"})
     .handler(async ({data, context}) => {
         commentsRepository.reactToComment(data.commentId, context.user.id, data.reaction)
     })    
+
+export const deleteCommentFn = createServerFn({method: "POST"})    
+    .middleware([verifiedOnlyMiddleware])
+    .inputValidator(z.object({
+        commentId: z.number()
+    }))
+    .handler(async ({data, context}) => {
+        const result = await commentsRepository.deleteComment(data.commentId, context.user.id)
+        if (result.length == 0) throw new AppError("Failed to delete", 400)
+    })

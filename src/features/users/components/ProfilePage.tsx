@@ -2,7 +2,7 @@ import { getLoggedInUser } from "~/serverFn/users";
 import styles from "./ProfilePage.module.css"
 import { Form } from "~/components/Forms/Form";
 import { UploadBox } from "~/components/UploadBox/UploadBox";
-import { ConfirmPopover } from "~/components/Popover/Popover";
+import { ConfirmPopover, ConfirmPopoverWithButton } from "~/components/Popover/Popover";
 import { useEditProfile } from "../hooks/useEditProfile";
 import { useLogout } from "~/hooks/useLogout";
 import { STORAGE_DOMAIN } from "~/utils/env";
@@ -86,13 +86,17 @@ export function Profile(props: { user: Awaited<ReturnType<typeof getLoggedInUser
                     type="date"
                 />
             </Form>
-            <button class={styles.dangerBtn} popoverTarget="autoPopover">
-                Logout
-            </button>
 
-            <ConfirmPopover
-                text="Are you sure you want to logout?"
-                onConfirm={logout}
+            <ConfirmPopoverWithButton
+                popover={{
+                    text: "Are you sure you want to logout?",
+                    onConfirm: logout,                    
+                    id: "logout-warn"
+                }}
+                button={{
+                    class: styles.dangerBtn,
+                    children: "Logout"
+                }}
             />
         </div>
     )
