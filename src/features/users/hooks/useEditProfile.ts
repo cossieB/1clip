@@ -19,7 +19,7 @@ export function useEditProfile(props: { user: Awaited<ReturnType<typeof getLogge
         mutationFn: updateUser,
         onSuccess: () => {
             addToast({ text: "Success", type: "info" })
-            queryClient.setQueryData(["users", user.userId], user)
+            queryClient.setQueryData(["users", user.id], user)
             queryClient.setQueryData(["you"], user)
         },
         onError(error) {

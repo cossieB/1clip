@@ -1,4 +1,4 @@
-import { and, eq, SQL } from "drizzle-orm";
+import { and, eq, getColumns, SQL } from "drizzle-orm";
 import { db } from "~/drizzle/db";
 import { User } from "~/drizzle/models";
 import { users } from "~/drizzle/schema/auth";
@@ -18,16 +18,11 @@ export async function updateUser(userId: string, user: Partial<User>) {
 }
 
 function userQuery(...where: SQL[]) {
+    const { email, emailVerified, createdAt, updatedAt,...rest} = getColumns(users)
     return db.select({
-        userId: users.id,
-        displayName: users.displayName,
-        bio: users.bio,
-        image: users.image,
-        banner: users.banner,
-        username: users.username,
-        displayUsername: users.displayName,
-        dob: users.dob,
-        location: users.location
+        ...rest,
+        joined: users.createdAt,
+        links: users.links
     })
         .from(users)
         .where(and(...where))

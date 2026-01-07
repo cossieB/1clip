@@ -1,5 +1,5 @@
 import { PostBlock } from "./PostBlock";
-import { deletePostFn, type getAllPostsFn } from "~/serverFn/posts";
+import { deletePostFn, type getPostsFn } from "~/serverFn/posts";
 import { createSignal } from "solid-js";
 import { useServerFn } from "@tanstack/solid-start";
 import { useMutation, useQueryClient } from "@tanstack/solid-query";
@@ -11,7 +11,7 @@ import { useToastContext } from "~/hooks/useToastContext";
 import { Post } from "~/drizzle/models";
 
 type Props = {
-    post: Awaited<ReturnType<typeof getAllPostsFn>>[number]
+    post: Awaited<ReturnType<typeof getPostsFn>>[number]
 }
 
 export function PostId(props: Props) {

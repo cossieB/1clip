@@ -1,8 +1,8 @@
 import { useQueryClient, UseQueryResult } from "@tanstack/solid-query";
 import { createEffect } from "solid-js";
-import { getAllPostsFn } from "~/serverFn/posts";
+import { getPostsFn } from "~/serverFn/posts";
 
-export function usePostCache(result: UseQueryResult<Awaited<ReturnType<typeof getAllPostsFn>>>) {
+export function usePostCache(result: UseQueryResult<Awaited<ReturnType<typeof getPostsFn>>>) {
     const queryClient = useQueryClient()
     createEffect(() => {
         if (result.data) {

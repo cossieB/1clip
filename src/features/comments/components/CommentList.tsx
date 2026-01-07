@@ -1,22 +1,10 @@
 import { useQuery } from "@tanstack/solid-query";
 import { For, Suspense } from "solid-js";
-import { getCommentsByPostIdFn } from "~/serverFn/comments";
 import { CommentBlock } from "./CommentBlock";
+import { commentListQueryOpts } from "../utils/commentListQueryOpts";
 
 export function CommentList(props: { postId: number, replyTo?: number, enabled?: boolean }) {
-    const result = useQuery(() => ({
-        enabled: props.enabled ?? true,
-        queryKey: ["comments", {
-                postId: props.postId,
-                replyTo: props.replyTo
-            }],
-        queryFn: () => getCommentsByPostIdFn({
-            data: {
-                postId: props.postId,
-                replyTo: props.replyTo
-            }
-        })
-    }))
+    const result = useQuery(() => commentListQueryOpts(props.postId, props.replyTo, props.enabled))
     return (
         <Suspense>
             <div>

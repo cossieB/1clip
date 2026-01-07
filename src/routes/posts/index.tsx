@@ -3,14 +3,14 @@ import { createFileRoute } from '@tanstack/solid-router'
 import { Suspense } from 'solid-js'
 import { PostList } from '~/features/posts/components/PostList'
 import { usePostCache } from '~/features/posts/hooks/usePostCache'
-import { getAllPostsFn } from '~/serverFn/posts'
+import { getPostsFn } from '~/serverFn/posts'
 
 export const Route = createFileRoute('/posts/')({
     component: RouteComponent,
     loader: async ({ context }) => {
         await context.queryClient.ensureQueryData({
             queryKey: ["posts"],
-            queryFn: () => getAllPostsFn()
+            queryFn: () => getPostsFn()
         })
     },
     head: () => ({
@@ -21,7 +21,7 @@ export const Route = createFileRoute('/posts/')({
 function RouteComponent() {
     const result = useQuery(() => ({
         queryKey: ["posts"],
-        queryFn: () => getAllPostsFn()
+        queryFn: () => getPostsFn()
     }))
 
     usePostCache(result)

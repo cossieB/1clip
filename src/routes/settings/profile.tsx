@@ -23,7 +23,7 @@ function RouteComponent() {
 
     createEffect(() => {
         if (user.data)
-        queryClient.setQueryData(["users", user.data.userId], user.data)
+        queryClient.setQueryData(["users", user.data.id], user.data)
     })
 
     return (

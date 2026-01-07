@@ -20,7 +20,11 @@ export const getLoggedInUser = createServerFn()
 
 export const getUserByUsernameFn = createServerFn()
     .inputValidator((username: string) => username)
-    .handler(async ({ data }) => userRepository.findByUsername(data))
+    .handler(async ({ data }) => {
+        const user = await userRepository.findByUsername(data);
+        if (!user) throw notFound()
+        return user
+    })
 
 export const getUserByIdFn = createServerFn()
     .inputValidator((id: unknown) => {
@@ -52,6 +56,6 @@ export const updateCurrentUser = createServerFn({ method: "POST" })
         }
         catch (error) {
             console.log(error)
-            throw new AppError("Something went wrong", 500 )
+            throw new AppError("Something went wrong", 500)
         }
     })

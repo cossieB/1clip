@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/solid-query"
 import { useServerFn } from "@tanstack/solid-start"
-import { Post } from "~/drizzle/models"
 import { useToastContext } from "~/hooks/useToastContext"
 import { deleteCommentFn, getCommentsByPostIdFn } from "~/serverFn/comments"
+import { commentListQueryOpts } from "../utils/commentListQueryOpts"
 
 export function useDeleteComment(comment: Awaited<ReturnType<typeof getCommentsByPostIdFn>>[number], postId: number, replyTo?: number) {
     const { addToast } = useToastContext()
@@ -11,14 +11,14 @@ export function useDeleteComment(comment: Awaited<ReturnType<typeof getCommentsB
     const deleteMutation = useMutation(() => ({
         mutationFn: delComment,
         onSuccess() {
-            queryClient.setQueryData(["comments", {
-                postId: postId,
-                replyTo: replyTo
-            }], (data: {commentId: number}[]) => data?.filter(c => c.commentId != comment.commentId))
+            queryClient.setQueryData(
+                commentListQueryOpts(postId, replyTo).queryKey,
+                data => data?.filter(c => c.commentId != comment.commentId)
+            )
         },
         onError(error, variables, onMutateResult, context) {
             addToast({ text: error.message, type: "error" })
         },
     }))
-    return {deleteMutation}
+    return { deleteMutation }
 }

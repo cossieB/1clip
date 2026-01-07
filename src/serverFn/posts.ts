@@ -38,18 +38,20 @@ export const getPostFn = createServerFn()
         return post
     })
 
-export const getAllPostsFn = createServerFn()
-    .handler(async () => {
-        const user = await getCurrentUser()
-        return postRepository.findAll(undefined, user?.id)
-    })
-
-export const getPostsByTagFn = createServerFn()
-    .inputValidator((tag: string) => tag)
+export const getPostsFn = createServerFn()
+    .inputValidator(z.object({
+        username: z.string(),
+        authorId: z.string(),
+        likerUsername: z.string(),
+        dislikerUsername: z.string(),
+        tag: z.string(),
+        limit: z.number(),
+        cursor: z.number()
+    }).partial().optional())
     .handler(async ({data}) => {
         const user = await getCurrentUser()
-        return postRepository.findByTag(data, undefined, user?.id)
-    })
+        return postRepository.findAll(data, user?.id)
+    }) 
 
 export const reactToPostFn = createServerFn({method: "POST"}) 
     .middleware([verifiedOnlyMiddleware])

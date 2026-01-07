@@ -29,7 +29,8 @@ export const users = pgTable("users", {
     role: varchar("role", { length: 10 }).default("user").notNull(),
     bio: varchar("bio", {length: 255}).notNull().default(""),
     dob: date('dob'),
-    location: varchar("location", {length: 100})
+    location: varchar("location", {length: 100}),
+    links: text('links').array().notNull().default([])
 });
 
 export const sessions = pgTable(

@@ -1,10 +1,10 @@
 import { For } from "solid-js";
-import { type getPostsByTagFn } from "~/serverFn/posts";
+import { type getPostsFn } from "~/serverFn/posts";
 import { PostBlock } from "./PostBlock";
 import styles from "./Post.module.css"
 
 type Props = {
-    posts: Awaited<ReturnType<typeof getPostsByTagFn>>
+    posts: Awaited<ReturnType<typeof getPostsFn>>
 }
 
 export function PostList(props: Props) {

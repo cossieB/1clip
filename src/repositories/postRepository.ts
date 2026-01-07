@@ -1,7 +1,6 @@
-import { and, count, desc, eq, getColumns, inArray, SQL, sql } from "drizzle-orm";
+import { and, count, desc, eq, getColumns, gt, inArray, SQL, sql } from "drizzle-orm";
 import { db } from "~/drizzle/db";
 import { comments, media, postReactions, posts, postTags, users } from "~/drizzle/schema";
-import { Filters } from "./types";
 
 type PostInsert = {
     title: string;
@@ -23,29 +22,74 @@ export function createPost(obj: PostInsert) {
         return post
     })
 }
-
-export async function findAll(obj?: Filters, userId?: string) {
-    return detailedPosts(obj, userId)
-}
-
 export async function findById(postId: number, userId?: string) {
     return (await detailedPosts({ filters: [eq(posts.postId, postId)] }, userId)).at(0)
 }
 
-export async function findByTag(tag: string, obj: Filters = {filters: []}, userId?: string) {
-    return detailedPosts({
-        ...obj,
-        filters: [
-            ...obj.filters,
-            inArray(
-                posts.postId,
-                db
-                    .select({postId: postTags.postId})
-                    .from(postTags)
-                    .where(eq(postTags.tagName, tag))
-            )
-        ]
-    }, userId)
+type Filters = {
+    username?: string
+    authorId?: string,
+    likerUsername?: string,
+    dislikerUsername?: string
+    tag?: string
+    limit?: number
+    cursor?: number
+}
+
+export async function findAll(obj: Filters = {}, userId?: string) {
+    const filters: SQL[] = []
+    if (obj.username)
+        filters.push(eq(
+            posts.userId,
+            db
+                .select({ userId: users.id })
+                .from(users)
+                .where(eq(users.username, obj.username))
+        ))
+
+    if (obj.authorId)
+        filters.push(eq(posts.userId, obj.authorId))
+
+    if (obj.likerUsername)
+        filters.push(inArray(
+            posts.postId,
+            db
+                .select({ postId: postReactions.postId })
+                .from(postReactions)
+                .innerJoin(users, eq(postReactions.userId, users.id))
+                .where(
+                    and(
+                        eq(users.username, obj.likerUsername),
+                        eq(postReactions.reaction, 'like')
+                    ))
+        ))
+    if (obj.dislikerUsername)
+        filters.push(inArray(
+            posts.postId,
+            db
+                .select({ postId: postReactions.postId })
+                .from(postReactions)
+                .innerJoin(users, eq(postReactions.userId, users.id))
+                .where(
+                    and(
+                        eq(users.username, obj.dislikerUsername),
+                        eq(postReactions.reaction, 'dislike')
+                    ))
+        ))
+
+    if (obj.tag)
+        filters.push(inArray(
+            posts.postId,
+            db
+                .select({ postId: postTags.postId })
+                .from(postTags)
+                .where(eq(postTags.tagName, obj.tag))
+        ))
+
+    if (obj.cursor)
+        filters.push(gt(posts.postId, obj.cursor))
+
+    return detailedPosts({ filters, limit: obj.limit }, userId)
 }
 
 export async function reactToPost(postId: number, userId: string, reaction: "like" | "dislike") {
@@ -60,7 +104,7 @@ export async function reactToPost(postId: number, userId: string, reaction: "lik
         WHERE NOT EXISTS (
             SELECT 1 FROM deleted WHERE reaction = ${reaction}
         );
-    `)        
+    `)
 }
 
 export async function deletePost(postId: number, userId: string) {
@@ -68,10 +112,15 @@ export async function deletePost(postId: number, userId: string) {
         eq(posts.postId, postId),
         eq(posts.userId, userId)
     ))
-    .returning({postId: posts.postId})
+        .returning({ postId: posts.postId })
 }
 
-function detailedPosts(obj: Filters = { filters: [] }, userId?: string) {
+type Args = {
+    filters: SQL[]
+    limit?: number
+}
+
+function detailedPosts(obj: Args = { filters: [], }, userId?: string) {
     const mediaQuery = db.$with("mq").as(
         db.select({
             postId: media.postId,
@@ -99,8 +148,8 @@ function detailedPosts(obj: Filters = { filters: [] }, userId?: string) {
             likes: sql<number>`SUM(CASE WHEN ${postReactions.reaction} = 'like' THEN 1 ELSE 0 END)`.as("likes"),
             dislikes: sql<number>`SUM(CASE WHEN ${postReactions.reaction} = 'dislike' THEN 1 ELSE 0 END)`.as("dislikes"),
         })
-        .from(postReactions)
-        .groupBy(postReactions.postId)
+            .from(postReactions)
+            .groupBy(postReactions.postId)
     )
 
     const commentsQuery = db.$with("cq").as(
@@ -108,8 +157,8 @@ function detailedPosts(obj: Filters = { filters: [] }, userId?: string) {
             postId: comments.postId,
             numComments: count().as("num_comments")
         })
-        .from(comments)
-        .groupBy(comments.postId)
+            .from(comments)
+            .groupBy(comments.postId)
     )
 
     const userReactionQuery = db.$with("urq").as(
@@ -117,8 +166,8 @@ function detailedPosts(obj: Filters = { filters: [] }, userId?: string) {
             postId: postReactions.postId,
             reaction: postReactions.reaction
         })
-        .from(postReactions)
-        .where(eq(postReactions.userId, userId!))
+            .from(postReactions)
+            .where(eq(postReactions.userId, userId!))
     )
 
     const query = db.with(mediaQuery, tagsQuery, reactionQuery, commentsQuery, userReactionQuery).select({
@@ -156,8 +205,6 @@ function detailedPosts(obj: Filters = { filters: [] }, userId?: string) {
 
     if (obj.limit)
         query.limit(obj.limit)
-    if (obj.offset)
-        query.offset(obj.offset)
 
     if (userId)
         query.leftJoin(userReactionQuery, eq(userReactionQuery.postId, posts.postId))

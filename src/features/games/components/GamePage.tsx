@@ -7,6 +7,7 @@ import { PhotoCardGrid } from "~/components/CardLink/PhotoCardLink"
 import { Carousel } from "~/components/Carousel/Carousel"
 import { YouTubeIframe } from "~/components/YoutubeIframe"
 import { STORAGE_DOMAIN } from "~/utils/env"
+import { HeroHeader } from "~/components/Hero/HeroHeader"
 
 type Props = {
     game: Awaited<ReturnType<typeof getGameFn>>
@@ -16,19 +17,12 @@ export function GamePage(props: Props) {
 
     return (
         <div class={styles.game}>
-            <div class={styles.header}>
-                <h1 class={`${styles.title}`}>{props.game.title}</h1>
-                <div class={styles.hero}>
-                    <img src={STORAGE_DOMAIN + props.game.banner} alt="" />
-                </div>
-                <div class={`${styles.cover} cutout-wrapper`}>
-                    <img
-                        style={{ "view-transition-name": "gameId" + props.game.gameId }}
-                        class={`cutout`}
-                        src={STORAGE_DOMAIN + props.game.cover} alt=""
-                    />
-                </div>
-            </div>
+            <HeroHeader
+                banner={STORAGE_DOMAIN + props.game.banner}
+                image={STORAGE_DOMAIN + props.game.cover}
+                label={props.game.title}
+                viewTransitionName={"gameId" + props.game.gameId}
+            />
             <div class={styles.body}>
                 <div class={styles.columns}>
                     <div class={`${styles.main} cutout-wrapper`}>
@@ -117,32 +111,6 @@ function ReleaseDate(props: { date: Date }) {
             <span> {props.date.getDate()} </span>
             <span> {props.date.toLocaleString("default", { month: "long" })} </span>
             <span> {props.date.getFullYear()} </span>
-        </div>
-    )
-}
-
-type P = {
-    label: string
-    banner: string
-    type: string
-    identifier: string | number
-    image: string
-}
-
-export function HeroHeader(props: P) {
-    return (
-        <div class={styles.header}>
-            <h1 class={`${styles.title}`}>{props.label}</h1>
-            <div class={styles.hero}>
-                <img src={props.banner} alt="" />
-            </div>
-            <div class={`${styles.cover} cutout-wrapper`}>
-                <img
-                    style={{ "view-transition-name": props.type + props.identifier }}
-                    class={`cutout`}
-                    src={props.image} alt=""
-                />
-            </div>
         </div>
     )
 }
