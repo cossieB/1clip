@@ -8,9 +8,10 @@ import { ContentEditable } from "~/components/Forms/ContentEditable";
 import { STORAGE_DOMAIN } from "~/utils/env";
 import { useServerFn } from "@tanstack/solid-start";
 import { useMutation, useQueryClient } from "@tanstack/solid-query";
-import styles from "./DevForm.module.css"
+import styles from "~/styles/F.module.css"
 import { useToastContext } from "~/hooks/useToastContext";
 import { developerQueryOpts } from "../utils/developerQueryOpts";
+import { mediaSrc } from "~/utils/mediaSrc";
 
 type Developer = Awaited<ReturnType<typeof getDeveloperFn>>
 
@@ -120,5 +121,3 @@ export function DevForm(props: { developer?: Developer }) {
         </div>
     )
 }
-
-export const mediaSrc = (src: string) => src.startsWith("blob:") ? src : STORAGE_DOMAIN + src
