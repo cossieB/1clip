@@ -5,7 +5,7 @@ import { NotFound } from '~/components/NotFound/NotFound'
 import { GamePage } from '~/features/games/components/GamePage'
 import { getGameFn } from '~/serverFn/games'
 
-export const Route = createFileRoute('/games/$gameId')({
+export const Route = createFileRoute('/games/$gameId/')({
     component: RouteComponent,
     params: {
         parse: params => ({

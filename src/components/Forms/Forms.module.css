@@ -17,7 +17,8 @@
         color: hsl(0, 64%, 60%);
     }
 
-    button, .btn {
+    button,
+    .btn {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -26,10 +27,11 @@
         height: 2.5rem;
         padding: 0 1rem;
         color: black;
-        
+
         &[type="submit"] {
             background-color: var(--neon-green);
         }
+
         &:disabled {
             background-color: rgba(90, 82, 82, 0.3);
             color: white;
@@ -110,6 +112,14 @@
     border-radius: 50%;
     background-color: white;
     animation: up-down 2s ease-in-out var(--delay) infinite alternate;
+}
+
+.content-editable {
+    position: relative;
+    border-radius: .5rem;
+    color: white;
+    border: none;
+    background: #00000050;
 }
 
 @keyframes up-down {

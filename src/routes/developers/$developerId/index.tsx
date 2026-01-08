@@ -1,30 +1,24 @@
 import { useQuery } from '@tanstack/solid-query'
-import { createFileRoute, notFound } from '@tanstack/solid-router'
-import { Suspense } from 'solid-js'
+import { createFileRoute, Link, notFound } from '@tanstack/solid-router'
+import { Show, Suspense } from 'solid-js'
 import { CompanyPage } from '~/components/CompanyPage/CompanyPage'
 import { GamesList } from '~/features/games/components/GamesList'
 import { NotFound } from '~/components/NotFound/NotFound'
-import { getDeveloperFn } from '~/serverFn/developers'
 import { getGamesByDeveloperFn } from '~/serverFn/games'
 import { STORAGE_DOMAIN } from '~/utils/env'
+import { developerQueryOpts } from '~/features/developers/utils/developerQueryOpts'
+import { AdminWrapper } from '~/components/AdminWrapper'
 
-export const Route = createFileRoute('/developers/$developerId')({
+export const Route = createFileRoute('/developers/$developerId/')({
     component: RouteComponent,
-    params: {
-        parse: params => ({
-            developerId: Number(params.developerId)
-        })
-    },
+
     loader: async ({ context, params }) => {
         if (Number.isNaN(params.developerId)) throw notFound();
         context.queryClient.ensureQueryData({
             queryKey: ["games", "byDev", params.developerId],
             queryFn: () => getGamesByDeveloperFn({ data: params.developerId })
         })
-        return await context.queryClient.ensureQueryData({
-            queryKey: ["developers", params.developerId],
-            queryFn: () => getDeveloperFn({ data: params.developerId })
-        })
+        return await context.queryClient.ensureQueryData(developerQueryOpts(params.developerId))
     },
     head: ({ loaderData }) => ({
         meta: loaderData ? [{ title: loaderData.name + " :: GG" }] : undefined,
@@ -34,13 +28,13 @@ export const Route = createFileRoute('/developers/$developerId')({
 
 function RouteComponent() {
     const params = Route.useParams()
-    const devResult = useQuery(() => ({
-        queryKey: ["developers", params().developerId],
-        queryFn: () => getDeveloperFn({ data: params().developerId })
-    }))
+    const devResult = useQuery(() => developerQueryOpts(params().developerId))
 
     return (
         <>
+            <AdminWrapper>
+                <Link from='/developers/$developerId/' to='./edit'>Edit</Link>
+            </AdminWrapper>
             <Suspense>
                 <CompanyPage
                     id={devResult.data!.developerId}

@@ -100,6 +100,9 @@ export function GamePage(props: Props) {
                     />
                 </Show>
             </div>
+            <Show when={true}>
+                <Link from="/games/$gameId" to="./edit">Edit</Link>
+            </Show>
         </div>
     )
 }

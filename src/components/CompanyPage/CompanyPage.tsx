@@ -1,6 +1,5 @@
 import { Show } from "solid-js"
 import styles from "./CompanyPage.module.css"
-import { useLocation } from "@tanstack/solid-router"
 
 type Props = {
     id: number,

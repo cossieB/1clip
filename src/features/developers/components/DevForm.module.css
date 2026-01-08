@@ -1,0 +1,17 @@
+.container {
+
+    .upload {
+        position: relative;
+        height: 10rem;
+        >div {
+            height: 100%;
+        }
+    }
+    .preview {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        z-index: -1;
+        
+    }
+}
