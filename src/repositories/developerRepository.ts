@@ -2,14 +2,18 @@ import { eq, InferInsertModel, InferSelectModel } from "drizzle-orm";
 import { db } from "~/drizzle/db";
 import { developers } from "~/drizzle/schema";
 
-export async function findAll(filters?: {limit: number, offset: number}) {
-    return await db.query.developersView.findMany({
+export async function findAll(filters?: { limit: number, offset: number }) {
+    return await db.query.developers.findMany({
+        columns: {
+            dateAdded: false,
+            dateModified: false
+        },
         ...filters
     })
 }
 
 export async function findById(developerId: number) {
-    return await db.query.developersView.findFirst({
+    return await db.query.developers.findFirst({
         where: {
             developerId
         }

@@ -3,7 +3,11 @@ import { db } from "~/drizzle/db";
 import { actors } from "~/drizzle/schema";
 
 export function findById(actorId: number) {
-    return db.query.actorsView.findFirst({
+    return db.query.actors.findFirst({
+        columns: {
+            dateAdded: false,
+            dateModified: false
+        },
         where: {
             actorId
         }

@@ -3,11 +3,20 @@ import { db } from "~/drizzle/db";
 import { platforms } from "~/drizzle/schema";
 
 export function findAll() {
-    return db.query.platformsView.findMany()
+    return db.query.platforms.findMany({
+        columns: {
+            dateAdded: false,
+            dateModified: false
+        },
+    })
 }
 
 export function findById(platformId: number) {
-    return db.query.platformsView.findFirst({
+    return db.query.platforms.findFirst({
+        columns: {
+            dateAdded: false,
+            dateModified: false
+        },
         where: {
             platformId
         }

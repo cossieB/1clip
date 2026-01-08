@@ -3,13 +3,17 @@ import { db } from "~/drizzle/db";
 import { publishers } from "~/drizzle/schema";
 
 export async function findAll(filters?: {limit: number, offset: number}) {
-    return await db.query.publishersView.findMany({
+    return await db.query.publishers.findMany({
+        columns: {
+            dateAdded: false,
+            dateModified: false
+        },
         ...filters
     })
 }
 
 export async function findById(publisherId: number) {
-    return await db.query.publishersView.findFirst({
+    return await db.query.publishers.findFirst({
         where: {
             publisherId
         }

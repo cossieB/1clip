@@ -1,9 +1,8 @@
 import { and, eq, getColumns, inArray, SQL, sql } from "drizzle-orm";
 import { db } from "~/drizzle/db";
-import type { ActorView, PlatformView } from "~/drizzle/models";
-import { gameActors, gamePlatforms, gameGenres, actors, platforms, media } from "~/drizzle/schema/schema";
-import { gamesView, publishersView, developersView } from "~/drizzle/schema/views";
+import { gameActors, gamePlatforms, gameGenres, actors, platforms, media, games, publishers, developers } from "~/drizzle/schema/schema";
 import { Filters } from "./types";
+import { Actor, Platform } from "~/drizzle/models";
 
 export async function findAll(obj?: Filters) {
     try {
@@ -15,16 +14,16 @@ export async function findAll(obj?: Filters) {
 }
 
 export async function findById(gameId: number) {
-    const list = await detailedGames({ filters: [eq(gamesView.gameId, gameId)] })
+    const list = await detailedGames({ filters: [eq(games.gameId, gameId)] })
     return list.at(0)
 }
 
 export async function findByDeveloper(developerId: number, obj: Filters = { filters: [] }) {
-    return detailedGames({ ...obj, filters: [...obj.filters, eq(gamesView.developerId, developerId)] })
+    return detailedGames({ ...obj, filters: [...obj.filters, eq(games.developerId, developerId)] })
 }
 
 export async function findByPublisher(publisherId: number, obj: Filters = { filters: [] }) {
-    return detailedGames({ ...obj, filters: [...obj.filters, eq(gamesView.publisherId, publisherId)] })
+    return detailedGames({ ...obj, filters: [...obj.filters, eq(games.publisherId, publisherId)] })
 }
 
 export async function findByActor(actorId: number, obj: Filters = { filters: [] }) {
@@ -33,7 +32,7 @@ export async function findByActor(actorId: number, obj: Filters = { filters: [] 
         filters: [
             ...obj.filters,
             inArray(
-                gamesView.gameId,
+                games.gameId,
                 db
                     .select({ gameId: gameActors.gameId })
                     .from(gameActors)
@@ -48,7 +47,7 @@ export async function findByPlatform(platformId: number, obj: Filters = { filter
         filters: [
             ...obj.filters,
             inArray(
-                gamesView.gameId,
+                games.gameId,
                 db
                     .select({ gameId: gamePlatforms.gameId })
                     .from(gamePlatforms)
@@ -64,7 +63,7 @@ export async function findByTag(tag: string, obj: Filters = { filters: [] }) {
         filters: [
             ...obj.filters,
             inArray(
-                gamesView.gameId,
+                games.gameId,
                 db
                     .select({ gameId: gameGenres.gameId })
                     .from(gameGenres)
@@ -75,7 +74,7 @@ export async function findByTag(tag: string, obj: Filters = { filters: [] }) {
 }
 
 function detailedGames(obj: Filters = { filters: [] }) {
-    const { developerId, publisherId, ...gamesColumns } = getColumns(gamesView)
+    const { developerId, publisherId, ...gamesColumns } = getColumns(games)
     const actorQuery = db.$with("aq").as(
         db.select({
             gameId: gameActors.gameId,
@@ -133,22 +132,22 @@ function detailedGames(obj: Filters = { filters: [] }) {
         .with(actorQuery, platformQuery, genresQuery, mediaQuery)
         .select({
             ...gamesColumns,
-            publisher: { ...getColumns(publishersView) },
-            developer: { ...getColumns(developersView) },
+            publisher: { ...getColumns(publishers) },
+            developer: { ...getColumns(developers) },
             tags: sql<string[]>`COALESCE(${genresQuery.tags}, '{}')`,
-            platforms: sql<PlatformView[]>`COALESCE(${platformQuery.platformArr}, '[]'::JSONB)`,
-            actors: sql<(ActorView & { character: string })[]>`COALESCE(${actorQuery.actorArr}, '[]'::JSONB)`,
+            platforms: sql<Platform[]>`COALESCE(${platformQuery.platformArr}, '[]'::JSONB)`,
+            actors: sql<(Actor & { character: string })[]>`COALESCE(${actorQuery.actorArr}, '[]'::JSONB)`,
             media: sql<{ key: string, contentType: string }[]>`COALESCE(${mediaQuery.media}, '[]'::JSONB)`
         })
-        .from(gamesView)
-        .innerJoin(developersView, eq(gamesView.developerId, developersView.developerId))
-        .innerJoin(publishersView, eq(gamesView.publisherId, publishersView.publisherId))
-        .leftJoin(actorQuery, eq(gamesView.gameId, actorQuery.gameId))
-        .leftJoin(platformQuery, eq(gamesView.gameId, platformQuery.gameId))
-        .leftJoin(genresQuery, eq(gamesView.gameId, genresQuery.gameId))
-        .leftJoin(mediaQuery, eq(gamesView.gameId, mediaQuery.gameId))
+        .from(games)
+        .innerJoin(developers, eq(games.developerId, developers.developerId))
+        .innerJoin(publishers, eq(games.publisherId, publishers.publisherId))
+        .leftJoin(actorQuery, eq(games.gameId, actorQuery.gameId))
+        .leftJoin(platformQuery, eq(games.gameId, platformQuery.gameId))
+        .leftJoin(genresQuery, eq(games.gameId, genresQuery.gameId))
+        .leftJoin(mediaQuery, eq(games.gameId, mediaQuery.gameId))
         .where(and(...obj.filters))
-        .orderBy(gamesView.title)
+        .orderBy(games.title)
 
     if (obj.limit)
         gamesQuery.limit(obj.limit)
