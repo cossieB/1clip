@@ -56,7 +56,7 @@ export function UserPage(props: Props) {
                                 <li>
                                     <img
                                         src={`${validateUrl(link)?.origin}/favicon.ico`}
-                                        onerror={e => e.currentTarget.src = "https://upload.wikimedia.org/wikipedia/commons/8/84/Icons8-question-mark-52.png"}
+                                        onerror={e => e.currentTarget.src = "/q.png"}
                                     />
                                     <a href={link} target="_blank" rel="noreferrer">{link}</a>
                                 </li>

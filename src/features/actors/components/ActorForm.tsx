@@ -6,10 +6,9 @@ import { useUpload } from "~/hooks/useUpload"
 import { createActorFn, editActorFn, getActorFn } from "~/serverFn/actors"
 import { actorQueryOpts } from "../utils/actorQueryOpts"
 import { Form } from "~/components/Forms/Form"
-import { UploadBox } from "~/components/UploadBox/UploadBox"
-import { mediaSrc } from "~/utils/mediaSrc"
 import { ContentEditable } from "~/components/Forms/ContentEditable"
 import styles from "~/styles/F.module.css"
+import { UploadBoxWithPreview } from "~/components/UploadBox/UploadBoxWithPreview"
 
 type Actor = Awaited<ReturnType<typeof getActorFn>>
 
@@ -56,7 +55,6 @@ export function ActorForm(props: { actor?: Actor }) {
         })
     }
 
-
     return (
         <div class={styles.container}>
             <Form
@@ -71,27 +69,13 @@ export function ActorForm(props: { actor?: Actor }) {
                     setter={name => setActor({ name })}
                     value={actor.name}
                 />
-                <div class={styles.upload}>
-                    <UploadBox
-                        accept={{
-                            image: true,
-                            video: false,
-                            audio: false
-                        }}
-                        label="photo"
-                        limit={1}
-                        maxSize={5}
-                        onSuccess={data => {
-                            const a = data[0]
-                            setActor({ photo: a.objectUrl })
-                            setFiles([{ ...a, field: "photo" }])
-                        }}
-                    />
-                    <div class={styles.preview}>
-                        <img src={mediaSrc(actor.photo ?? "")} />
-                    </div>
-                </div>
-
+                <UploadBoxWithPreview
+                    image={actor.photo ?? "/q.png"}
+                    onDrop={data => {
+                        setActor({ photo: data.objectUrl })
+                        setFiles([{ ...data, field: "photo" }])
+                    }}
+                />
                 <ContentEditable
                     html={actor.bio}
                     setter={bio => setActor({ bio })}

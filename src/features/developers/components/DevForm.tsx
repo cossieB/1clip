@@ -1,6 +1,5 @@
 import { createStore } from "solid-js/store";
 import { Form } from "~/components/Forms/Form";
-import { UploadBox } from "~/components/UploadBox/UploadBox";
 import { createDeveloperFn, editDeveloperFn, type getDeveloperFn } from "~/serverFn/developers";
 import { useUpload } from "~/hooks/useUpload";
 import { countryList } from "~/utils/countryList";
@@ -10,7 +9,7 @@ import { useMutation, useQueryClient } from "@tanstack/solid-query";
 import styles from "~/styles/F.module.css"
 import { useToastContext } from "~/hooks/useToastContext";
 import { developerQueryOpts } from "../utils/developerQueryOpts";
-import { mediaSrc } from "~/utils/mediaSrc";
+import { UploadBoxWithPreview } from "~/components/UploadBox/UploadBoxWithPreview";
 
 type Developer = Awaited<ReturnType<typeof getDeveloperFn>>
 
@@ -59,7 +58,6 @@ export function DevForm(props: { developer?: Developer }) {
         })
     }
 
-
     return (
         <div class={styles.container}>
 
@@ -79,26 +77,13 @@ export function DevForm(props: { developer?: Developer }) {
                     setter={name => setDeveloper({ name })}
                     value={developer.name}
                 />
-                <div class={styles.upload}>
-                    <UploadBox
-                        accept={{
-                            image: true,
-                            video: false,
-                            audio: false
-                        }}
-                        label="Logo"
-                        limit={1}
-                        maxSize={5}
-                        onSuccess={data => {
-                            const a = data[0]
-                            setDeveloper({ logo: a.objectUrl })
-                            setFiles([{ ...a, field: "logo" }])
-                        }}
-                    />
-                    <div class={styles.preview}>
-                        <img src={mediaSrc(developer.logo)} />
-                    </div>
-                </div>
+                <UploadBoxWithPreview
+                    image={developer.logo}
+                    onDrop={data => {
+                        setDeveloper({ logo: data.objectUrl })
+                        setFiles([{ ...data, field: "logo" }])
+                    }}
+                />
                 <Form.FormSelect
                     field={"country"}
                     list={countryList}
@@ -120,3 +105,4 @@ export function DevForm(props: { developer?: Developer }) {
         </div>
     )
 }
+

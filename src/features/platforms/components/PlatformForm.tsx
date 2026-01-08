@@ -10,6 +10,7 @@ import { Form } from "~/components/Forms/Form"
 import { UploadBox } from "~/components/UploadBox/UploadBox"
 import { mediaSrc } from "~/utils/mediaSrc"
 import { ContentEditable } from "~/components/Forms/ContentEditable"
+import { UploadBoxWithPreview } from "~/components/UploadBox/UploadBoxWithPreview"
 
 type Platform = Awaited<ReturnType<typeof getPlatformFn>>
 
@@ -78,27 +79,13 @@ export function PlatformForm(props: { platform?: Platform }) {
                     setter={name => setPlatform({ name })}
                     value={platform.name}
                 />
-                <div class={styles.upload}>
-                    <UploadBox
-                        accept={{
-                            image: true,
-                            video: false,
-                            audio: false
-                        }}
-                        label="Logo"
-                        limit={1}
-                        maxSize={5}
-                        onSuccess={data => {
-                            const a = data[0]
-                            setPlatform({ logo: a.objectUrl })
-                            setFiles([{ ...a, field: "logo" }])
-                        }}
-                    />
-                    <div class={styles.preview}>
-                        <img src={mediaSrc(platform.logo)} />
-                    </div>
-                </div>
-
+                <UploadBoxWithPreview
+                    image={platform.logo}
+                    onDrop={data => {
+                        setPlatform({ logo: data.objectUrl })
+                        setFiles([{ ...data, field: "logo" }])
+                    }}
+                />
                 <ContentEditable
                     html={platform.summary}
                     setter={summary => setPlatform({ summary })}

@@ -11,6 +11,7 @@ import styles from "~/styles/F.module.css"
 import { countryList } from "~/utils/countryList";
 import { mediaSrc } from "~/utils/mediaSrc";
 import { publisherQueryOpts } from "../utils/publisherQueryOpts";
+import { UploadBoxWithPreview } from "~/components/UploadBox/UploadBoxWithPreview";
 
 type Publisher = Awaited<ReturnType<typeof getPublisherFn>>
 
@@ -82,26 +83,13 @@ export function PubForm(props: { publisher?: Publisher }) {
                     setter={name => setPublisher({ name })}
                     value={publisher.name}
                 />
-                <div class={styles.upload}>
-                    <UploadBox
-                        accept={{
-                            image: true,
-                            video: false,
-                            audio: false
-                        }}
-                        label="Logo"
-                        limit={1}
-                        maxSize={5}
-                        onSuccess={data => {
-                            const a = data[0]
-                            setPublisher({ logo: a.objectUrl })
-                            setFiles([{ ...a, field: "logo" }])
-                        }}
-                    />
-                    <div class={styles.preview}>
-                        <img src={mediaSrc(publisher.logo)} />
-                    </div>
-                </div>
+                <UploadBoxWithPreview
+                    image={publisher.logo}
+                    onDrop={data => {
+                        setPublisher({ logo: data.objectUrl })
+                        setFiles([{ ...data, field: "logo" }])
+                    }}
+                />
                 <Form.FormSelect
                     field={"country"}
                     list={countryList}
