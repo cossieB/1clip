@@ -12,7 +12,7 @@ export function useDeleteComment(comment: Awaited<ReturnType<typeof getCommentsB
         mutationFn: delComment,
         onSuccess() {
             queryClient.setQueryData(
-                commentListQueryOpts(postId, replyTo).queryKey,
+                commentListQueryOpts({postId, replyTo}).queryKey,
                 data => data?.filter(c => c.commentId != comment.commentId)
             )
         },

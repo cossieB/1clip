@@ -4,19 +4,16 @@ import { Suspense } from 'solid-js'
 import { CompanyPage } from '~/components/CompanyPage/CompanyPage'
 import { GamesList } from '~/features/games/components/GamesList'
 import { NotFound } from '~/components/NotFound/NotFound'
-import { getGamesByPublisherFn } from '~/serverFn/games'
 import { STORAGE_DOMAIN } from '~/utils/env'
 import { publisherQueryOpts } from '~/features/publishers/utils/publisherQueryOpts'
 import { AdminWrapper } from '~/components/AdminWrapper'
+import { gamesQueryOpts } from '~/features/games/utils/gameQueryOpts'
 
 export const Route = createFileRoute('/publishers/$publisherId/')({
     component: RouteComponent,
     loader: async ({ context, params}) => {
         if (Number.isNaN(params.publisherId)) throw notFound()
-        context.queryClient.ensureQueryData({
-            queryKey: ["games", "byPub", params.publisherId],
-            queryFn: () => getGamesByPublisherFn({ data: params.publisherId })
-        })
+        context.queryClient.ensureQueryData(gamesQueryOpts({publisherId: params.publisherId}))
         return await context.queryClient.ensureQueryData(publisherQueryOpts(params.publisherId))
     },
     head: ({ loaderData }) => ({
@@ -44,10 +41,7 @@ function RouteComponent() {
                 />
             </Suspense>
             <GamesList
-                opts={{
-                    queryKey: ["games", "byPub", params().publisherId],
-                    queryFn: () => getGamesByPublisherFn({ data: params().publisherId })
-                }}
+                filters={{publisherId: params().publisherId}}
             />
         </>
     )

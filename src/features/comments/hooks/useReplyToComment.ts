@@ -2,6 +2,7 @@ import { useQueryClient, useMutation, QueryClient } from "@tanstack/solid-query"
 import { useServerFn } from "@tanstack/solid-start"
 import { createStore } from "solid-js/store"
 import { addCommentFn, getCommentsByPostIdFn } from "~/serverFn/comments"
+import { commentListQueryOpts } from "../utils/commentListQueryOpts"
 
 export function useReplyToComment(comment: Awaited<ReturnType<typeof getCommentsByPostIdFn>>[number], postId: number) {
     const queryClient = useQueryClient()
@@ -17,12 +18,10 @@ export function useReplyToComment(comment: Awaited<ReturnType<typeof getComments
         mutationFn: reply,
         onSuccess() {
             setCommentState({ showReplies: true, comment: "", showInput: false })
-            queryClient.invalidateQueries({
-                queryKey: ["comments", {
+            queryClient.invalidateQueries(commentListQueryOpts({
                     postId: postId,
                     replyTo: comment.commentId
-                }],
-            })
+                }))
         }
     }))
     return {

@@ -4,11 +4,8 @@ import { createStore } from "solid-js/store"
 import { useToastContext } from "~/hooks/useToastContext"
 import { useUpload } from "~/hooks/useUpload"
 import { createPlatformFn, editPlatformFn, getPlatformFn } from "~/serverFn/platforms"
-import styles from "~/styles/F.module.css"
 import { platformQueryOpts } from "../utils/platformQueryOpts"
 import { Form } from "~/components/Forms/Form"
-import { UploadBox } from "~/components/UploadBox/UploadBox"
-import { mediaSrc } from "~/utils/mediaSrc"
 import { ContentEditable } from "~/components/Forms/ContentEditable"
 import { UploadBoxWithPreview } from "~/components/UploadBox/UploadBoxWithPreview"
 
@@ -63,8 +60,7 @@ export function PlatformForm(props: { platform?: Platform }) {
     }
 
     return (
-        <div class={styles.container}>
-
+        <div >
             <Form
                 isPending={isUploading() || createPlatformMutation.isPending || editPlatformMutation.isPending}
                 disabled={

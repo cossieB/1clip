@@ -14,6 +14,10 @@ export async function findAll(filters?: { limit: number, offset: number }) {
 
 export async function findById(developerId: number) {
     return await db.query.developers.findFirst({
+        columns: {
+            dateAdded: false,
+            dateModified: false
+        },
         where: {
             developerId
         }

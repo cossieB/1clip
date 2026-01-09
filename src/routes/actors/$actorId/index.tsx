@@ -5,19 +5,15 @@ import { AdminWrapper } from '~/components/AdminWrapper'
 import { CompanyPage } from '~/components/CompanyPage/CompanyPage'
 import { actorQueryOpts } from '~/features/actors/utils/actorQueryOpts'
 import { GamesList } from '~/features/games/components/GamesList'
-import { getGamesByActorFn } from '~/serverFn/games'
+import { gamesQueryOpts } from '~/features/games/utils/gameQueryOpts'
 import { STORAGE_DOMAIN } from '~/utils/env'
-
 
 export const Route = createFileRoute('/actors/$actorId/')({
     component: RouteComponent,
 
     loader: async ({ context, params }) => {
         if (Number.isNaN(params.actorId)) throw notFound()
-        context.queryClient.ensureQueryData({
-            queryKey: ["games", "withActor", params.actorId],
-            queryFn: () => getGamesByActorFn({ data: params.actorId })
-        })
+        context.queryClient.ensureQueryData(gamesQueryOpts({actorId: params.actorId}))
         return await context.queryClient.ensureQueryData(actorQueryOpts(params.actorId))
     },
     head: ({ loaderData }) => ({
@@ -45,10 +41,7 @@ function RouteComponent() {
                 />
             </Suspense>
             <GamesList
-                opts={{
-                    queryKey: ["games", "withActor", params().actorId],
-                    queryFn: () => getGamesByActorFn({ data: params().actorId })
-                }}
+                filters={{actorId: params().actorId}}
             />
         </>
     )

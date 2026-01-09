@@ -1,8 +1,19 @@
 import { notFound } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start"
+import z from "zod";
 import * as gamesRepository from "~/repositories/gamesRepository";
 
-export const getGamesFn = createServerFn().handler(() => gamesRepository.findAll())
+export const getGamesFn = createServerFn()
+    .inputValidator(z.object({
+        developerId: z.number(),
+        publisherId: z.number(),
+        actorId: z.number(),
+        platformId: z.number(),
+        tag: z.string(),
+        limit: z.number(),
+        cursor: z.number()
+    }).partial().optional())
+    .handler(({data}) => gamesRepository.findAll(data))
 
 export const getGameFn = createServerFn()
     .inputValidator((gameId: number) => {
@@ -14,35 +25,3 @@ export const getGameFn = createServerFn()
         if (!game) throw notFound()
         return game
     })
-
-export const getGamesByDeveloperFn = createServerFn()
-    .inputValidator((id: number) => id)
-    .handler(async ({ data }) => {
-        if (data < 1) return []
-        return gamesRepository.findByDeveloper(data)
-    })
-
-export const getGamesByPublisherFn = createServerFn()
-    .inputValidator((id: number) => id)
-    .handler(async ({ data }) => {
-        if (data < 1) return [];
-        return gamesRepository.findByPublisher(data)
-    })
-
-export const getGamesByActorFn = createServerFn()
-    .inputValidator((id: number) => id)
-    .handler(async ({data}) => {
-        if (data < 1) return []
-        return gamesRepository.findByActor(data)
-    })
-
-export const getGamesByPlatformFn = createServerFn()
-    .inputValidator((id: number) => id)
-    .handler(async ({data}) => {
-        if (data < 1) return []
-        return gamesRepository.findByPlatform(data)
-    })
-
-export const getGamesByGenreFn = createServerFn()
-    .inputValidator((tag: string) => tag )
-    .handler(async ({data}) => gamesRepository.findByTag(data))

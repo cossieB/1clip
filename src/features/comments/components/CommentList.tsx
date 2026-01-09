@@ -4,7 +4,7 @@ import { CommentBlock } from "./CommentBlock";
 import { commentListQueryOpts } from "../utils/commentListQueryOpts";
 
 export function CommentList(props: { postId: number, replyTo?: number, enabled?: boolean }) {
-    const result = useQuery(() => commentListQueryOpts(props.postId, props.replyTo, props.enabled))
+    const result = useQuery(() => commentListQueryOpts({postId: props.postId, replyTo: props.replyTo}, props.enabled))
     return (
         <Suspense>
             <div>

@@ -11,29 +11,30 @@
         top: 0;
         font-size: small;
     }
+
     span {
         font-size: x-small;
     }
+
     &.dragover {
         z-index: 5;
         background-color: #3d3a3a;
     }
 }
 
-.container {
+.upload {
+    position: relative;
+    height: 10rem;
 
-    .upload {
-        position: relative;
-        height: 10rem;
-        >div {
-            height: 100%;
-        }
+    >div {
+        height: 100%;
     }
-    .preview {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        z-index: -1;
-        
-    }
+}
+
+.preview {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    z-index: -1;
+
 }

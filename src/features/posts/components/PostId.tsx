@@ -1,5 +1,5 @@
 import { PostBlock } from "./PostBlock";
-import { deletePostFn, type getPostsFn } from "~/serverFn/posts";
+import { type getPostsFn } from "~/serverFn/posts";
 import { createSignal } from "solid-js";
 import { useServerFn } from "@tanstack/solid-start";
 import { useMutation, useQueryClient } from "@tanstack/solid-query";
@@ -7,8 +7,7 @@ import { addCommentFn } from "~/serverFn/comments";
 import styles from "./PostId.module.css"
 import { CommentList } from "~/features/comments/components/CommentList";
 import { CommentInput } from "~/features/comments/components/CommentInput";
-import { useToastContext } from "~/hooks/useToastContext";
-import { Post } from "~/drizzle/models";
+import { commentListQueryOpts } from "~/features/comments/utils/commentListQueryOpts";
 
 type Props = {
     post: Awaited<ReturnType<typeof getPostsFn>>[number]
@@ -23,11 +22,9 @@ export function PostId(props: Props) {
         mutationFn: commentOnPost,
         onSuccess(data, variables, onMutateResult, context) {
             setComment("")
-            queryClient.invalidateQueries({
-                queryKey: ["comments", {
+            queryClient.invalidateQueries(commentListQueryOpts({
                     postId: props.post.postId
-                }]
-            })
+                }))
         },
         onError(error, variables, onMutateResult, context) {
 

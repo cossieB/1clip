@@ -1,14 +1,11 @@
 import { createFileRoute } from '@tanstack/solid-router'
 import { GamesList } from '~/features/games/components/GamesList'
-import { getGamesByGenreFn } from '~/serverFn/games'
+import { gamesQueryOpts } from '~/features/games/utils/gameQueryOpts'
 
 export const Route = createFileRoute('/games/genres/$genre')({
     component: RouteComponent,
     loader: async ({ context, params: { genre } }) => {
-        return context.queryClient.ensureQueryData({
-            queryKey: ["games", "genres", genre],
-            queryFn: () => getGamesByGenreFn({ data: genre })
-        })
+        return context.queryClient.ensureQueryData(gamesQueryOpts({tag: genre}))
     }
 })
 
@@ -17,10 +14,7 @@ function RouteComponent() {
 
     return (
         <GamesList
-            opts={{
-                queryKey: ["games", "tag", params().genre],
-                queryFn: () => getGamesByGenreFn({ data: params().genre })
-            }}
+            filters={{tag: params().genre}}
         />
     )
 }

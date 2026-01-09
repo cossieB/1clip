@@ -1,9 +1,16 @@
 import { queryOptions } from "@tanstack/solid-query";
-import { getPublisherFn } from "~/serverFn/publishers";
+import { getPublisherFn, getPublishersFn } from "~/serverFn/publishers";
 
 export function publisherQueryOpts(publisherId: number) {
     return queryOptions({
-        queryKey: ["publishers", publisherId],
+        queryKey: ["publisher", publisherId],
         queryFn: () => getPublisherFn({ data: publisherId })
+    })
+}
+
+export function publishersQueryOpts() {
+    return queryOptions({
+        queryKey: ["publishers"],
+        queryFn: () => getPublishersFn()
     })
 }

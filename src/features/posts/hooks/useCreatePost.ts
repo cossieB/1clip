@@ -7,17 +7,14 @@ import { useGamesQuery } from "~/features/games/hooks/useGameQuery"
 import { useAbortController } from "~/hooks/useAbortController"
 import { useToastContext } from "~/hooks/useToastContext"
 import { useUpload } from "~/hooks/useUpload"
-import { getGamesFn } from "~/serverFn/games"
 import { createPostFn } from "~/serverFn/posts"
+import { postsQueryOpts } from "../utils/postQueryOpts"
 
 export function useCreatePost() {
     const { addToast } = useToastContext()
     const queryClient = useQueryClient()
     const navigate = useNavigate()
-    const result = useGamesQuery({
-        queryKey: ["games"],
-        queryFn: () => getGamesFn()
-    })
+    const result = useGamesQuery()
     
     const abortController = useAbortController()
 
@@ -59,7 +56,7 @@ export function useCreatePost() {
                     addToast({ text: error.message, type: "error" })
                 },
                 onSuccess(response, variables) {
-                    queryClient.invalidateQueries({ queryKey: ["posts"] })
+                    queryClient.invalidateQueries(postsQueryOpts())
                     navigate({ to: "/posts/$postId", params: { postId: response.postId } })
                 },
             })

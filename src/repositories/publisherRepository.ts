@@ -14,6 +14,10 @@ export async function findAll(filters?: {limit: number, offset: number}) {
 
 export async function findById(publisherId: number) {
     return await db.query.publishers.findFirst({
+        columns: {
+            dateAdded: false,
+            dateModified: false
+        },
         where: {
             publisherId
         }

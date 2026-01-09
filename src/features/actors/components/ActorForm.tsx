@@ -7,7 +7,6 @@ import { createActorFn, editActorFn, getActorFn } from "~/serverFn/actors"
 import { actorQueryOpts } from "../utils/actorQueryOpts"
 import { Form } from "~/components/Forms/Form"
 import { ContentEditable } from "~/components/Forms/ContentEditable"
-import styles from "~/styles/F.module.css"
 import { UploadBoxWithPreview } from "~/components/UploadBox/UploadBoxWithPreview"
 
 type Actor = Awaited<ReturnType<typeof getActorFn>>
@@ -56,7 +55,7 @@ export function ActorForm(props: { actor?: Actor }) {
     }
 
     return (
-        <div class={styles.container}>
+        <div>
             <Form
                 isPending={isUploading() || createActorMutation.isPending || editActorMutation.isPending}
                 disabled={

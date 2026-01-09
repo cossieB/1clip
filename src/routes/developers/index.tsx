@@ -2,16 +2,13 @@ import { useQuery, useQueryClient } from '@tanstack/solid-query'
 import { createFileRoute } from '@tanstack/solid-router'
 import { createEffect, For, Suspense } from 'solid-js'
 import { LogoLink } from '~/components/LogoLink/LogoLink'
-import { getDevelopersFn } from '~/serverFn/developers'
+import { developerQueryOpts, developersQueryOpts } from '~/features/developers/utils/developerQueryOpts'
 import { STORAGE_DOMAIN } from '~/utils/env'
 
 export const Route = createFileRoute('/developers/')({
     component: RouteComponent,
     loader: async ({ context }) => {
-        await context.queryClient.ensureQueryData({
-            queryKey: ["developers"],
-            queryFn: () => getDevelopersFn()
-        })
+        await context.queryClient.ensureQueryData(developersQueryOpts())
     },
     head: () => ({
         meta: [{ title: "Developers :: GG" }],
@@ -20,15 +17,12 @@ export const Route = createFileRoute('/developers/')({
 
 function RouteComponent() {
     const queryClient = useQueryClient()
-    const result = useQuery(() => ({
-        queryKey: ["developers"],
-        queryFn: () => getDevelopersFn()
-    }))
+    const result = useQuery(() => developersQueryOpts())
 
     createEffect(() => {
         if (result.data) {
             for (const item of result.data) {
-                queryClient.setQueryData(["developers", item.developerId], item)
+                queryClient.setQueryData(developerQueryOpts(item.developerId).queryKey, item)
             }
         }
     })

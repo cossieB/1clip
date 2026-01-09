@@ -5,6 +5,6 @@ export default defineConfig({
     schema: "./src/drizzle/schema/*.ts",
     out: "./src/drizzle/migrations",
     dbCredentials: {
-        url: process.env.DATABASE_URL!
+        url: "postgres://postgres:password@localhost:5432/gg"
     }
 })

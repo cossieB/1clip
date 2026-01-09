@@ -7,7 +7,6 @@ import { UploadBox } from "~/components/UploadBox/UploadBox";
 import { useToastContext } from "~/hooks/useToastContext";
 import { useUpload } from "~/hooks/useUpload";
 import { createPublisherFn, editPublisherFn, getPublisherFn } from "~/serverFn/publishers";
-import styles from "~/styles/F.module.css"
 import { countryList } from "~/utils/countryList";
 import { mediaSrc } from "~/utils/mediaSrc";
 import { publisherQueryOpts } from "../utils/publisherQueryOpts";
@@ -65,7 +64,7 @@ export function PubForm(props: { publisher?: Publisher }) {
     }
 
     return (
-        <div class={styles.container}>
+        <div >
 
             <Form
                 isPending={isUploading() || createPubMutation.isPending || editPubMutation.isPending}

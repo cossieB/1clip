@@ -3,7 +3,7 @@ import { getActorFn } from "~/serverFn/actors";
 
 export function actorQueryOpts(actorId: number) {
     return queryOptions({
-        queryKey: ["actors", actorId],
+        queryKey: ["actor", actorId],
         queryFn: () => getActorFn({ data: actorId })
     })
 }

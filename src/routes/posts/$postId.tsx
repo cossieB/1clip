@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/solid-query'
 import { createFileRoute, notFound } from '@tanstack/solid-router'
 import { Suspense } from 'solid-js'
 import { PostId } from '~/features/posts/components/PostId'
-import { getPostFn } from '~/serverFn/posts'
+import { postQueryOpts, postsQueryOpts } from '~/features/posts/utils/postQueryOpts'
 
 export const Route = createFileRoute('/posts/$postId')({
     params: {
@@ -12,10 +12,7 @@ export const Route = createFileRoute('/posts/$postId')({
     },
     loader: async ({ context, params: { postId }, }) => {        
         if (Number.isNaN(postId)) throw notFound()
-        return await context.queryClient.ensureQueryData({
-            queryKey: ["post", postId],
-            queryFn: () => getPostFn({ data: postId })
-        })
+        return await context.queryClient.ensureQueryData(postQueryOpts(postId))
     },
     head: ({ loaderData }) => ({
         meta: loaderData ? [{ title: loaderData.title + " :: GG" }] : undefined,
@@ -25,10 +22,7 @@ export const Route = createFileRoute('/posts/$postId')({
 
 function RouteComponent() {
     const params = Route.useParams()
-    const result = useQuery(() => ({
-        queryKey: ["post", params().postId],
-        queryFn: () => getPostFn({ data: params().postId })
-    }))
+    const result = useQuery(() => postQueryOpts(params().postId))
 
 
     return (
@@ -37,3 +31,4 @@ function RouteComponent() {
         </Suspense>
     )
 }
+postsQueryOpts

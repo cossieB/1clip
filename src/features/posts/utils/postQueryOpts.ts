@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/solid-query";
-import { getPostsFn } from "~/serverFn/posts";
+import { getPostFn, getPostsFn } from "~/serverFn/posts";
 
 type Filters = {
     username?: string
@@ -11,9 +11,16 @@ type Filters = {
     cursor?: number
 }
 
-export function postQueryOpts(filters?: Filters) {
+export function postsQueryOpts(filters?: Filters) {
     return queryOptions({
         queryKey: ["posts", filters],
         queryFn: () => getPostsFn({data: filters})
+    })
+}
+
+export function postQueryOpts(postId: number) {
+    return queryOptions({
+        queryKey: ["post", postId],
+        queryFn: () => getPostFn({data: postId})
     })
 }

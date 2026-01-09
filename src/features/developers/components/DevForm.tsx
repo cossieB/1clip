@@ -6,7 +6,6 @@ import { countryList } from "~/utils/countryList";
 import { ContentEditable } from "~/components/Forms/ContentEditable";
 import { useServerFn } from "@tanstack/solid-start";
 import { useMutation, useQueryClient } from "@tanstack/solid-query";
-import styles from "~/styles/F.module.css"
 import { useToastContext } from "~/hooks/useToastContext";
 import { developerQueryOpts } from "../utils/developerQueryOpts";
 import { UploadBoxWithPreview } from "~/components/UploadBox/UploadBoxWithPreview";
@@ -59,8 +58,7 @@ export function DevForm(props: { developer?: Developer }) {
     }
 
     return (
-        <div class={styles.container}>
-
+        <div>
             <Form
                 isPending={isUploading() || createDevMutation.isPending || editDevMutation.isPending}
                 disabled={

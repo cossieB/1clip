@@ -1,12 +1,12 @@
 import { type QueryClient } from "@tanstack/solid-query";
 import { type getPostFn } from "~/serverFn/posts";
-import { postQueryOpts } from "./postQueryOpts";
+import { postsQueryOpts } from "./postQueryOpts";
 
 type Post = Awaited<ReturnType<typeof getPostFn>>
 
 export function modifyPostCache(queryClient: QueryClient, postId: number, reaction: "dislike" | "like") {
     queryClient.setQueryData(["post", postId], (data: Post) => modifyPostInCache(data, reaction))
-    queryClient.setQueryData(postQueryOpts().queryKey, (data): Post[] | undefined => {
+    queryClient.setQueryData(postsQueryOpts().queryKey, (data): Post[] | undefined => {
         if (!data) return undefined
         const i = data.findIndex(x => x.postId == postId);
         if (i == -1) return data;

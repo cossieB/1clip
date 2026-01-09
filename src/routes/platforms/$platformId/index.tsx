@@ -4,20 +4,17 @@ import { Suspense } from 'solid-js'
 import { CompanyPage } from '~/components/CompanyPage/CompanyPage'
 import { GamesList } from '~/features/games/components/GamesList'
 import { NotFound } from '~/components/NotFound/NotFound'
-import { getGamesByPlatformFn } from '~/serverFn/games'
 import { STORAGE_DOMAIN } from '~/utils/env'
 import { platformQueryOpts } from '~/features/platforms/utils/platformQueryOpts'
 import { AdminWrapper } from '~/components/AdminWrapper'
+import { gamesQueryOpts } from '~/features/games/utils/gameQueryOpts'
 
 export const Route = createFileRoute('/platforms/$platformId/')({
     component: RouteComponent,
 
     loader: async ({ context, params }) => {
         if (Number.isNaN(params.platformId)) throw notFound()
-        context.queryClient.ensureQueryData({
-            queryKey: ["games", "byPlatform", params.platformId],
-            queryFn: () => getGamesByPlatformFn({ data: params.platformId })
-        })
+        context.queryClient.ensureQueryData(gamesQueryOpts({platformId: params.platformId}))
         return await context.queryClient.ensureQueryData(platformQueryOpts(params.platformId))
     },
     head: ({ loaderData }) => ({
@@ -45,10 +42,7 @@ function RouteComponent() {
                 />
             </Suspense>
             <GamesList
-                opts={{
-                    queryKey: ["games", "byPlatform", params().platformId],
-                    queryFn: () => getGamesByPlatformFn({ data: params().platformId })
-                }}
+                filters={{platformId: params().platformId}}
             />
         </>
     )

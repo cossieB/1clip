@@ -4,20 +4,17 @@ import { Show, Suspense } from 'solid-js'
 import { CompanyPage } from '~/components/CompanyPage/CompanyPage'
 import { GamesList } from '~/features/games/components/GamesList'
 import { NotFound } from '~/components/NotFound/NotFound'
-import { getGamesByDeveloperFn } from '~/serverFn/games'
 import { STORAGE_DOMAIN } from '~/utils/env'
 import { developerQueryOpts } from '~/features/developers/utils/developerQueryOpts'
 import { AdminWrapper } from '~/components/AdminWrapper'
+import { gamesQueryOpts } from '~/features/games/utils/gameQueryOpts'
 
 export const Route = createFileRoute('/developers/$developerId/')({
     component: RouteComponent,
 
     loader: async ({ context, params }) => {
         if (Number.isNaN(params.developerId)) throw notFound();
-        context.queryClient.ensureQueryData({
-            queryKey: ["games", "byDev", params.developerId],
-            queryFn: () => getGamesByDeveloperFn({ data: params.developerId })
-        })
+        context.queryClient.ensureQueryData(gamesQueryOpts({developerId: params.developerId}))
         return await context.queryClient.ensureQueryData(developerQueryOpts(params.developerId))
     },
     head: ({ loaderData }) => ({
@@ -45,10 +42,7 @@ function RouteComponent() {
                 />
             </Suspense>
             <GamesList
-                opts={{
-                    queryKey: ["games", "byDev", params().developerId],
-                    queryFn: () => getGamesByDeveloperFn({ data: params().developerId })
-                }}
+                filters={{developerId: params().developerId}}
             />
         </>
     )

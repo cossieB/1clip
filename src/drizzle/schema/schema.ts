@@ -1,5 +1,5 @@
-import { getColumns, sql } from "drizzle-orm";
-import { timestamp, integer, pgTable, text, varchar, primaryKey, pgEnum, pgView, jsonb, check, uuid, foreignKey, date } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { timestamp, integer, pgTable, text, varchar, primaryKey, pgEnum, jsonb, check, uuid, foreignKey, date } from "drizzle-orm/pg-core";
 import { users } from "./auth";
 
 export const developers = pgTable("developers", {

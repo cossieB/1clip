@@ -2,17 +2,13 @@ import { useQuery, useQueryClient } from '@tanstack/solid-query'
 import { createFileRoute } from '@tanstack/solid-router'
 import { Suspense, For, createEffect } from 'solid-js'
 import { LogoLink } from '~/components/LogoLink/LogoLink'
-import { getPublishersFn } from '~/serverFn/publishers'
-import styles from "~/lists.module.css"
 import { STORAGE_DOMAIN } from '~/utils/env'
+import { publisherQueryOpts, publishersQueryOpts } from '~/features/publishers/utils/publisherQueryOpts'
 
 export const Route = createFileRoute('/publishers/')({
     component: RouteComponent,
     loader: async ({ context }) => {
-        return context.queryClient.ensureQueryData({
-            queryKey: ["publishers"],
-            queryFn: () => getPublishersFn()
-        })
+        return context.queryClient.ensureQueryData(publishersQueryOpts())
     },
     head: () => ({
         meta: [{ title: "Publishers :: GG" }],
@@ -21,15 +17,12 @@ export const Route = createFileRoute('/publishers/')({
 
 function RouteComponent() {
     const queryClient = useQueryClient()
-    const result = useQuery(() => ({
-        queryKey: ["publishers"],
-        queryFn: () => getPublishersFn()
-    }))
+    const result = useQuery(() => publishersQueryOpts())
 
     createEffect(() => {
         if (result.data) {
             for (const item of result.data) {
-                queryClient.setQueryData(["publishers", item.publisherId], item)
+                queryClient.setQueryData(publisherQueryOpts(item.publisherId).queryKey, item)
             }
         }
     })
