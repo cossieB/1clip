@@ -86,7 +86,7 @@ a {
   }
 }
 
-a[href^="http"]:not([href*="gg.cossie.dev"])::after {
+a[href^="http"]::after {
   content: "↗";
   margin-inline-start: 0.2rem;
   color: initial;

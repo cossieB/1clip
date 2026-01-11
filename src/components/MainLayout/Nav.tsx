@@ -15,7 +15,7 @@ export function Nav(props: { toggleNav(): void }) {
                     <MenuIcon />
                 </button>
                 <aside>
-                    GG
+                    1Clip
                 </aside>
             </div>
             <ul>
