@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/solid-query'
-import { createFileRoute, notFound } from '@tanstack/solid-router'
+import { createFileRoute, Link, notFound } from '@tanstack/solid-router'
 import { createEffect, Suspense } from 'solid-js'
+import { AdminWrapper } from '~/components/AdminWrapper'
 import { NotFound } from '~/components/NotFound/NotFound'
 import { developerQueryOpts } from '~/features/developers/utils/developerQueryOpts'
 import { GamePage } from '~/features/games/components/GamePage'
@@ -11,11 +12,7 @@ import { getGameFn } from '~/serverFn/games'
 
 export const Route = createFileRoute('/games/$gameId/')({
     component: RouteComponent,
-    params: {
-        parse: params => ({
-            gameId: Number(params.gameId)
-        })
-    },
+
     loader: async ({ context, params: { gameId } }) => {
         if (Number.isNaN(gameId)) throw notFound()
         return await context.queryClient.ensureQueryData(gameQueryOpts(gameId))
@@ -45,6 +42,9 @@ function RouteComponent() {
   
     return (
         <Suspense>
+            <AdminWrapper>
+                <Link from='/games/$gameId/' to='./edit'>Edit</Link>
+            </AdminWrapper>
             <GamePage game={result.data!} />
         </Suspense>
     )

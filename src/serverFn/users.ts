@@ -53,9 +53,9 @@ export const updateCurrentUser = createServerFn({ method: "POST" })
 
         try {
             const old = (await userRepository.updateUser(user.id, data))[0]
-            if (data.banner)
+            if (data.banner != old.oldBanner)
                 uploadService.deleteObject(old.oldBanner)
-            if (data.image)
+            if (data.image != old.oldAvatar)
                 uploadService.deleteObject(old.oldAvatar)
             return new Response(null, { status: 200 })
         }

@@ -42,7 +42,7 @@ export function Profile(props: { user: Awaited<ReturnType<typeof getLoggedInUser
                             const file = files.at(0)
                             if (!file) return
                             setUser({ image: file.objectUrl })
-                            setFiles(prev => [...prev.filter(x => x.field != "avatar"), { file: file.file, field: "avatar" }])
+                            setFiles(prev => [...prev.filter(x => x.field != "avatar"), { ...file, field: "avatar" }])
                         }}
                         maxSize={1}
                         limit={1}
@@ -58,7 +58,7 @@ export function Profile(props: { user: Awaited<ReturnType<typeof getLoggedInUser
                             const file = files.at(0)
                             if (!file) return
                             setUser({ banner: file.objectUrl })
-                            setFiles(prev => [...prev.filter(x => x.field != "banner"), { file: file.file, field: "banner" }])
+                            setFiles(prev => [...prev.filter(x => x.field != "banner"), { ...file, field: "banner" }])
                         }}
                         maxSize={1}
                         limit={1}

@@ -2,6 +2,7 @@ import { and, eq, getColumns, gt, inArray, InferInsertModel, InferSelectModel, n
 import { db } from "~/drizzle/db";
 import { gameActors, gamePlatforms, gameGenres, actors, platforms, media, games, publishers, developers } from "~/drizzle/schema/schema";
 import { Actor, Platform } from "~/drizzle/models";
+import { AnyPgTable } from "drizzle-orm/pg-core";
 
 export type GameQueryFilters = {
     developerId?: number
@@ -132,7 +133,7 @@ type Args = {
 }
 
 function detailedGames(obj: Args = { filters: [], }) {
-    const { developerId, publisherId, ...gamesColumns } = getColumns(games)
+    const { dateAdded, dateModified, ...gamesColumns } = getColumns(games)
     const actorQuery = db.$with("aq").as(
         db.select({
             gameId: gameActors.gameId,
@@ -185,7 +186,7 @@ function detailedGames(obj: Args = { filters: [], }) {
             .from(media)
             .groupBy(media.gameId)
     )
-
+    
     const gamesQuery = db
         .with(actorQuery, platformQuery, genresQuery, mediaQuery)
         .select({
@@ -193,7 +194,7 @@ function detailedGames(obj: Args = { filters: [], }) {
             publisher: { ...getColumns(publishers) },
             developer: { ...getColumns(developers) },
             tags: sql<string[]>`COALESCE(${genresQuery.tags}, '{}')`,
-            platforms: sql<Platform[]>`COALESCE(${platformQuery.platformArr}, '[]'::JSONB)`,
+            platforms: sql<Omit<Platform, 'dateAdded' | 'dateModified'>[]>`COALESCE(${platformQuery.platformArr}, '[]'::JSONB)`,
             actors: sql<(Actor & { character: string })[]>`COALESCE(${actorQuery.actorArr}, '[]'::JSONB)`,
             media: sql<{ key: string, contentType: string }[]>`COALESCE(${mediaQuery.media}, '[]'::JSONB)`
         })

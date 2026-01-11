@@ -13,7 +13,7 @@ export function useUpload(
     const {addToast} = useToastContext()
     const [state, setState] = createStore({
         isUploading: false,
-        files: [] as {file: File, field: string}[]
+        files: [] as {file: File, field: string, objectUrl: string}[]
     })
 
     async function upload() {

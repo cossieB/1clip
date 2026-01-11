@@ -8,6 +8,9 @@ export function findAll() {
             dateAdded: false,
             dateModified: false
         },
+        orderBy: {
+            releaseDate: 'desc'
+        }
     })
 }
 

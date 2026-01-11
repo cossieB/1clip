@@ -9,13 +9,19 @@ type Props<T = any> = {
     list: {value: number | string, label: string}[] | string[]
     setter: (newObj: {value: number | string, label: string} | null) => void
     label?: string
-    selected: {value: number | string, label: string} | string | null
+    selected: string | number | null
     required: boolean
 }
 
 export function FormSelect<T>(props: Props<T>) {
     const [isOpen, setIsOpen] = createSignal(false)
-    const selected = () => typeof props.selected == "string" ? {label: props.selected, value: props.selected} : props.selected
+    const selected = () => {
+        for (const item of props.list) {
+            const obj = typeof item === 'object' ? item : {label: item, value: item}
+            if (obj.value === props.selected) return obj
+        }
+        return null
+    }
     return (
         <div
             use:clickOutside={() => setIsOpen(false)}
@@ -28,7 +34,7 @@ export function FormSelect<T>(props: Props<T>) {
                 class={styles.header}
                 onclick={() => setIsOpen(prev => !prev)}
             >
-                <span> {selected()?.label ?? "Select..."} </span>
+                <span> {selected()?.label ?? props.field} </span>
                 <ChevronDown />
             </div>
             <ul class={styles.drawer} classList={{ [styles.isOpen]: isOpen() }}>

@@ -5,6 +5,7 @@ import { Form } from "~/components/Forms/Form"
 import { UploadBox } from "~/components/UploadBox/UploadBox"
 import { useCreatePost } from "../hooks/useCreatePost"
 import { Trash2Icon } from "lucide-solid"
+import { ImagePreview } from "~/components/ImagePreview"
 
 export function CreatePostPage() {
     const { handleSubmit,
@@ -36,7 +37,7 @@ export function CreatePostPage() {
                     maxSize={2}
                     onSuccess={async (array) => {
                         setInput('media', array.map(file => file.objectUrl))
-                        setFiles(array.map(x => ({ field: "media", file: x.file })))
+                        setFiles(array.map(x => ({ field: "media", ...x })))
                     }}
                     style={{ height: "10rem" }}
                     accept={{
@@ -48,7 +49,8 @@ export function CreatePostPage() {
                 />
                 <div class={styles.imgs}>
                     <For each={input.media}>
-                        {(src, i) => <Preview
+                        {(src, i) => <ImagePreview
+                            class={styles.preview}
                             img={src}
                             onDelete={() => {
                                 setInput('media', prev => prev.filter(f => f != src))
@@ -69,7 +71,7 @@ export function CreatePostPage() {
                 <div innerHTML={preview()} />
                 <Suspense>
                     <Form.FormSelect<typeof input>
-                        selected={input.game ? { label: input.game.title, value: input.game.gameId } : null}
+                        selected={input.game?.gameId ?? null}
                         list={result.data!.map(game => ({
                             label: game.title,
                             value: game.gameId
@@ -90,21 +92,3 @@ export function CreatePostPage() {
     )
 }
 
-type Props = {
-    img: string
-    onDelete(): void
-}
-
-function Preview(props: Props) {
-    return (
-        <div
-            class={styles.preview}
-            onClick={props.onDelete}
-        >
-            <img src={props.img} />
-            <button>
-                <Trash2Icon />
-            </button>
-        </div>
-    )
-}

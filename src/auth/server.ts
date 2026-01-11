@@ -107,20 +107,20 @@ export const auth = betterAuth({
             },
         }
     },
-    secondaryStorage: {
-        set(key, value, ttl) {
-            if (ttl)
-                redis.setEx(key, ttl, value)
-            else
-                redis.set(key, value)
-        },
-        delete(key) {
-            redis.del(key)
-        },
-        get(key) {
-            return redis.get(key)
-        },
-    },
+    // secondaryStorage: {
+    //     set(key, value, ttl) {
+    //         if (ttl)
+    //             redis.setEx(key, ttl, value)
+    //         else
+    //             redis.set(key, value)
+    //     },
+    //     delete(key) {
+    //         redis.del(key)
+    //     },
+    //     get(key) {
+    //         return redis.get(key)
+    //     },
+    // },
     rateLimit: {
         enabled: true,
     },
