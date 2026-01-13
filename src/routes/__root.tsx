@@ -95,9 +95,9 @@ function RootComponent() {
     )
 }
 
-function RootDocument({ children }: { children: Solid.JSX.Element }) {
+function RootDocument(props: { children: Solid.JSX.Element }) {
     const search = Route.useSearch()
-    const {addToast} = useToastContext()
+    const { addToast } = useToastContext()
 
     Solid.createEffect(() => {
         (search().toasts ?? []).forEach(toast => addToast(toast))
@@ -110,9 +110,7 @@ function RootDocument({ children }: { children: Solid.JSX.Element }) {
             </head>
             <body>
                 <HeadContent />
-                <MainLayout>
-                    {children}
-                </MainLayout>
+                {props.children}
                 <TanStackRouterDevtools position="bottom-right" />
                 <SolidQueryDevtools buttonPosition="bottom-left" />
                 <Scripts />

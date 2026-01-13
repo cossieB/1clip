@@ -58,14 +58,13 @@ export function PubForm(props: { publisher?: Publisher }) {
                 queryClient.setQueryData(publisherQueryOpts(data.publisherId).queryKey, data)
             },
             onError(error, variables, onMutateResult, context) {
-                addToast({ text: "Failed", type: "error" })
+                addToast({ text: error.message, type: "error" })
             },
         })
     }
 
     return (
         <div >
-
             <Form
                 isPending={isUploading() || createPubMutation.isPending || editPubMutation.isPending}
                 disabled={
@@ -105,6 +104,7 @@ export function PubForm(props: { publisher?: Publisher }) {
                 <ContentEditable
                     html={publisher.summary}
                     setter={summary => setPublisher({ summary })}
+                    label="Summary"
                 />
             </Form>
         </div>

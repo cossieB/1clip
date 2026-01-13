@@ -52,7 +52,7 @@ export function DevForm(props: { developer?: Developer }) {
                 queryClient.setQueryData(developerQueryOpts(data.developerId).queryKey, data)
             },
             onError(error, variables, onMutateResult, context) {
-                addToast({ text: "Failed", type: "error" })
+                addToast({ text: error.message, type: "error" })
             },
         })
     }
@@ -98,6 +98,7 @@ export function DevForm(props: { developer?: Developer }) {
                 <ContentEditable
                     html={developer.summary}
                     setter={summary => setDeveloper({ summary })}
+                    label="Summary"
                 />
             </Form>
         </div>

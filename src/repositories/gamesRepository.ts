@@ -1,15 +1,14 @@
 import { and, eq, getColumns, gt, inArray, InferInsertModel, InferSelectModel, notInArray, SQL, sql } from "drizzle-orm";
 import { db } from "~/drizzle/db";
-import { gameActors, gamePlatforms, gameGenres, actors, platforms, media, games, publishers, developers } from "~/drizzle/schema/schema";
+import { gameActors, gamePlatforms, gameGenres, actors, platforms, media, games, publishers, developers, genres } from "~/drizzle/schema/schema";
 import { Actor, Platform } from "~/drizzle/models";
-import { AnyPgTable } from "drizzle-orm/pg-core";
 
 export type GameQueryFilters = {
     developerId?: number
     publisherId?: number
     actorId?: number
     platformId?: number
-    tag?: string
+    genre?: string
     limit?: number
     cursor?: number
 }
@@ -36,13 +35,13 @@ export async function findAll(obj: GameQueryFilters = {}) {
                 .from(gamePlatforms)
                 .where(eq(gamePlatforms.platformId, obj.platformId))
         ))
-    if (obj.tag)
+    if (obj.genre)
         filters.push(inArray(
             games.gameId,
             db
                 .select({gameId: gameGenres.gameId})
                 .from(gameGenres)
-                .where(eq(gameGenres.genre, obj.tag))
+                .where(eq(gameGenres.genre, obj.genre))
         ))
     if (obj.cursor)
         filters.push(gt(games.gameId, obj.cursor))
@@ -63,8 +62,10 @@ type GameInsert = {
 export async function createGame(game: InferInsertModel<typeof games>, other: GameInsert) {
     return db.transaction(async tx => {
         const g = (await tx.insert(games).values(game).returning())[0]
-        if (other.genres.length > 0)
+        if (other.genres.length > 0) {
+            await tx.insert(genres).values(other.genres.map(x => ({name: x}))).onConflictDoNothing()
             await tx.insert(gameGenres).values(other.genres.map(genre => ({ gameId: g.gameId, genre })))
+        }
         if (other.media.length > 0)
             await tx.insert(media).values(other.media.map(m => ({
                 ...m,
@@ -72,6 +73,8 @@ export async function createGame(game: InferInsertModel<typeof games>, other: Ga
             })))
         if (other.platforms.length > 0)
             await tx.insert(gamePlatforms).values(other.platforms.map(platformId => ({ platformId, gameId: g.gameId })))
+
+        return g.gameId
     })
 }
 
@@ -133,7 +136,7 @@ type Args = {
 }
 
 function detailedGames(obj: Args = { filters: [], }) {
-    const { dateAdded, dateModified, ...gamesColumns } = getColumns(games)
+    const gamesColumns = getColumns(games)
     const actorQuery = db.$with("aq").as(
         db.select({
             gameId: gameActors.gameId,
@@ -193,8 +196,8 @@ function detailedGames(obj: Args = { filters: [], }) {
             ...gamesColumns,
             publisher: { ...getColumns(publishers) },
             developer: { ...getColumns(developers) },
-            tags: sql<string[]>`COALESCE(${genresQuery.tags}, '{}')`,
-            platforms: sql<Omit<Platform, 'dateAdded' | 'dateModified'>[]>`COALESCE(${platformQuery.platformArr}, '[]'::JSONB)`,
+            genres: sql<string[]>`COALESCE(${genresQuery.tags}, '{}')`,
+            platforms: sql<Platform[]>`COALESCE(${platformQuery.platformArr}, '[]'::JSONB)`,
             actors: sql<(Actor & { character: string })[]>`COALESCE(${actorQuery.actorArr}, '[]'::JSONB)`,
             media: sql<{ key: string, contentType: string }[]>`COALESCE(${mediaQuery.media}, '[]'::JSONB)`
         })

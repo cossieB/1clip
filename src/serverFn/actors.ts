@@ -13,6 +13,9 @@ export const getActorFn = createServerFn()
         return actorRepository.findById(data)
     })
 
+export const getActorsFn = createServerFn()
+    .handler(() => actorRepository.findAll())
+
 const actorCreateSchema = z.object({
     name: z.string(),
     bio: z.string().optional(),

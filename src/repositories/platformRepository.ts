@@ -4,10 +4,6 @@ import { platforms } from "~/drizzle/schema";
 
 export function findAll() {
     return db.query.platforms.findMany({
-        columns: {
-            dateAdded: false,
-            dateModified: false
-        },
         orderBy: {
             releaseDate: 'desc'
         }

@@ -4,9 +4,8 @@ import { developers } from "~/drizzle/schema";
 
 export async function findAll(filters?: { limit: number, offset: number }) {
     return await db.query.developers.findMany({
-        columns: {
-            dateAdded: false,
-            dateModified: false
+        orderBy: {
+            name: "asc"
         },
         ...filters
     })
@@ -20,7 +19,8 @@ export async function findById(developerId: number) {
         },
         where: {
             developerId
-        }
+        },
+
     })
 }
 

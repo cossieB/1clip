@@ -21,6 +21,7 @@
     "@tanstack/solid-router-devtools": "^1.141.1",
     "@tanstack/solid-router-ssr-query": "^1.141.1",
     "@tanstack/solid-start": "^1.141.1",
+    "ag-grid-community": "^35.0.0",
     "better-auth": "^1.4.7",
     "dompurify": "^3.3.1",
     "drizzle-orm": "^1.0.0-beta.6-d6f09ef",
@@ -30,6 +31,7 @@
     "nodemailer": "^7.0.12",
     "pg": "^8.16.3",
     "redis": "^5.10.0",
+    "solid-ag-grid": "^0.0.230",
     "solid-js": "^1.9.10",
     "zod": "^4.1.13"
   },

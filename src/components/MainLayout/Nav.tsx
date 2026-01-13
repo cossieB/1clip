@@ -1,10 +1,9 @@
 import { BriefcaseBusiness, LockOpenIcon, MenuIcon, CodeIcon, Dice5Icon, HouseIcon, CirclePlus } from "lucide-solid";
 import styles from "./MainLayout.module.css"
-import { Show, splitProps, type JSXElement } from "solid-js";
-import { Link, LinkComponentProps } from "@tanstack/solid-router";
+import { Show } from "solid-js";
 import { authClient } from "~/auth/authClient";
-import { Require } from "~/lib/utilityTypes";
 import { STORAGE_DOMAIN } from "~/utils/env";
+import { NavItem } from "./NavItem";
 
 export function Nav(props: { toggleNav(): void }) {
     const session = authClient.useSession()
@@ -53,22 +52,7 @@ export function Nav(props: { toggleNav(): void }) {
     )
 }
 
-type NavItemProps = {
-    label: string
-    icon: JSXElement
-} & Require<LinkComponentProps, 'to'>
 
-function NavItem(props: NavItemProps) {
-    const [_, toProps] = splitProps(props, ["label", "icon"])
-    return (
-        <Link {...toProps} activeProps={{ class: styles.active }} >
-            <li class={`${styles.navItem}`}>
-                {props.icon}
-                <span> {props.label} </span>
-            </li>
-        </Link>
-    )
-}
 
 function UserComponent() {
     const session = authClient.useSession()

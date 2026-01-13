@@ -2,7 +2,7 @@ import { createStore, unwrap } from "solid-js/store";
 import { Form } from "~/components/Forms/Form";
 import { UploadBox } from "~/components/UploadBox/UploadBox";
 import { useUpload } from "~/hooks/useUpload";
-import { getGameFn } from "~/serverFn/games";
+import { createGameFn, getGameFn, updateGameFn } from "~/serverFn/games";
 import { For, Show } from "solid-js";
 import { YouTubeIframe } from "~/components/YoutubeIframe";
 import { ContentEditable } from "~/components/Forms/ContentEditable";
@@ -14,21 +14,111 @@ import { ImagePreview } from "~/components/ImagePreview";
 import styles from "./GameForm.module.css"
 import { AsyncChecklist } from "~/components/Forms/AsyncChecklist";
 import { platformsQueryOpts } from "~/features/platforms/utils/platformQueryOpts";
+import { useMutation } from "@tanstack/solid-query";
+import { useServerFn } from "@tanstack/solid-start";
+import { useToastContext } from "~/hooks/useToastContext";
+import { useNavigate } from "@tanstack/solid-router";
 
 type Game = Awaited<ReturnType<typeof getGameFn>>
 
-export function GameForm(props: { game: Game }) {
-    const [game, setGame] = createStore(props.game)
-    const { setFiles, files } = useUpload(["games", props.game.gameId.toString()])
+enum MediaField {
+    Cover = "cover",
+    Banner = "banner",
+    Screenshots = "screenshots"
+}
 
+export function GameForm(props: { game?: Game }) {
+    const { addToast } = useToastContext()
+    const navigate = useNavigate()
+    const [game, setGame] = createStore({
+        gameId: props.game?.gameId,
+        title: props.game?.title ?? "",
+        cover: props.game?.cover ?? "",
+        banner: props.game?.banner ?? "",
+        developerId: props.game?.developerId ?? -1,
+        publisherId: props.game?.publisherId ?? -1,
+        summary: props.game?.summary ?? "",
+        media: props.game?.media ?? [],
+        platforms: props.game?.platforms ?? [],
+        trailer: props.game?.trailer ?? "",
+        releaseDate: props.game?.releaseDate ?? "",
+        genres: props.game?.genres ?? [],
+        actors: props.game?.actors ?? []
+    })
+    const paths = game.gameId ? ["games", game.gameId.toString()] : ["games"]
+    const { setFiles, files, isUploading, upload } = useUpload(paths)
+
+    const editGameMutation = useMutation(() => ({
+        mutationFn: useServerFn(updateGameFn)
+    }))
+
+    const createGameMutation = useMutation(() => ({
+        mutationFn: useServerFn(createGameFn)
+    }))
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault()
-        console.log(unwrap(files()))
+        try {
+            const uploadResult = await upload();
+            const newCover = uploadResult.find(x => x.field == MediaField.Cover)?.key
+            const newBanner = uploadResult.find(x => x.field == MediaField.Banner)?.key
+            setGame({
+                ...newCover && { cover: newCover },
+                ...newBanner && { banner: newBanner },
+                media: [
+                    ...game.media,
+                    ...uploadResult
+                        .filter(x => x.field === MediaField.Screenshots)
+                        .map(x => ({ key: x.key, contentType: x.file.type }))]
+            })
+            const { gameId, ...rest } = game
+            if (gameId) {
+                return editGameMutation.mutate({
+                    data: {
+                        ...rest,
+                        gameId,
+                        platforms: rest.platforms.map(platform => platform.platformId)
+                    }
+                }, {
+                    onSuccess(data, variables, onMutateResult, context) {
+                        addToast({ text: "Successfully edited game, ", type: "info" })
+                    },
+                    onError(error, variables, onMutateResult, context) {
+                        addToast({ text: error.message, type: "error" })
+                    },
+                })
+            }
+            return createGameMutation.mutate({
+                data: {
+                    ...rest,
+                    platforms: rest.platforms.map(platform => platform.platformId)
+                }
+            }, {
+                onSuccess(data, variables, onMutateResult, context) {
+                    addToast({ text: "Successfully created game, " + data, type: "info" })
+                    navigate({ to: "/admin/games/$gameId/edit", params: { gameId: data } })
+                },
+                onError(error, variables, onMutateResult, context) {
+                    addToast({ text: error.message, type: "error" })
+                },
+            })
+        }
+        catch (error) {
+
+        }
     }
 
     return (
         <Form
-            onSubmit={handleSubmit}            
+            onSubmit={handleSubmit}
+            isPending={isUploading() || createGameMutation.isPending || editGameMutation.isPending}
+            disabled={
+                !game.title ||
+                !game.cover ||
+                !game.banner ||
+                !game.developerId ||
+                !game.publisherId ||
+                !game.releaseDate
+            }
         >
             <Form.Input
                 field="title"
@@ -42,7 +132,7 @@ export function GameForm(props: { game: Game }) {
                         const file = files.at(0)
                         if (!file) return
                         setGame({ cover: file.objectUrl })
-                        setFiles(prev => [...prev.filter(x => x.field != "cover"), { ...file, field: "cover" }])
+                        setFiles(prev => [...prev.filter(x => x.field != MediaField.Cover), { ...file, field: MediaField.Cover }])
                     }}
                     maxSize={1}
                     limit={1}
@@ -58,7 +148,7 @@ export function GameForm(props: { game: Game }) {
                         const file = files.at(0)
                         if (!file) return
                         setGame({ banner: file.objectUrl })
-                        setFiles(prev => [...prev.filter(x => x.field != "banner"), { ...file, field: "banner" }])
+                        setFiles(prev => [...prev.filter(x => x.field != MediaField.Banner), { ...file, field: MediaField.Banner }])
                     }}
                     maxSize={4}
                     limit={1}
@@ -85,7 +175,7 @@ export function GameForm(props: { game: Game }) {
                                 contentType: x.file.type
                             }))
                         ])
-                        setFiles(files.map(f => ({ ...f, field: "screenshots" })))
+                        setFiles(files.map(f => ({ ...f, field: MediaField.Screenshots })))
                     }}
                     accept={{
                         image: true,
@@ -107,10 +197,13 @@ export function GameForm(props: { game: Game }) {
                     />}
                 </For>
             </div>
-            <ContentEditable
-                html={game.summary}
-                setter={summary => setGame({ summary })}
-            />
+            <div style={{ "margin-top": "1.5rem" }}>
+                <ContentEditable
+                    html={game.summary}
+                    setter={summary => setGame({ summary })}
+                    label="Summary"
+                />
+            </div>
             <Form.Input
                 field="releaseDate"
                 setter={releaseDate => setGame({ releaseDate })}
@@ -150,8 +243,8 @@ export function GameForm(props: { game: Game }) {
                 value={game.trailer ?? ""}
             />
             <Form.TagsInput
-                setTags={tags => setGame('tags', tags)}
-                tags={() => game.tags}
+                setTags={tags => setGame('genres', tags)}
+                tags={() => game.genres}
                 label="Genres"
             />
             <Show when={game.trailer}>

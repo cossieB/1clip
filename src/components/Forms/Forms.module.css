@@ -120,6 +120,18 @@
     color: white;
     border: none;
     background: #00000050;
+    min-height: 10rem;
+    --label: "";
+
+    &::before {
+        position: absolute;
+        color: #757575;
+        content: var(--label);
+        transition: translate 200ms ease;
+    }
+    &:focus::before, &.notEmpty::before {
+        translate: 0 -100%;
+    }
 }
 
 @keyframes up-down {

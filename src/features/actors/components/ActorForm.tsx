@@ -49,7 +49,7 @@ export function ActorForm(props: { actor?: Actor }) {
                 queryClient.setQueryData(actorQueryOpts(data.actorId).queryKey, data)
             },
             onError(error, variables, onMutateResult, context) {
-                addToast({ text: "Failed", type: "error" })
+                addToast({ text: error.message, type: "error" })
             },
         })
     }
@@ -78,6 +78,7 @@ export function ActorForm(props: { actor?: Actor }) {
                 <ContentEditable
                     html={actor.bio}
                     setter={bio => setActor({ bio })}
+                    label="Bio"
                 />
             </Form>
         </div>

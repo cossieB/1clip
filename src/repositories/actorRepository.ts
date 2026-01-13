@@ -4,14 +4,14 @@ import { actors } from "~/drizzle/schema";
 
 export function findById(actorId: number) {
     return db.query.actors.findFirst({
-        columns: {
-            dateAdded: false,
-            dateModified: false
-        },
         where: {
             actorId
         }
     })
+}
+
+export async function findAll() {
+    return db.query.actors.findMany()
 }
 
 export function createActor(actor: InferInsertModel<typeof actors>) {

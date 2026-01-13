@@ -1,0 +1,118 @@
+.container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+    main {
+        flex-grow: 1;
+        form  {
+            margin: 0 auto;
+        }
+        overflow: auto;
+    }
+}
+
+.nav {
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 15rem;
+
+    background: #00000050;
+    font-size: large;
+    z-index: 99;
+
+    ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    li {
+        transition: all 250ms ease;
+        height: 2.5rem;
+        width: 100%;
+        margin-bottom: 0.25rem;
+        display: flex;
+        background-color: black;
+        padding-left: 0.5rem;
+
+        &:last-child {
+            margin-top: auto;
+
+        }
+
+        .label {
+            height: 100%;
+            width: calc(100% - 2rem);
+            transition: padding 150ms ease;
+
+            &:hover {
+                padding-left: 0.5rem;
+            }
+
+            &:has(.active) {
+                border: 1px solid red;
+                border-right: none;
+            }
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            align-items: center;
+
+        }
+
+        .addBtn {
+            margin-left: auto;
+            height: 100%;
+            width: 2rem;
+            background-color: hsl(0, 50%, 46%);
+
+            a {
+                justify-content: center;
+            }
+
+            svg {
+                transition: scale 250ms ease;
+            }
+
+            &:hover {
+                svg {
+                    scale: 1.5;
+                }
+            }
+
+            &:has(.active) svg {
+                animation: spin infinite 2s linear;
+            }
+        }
+
+        .lockIcon {
+            cursor: pointer;
+
+            &:disabled {
+                background-color: hsl(0, 100%, 20%);
+                background-color: color-mix(in srgb, red 20%, gray);
+            }
+        }
+    }
+}
+
+@keyframes spin {
+    from {
+        rotate: 0deg;
+    }
+
+    to {
+        rotate: 360deg;
+    }
+}

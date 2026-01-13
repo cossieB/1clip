@@ -62,7 +62,7 @@ export function GamePage(props: Props) {
                         </For>
                     </div>
                     <div class={styles.tags}>
-                        <For each={props.game.tags}>
+                        <For each={props.game.genres}>
                             {genre =>
                                 <div class="cutout">
                                     {genre}

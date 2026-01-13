@@ -140,7 +140,8 @@ export const media = pgTable("media", {
     contentType: varchar("content_type").notNull(),
     postId: integer("post_id").references(() => posts.postId, { onDelete: "set null" }),
     gameId: integer("game_id").references(() => games.gameId, { onDelete: "set null" }),
-    metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull().default({})
+    metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull().default({}),
+    createdAt: timestamp('created_at', {withTimezone: true}).notNull().defaultNow()
 })
 
 export const postTags = pgTable("post_tags", {

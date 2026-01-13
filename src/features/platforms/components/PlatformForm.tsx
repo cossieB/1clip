@@ -44,7 +44,7 @@ export function PlatformForm(props: { platform?: Platform }) {
                     queryClient.setQueryData(platformQueryOpts(platform.platformId).queryKey, platform)
                 },
                 onError(error, variables, onMutateResult, context) {
-                    addToast({ text: "Failed", type: "error" })
+                    addToast({ text: error.message, type: "error" })
                 },
             })
         }
@@ -85,9 +85,15 @@ export function PlatformForm(props: { platform?: Platform }) {
                 <ContentEditable
                     html={platform.summary}
                     setter={summary => setPlatform({ summary })}
+                    label="Summary"
+                />
+                <Form.Input
+                    field={"releaseDate"}
+                    setter={releaseDate => setPlatform({releaseDate})}
+                    value={platform.releaseDate}
+                    type="date"
                 />
             </Form>
         </div>
     )
-
 }
