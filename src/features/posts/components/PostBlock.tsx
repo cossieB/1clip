@@ -24,7 +24,7 @@ export function PostBlock(props: Props) {
     const { deleteMutation } = useDeletePost(props.post)
 
     return (
-        <div class={styles.postContainer}>
+        <div data-type="post" class={styles.postContainer}>
             <div class={styles.user}>
                 <div>
                     <img src={STORAGE_DOMAIN + props.post.user.image} />

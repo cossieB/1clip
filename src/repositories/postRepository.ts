@@ -1,4 +1,4 @@
-import { and, count, desc, eq, getColumns, gt, inArray, SQL, sql } from "drizzle-orm";
+import { and, count, desc, eq, getColumns, gt, inArray, lt, SQL, sql } from "drizzle-orm";
 import { db } from "~/drizzle/db";
 import { comments, media, postReactions, posts, postTags, users } from "~/drizzle/schema";
 
@@ -26,7 +26,7 @@ export async function findById(postId: number, userId?: string) {
     return (await detailedPosts({ filters: [eq(posts.postId, postId)] }, userId)).at(0)
 }
 
-type Filters = {
+export type PostFilters = {
     username?: string
     authorId?: string,
     likerUsername?: string,
@@ -36,7 +36,7 @@ type Filters = {
     cursor?: number
 }
 
-export async function findAll(obj: Filters = {}, userId?: string) {
+export async function findAll(obj: PostFilters = {}, userId?: string) {
     const filters: SQL[] = []
     if (obj.username)
         filters.push(eq(
@@ -87,7 +87,7 @@ export async function findAll(obj: Filters = {}, userId?: string) {
         ))
 
     if (obj.cursor)
-        filters.push(gt(posts.postId, obj.cursor))
+        filters.push(lt(posts.postId, obj.cursor))
 
     return detailedPosts({ filters, limit: obj.limit }, userId)
 }
@@ -120,7 +120,7 @@ type Args = {
     limit?: number
 }
 
-function detailedPosts(obj: Args = { filters: [], }, userId?: string) {
+function detailedPosts(obj: Args = { filters: [], limit: 1}, userId?: string) {
     const mediaQuery = db.$with("mq").as(
         db.select({
             postId: media.postId,
@@ -200,11 +200,9 @@ function detailedPosts(obj: Args = { filters: [], }, userId?: string) {
         .leftJoin(tagsQuery, eq(posts.postId, tagsQuery.postId))
         .leftJoin(reactionQuery, eq(posts.postId, reactionQuery.postId))
         .leftJoin(commentsQuery, eq(posts.postId, commentsQuery.postId))
-        .orderBy(desc(posts.createdAt))
+        .orderBy(desc(posts.postId))
         .where(and(...obj.filters))
-
-    if (obj.limit)
-        query.limit(obj.limit)
+        .limit(obj.limit ?? 10)
 
     if (userId)
         query.leftJoin(userReactionQuery, eq(userReactionQuery.postId, posts.postId))

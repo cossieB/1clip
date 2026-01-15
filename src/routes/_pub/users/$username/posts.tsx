@@ -7,16 +7,16 @@ import { postsQueryOpts } from '~/features/posts/utils/postQueryOpts'
 export const Route = createFileRoute('/_pub/users/$username/posts')({
     component: RouteComponent,
     loader: async ({params, context: {queryClient} }) => {
-        await queryClient.ensureQueryData(postsQueryOpts({ username: params.username }))
+        await queryClient.ensureInfiniteQueryData(postsQueryOpts({ username: params.username }))
     }
 })
 
 function RouteComponent() {
     const params = Route.useParams()
-    const postResult = useQuery(() => (postsQueryOpts({ username: params().username })))
+
     return (
         <Suspense>
-            <PostList posts={postResult.data!} />
+            <PostList filters={{ username: params().username }} />
         </Suspense>
     )
 }

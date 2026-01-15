@@ -147,7 +147,7 @@ type Args = {
     limit?: number
 }
 
-function detailedGames(obj: Args = { filters: [], limit: 50 }) {
+function detailedGames(obj: Args = { filters: []}) {
     const gamesColumns = getColumns(games)
     const actorQuery = db.$with("aq").as(
         db.select({
@@ -222,8 +222,7 @@ function detailedGames(obj: Args = { filters: [], limit: 50 }) {
         .leftJoin(mediaQuery, eq(games.gameId, mediaQuery.gameId))
         .where(and(...obj.filters))
         .orderBy(desc(games.gameId))
-    if (obj.limit)
-        gamesQuery.limit(obj.limit)
+        .limit(obj.limit ?? 50)
 
     return gamesQuery
 }

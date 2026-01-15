@@ -19,7 +19,7 @@ export function GamesList(props: { filters: GameQueryFilters }) {
 
     createEffect(() => {
         if (result.data) {
-            const cards = document.querySelectorAll<HTMLDivElement>(`[role="img"]`)
+            const cards = document.querySelectorAll<HTMLDivElement>(`[data-type="card"]`)
             if (cards.length == 0) return;
             lastItem && observer?.unobserve(lastItem)
             lastItem = cards[cards.length - 1]

@@ -1,18 +1,37 @@
-import { For } from "solid-js";
-import { type getPostsFn } from "~/serverFn/posts";
+import { createEffect, For, onMount } from "solid-js";
 import { PostBlock } from "./PostBlock";
 import styles from "./Post.module.css"
+import { type PostFilters } from "~/repositories/postRepository";
+import { usePostQuery } from "../hooks/usePostCache";
 
-type Props = {
-    posts: Awaited<ReturnType<typeof getPostsFn>>
-}
+export function PostList(props: { filters?: PostFilters }) {
+    const result = usePostQuery(props.filters)
+    let observer: IntersectionObserver
+    let lastItem: HTMLDivElement | undefined
 
-export function PostList(props: Props) {
+    onMount(() => {
+        observer = new IntersectionObserver(entries => {
+            console.log(entries)
+            if (entries.at(-1)!.isIntersecting)
+                result.fetchNextPage()
+        })
+    })
+
+    createEffect(() => {
+        if (result.data) {
+            const cards = document.querySelectorAll<HTMLDivElement>(`[data-type="post"]`)
+            if (cards.length == 0) return;
+            lastItem && observer?.unobserve(lastItem)
+            lastItem = cards[cards.length - 1]
+            observer?.observe(lastItem)
+        }
+    })
+
     return (
         <div class={styles.page}>
-        <For each={props.posts}>
-            {post => <PostBlock post={post} /> }
-        </For>
+            <For each={result.data?.pages.flat()}>
+                {post => <PostBlock post={post} />}
+            </For>
         </div>
     )
 }
