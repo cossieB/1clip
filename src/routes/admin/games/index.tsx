@@ -3,22 +3,23 @@ import { ICellRendererParams } from 'ag-grid-community'
 import { Suspense } from 'solid-js'
 import { GridWrapper } from '~/components/AdminTable/GridWrapper'
 import { useGamesQuery } from '~/features/games/hooks/useGameQuery'
-import { gamesQueryOpts } from '~/features/games/utils/gameQueryOpts'
+import { gamesWithExtrasQueryOpts } from '~/features/games/utils/gameQueryOpts'
 
 export const Route = createFileRoute('/admin/games/')({
     component: RouteComponent,
     loader: (async ({ context }) => {
-        await context.queryClient.ensureQueryData(gamesQueryOpts())
+        await context.queryClient.ensureInfiniteQueryData(gamesWithExtrasQueryOpts({limit: 5000}))
     })    
 })
 
 function RouteComponent() {
 
-    const result = useGamesQuery()
+    const result = useGamesQuery({limit: 5000})
+
     return (
         <Suspense>
             <GridWrapper
-                rowData={result.data}
+                rowData={result.data?.pages[0]}
                 columnDefs={[{
                     field: "title",
                 }, {
@@ -32,8 +33,6 @@ function RouteComponent() {
                 }, {
                     field: "actors",
                     valueFormatter: params => params.data?.actors.map(actor => actor.name).join(", ") ?? ""
-                }, {
-                    field: "trailer"
                 }, {
                     field: "dateModified"
                 }, {

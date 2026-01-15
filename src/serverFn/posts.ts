@@ -45,7 +45,6 @@ export const getPostsFn = createServerFn()
         likerUsername: z.string(),
         dislikerUsername: z.string(),
         tag: z.string(),
-        limit: z.number(),
         cursor: z.number()
     }).partial().optional())
     .handler(async ({data}) => {

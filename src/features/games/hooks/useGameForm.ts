@@ -5,7 +5,7 @@ import { createStore } from "solid-js/store"
 import { useToastContext } from "~/hooks/useToastContext"
 import { useUpload } from "~/hooks/useUpload"
 import { createGameFn, getGameFn, updateGameFn } from "~/serverFn/games"
-import { gameQueryOpts, gamesQueryOpts } from "../utils/gameQueryOpts"
+import { gameQueryOpts, gamesQueryOpts, gamesWithExtrasQueryOpts } from "../utils/gameQueryOpts"
 
 export type Game = Awaited<ReturnType<typeof getGameFn>>
 
@@ -70,8 +70,9 @@ export function useGameForm(props: { game?: Game }) {
                 }, {
                     onSuccess(data, variables, onMutateResult, context) {
                         addToast({ text: "Successfully edited game, ", type: "info" })
-                        queryClient.invalidateQueries(gamesQueryOpts())
+                        queryClient.invalidateQueries(gamesWithExtrasQueryOpts())
                         queryClient.invalidateQueries(gameQueryOpts(gameId))
+                        queryClient.invalidateQueries(gamesQueryOpts())
                     },
                     onError(error, variables, onMutateResult, context) {
                         addToast({ text: error.message, type: "error" })
@@ -86,8 +87,9 @@ export function useGameForm(props: { game?: Game }) {
             }, {
                 onSuccess(data, variables, onMutateResult, context) {
                     addToast({ text: "Successfully created game, " + data, type: "info" })
-                    queryClient.invalidateQueries(gamesQueryOpts())
+                    queryClient.invalidateQueries(gamesWithExtrasQueryOpts())
                     queryClient.invalidateQueries(gameQueryOpts(data))
+                    queryClient.invalidateQueries(gamesQueryOpts())
                     navigate({ to: "/admin/games/$gameId/edit", params: { gameId: data } })
                 },
                 onError(error, variables, onMutateResult, context) {

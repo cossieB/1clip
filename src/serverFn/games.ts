@@ -15,7 +15,7 @@ export const getGamesFn = createServerFn()
         limit: z.number(),
         cursor: z.number()
     }).partial().optional())
-    .handler(({ data }) => gamesRepository.findAll(data))
+    .handler(({ data }) => gamesRepository.findGamesWithDetails(data))
 
 export const getGameFn = createServerFn()
     .inputValidator((gameId: number) => {
@@ -67,3 +67,6 @@ export const updateGameFn = createServerFn({ method: "POST" })
         const { gameId, media, platforms, genres, ...game } = data
         gamesRepository.updateGame(gameId, game, { platforms, media, genres })
     })
+
+export const getGamesWithoutExtras = createServerFn()
+    .handler(async () => gamesRepository.findAll())

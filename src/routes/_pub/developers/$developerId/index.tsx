@@ -1,20 +1,19 @@
 import { useQuery } from '@tanstack/solid-query'
-import { createFileRoute, Link, notFound } from '@tanstack/solid-router'
-import { Show, Suspense } from 'solid-js'
+import { createFileRoute, notFound } from '@tanstack/solid-router'
+import { Suspense } from 'solid-js'
 import { CompanyPage } from '~/components/CompanyPage/CompanyPage'
 import { GamesList } from '~/features/games/components/GamesList'
 import { NotFound } from '~/components/NotFound/NotFound'
 import { STORAGE_DOMAIN } from '~/utils/env'
 import { developerQueryOpts } from '~/features/developers/utils/developerQueryOpts'
-import { AdminWrapper } from '~/components/AdminWrapper'
-import { gamesQueryOpts } from '~/features/games/utils/gameQueryOpts'
+import { gamesWithExtrasQueryOpts } from '~/features/games/utils/gameQueryOpts'
 
 export const Route = createFileRoute('/_pub/developers/$developerId/')({
     component: RouteComponent,
 
     loader: async ({ context, params }) => {
         if (Number.isNaN(params.developerId)) throw notFound();
-        context.queryClient.ensureQueryData(gamesQueryOpts({developerId: params.developerId}))
+        context.queryClient.ensureInfiniteQueryData(gamesWithExtrasQueryOpts({developerId: params.developerId}))
         return await context.queryClient.ensureQueryData(developerQueryOpts(params.developerId))
     },
     head: ({ loaderData }) => ({

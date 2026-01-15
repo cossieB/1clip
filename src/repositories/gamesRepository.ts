@@ -1,4 +1,4 @@
-import { and, eq, getColumns, gt, inArray, InferInsertModel, InferSelectModel, notInArray, SQL, sql } from "drizzle-orm";
+import { and, desc, eq, getColumns, gt, inArray, InferInsertModel, InferSelectModel, lt, notInArray, SQL, sql } from "drizzle-orm";
 import { db } from "~/drizzle/db";
 import { gameActors, gamePlatforms, gameGenres, actors, platforms, media, games, publishers, developers, genres } from "~/drizzle/schema/schema";
 import { Actor, Platform } from "~/drizzle/models";
@@ -13,7 +13,19 @@ export type GameQueryFilters = {
     cursor?: number
 }
 
-export async function findAll(obj: GameQueryFilters = {}) {
+export async function findAll() {
+    return db.query.games.findMany({
+        columns: {
+            title: true,
+            gameId: true
+        },
+        orderBy: {
+            title: 'asc'
+        }
+    })
+}
+
+export async function findGamesWithDetails(obj: GameQueryFilters = {}) {
     const filters: SQL[] = []
     if (obj.developerId)
         filters.push(eq(games.developerId, obj.developerId))
@@ -31,7 +43,7 @@ export async function findAll(obj: GameQueryFilters = {}) {
         filters.push(inArray(
             games.gameId,
             db
-                .select({gameId: gamePlatforms.gameId})
+                .select({ gameId: gamePlatforms.gameId })
                 .from(gamePlatforms)
                 .where(eq(gamePlatforms.platformId, obj.platformId))
         ))
@@ -39,13 +51,13 @@ export async function findAll(obj: GameQueryFilters = {}) {
         filters.push(inArray(
             games.gameId,
             db
-                .select({gameId: gameGenres.gameId})
+                .select({ gameId: gameGenres.gameId })
                 .from(gameGenres)
                 .where(eq(gameGenres.genre, obj.genre))
         ))
     if (obj.cursor)
-        filters.push(gt(games.gameId, obj.cursor))
-    return detailedGames({filters, limit: obj.limit})
+        filters.push(lt(games.gameId, obj.cursor))
+    return detailedGames({ filters, limit: obj.limit })
 }
 
 export async function findById(gameId: number) {
@@ -63,7 +75,7 @@ export async function createGame(game: InferInsertModel<typeof games>, other: Ga
     return db.transaction(async tx => {
         const g = (await tx.insert(games).values(game).returning())[0]
         if (other.genres.length > 0) {
-            await tx.insert(genres).values(other.genres.map(x => ({name: x}))).onConflictDoNothing()
+            await tx.insert(genres).values(other.genres.map(x => ({ name: x }))).onConflictDoNothing()
             await tx.insert(gameGenres).values(other.genres.map(genre => ({ gameId: g.gameId, genre })))
         }
         if (other.media.length > 0)
@@ -135,7 +147,7 @@ type Args = {
     limit?: number
 }
 
-function detailedGames(obj: Args = { filters: [], }) {
+function detailedGames(obj: Args = { filters: [], limit: 50 }) {
     const gamesColumns = getColumns(games)
     const actorQuery = db.$with("aq").as(
         db.select({
@@ -189,7 +201,7 @@ function detailedGames(obj: Args = { filters: [], }) {
             .from(media)
             .groupBy(media.gameId)
     )
-    
+
     const gamesQuery = db
         .with(actorQuery, platformQuery, genresQuery, mediaQuery)
         .select({
@@ -209,8 +221,7 @@ function detailedGames(obj: Args = { filters: [], }) {
         .leftJoin(genresQuery, eq(games.gameId, genresQuery.gameId))
         .leftJoin(mediaQuery, eq(games.gameId, mediaQuery.gameId))
         .where(and(...obj.filters))
-        .orderBy(games.title)
-
+        .orderBy(desc(games.gameId))
     if (obj.limit)
         gamesQuery.limit(obj.limit)
 

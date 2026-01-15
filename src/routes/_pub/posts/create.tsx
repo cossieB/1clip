@@ -2,7 +2,6 @@ import { createFileRoute, redirect } from '@tanstack/solid-router'
 import { gamesQueryOpts } from '~/features/games/utils/gameQueryOpts';
 import { CreatePostPage } from '~/features/posts/components/CreatePostPage';
 import { getCurrentUser } from '~/serverFn/auth'
-import { getGamesFn } from '~/serverFn/games'
 
 export const Route = createFileRoute('/_pub/posts/create')({
     component: RouteComponent,

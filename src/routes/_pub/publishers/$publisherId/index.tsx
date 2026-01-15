@@ -1,19 +1,18 @@
 import { useQuery } from '@tanstack/solid-query'
-import { createFileRoute, Link, notFound } from '@tanstack/solid-router'
+import { createFileRoute, notFound } from '@tanstack/solid-router'
 import { Suspense } from 'solid-js'
 import { CompanyPage } from '~/components/CompanyPage/CompanyPage'
 import { GamesList } from '~/features/games/components/GamesList'
 import { NotFound } from '~/components/NotFound/NotFound'
 import { STORAGE_DOMAIN } from '~/utils/env'
 import { publisherQueryOpts } from '~/features/publishers/utils/publisherQueryOpts'
-import { AdminWrapper } from '~/components/AdminWrapper'
-import { gamesQueryOpts } from '~/features/games/utils/gameQueryOpts'
+import { gamesWithExtrasQueryOpts } from '~/features/games/utils/gameQueryOpts'
 
 export const Route = createFileRoute('/_pub/publishers/$publisherId/')({
     component: RouteComponent,
     loader: async ({ context, params}) => {
         if (Number.isNaN(params.publisherId)) throw notFound()
-        context.queryClient.ensureQueryData(gamesQueryOpts({publisherId: params.publisherId}))
+        context.queryClient.ensureInfiniteQueryData(gamesWithExtrasQueryOpts({publisherId: params.publisherId}))
         return await context.queryClient.ensureQueryData(publisherQueryOpts(params.publisherId))
     },
     head: ({ loaderData }) => ({
