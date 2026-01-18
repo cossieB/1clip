@@ -9,10 +9,14 @@ export class NodemailService implements EmailService {
             pass: process.env.GOOGLE_APP_PASSWORD
         }
     })
-    sendMail = async (opts: EmailOptions ) => {
-        this.transporter.sendMail({
-            ...opts,
-            name: "GG"
-        })
+    sendMail = async (opts: EmailOptions) => {
+        try {
+            await this.transporter.sendMail({
+                ...opts,
+                name: "1Clip"
+            })
+        } catch (error) {
+            console.error(error)
+        }
     }
 }
