@@ -22,7 +22,7 @@ export function useDeletePost(post: Awaited<ReturnType<typeof getPostFn>>) {
                 }
                 return {...data, pages}
             });
-            navigate({to: "/posts"})
+            navigate({to: "/"})
         },
         onError(error, variables, onMutateResult, context) {
             addToast({ text: error.message, type: "error" })

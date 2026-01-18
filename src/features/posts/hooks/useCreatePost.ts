@@ -57,7 +57,7 @@ export function useCreatePost() {
                 },
                 onSuccess(response, variables) {
                     queryClient.invalidateQueries(postsQueryOpts())
-                    navigate({ to: "/posts/$postId", params: { postId: response.postId } })
+                    navigate({ to: "/$postId", params: { postId: response.postId } })
                 },
             })
         }

@@ -4,7 +4,7 @@ import { Suspense } from 'solid-js'
 import { PostId } from '~/features/posts/components/PostId'
 import { postQueryOpts, postsQueryOpts } from '~/features/posts/utils/postQueryOpts'
 
-export const Route = createFileRoute('/_pub/posts/$postId')({
+export const Route = createFileRoute('/_pub/_posts/$postId')({
     params: {
         parse: params => ({
             postId: Number(params.postId)

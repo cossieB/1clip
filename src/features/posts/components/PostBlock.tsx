@@ -58,7 +58,7 @@ export function PostBlock(props: Props) {
                             {tag =>
                                 <div class="cutout">
                                     {tag}
-                                    <Link to='/posts/tags/$tag' params={{ tag }} />
+                                    <Link to='/tags/$tag' params={{ tag }} />
                                 </div>}
                         </For>
                     </div>
@@ -95,7 +95,7 @@ export function PostBlock(props: Props) {
                         {props.post.reactions.likes - props.post.reactions.dislikes}
                     </div>
                 </div>
-                <Link class={styles.a} to='/posts/$postId' params={{ postId: props.post.postId }} />
+                <Link class={styles.a} to='/$postId' params={{ postId: props.post.postId }} />
             </div>
             <MenuPopover
                 id='post-popover'

@@ -1,9 +1,9 @@
 import { BriefcaseBusiness, LockOpenIcon, MenuIcon, CodeIcon, Dice5Icon, HouseIcon, CirclePlus } from "lucide-solid";
-import styles from "./MainLayout.module.css"
 import { Show } from "solid-js";
 import { authClient } from "~/auth/authClient";
 import { STORAGE_DOMAIN } from "~/utils/env";
 import { NavItem } from "./NavItem";
+import styles from "./MainLayout.module.css"
 
 export function Nav(props: { toggleNav(): void }) {
     const session = authClient.useSession()
@@ -22,7 +22,7 @@ export function Nav(props: { toggleNav(): void }) {
                     to="/"
                     label="Home"
                     icon={<HouseIcon />}
-                />
+                />                
                 <NavItem
                     to="/games"
                     label="Games"
@@ -40,7 +40,7 @@ export function Nav(props: { toggleNav(): void }) {
                 />
                 <Show when={session().data && session().data!.user.emailVerified}>
                     <NavItem
-                        to="/posts/create"
+                        to="/create"
                         icon={<CirclePlus />}
                         label="Create"
                         style={{color: "var(--neon-pink)"}}
