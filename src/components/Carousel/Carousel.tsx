@@ -1,7 +1,8 @@
-import { createSignal, For, Match, Show, Switch } from "solid-js"
-import styles from "./Carousel.module.css"
+import { createSignal, For, Show } from "solid-js"
 import { MoveLeftIcon, MoveRightIcon } from "lucide-solid"
 import { getTouchHandlers } from "~/lib/getTouchHandlers"
+import { RenderMedia } from "../RenderMedia"
+import styles from "./Carousel.module.css"
 
 type Props = {
     showPrevBtn: boolean
@@ -22,6 +23,7 @@ export function Carousel(props: Props) {
             setIdx(p => p - 1)
     }
     const { handleTouchEnd, handleTouchStart } = getTouchHandlers({ onSwipeLeft: next, onSwipeRight: prev })
+    
     return (
         <div
             data-func="carousel"
@@ -35,15 +37,8 @@ export function Carousel(props: Props) {
             >
                 <For each={props.media}>
                     {m =>
-                        <div>
-                            <Switch>
-                                <Match when={m.contentType.startsWith("image")}>
-                                    <img src={m.url} alt="" />
-                                </Match>
-                                <Match when={m.contentType.startsWith("video")}>
-                                    <video src={m.url}></video>
-                                </Match>
-                            </Switch>
+                        <div class={styles.media}>
+                            <RenderMedia {...m}/>
                         </div>}
                 </For>
                 <Show when={props.showPrevBtn && props.media.length > 1}>

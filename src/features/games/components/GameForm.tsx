@@ -106,7 +106,8 @@ export function GameForm(props: { game?: Game }) {
             <div class={styles.screenshots}>
                 <For each={game.media}>
                     {(m, i) => <ImagePreview
-                        img={mediaSrc(m.key)}
+                        url={mediaSrc(m.key)}
+                        contentType={m.contentType}
                         onDelete={() => {
                             setGame('media', prev => prev.filter(f => f.key != m.key))
                             setFiles(prev => prev.filter(a => a.objectUrl != m.key))

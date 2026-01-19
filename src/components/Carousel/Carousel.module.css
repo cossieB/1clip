@@ -70,3 +70,7 @@
         }
     }
 }
+
+.media img, video {
+    object-fit: contain;
+}

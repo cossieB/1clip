@@ -1,7 +1,6 @@
 import { useQueryClient, useMutation } from "@tanstack/solid-query"
 import { useNavigate } from "@tanstack/solid-router"
 import { useServerFn } from "@tanstack/solid-start"
-import { createSignal } from "solid-js"
 import { createStore } from "solid-js/store"
 import { useGamesQuery } from "~/features/games/hooks/useGameQuery"
 import { useAbortController } from "~/hooks/useAbortController"
@@ -9,6 +8,7 @@ import { useToastContext } from "~/hooks/useToastContext"
 import { useUpload } from "~/hooks/useUpload"
 import { createPostFn } from "~/serverFn/posts"
 import { postsQueryOpts } from "../utils/postQueryOpts"
+import { onCleanup } from "solid-js"
 
 export function useCreatePost() {
     const { addToast } = useToastContext()
@@ -16,9 +16,10 @@ export function useCreatePost() {
     const navigate = useNavigate()
     const result = useGamesQuery()
     
-    const abortController = useAbortController()
+    const abortController = useAbortController();
+    onCleanup(() => abortController.abort())
 
-    const { isUploading, setFiles, upload } = useUpload(["media"], abortController)
+    const { isUploading, setFiles, upload, files } = useUpload(["media"], abortController)
     const createAction = useServerFn(createPostFn)
 
     const mutation = useMutation(() => ({
@@ -28,7 +29,6 @@ export function useCreatePost() {
     const [input, setInput] = createStore({
         title: "",
         text: "",
-        media: [] as string[],
         game: null as { gameId: number, title: string } | null,
         tags: [] as string[],
     })
@@ -72,6 +72,7 @@ export function useCreatePost() {
         abortController,
         mutation,
         result,
-        setFiles
+        setFiles,
+        files
     }
 }

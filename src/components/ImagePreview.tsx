@@ -1,18 +1,18 @@
 import { Trash2Icon } from "lucide-solid"
 import { ComponentProps, splitProps } from "solid-js"
+import { RenderMedia } from "./RenderMedia"
 
 type Props = {
-    img: string
+    url: string
+    contentType: string
     onDelete(): void
 } & ComponentProps<'div'>
 
 export function ImagePreview(props: Props) {
-    const [_, rest] = splitProps(props, ['img', 'onDelete'])
+    const [_, rest] = splitProps(props, ['url', 'onDelete'])
     return (
-        <div
-            {...rest}            
-        >
-            <img src={props.img} />
+        <div {...rest}>
+            <RenderMedia {...props} />
             <button type="button" onClick={props.onDelete} >
                 <Trash2Icon />
             </button>

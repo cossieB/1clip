@@ -15,12 +15,13 @@ export function CreatePostPage() {
         setInput,
         mutation,
         setFiles,
+        files
     } = useCreatePost()
 
     return (
         <div class='flexCenter'>
             <Form
-                disabled={!input.title || input.text.length + input.media.length == 0}
+                disabled={input.title.length < 3 || input.text.length + files().length == 0}
                 isPending={mutation.isPending || isUploading()}
                 onSubmit={handleSubmit}
             >
@@ -29,12 +30,12 @@ export function CreatePostPage() {
                     setter={val => setInput({ title: val })}
                     value={input.title}
                     required
+                    minLength={3}
                 />
                 <UploadBox
                     label='Images'
-                    maxSize={2}
+                    maxSize={4}
                     onSuccess={async (array) => {
-                        setInput('media', array.map(file => file.objectUrl))
                         setFiles(array.map(x => ({ field: "media", ...x })))
                     }}
                     style={{ height: "10rem" }}
@@ -46,12 +47,12 @@ export function CreatePostPage() {
                     limit={4}
                 />
                 <div class={styles.imgs}>
-                    <For each={input.media}>
-                        {(src, i) => <ImagePreview
+                    <For each={files()}>
+                        {(file, i) => <ImagePreview
+                            contentType={file.file.type}
                             class={styles.preview}
-                            img={src}
+                            url={file.objectUrl}
                             onDelete={() => {
-                                setInput('media', prev => prev.filter(f => f != src))
                                 setFiles(prev => prev.filter((_, j) => j != i()))
                             }}
                         />}
