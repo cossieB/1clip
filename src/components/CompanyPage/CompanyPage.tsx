@@ -11,7 +11,7 @@ type Props = {
 }
 
 export function CompanyPage(props: Props) {
-    
+
     return (
         <div>
             <div class={styles.header} >
@@ -19,12 +19,12 @@ export function CompanyPage(props: Props) {
                     <h1>{props.name}</h1>
                 </Show>
                 <div class="cutout-wrapper">
-                    <img 
-                    style={{"view-transition-name": `${props.type}Id${props.id}` }}
-                    class="cutout" 
-                    classList={{ [styles.isActor]: props.showName }} 
-                    src={props.logo ?? ""} 
-                    alt="" 
+                    <img
+                        style={{ "view-transition-name": `${props.type}Id${props.id}` }}
+                        class="cutout"
+                        classList={{ [styles.isActor]: props.showName }}
+                        src={props.logo ?? ""}
+                        alt=""
                     />
                 </div>
             </div>

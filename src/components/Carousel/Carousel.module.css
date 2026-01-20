@@ -52,8 +52,10 @@
 }
 
 .notches {
+    width: 100%;
+    justify-content: center;
     display: flex;
-    width: max-content;
+    flex-wrap: wrap;
     gap: 1rem;
     margin: 0.5rem auto;
 
