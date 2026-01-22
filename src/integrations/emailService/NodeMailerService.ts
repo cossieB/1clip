@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer"
-import { EmailOptions, EmailService } from "."
+import type { EmailOptions, EmailService } from "./emailService.interface"
 
 export class NodemailService implements EmailService {
     private transporter = nodemailer.createTransport({
@@ -12,7 +12,7 @@ export class NodemailService implements EmailService {
     sendMail = async (opts: EmailOptions ) => {
         return this.transporter.sendMail({
             ...opts,
-            name: "GG"
+            name: "1Clip"
         })
     }
 }

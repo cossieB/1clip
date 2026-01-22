@@ -31,5 +31,6 @@ export async function editPublisher(publisherId: number, data: Partial<InferSele
 }
 
 export async function createPublisher(data: InferInsertModel<typeof publishers>) {
-    return db.insert(publishers).values(data).returning()
+    const result = await db.insert(publishers).values(data).returning()
+    return result[0]
 }

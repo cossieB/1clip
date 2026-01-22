@@ -29,5 +29,6 @@ export async function editDeveloper(developerId: number, data: Partial<InferSele
 }
 
 export async function createDeveloper(data: InferInsertModel<typeof developers>) {
-    return db.insert(developers).values(data).returning()
+    const result = await db.insert(developers).values(data).returning()
+    return result[0]
 }

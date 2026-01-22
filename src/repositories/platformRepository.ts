@@ -22,8 +22,9 @@ export function findById(platformId: number) {
     })
 }
 
-export function createPlatform(platform: InferInsertModel<typeof platforms>) {
-    return db.insert(platforms).values(platform).returning()
+export async function createPlatform(platform: InferInsertModel<typeof platforms>) {
+    const result = await db.insert(platforms).values(platform).returning();
+    return result[0]
 }
 
 export function editPlatform(platformId: number, data: Partial<InferSelectModel<typeof platforms>>) {

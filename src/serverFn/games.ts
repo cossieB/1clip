@@ -1,6 +1,7 @@
 import { notFound } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start"
 import z from "zod";
+import { cacheService } from "~/integrations/cacheService";
 import { adminOnlyMiddleware } from "~/middleware/authorization";
 import { staticDataMiddleware } from "~/middleware/static";
 import * as gamesRepository from "~/repositories/gamesRepository";
@@ -18,7 +19,14 @@ export const getGamesFn = createServerFn()
         cursor: z.number()
     }).partial().optional())
     
-    .handler(({ data }) => gamesRepository.findGamesWithDetails(data))
+    .handler(async ({ data }) => {
+        const key = `games:${JSON.stringify(data)}`
+        const cached = await cacheService.get<ReturnType<typeof gamesRepository.findGamesWithDetails>>(key)
+        if (cached) return cached
+        const games = await gamesRepository.findGamesWithDetails(data)
+        cacheService.set(key, games, 3600)
+        return games
+    })
 
 export const getGameFn = createServerFn()
     .middleware([staticDataMiddleware])
@@ -27,8 +35,12 @@ export const getGameFn = createServerFn()
         return gameId
     })
     .handler(async ({ data }) => {
+        const key = `game:${data}`
+        const cached = await cacheService.get<ReturnType<typeof gamesRepository.findById>>(key)
+        if (cached) return cached
         const game = await gamesRepository.findById(data)
         if (!game) throw notFound()
+        cacheService.set(key, game)
         return game
     })
 
@@ -57,6 +69,7 @@ export const createGameFn = createServerFn({ method: "POST" })
     .handler(async ({ data }) => {
         const { media, platforms, genres, ...game } = data
         try {
+            void cacheService.delete("games")
             return await gamesRepository.createGame(game, { platforms, media, genres })
         } catch (error) {
             console.log(error)
@@ -69,8 +82,10 @@ export const updateGameFn = createServerFn({ method: "POST" })
     .inputValidator(GameEditSchema)
     .handler(async ({ data }) => {
         const { gameId, media, platforms, genres, ...game } = data
+        void cacheService.delete("games", `game:${gameId}`)
         await gamesRepository.updateGame(gameId, game, { platforms, media, genres })
     })
 
 export const getGamesWithoutExtras = createServerFn()
+    .middleware([staticDataMiddleware])
     .handler(async () => gamesRepository.findAll())

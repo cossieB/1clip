@@ -1,16 +1,6 @@
 import { ConsoleService } from "./ConsoleService"
+import { EmailService } from "./emailService.interface"
 import { NodemailService } from "./NodeMailerService"
-
-export type EmailOptions = {
-    to: string
-    subject: string
-    text?: string
-    html?: string
-}
-
-export interface EmailService {
-    sendMail(opts: EmailOptions): Promise<any>
-}
 
 export const emailService = (function(): EmailService {
     if (process.env.NODE_ENV == 'production')

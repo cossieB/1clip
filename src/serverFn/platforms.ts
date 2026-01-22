@@ -1,13 +1,21 @@
 import { notFound } from "@tanstack/solid-router"
 import { createServerFn } from "@tanstack/solid-start"
 import z from "zod"
+import { cacheService } from "~/integrations/cacheService"
 import { adminOnlyMiddleware } from "~/middleware/authorization"
 import { staticDataMiddleware } from "~/middleware/static"
 import * as platformRepository from "~/repositories/platformRepository"
 
 export const getPlatformsFn = createServerFn()
     .middleware([staticDataMiddleware])
-    .handler(() => platformRepository.findAll())
+    .handler(async () => {
+        const key = "platforms"
+        const cached = await cacheService.get<ReturnType<typeof platformRepository.findAll>>(key)
+        if (cached) return cached
+        const platforms = await platformRepository.findAll()
+        void cacheService.set(key, platforms)
+        return platforms
+    })
 
 export const getPlatformFn = createServerFn()
     .middleware([staticDataMiddleware])
@@ -16,9 +24,13 @@ export const getPlatformFn = createServerFn()
         return id
     })
     .handler(async ({ data }) => {
-        const dev = await platformRepository.findById(data)
-        if (!dev) throw notFound()
-        return dev
+        const key = `platform:${data}`
+        const cached = cacheService.get<ReturnType<typeof platformRepository.findById>>(key)
+        if (cached) return cached;
+        const platform = await platformRepository.findById(data)
+        if (!platform) throw notFound()
+        void cacheService.set(key, platform)
+        return platform
     })
 
 const platformCreateSchema = z.object({
@@ -34,7 +46,9 @@ export const createPlatformFn = createServerFn({method: "POST"})
     .middleware([adminOnlyMiddleware])
     .inputValidator(platformCreateSchema)
     .handler(async ({data}) => {
-        return (await platformRepository.createPlatform(data))[0]
+        const platform =  await platformRepository.createPlatform(data)
+        cacheService.delete("platforms")
+        return platform
     })
 
 export const editPlatformFn = createServerFn({method: "POST"})    
@@ -42,5 +56,6 @@ export const editPlatformFn = createServerFn({method: "POST"})
     .inputValidator(platformEditSchema)
     .handler(async ({data}) => {
         const {platformId, ...rest} = data
-        return await platformRepository.editPlatform(platformId, rest)
+        await platformRepository.editPlatform(platformId, rest)
+        void cacheService.delete("platforms", `platform:${platformId}`)
     })

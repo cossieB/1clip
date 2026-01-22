@@ -6,6 +6,7 @@ import { postsQueryOpts } from '~/features/posts/utils/postQueryOpts'
 export const Route = createFileRoute('/_pub/_posts/')({
     component: RouteComponent,
     loader: async ({ context }) => {
+        console.log(typeof process.env.REDIS_URL)
         await context.queryClient.ensureInfiniteQueryData(postsQueryOpts())
     },
     head: () => ({
