@@ -6,6 +6,7 @@ import { forceLogin, getCurrentUser as getCurrentUser } from "./auth";
 import { verifiedOnlyMiddleware } from "~/middleware/authorization";
 import { AppError } from "~/utils/AppError";
 import * as uploadService from "~/integrations/uploadService/cloudflareUploadService"
+import { HttpStatusCode } from "~/utils/statusCodes";
 
 export const getLoggedInUser = createServerFn()
     .handler(async () => {
@@ -49,7 +50,7 @@ export const updateCurrentUser = createServerFn({ method: "POST" })
     }))
     .handler(async ({ data, context: { user } }) => {
 
-        if (Object.keys(data).length === 0) throw new AppError("Nothing to update", 400)
+        if (Object.keys(data).length === 0) throw new AppError("Nothing to update", HttpStatusCode.BAD_REQUEST)
 
         try {
             const old = (await userRepository.updateUser(user.id, data))[0]
@@ -61,6 +62,6 @@ export const updateCurrentUser = createServerFn({ method: "POST" })
         }
         catch (error) {
             console.log(error)
-            throw new AppError("Something went wrong", 500)
+            throw new AppError("Something went wrong", HttpStatusCode.INTERNAL_SERVER_ERROR)
         }
     })

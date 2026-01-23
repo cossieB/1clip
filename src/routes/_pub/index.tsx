@@ -1,7 +1,8 @@
 import { createFileRoute, redirect } from '@tanstack/solid-router'
+import { HttpStatusCode } from '~/utils/statusCodes'
 
 export const Route = createFileRoute('/_pub/')({
-  beforeLoad: async ({context}) => {
-    throw redirect({to: "/posts", statusCode: 308})
+  beforeLoad: async () => {
+    throw redirect({to: "/posts", statusCode: HttpStatusCode.MOVED_PERMANENTLY})
   }
 })

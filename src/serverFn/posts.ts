@@ -7,6 +7,7 @@ import { getCurrentUser } from "./auth";
 import { AppError } from "~/utils/AppError";
 import { variables } from "~/utils/variables";
 import { rateLimiter } from "~/utils/rateLimiter";
+import { HttpStatusCode } from "~/utils/statusCodes";
 
 export const createPostFn = createServerFn({ method: "POST" })
     .middleware([verifiedOnlyMiddleware])
@@ -22,7 +23,7 @@ export const createPostFn = createServerFn({ method: "POST" })
     }))
     .handler(async ({ data, context: { user } }) => {
         await rateLimiter("post:create", user.id, 5, 60)
-        if (data.text.length + data.media.length === 0) throw new AppError("Empty post", 400)
+        if (data.text.length + data.media.length === 0) throw new AppError("Empty post", HttpStatusCode.BAD_REQUEST)
         const post = await postRepository.createPost({ ...data, userId: user.id, })
         return {...post, user}
     })
@@ -73,5 +74,5 @@ export const deletePostFn = createServerFn({method: "POST"})
     .handler(async ({data, context: {user}}) => {
         await rateLimiter("post:delete", user.id, 5, 60)        
         const result = await postRepository.deletePost(data.postId, user.id);
-        if (result.length == 0) throw new AppError("Failed to delete", 400)
+        if (result.length == 0) throw new AppError("Failed to delete", HttpStatusCode.INTERNAL_SERVER_ERROR)
     })

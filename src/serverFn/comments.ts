@@ -5,6 +5,7 @@ import * as commentsRepository from "~/repositories/commentRepository"
 import { getCurrentUser } from "./auth";
 import { AppError } from "~/utils/AppError";
 import { rateLimiter } from "~/utils/rateLimiter";
+import { HttpStatusCode } from "~/utils/statusCodes";
 
 export const addCommentFn = createServerFn({method: "POST"})
     .middleware([verifiedOnlyMiddleware])
@@ -18,7 +19,7 @@ export const addCommentFn = createServerFn({method: "POST"})
         try {
             return await commentsRepository.addComment({...data, userId: user.id});
         } catch (error) {
-            throw new AppError("Something went wrong", 500)
+            throw new AppError("Something went wrong", HttpStatusCode.INTERNAL_SERVER_ERROR)
         }
     })
 
@@ -51,5 +52,5 @@ export const deleteCommentFn = createServerFn({method: "POST"})
     .handler(async ({data, context: {user}}) => {
         await rateLimiter("comment:delete", user.id, 5, 60)
         const result = await commentsRepository.deleteComment(data.commentId, user.id)
-        if (result.length == 0) throw new AppError("Failed to delete", 400)
+        if (result.length == 0) throw new AppError("Failed to delete", HttpStatusCode.INTERNAL_SERVER_ERROR)
     })
