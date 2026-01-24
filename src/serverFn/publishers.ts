@@ -1,19 +1,14 @@
 import { notFound } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start";
 import z from "zod";
-import { cacheService } from "~/integrations/cacheService";
 import { adminOnlyMiddleware } from "~/middleware/authorization";
 import { staticDataMiddleware } from "~/middleware/static";
 import * as publisherRepository from "~/repositories/publisherRepository"
 
 export const getPublishersFn = createServerFn()
     .middleware([staticDataMiddleware])
-    .handler(async () => {
-        const key = "publishers"
-        const cached = await cacheService.get<ReturnType<typeof publisherRepository.findAll>>(key);
-        if (cached) return cached
+    .handler(async () => {        
         const pubs = await publisherRepository.findAll()
-        void cacheService.set(key, pubs)
         return pubs
     })
 
@@ -23,13 +18,9 @@ export const getPublisherFn = createServerFn()
         if (Number.isNaN(id) || id < 1) throw notFound()
         return id
     })
-    .handler(async ({ data }) => {
-        const key = `publisher:${data}`
-        const cached = cacheService.get<ReturnType<typeof publisherRepository.findById>>(key)
-        if (cached) return cached
+    .handler(async ({ data }) => {        
         const dev = await publisherRepository.findById(data)
         if (!dev) throw notFound()
-        void cacheService.set(key, dev)
         return dev
     })
 
@@ -50,7 +41,6 @@ export const createPublisherFn = createServerFn({method: "POST"})
     .inputValidator(publisherCreateSchema)
     .handler(async ({data}) => {
         const pub = await publisherRepository.createPublisher(data)
-        void cacheService.delete("publishers")
         return pub
     })
 

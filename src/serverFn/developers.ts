@@ -1,19 +1,14 @@
 import { notFound } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start";
 import z from "zod";
-import { cacheService } from "~/integrations/cacheService";
 import { adminOnlyMiddleware } from "~/middleware/authorization";
 import { staticDataMiddleware } from "~/middleware/static";
 import * as developerRepository from "~/repositories/developerRepository"
 
 export const getDevelopersFn = createServerFn()
     .middleware([staticDataMiddleware])
-    .handler(async () => {
-        const key = "developers"
-        const cached = await cacheService.get<ReturnType<typeof developerRepository.findAll>>(key)
-        if (cached) return cached
+    .handler(async () => {        
         const devs = await developerRepository.findAll()
-        void cacheService.set(key, devs)
         return devs
     })
 
@@ -23,13 +18,9 @@ export const getDeveloperFn = createServerFn()
         if (Number.isNaN(developerId) || developerId < 1) throw notFound()
         return developerId
     })
-    .handler(async ({ data }) => {
-        const key = `developer:${data}`
-        const cached = await cacheService.get<ReturnType<typeof developerRepository.findById>>(key)
-        if (cached) return cached
+    .handler(async ({ data }) => {        
         const dev = await developerRepository.findById(data)
         if (!dev) throw notFound()
-        void cacheService.set(key, dev)
         return dev
     })
 
@@ -50,7 +41,6 @@ export const createDeveloperFn = createServerFn({method: "POST"})
     .inputValidator(developerCreateSchema)
     .handler(async ({data}) => {
         const dev = await developerRepository.createDeveloper(data)
-        void cacheService.delete("developers")
         return dev
     })
 
@@ -60,5 +50,4 @@ export const editDeveloperFn = createServerFn({method: "POST"})
     .handler(async ({data}) => {
         const {developerId, ...rest} = data
         await developerRepository.editDeveloper(developerId, rest)
-        void cacheService.delete("developers", `developer:${developerId}`)
     })
