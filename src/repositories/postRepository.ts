@@ -115,6 +115,10 @@ export async function deletePost(postId: number, userId: string) {
         .returning({ postId: posts.postId })
 }
 
+export async function viewPosts(postIds: number[]) {
+    return db.update(posts).set({views: sql`${posts.views} + 1`}).where(inArray(posts.postId, postIds))
+}
+
 type Args = {
     filters: SQL[]
     limit?: number

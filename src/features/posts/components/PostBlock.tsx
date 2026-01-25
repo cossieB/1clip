@@ -1,6 +1,6 @@
 import { getPostFn } from '~/serverFn/posts'
 import { For, Show } from 'solid-js'
-import { EllipsisVerticalIcon, MessageCircleIcon, ThumbsDownIcon, ThumbsUpIcon } from 'lucide-solid'
+import { EllipsisVerticalIcon, EyeIcon, MessageCircleIcon, ThumbsDownIcon, ThumbsUpIcon } from 'lucide-solid'
 import { getRelativeTime } from '~/lib/getRelativeTime'
 import { formatDate } from '~/lib/formatDate'
 import { Link } from '@tanstack/solid-router'
@@ -23,7 +23,7 @@ export function PostBlock(props: Props) {
     const { deleteMutation } = useDeletePost(props.post)
 
     return (
-        <div data-type="post" class={styles.postContainer}>
+        <div data-type="post" data-postId={props.post.postId} class={styles.postContainer}>
             <div class={styles.user}>
                 <div>
                     <img src={STORAGE_DOMAIN + props.post.user.image} />
@@ -78,6 +78,10 @@ export function PostBlock(props: Props) {
                         <button><MessageCircleIcon /></button>
                         {props.post.comments}
                     </div>
+                    <div>
+                        <EyeIcon />
+                        {props.post.views}
+                    </div>
                     <div class={styles.react} >
                         <button onclick={fn('like')}
                             classList={{ [styles.liked]: props.post.yourReaction === "like" }}
@@ -94,6 +98,7 @@ export function PostBlock(props: Props) {
                         </button>
                         {props.post.reactions.likes - props.post.reactions.dislikes}
                     </div>
+                    
                 </div>
                 <Link class={styles.a} to='/posts/$postId' params={{ postId: props.post.postId }} />
             </div>

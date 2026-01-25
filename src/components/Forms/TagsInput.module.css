@@ -8,7 +8,8 @@
     min-height: var(--lineHeight);
     gap: 0.25rem;
 
-    button {
+    .addBtn {
+        margin-left: auto;
         all: unset;
         height: var(--lineHeight);
         background: none;
@@ -17,16 +18,13 @@
         justify-content: center;
     }
 
-    .addBtn {
-        margin-left: auto;
-    }
-
     input {
         background: none;
         border: none;
         flex: 1;
         height: var(--lineHeight);
         padding-left: 1rem;
+
         &:disabled {
             background-color: var(--gray1);
         }

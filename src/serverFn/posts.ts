@@ -8,6 +8,8 @@ import { AppError } from "~/utils/AppError";
 import { variables } from "~/utils/variables";
 import { rateLimiter } from "~/utils/rateLimiter";
 import { HttpStatusCode } from "~/utils/statusCodes";
+import { getRequestIP } from "@tanstack/solid-start/server";
+import { redis } from "~/utils/redis";
 
 export const createPostFn = createServerFn({ method: "POST" })
     .middleware([verifiedOnlyMiddleware])
@@ -75,4 +77,18 @@ export const deletePostFn = createServerFn({method: "POST"})
         await rateLimiter("post:delete", user.id, 5, 60)        
         const result = await postRepository.deletePost(data.postId, user.id);
         if (result.length == 0) throw new AppError("Failed to delete", HttpStatusCode.INTERNAL_SERVER_ERROR)
+    })
+
+export const viewPostFn = createServerFn({method: "POST"})    
+    .inputValidator(z.array(z.number()))
+    .handler(async ({data}) => {
+        if (data.length == 0) return
+        const ip = getRequestIP();
+        const user = await getCurrentUser()
+        if (!ip) return
+        // Only count a view if user hasn't viewed the post within the past day
+        const cached = await Promise.all(data.map(postId => redis.get(`view:${postId}:${ip}`)))
+        const postIds = data.filter((_, i) => cached[i] === null)
+        await postRepository.viewPosts(postIds);
+        await Promise.all(postIds.map(postId => redis.setEx(`view:${postId}:${ip}`, 86400, user?.id ?? "Anon")))
     })

@@ -6,7 +6,7 @@
         font-size: small;
 
     }
-    button {
+    .button {
         all: unset;
         color: red;
     }

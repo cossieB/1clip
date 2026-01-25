@@ -20,20 +20,26 @@
     }
 
     h1 {
-        font-size: clamp(1rem, 2.5vw + 1rem, 2rem);
+        font-size: clamp(1rem, 3vw, 2rem);
+        
         @media (width < 768px) {
-            z-index: 2;
             position: absolute;
+            text-align: center;
+            color: var(--neon-green);
+            z-index: 5;
+            translate: -50% -100%;
+            text-wrap: wrap;
+            padding: 1rem;
+            backdrop-filter: blur(10px) grayscale(50%);
+            box-shadow: 0 0 25px black;
             top: 100%;
             left: 50%;
-            translate: -50% -100%;
-            backdrop-filter: blur(10px);
-            padding: 0.5rem;
         }
     }
 
     img {
         max-height: 95%;
+
         @media (width < 768px) {
             position: absolute;
             left: 50%;

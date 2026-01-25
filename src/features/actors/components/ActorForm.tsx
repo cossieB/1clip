@@ -105,6 +105,7 @@ export function ActorForm(props: { actor?: Omit<Actor, 'characters'> & { charact
                                 <div> {char.character} </div>
                                 <div> {char.roleType} </div>
                                 <button
+                                    class={styles.button}
                                     type="button"
                                     onclick={() => setActor('characters', prev => prev.filter(x => x.gameId != char.gameId))}
                                 >

@@ -1,14 +1,12 @@
 import { useQuery, useQueryClient } from '@tanstack/solid-query'
 import { createFileRoute, Link, notFound } from '@tanstack/solid-router'
 import { createEffect, Suspense } from 'solid-js'
-import { AdminWrapper } from '~/components/AdminWrapper'
 import { NotFound } from '~/components/NotFound/NotFound'
 import { developerQueryOpts } from '~/features/developers/utils/developerQueryOpts'
 import { GamePage } from '~/features/games/components/GamePage'
 import { gameQueryOpts } from '~/features/games/utils/gameQueryOpts'
 import { platformQueryOpts } from '~/features/platforms/utils/platformQueryOpts'
 import { publisherQueryOpts } from '~/features/publishers/utils/publisherQueryOpts'
-import { getGameFn } from '~/serverFn/games'
 
 export const Route = createFileRoute('/_pub/_static/games/$gameId/')({
     component: RouteComponent,
@@ -20,7 +18,7 @@ export const Route = createFileRoute('/_pub/_static/games/$gameId/')({
     head: ({ loaderData }) => ({
         meta: loaderData ? [{ title: loaderData.title + " :: 1Clip" }] : undefined,
     }),
-    notFoundComponent: () => <NotFound message="These Aren't The Games You're Looking For" />
+    notFoundComponent: () => <NotFound message="These Aren't The Games You're Looking For" />,    
 })
 
 function RouteComponent() {

@@ -97,7 +97,8 @@ export const posts = pgTable('posts', {
     gameId: integer("game_id").references(() => games.gameId, { onDelete: "set null" }),
     text: varchar("text", { length: 1000 }).notNull().default(""),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    editedOn: timestamp("edited_on", { withTimezone: true }).notNull().$onUpdateFn(() => new Date())
+    editedOn: timestamp("edited_on", { withTimezone: true }).notNull().$onUpdateFn(() => new Date()),
+    views: integer("views").notNull().default(0)
 })
 
 export const comments = pgTable("comments", {
@@ -150,4 +151,12 @@ export const postTags = pgTable("post_tags", {
     postId: integer("post_id").references(() => posts.postId, { onDelete: "cascade" }),
 }, table => [
     primaryKey({ columns: [table.tagName, table.postId] })
+])
+
+export const followerFollowee = pgTable('follower_followee', {
+    followerId: uuid("follower_id").notNull().references(() => users.id),
+    followeeId: uuid("followee_id").notNull().references(() => users.id),
+    dateFollowed: timestamp('date_followed', {withTimezone: true}).notNull().defaultNow(),
+}, table => [
+    primaryKey({columns: [table.followerId, table.followeeId]})
 ])
