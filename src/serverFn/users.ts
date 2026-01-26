@@ -22,8 +22,11 @@ export const getLoggedInUser = createServerFn()
 export const getUserByUsernameFn = createServerFn()
     .inputValidator((username: string) => username)
     .handler(async ({ data }) => {
-        const user = await userRepository.findByUsername(data);
+        const u = await getCurrentUser()
+        
+        const user = await userRepository.findByUsername(data, u?.id);
         if (!user) throw notFound()
+        console.log(user)
         return user
     })
 
@@ -35,7 +38,12 @@ export const getUserByIdFn = createServerFn()
         else
             return validated.data
     })
-    .handler(async ({ data }) => userRepository.findById(data))
+    .handler(async ({ data }) => {
+        const u = await getCurrentUser()
+        const user = await userRepository.findById(data, u?.id)
+        if (!user) throw notFound();
+        return user
+    })
 
 export const updateCurrentUser = createServerFn({ method: "POST" })
     .middleware([verifiedOnlyMiddleware])
@@ -64,4 +72,13 @@ export const updateCurrentUser = createServerFn({ method: "POST" })
             console.log(error)
             throw new AppError("Something went wrong", HttpStatusCode.INTERNAL_SERVER_ERROR)
         }
+    })
+
+export const followUserFn = createServerFn({ method: "POST" })
+    .middleware([verifiedOnlyMiddleware])
+    .inputValidator(z.uuidv7())
+    .handler(async ({ data, context: { user } }) => {
+        if (data == user.id) throw new AppError("You can't follow yourself", HttpStatusCode.BAD_REQUEST)
+        const res = await userRepository.followUser(user.id, data)
+        return res.rowCount === 1
     })

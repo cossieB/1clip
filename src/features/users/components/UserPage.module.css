@@ -27,3 +27,11 @@
         }
     }
 }
+
+.follow {
+    button {
+        padding: 0.25rem;
+        display: flex;
+        background-color: var(--neon-pink);
+    }
+}

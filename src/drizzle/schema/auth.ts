@@ -24,8 +24,8 @@ export const users = pgTable("users", {
         .defaultNow()
         .$onUpdate(() => /* @__PURE__ */ new Date())
         .notNull(),
-    username: varchar("username", { length: 15 }).unique(),
-    displayUsername: varchar("display_username", { length: 15 }).unique(),
+    username: varchar("username", { length: 15 }).notNull().unique(),
+    displayUsername: varchar("display_username", { length: 15 }).notNull().unique(),
     role: varchar("role", { length: 10 }).default("user").notNull(),
     bio: varchar("bio", {length: 255}).notNull().default(""),
     dob: date('dob'),
