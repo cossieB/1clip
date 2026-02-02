@@ -11,9 +11,11 @@ type PostInsert = {
     tags: string[]
 };
 
+
 export function createPost(obj: PostInsert) {
+    const { searchVector, ...columns } = getColumns(posts)
     return db.transaction(async tx => {
-        const insert = await tx.insert(posts).values(obj).returning()
+        const insert = await tx.insert(posts).values(obj).returning({ ...columns })
         const post = insert[0]
         if (obj.tags.length > 0)
             await tx.insert(postTags).values(obj.tags.map(tagName => ({ postId: post.postId, tagName })))
@@ -94,15 +96,15 @@ export async function findAll(obj: PostFilters = {}, userId?: string) {
         filters.push(inArray(
             posts.postId,
             db
-                .select({postId: posts.postId})
+                .select({ postId: posts.postId })
                 .from(posts)
                 .where(inArray(
                     posts.userId,
                     db.select({
                         userId: followerFollowee.followeeId
                     })
-                    .from(followerFollowee)
-                    .where(eq(followerFollowee.followerId, obj.followerId))
+                        .from(followerFollowee)
+                        .where(eq(followerFollowee.followerId, obj.followerId))
                 ))
         ))
 
@@ -133,7 +135,17 @@ export async function deletePost(postId: number, userId: string) {
 }
 
 export async function viewPosts(postIds: number[]) {
-    return db.update(posts).set({views: sql`${posts.views} + 1`}).where(inArray(posts.postId, postIds))
+    return db.update(posts).set({ views: sql`${posts.views} + 1` }).where(inArray(posts.postId, postIds))
+}
+
+export function searchPosts(query: string) {
+    const sub = db.select({
+        postId: posts.postId
+    })
+        .from(posts)
+        .where(sql`${posts.searchVector} @@ websearch_to_tsquery('english', ${query})`)
+
+    return detailedPosts({filters: [inArray(posts.postId, sub)], limit: 20})
 }
 
 type Args = {
@@ -141,7 +153,7 @@ type Args = {
     limit?: number
 }
 
-function detailedPosts(obj: Args = { filters: [], limit: 1}, userId?: string) {
+function detailedPosts(obj: Args = { filters: [], limit: 1 }, userId?: string) {
     const mediaQuery = db.$with("mq").as(
         db.select({
             postId: media.postId,
@@ -190,9 +202,9 @@ function detailedPosts(obj: Args = { filters: [], limit: 1}, userId?: string) {
             .from(postReactions)
             .where(eq(postReactions.userId, userId!))
     )
-
+    const { searchVector, ...columns } = getColumns(posts)
     const query = db.with(mediaQuery, tagsQuery, reactionQuery, commentsQuery, userReactionQuery).select({
-        ...getColumns(posts),
+        ...columns,
         media: sql<{ key: string, contentType: string }[]>`COALESCE(${mediaQuery.media}, '[]'::JSONB)`,
         tags: sql<string[]>`COALESCE(${tagsQuery.tags}, '{}')`,
         user: {

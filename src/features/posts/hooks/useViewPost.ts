@@ -14,7 +14,7 @@ export function useViewPost() {
         diff.forEach(postId => aknowledgedViews.add(postId))
     }
     onMount(() => {
-        timer = window.setInterval(() => send(), 1000)
+        timer = window.setInterval(() => send(), 5000)
         onCleanup(() => window.clearInterval(timer))
 
     })

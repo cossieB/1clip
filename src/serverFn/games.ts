@@ -78,3 +78,9 @@ export const updateGameFn = createServerFn({ method: "POST" })
 export const getGamesWithoutExtras = createServerFn()
     .middleware([staticDataMiddleware])
     .handler(async () => gamesRepository.findAll())
+
+export const searchGamesFn = createServerFn()
+    .inputValidator(z.string())    
+    .handler(async ({data}) => {
+        return gamesRepository.searchGames(data)
+    })

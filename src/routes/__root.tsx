@@ -13,8 +13,8 @@ import type { QueryClient } from '@tanstack/solid-query'
 import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'
 import { NotFound } from '~/components/NotFound/NotFound'
 import { seo } from '~/utils/seo'
-import appCss from '../../public/app.css?url'
-import resetCss from '../../public/reset.css?url'
+import resetCss from './reset.css?url'
+import appCss from './app.css?url'
 import { ToastProvider } from '~/components/Toast/ToastProvider'
 import z from 'zod'
 import { useToastContext } from '~/hooks/useToastContext'
@@ -34,7 +34,7 @@ export const Route = createRootRouteWithContext<{
             },
             ...seo({
                 title: 'GG',
-                description: `TanStack Start is a type-safe, client-first, full-stack React framework. `,
+                description: `1Clip is the ultimate gamer handgout. It is a place where gamers can showcase their skills, their screenshots, fanart or even fanfic.`,
             }),
         ],
         links: [

@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { timestamp, integer, pgTable, text, varchar, primaryKey, pgEnum, jsonb, check, uuid, foreignKey, date, unique } from "drizzle-orm/pg-core";
+import { timestamp, integer, pgTable, text, varchar, primaryKey, pgEnum, jsonb, check, uuid, foreignKey, date, unique, customType, index } from "drizzle-orm/pg-core";
 import { users } from "./auth";
 
 export const developers = pgTable("developers", {
@@ -36,7 +36,12 @@ export const games = pgTable("games", {
     trailer: text("trailer"),
     dateAdded: timestamp("date_added", { withTimezone: true }).notNull().defaultNow(),
     dateModified: timestamp("date_modified", { withTimezone: true }),
-});
+    searchVector: customType({ dataType: () => 'tsvector' })("search_vector").generatedAlwaysAs(sql`(setweight(to_tsvector('english'::regconfig, (COALESCE(title, ''::character varying))::text), 'A'::"char") || setweight(to_tsvector('english'::regconfig, COALESCE(summary, ''::text)), 'B'::"char"))`)
+}, table => [
+    index().using("gin", table.searchVector),
+    index().on(table.developerId),
+    index().on(table.publisherId)
+]);
 
 export const platforms = pgTable("platforms", {
     platformId: integer("platform_id").primaryKey().generatedAlwaysAsIdentity(),
@@ -98,12 +103,15 @@ export const posts = pgTable('posts', {
     text: varchar("text", { length: 1000 }).notNull().default(""),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     editedOn: timestamp("edited_on", { withTimezone: true }).notNull().$onUpdateFn(() => new Date()),
-    views: integer("views").notNull().default(0)
-})
+    views: integer("views").notNull().default(0),
+    searchVector: customType({ dataType: () => 'tsvector' })('search_vector').generatedAlwaysAs(sql`(setweight(to_tsvector('english'::regconfig, (COALESCE(title, ''::character varying))::text), 'A'::"char") || setweight(to_tsvector('english'::regconfig, (COALESCE(text, ''::character varying))::text), 'B'::"char"))`),
+}, table => [
+    index().using("gin", table.searchVector)
+])
 
 export const comments = pgTable("comments", {
     commentId: integer("comment_id").primaryKey().generatedAlwaysAsIdentity(),
-    postId: integer("post_id").primaryKey().references(() => posts.postId, { onDelete: "cascade" }),
+    postId: integer("post_id").notNull().references(() => posts.postId, { onDelete: "cascade" }),
     userId: uuid("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
     text: varchar("text", { length: 255 }).notNull(),
     replyTo: integer("reply_to"),
@@ -114,7 +122,8 @@ export const comments = pgTable("comments", {
     foreignKey({
         columns: [t.replyTo],
         foreignColumns: [t.commentId],
-    }).onDelete("cascade")
+    }).onDelete("cascade"),
+    index().on(t.postId)
 ])
 
 export const reactionType = pgEnum("reaction_type", ["like", "dislike"])
@@ -143,8 +152,10 @@ export const media = pgTable("media", {
     postId: integer("post_id").references(() => posts.postId, { onDelete: "set null" }),
     gameId: integer("game_id").references(() => games.gameId, { onDelete: "set null" }),
     metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull().default({}),
-    createdAt: timestamp('created_at', {withTimezone: true}).notNull().defaultNow()
-})
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
+}, table => [
+    index().on(table.postId, table.gameId)
+])
 
 export const postTags = pgTable("post_tags", {
     tagName: varchar("tag_name", { length: 25 }).notNull().primaryKey(),
@@ -156,7 +167,7 @@ export const postTags = pgTable("post_tags", {
 export const followerFollowee = pgTable('follower_followee', {
     followerId: uuid("follower_id").notNull().references(() => users.id),
     followeeId: uuid("followee_id").notNull().references(() => users.id),
-    dateFollowed: timestamp('date_followed', {withTimezone: true}).notNull().defaultNow(),
+    dateFollowed: timestamp('date_followed', { withTimezone: true }).notNull().defaultNow(),
 }, table => [
-    primaryKey({columns: [table.followerId, table.followeeId]})
+    primaryKey({ columns: [table.followerId, table.followeeId] })
 ])

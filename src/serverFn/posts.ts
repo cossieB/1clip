@@ -27,7 +27,7 @@ export const createPostFn = createServerFn({ method: "POST" })
         await rateLimiter("post:create", user.id, 5, 60)
         if (data.text.length + data.media.length === 0) throw new AppError("Empty post", HttpStatusCode.BAD_REQUEST)
         const post = await postRepository.createPost({ ...data, userId: user.id, })
-        return {...post, user}
+        return { ...post, user }
     })
 
 export const getPostFn = createServerFn()
@@ -35,7 +35,7 @@ export const getPostFn = createServerFn()
         if (postId < 1) throw notFound()
         return postId
     })
-    .handler(async ({data}) => {
+    .handler(async ({ data }) => {
         const user = await getCurrentUser()
         const post = await postRepository.findById(data, user?.id)
         if (!post) throw notFound()
@@ -53,36 +53,36 @@ export const getPostsFn = createServerFn()
         cursor: z.number(),
         followerId: z.uuidv7()
     }).partial().optional())
-    .handler(async ({data}) => {
+    .handler(async ({ data }) => {
         const user = await getCurrentUser()
         return postRepository.findAll(data, user?.id)
-    }) 
+    })
 
-export const reactToPostFn = createServerFn({method: "POST"}) 
+export const reactToPostFn = createServerFn({ method: "POST" })
     .middleware([verifiedOnlyMiddleware])
     .inputValidator(z.object({
         postId: z.number(),
         reaction: z.enum(["like", "dislike"])
     }))
-    .handler(async ({data, context: {user}}) => {
+    .handler(async ({ data, context: { user } }) => {
         await rateLimiter("post:react", user.id, 10, 60)
         await postRepository.reactToPost(data.postId, user.id, data.reaction)
     })
 
-export const deletePostFn = createServerFn({method: "POST"})
+export const deletePostFn = createServerFn({ method: "POST" })
     .middleware([verifiedOnlyMiddleware])
     .inputValidator(z.object({
         postId: z.number()
     }))
-    .handler(async ({data, context: {user}}) => {
-        await rateLimiter("post:delete", user.id, 5, 60)        
+    .handler(async ({ data, context: { user } }) => {
+        await rateLimiter("post:delete", user.id, 5, 60)
         const result = await postRepository.deletePost(data.postId, user.id);
         if (result.length == 0) throw new AppError("Failed to delete", HttpStatusCode.INTERNAL_SERVER_ERROR)
     })
 
-export const viewPostFn = createServerFn({method: "POST"})    
+export const viewPostFn = createServerFn({ method: "POST" })
     .inputValidator(z.array(z.number()))
-    .handler(async ({data}) => {
+    .handler(async ({ data }) => {
         if (data.length == 0) return
         const ip = getRequestIP();
         const user = await getCurrentUser()
@@ -92,4 +92,10 @@ export const viewPostFn = createServerFn({method: "POST"})
         const postIds = data.filter((_, i) => cached[i] === null)
         await postRepository.viewPosts(postIds);
         await Promise.all(postIds.map(postId => redis.setEx(`view:${postId}:${ip}`, 86400, user?.id ?? "Anon")))
+    })
+
+export const searchPostsFn = createServerFn()
+    .inputValidator(z.string())
+    .handler(async ({data}) => {
+        return postRepository.searchPosts(data)
     })

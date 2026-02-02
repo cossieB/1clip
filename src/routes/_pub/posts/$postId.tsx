@@ -34,4 +34,3 @@ function RouteComponent() {
         </Suspense>
     )
 }
-postsQueryOpts

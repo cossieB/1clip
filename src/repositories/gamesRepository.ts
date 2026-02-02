@@ -142,13 +142,25 @@ export async function updateGame(gameId: number, game: Partial<InferSelectModel<
     })
 }
 
+export function searchGames(query: string) {
+    return db.select({
+        title: games.title,
+        cover: games.cover,
+        gameId: games.gameId,
+        releaseDate: games.releaseDate
+    })
+    .from(games)
+    .where(sql`${games.searchVector} @@ websearch_to_tsquery('english', ${query})`)
+    .limit(50)
+}
+
 type Args = {
     filters: SQL[]
     limit?: number
 }
 
 function detailedGames(obj: Args = { filters: []}) {
-    const gamesColumns = getColumns(games)
+    const {searchVector, ...gamesColumns} = getColumns(games)
     const actorQuery = db.$with("aq").as(
         db.select({
             gameId: gameActors.gameId,

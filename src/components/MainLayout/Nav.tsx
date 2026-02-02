@@ -1,16 +1,23 @@
-import { BriefcaseBusiness, LockOpenIcon, MenuIcon, CodeIcon, Dice5Icon, HouseIcon, CirclePlus } from "lucide-solid";
-import { Show } from "solid-js";
+import { BriefcaseBusiness, LockOpenIcon, MenuIcon, CodeIcon, Dice5Icon, HouseIcon, CirclePlus, Search } from "lucide-solid";
+import { Setter, Show } from "solid-js";
 import { authClient } from "~/auth/authClient";
 import { STORAGE_DOMAIN } from "~/utils/env";
 import { NavItem } from "./NavItem";
 import styles from "./MainLayout.module.css"
+import clickOutside from "~/lib/clickOutside";
+false && clickOutside
 
-export function Nav(props: { toggleNav(): void }) {
+export function Nav(props: { setOpen: Setter<boolean> }) {
     const session = authClient.useSession()
     return (
-        <nav class={styles.nav} >
+        <nav 
+        use:clickOutside={() => {
+            if (window.innerWidth < 768)
+                props.setOpen(false)
+        }} 
+        class={styles.nav} >
             <div class={styles.topItem}>
-                <button class={styles.toggleBtn} onclick={props.toggleNav}>
+                <button class={styles.toggleBtn} onclick={() => props.setOpen(prev => !prev)}>
                     <MenuIcon />
                 </button>
                 <aside>
@@ -37,6 +44,11 @@ export function Nav(props: { toggleNav(): void }) {
                     to="/publishers"
                     label="Publishers"
                     icon={<BriefcaseBusiness />}
+                />
+                <NavItem
+                    to="/search/posts"
+                    label="Search"
+                    icon={<Search />}
                 />
                 <Show when={session().data && session().data!.user.emailVerified}>
                     <NavItem

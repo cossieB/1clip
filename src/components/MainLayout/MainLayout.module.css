@@ -16,6 +16,16 @@
 @media (width < 768px) {
     .navOpen .nav {
         width: 70vw;
+        &::after {
+            content: "";
+            backdrop-filter: blur(5px) grayscale(90%);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+        }
     }
 }
 
@@ -57,7 +67,6 @@
 
 .main {
     height: 100vh;
-    padding-top: 3.5rem;
 
     @media (width >=768px) {
         transition: margin-left 200ms ease;
@@ -117,45 +126,6 @@
 
     @media (width < 768px) {
         transform: translate(2, 2);
-    }
-}
-
-.search {
-    height: 3rem;
-    display: flex;
-    align-items: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: var(--bg-clr);
-    z-index: 100;
-
-    >div {
-        border-radius: 5rem;
-        overflow: hidden;
-        display: flex;
-        height: 80%;
-        margin-left: auto;
-        margin-right: auto;
-        width: 70%;
-        max-width: 400px;
-
-        >button {
-            background-color: #ffffff14;
-            width: var(--icon-width);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        >input {
-            all: unset;
-            width: 100%;
-            border: 1px solid gray;
-            background-color: hsl(0, 0%, 15%);
-            padding-left: 0.5rem;
-        }
     }
 }
 

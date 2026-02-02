@@ -49,6 +49,6 @@
 }
 
 .main {
-    width: min(90%, 1200px);
+    width: min(100%, 1200px);
     margin: 0.5rem auto;
 }

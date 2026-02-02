@@ -1,4 +1,4 @@
-import { Link, LinkComponentProps, useLocation } from "@tanstack/solid-router"
+import { Link, LinkComponentProps, useMatchRoute } from "@tanstack/solid-router"
 import { createEffect, createSignal, For, splitProps } from "solid-js"
 import { Require } from "~/lib/utilityTypes"
 import styles from "./NavTabs.module.css"
@@ -25,17 +25,19 @@ export function NavTabs(props: Props) {
 
 function Tab(props: Props["tabs"][number] & { setIdx(): void }) {
     const [div, linkProps] = splitProps(props, ['label', 'setIdx'])
-    const location = useLocation()
 
+    const matchRoute = useMatchRoute();
+    const match = matchRoute({to: props.to})
+    
     createEffect(() => {
-        if (location().pathname.toLowerCase().endsWith(props.to.toLowerCase()))
+        if (match())
             div.setIdx()
     })
 
     return (
         <div class={`${styles.tab} cutout`}>
             {div.label}
-            <Link {...linkProps} />
+            <Link {...linkProps} search />
         </div>
     )
 }
