@@ -10,7 +10,7 @@ export const developers = pgTable("developers", {
     summary: text("summary").notNull().default(""),
     country: varchar("country"),
     dateAdded: timestamp("date_added", { withTimezone: true }).notNull().defaultNow(),
-    dateModified: timestamp("date_modified", { withTimezone: true }),
+    dateModified: timestamp("date_modified", { withTimezone: true }).notNull().$onUpdateFn(() => new Date()),
 })
 
 export const publishers = pgTable("publishers", {
@@ -21,7 +21,7 @@ export const publishers = pgTable("publishers", {
     summary: text("summary").notNull().default(""),
     country: varchar("country"),
     dateAdded: timestamp("date_added", { withTimezone: true }).notNull().defaultNow(),
-    dateModified: timestamp("date_modified", { withTimezone: true }),
+    dateModified: timestamp("date_modified", { withTimezone: true }).notNull().$onUpdateFn(() => new Date()),
 })
 
 export const games = pgTable("games", {
@@ -35,7 +35,7 @@ export const games = pgTable("games", {
     banner: text("banner").notNull(),
     trailer: text("trailer"),
     dateAdded: timestamp("date_added", { withTimezone: true }).notNull().defaultNow(),
-    dateModified: timestamp("date_modified", { withTimezone: true }),
+    dateModified: timestamp("date_modified", { withTimezone: true }).notNull().$onUpdateFn(() => new Date()),
     searchVector: customType({ dataType: () => 'tsvector' })("search_vector").generatedAlwaysAs(sql`(setweight(to_tsvector('english'::regconfig, (COALESCE(title, ''::character varying))::text), 'A'::"char") || setweight(to_tsvector('english'::regconfig, COALESCE(summary, ''::text)), 'B'::"char"))`)
 }, table => [
     index().using("gin", table.searchVector),
@@ -50,7 +50,7 @@ export const platforms = pgTable("platforms", {
     releaseDate: date("release_date").notNull(),
     summary: text("summary").notNull().default(""),
     dateAdded: timestamp("date_added", { withTimezone: true }).notNull().defaultNow(),
-    dateModified: timestamp("date_modified", { withTimezone: true }),
+    dateModified: timestamp("date_modified", { withTimezone: true }).notNull().$onUpdateFn(() => new Date()),
 });
 
 export const actors = pgTable("actors", {

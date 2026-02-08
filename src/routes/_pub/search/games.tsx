@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/solid-query';
-import { createFileRoute } from '@tanstack/solid-router'
+import { createFileRoute, useLocation } from '@tanstack/solid-router'
 import { For, Suspense } from 'solid-js';
 import { PhotoCardGrid } from '~/components/CardLink/PhotoCardLink';
 import { searchGamesFn } from '~/serverFn/games';
@@ -10,9 +10,8 @@ export const Route = createFileRoute('/_pub/search/games')({
 })
 
 function RouteComponent() {
-    const searhParams = Route.useSearch();
-    //@ts-expect-error
-    const s = () => searhParams()?.s as string | undefined
+    const location = useLocation()
+    const s = () => location().search.s
 
     const result = useQuery(() => ({
         enabled: () => !!s(),

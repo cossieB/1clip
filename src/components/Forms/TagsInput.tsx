@@ -86,7 +86,11 @@ function Tag(props: P) {
     return (
         <div class={styles.tag}>
             <span> {props.tag} </span>
-            <button onclick={props.removeTag} type="button">
+            <button 
+                class={styles.delBtn}
+                onclick={props.removeTag} 
+                type="button"
+                >
                 <XIcon />
             </button>
         </div>

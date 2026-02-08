@@ -44,4 +44,7 @@
             color: hsl(0, 64%, 60%);
         }
     }
+    .delBtn {
+        all: unset
+    }
 }

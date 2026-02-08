@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, useNavigate } from '@tanstack/solid-router'
+import { createFileRoute, Outlet, useLocation, useNavigate } from '@tanstack/solid-router'
 import { SearchBar } from '~/components/Search/Searchbar'
 import { NavTabs } from '~/components/NavTabs/NavTabs'
 import z from 'zod'
@@ -11,13 +11,12 @@ export const Route = createFileRoute('/_pub/search')({
 })
 
 function RouteComponent() {
-    const searchParams = Route.useSearch()
+    const location = useLocation()
     const navigate = useNavigate()
     return (
         <div>
             <SearchBar
-                //@ts-expect-error
-                initialValue={searchParams()?.s}
+                initialValue={location().search.s}
                 onSearch={s => navigate({
                     to: ".",
                     search: { s }
