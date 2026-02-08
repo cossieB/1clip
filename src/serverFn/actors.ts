@@ -2,11 +2,12 @@ import { notFound } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start";
 import z from "zod";
 import { adminOnlyMiddleware } from "~/middleware/authorization";
+import { loggerMiddleware } from "~/middleware/logger";
 import { staticDataMiddleware } from "~/middleware/static";
 import * as actorRepository from "~/repositories/actorRepository"
 
 export const getActorFn = createServerFn()
-    .middleware([staticDataMiddleware])
+    .middleware([loggerMiddleware, staticDataMiddleware])
     .inputValidator((id: number) => {
         if (Number.isNaN(id) || id < 1) throw notFound()
         return id
@@ -18,7 +19,7 @@ export const getActorFn = createServerFn()
     })
 
 export const getActorsFn = createServerFn()
-    .middleware([staticDataMiddleware])
+    .middleware([loggerMiddleware, staticDataMiddleware])
     .handler(async () => {
         const actors = await actorRepository.findAll()
         return actors
@@ -39,7 +40,7 @@ const actorCreateSchema = z.object({
 const actorEditSchema = actorCreateSchema.partial().extend({actorId: z.number()})
 
 export const createActorFn = createServerFn({method: "POST"})  
-    .middleware([adminOnlyMiddleware])
+    .middleware([loggerMiddleware, adminOnlyMiddleware])
     .inputValidator(actorCreateSchema)
     .handler(async ({data}) => {
         const {characters, ...rest} = data
@@ -48,7 +49,7 @@ export const createActorFn = createServerFn({method: "POST"})
     })
 
 export const editActorFn = createServerFn({method: "POST"})    
-    .middleware([adminOnlyMiddleware])
+    .middleware([loggerMiddleware, adminOnlyMiddleware])
     .inputValidator(actorEditSchema)
     .handler(async ({data}) => {
         const {actorId, characters, ...rest} = data
@@ -56,6 +57,7 @@ export const editActorFn = createServerFn({method: "POST"})
     })
 
 export const getActorsWithCharacters = createServerFn()
+    .middleware([loggerMiddleware])
     .inputValidator(z.number())
     .handler(async ({data}) => {
         const actor = await actorRepository.findActorWithGames(data)
