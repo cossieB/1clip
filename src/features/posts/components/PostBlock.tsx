@@ -37,7 +37,7 @@ export function PostBlock(props: Props) {
                     <span title={formatDate(props.post.createdAt)}>
                         {getRelativeTime(props.post.createdAt)}
                     </span>
-                    <button style={{ "--anchor-name": "--postMenuBtn" }} popoverTarget='post-popover'>
+                    <button style={{ "--anchor-name": "--postMenuBtn" }} popoverTarget={'post-popover-' + props.post.postId}>
                         <EllipsisVerticalIcon />
                     </button>
                 </div>
@@ -70,7 +70,7 @@ export function PostBlock(props: Props) {
                             <span> {props.post.game?.title} </span>
                             <span> {props.post.game?.releaseDate.split("-")[0]} </span>
                         </div>
-                        <Link to='/games/$gameId' params={{gameId: props.post.gameId!}} />
+                        <Link to='/posts/games/$gameId' params={{ gameId: props.post.gameId! }} />
                     </div>
                 </Show>
                 <div class={styles.buttons}>
@@ -98,41 +98,59 @@ export function PostBlock(props: Props) {
                         </button>
                         {props.post.reactions.likes - props.post.reactions.dislikes}
                     </div>
-                    
+
                 </div>
                 <Link class={styles.a} to='/posts/$postId' params={{ postId: props.post.postId }} />
             </div>
             <MenuPopover
-                id='post-popover'
+                id={'post-popover-' + props.post.postId}
                 style={{ "position-anchor": "postMenuBtn", "position-area": "bottom left" }}
             >
                 <ul>
-                    <Show when={session().data && session().data!.user.id === props.post.userId}>
+                    <li
+                        onClick={() => {
+                            navigator.share({
+                                title: "Share post",
+                                url: "/posts/" + props.post.postId
+                            })
+                        }}
+                    >
+                        Share
+                    </li>
+                    <li>
+                        {props.post.user.username}'s Profile
+                        <Link to="/users/$username" params={{ username: props.post.user.username }} />
+                    </li>
+                    <Show when={props.post.gameId}>
                         <li>
+                            {props.post.game!.title} Posts
+                            <Link to='/posts/games/$gameId' params={{ gameId: props.post.gameId! }} />
+                        </li>
+                        <li>
+                            {props.post.game!.title} Details
+                            <Link to='/games/$gameId' params={{ gameId: props.post.gameId! }} />
+                        </li>
+                    </Show>
+                    <Show when={session().data && session().data!.user.id === props.post.userId}>
+                        <li
+                            onclick={() => {
+                                document.getElementById('del-post-warn-'+props.post.postId)?.showPopover()
+                            }}
+                        >
+                            Delete
                             <ConfirmPopoverWithButton
                                 popover={{
-                                    id: "del-post-warn",
-                                    text: 'Delete Post?',
+                                    id: "del-post-warn-"+props.post.postId,
+                                    text: 'Delete Post? ',
                                     onConfirm: () => deleteMutation.mutate({ data: { postId: props.post.postId } })
                                 }}
                                 button={{
-                                    children: "Delete"
+                                    hidden: true
                                 }}
                             />
                         </li>
                     </Show>
-                    <li>
-                        <button
-                            onClick={() => {
-                                navigator.share({
-                                    title: "Share post",
-                                    url: "/posts/" + props.post.postId
-                                })
-                            }}
-                        >
-                            Share
-                        </button>
-                    </li>
+
                 </ul>
             </MenuPopover>
         </div>

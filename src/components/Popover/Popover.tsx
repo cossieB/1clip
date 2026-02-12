@@ -26,7 +26,7 @@ type BaseProps = {
 
 type ValueProps =
     | { challengeAnswer: string; setChallengeAnswer: (val: string) => void; }
-    | { challengeAnswer?: never; setChallengeAnswer?: never; isPassword?: never; label?: never; };
+    | { challengeAnswer?: never; setChallengeAnswer?: never;  };
 
 type Props = BaseProps & ValueProps;
 

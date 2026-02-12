@@ -37,6 +37,7 @@ export type PostFilters = {
     limit?: number
     cursor?: number
     followerId?: string
+    gameId?: number
 }
 
 export async function findAll(obj: PostFilters = {}, userId?: string) {
@@ -94,19 +95,15 @@ export async function findAll(obj: PostFilters = {}, userId?: string) {
 
     if (obj.followerId)
         filters.push(inArray(
-            posts.postId,
+            posts.userId,
             db
-                .select({ postId: posts.postId })
-                .from(posts)
-                .where(inArray(
-                    posts.userId,
-                    db.select({
-                        userId: followerFollowee.followeeId
-                    })
-                        .from(followerFollowee)
-                        .where(eq(followerFollowee.followerId, obj.followerId))
-                ))
+                .select({userId: followerFollowee.followeeId})
+                .from(followerFollowee)
+                .where(eq(followerFollowee.followerId, obj.followerId))
         ))
+
+    if (obj.gameId)
+        filters.push(eq(posts.gameId, obj.gameId))
 
     return detailedPosts({ filters, limit: obj.limit }, userId)
 }

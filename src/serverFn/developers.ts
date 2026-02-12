@@ -2,19 +2,19 @@ import { notFound } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start";
 import z from "zod";
 import { adminOnlyMiddleware } from "~/middleware/authorization";
-import { loggerMiddleware } from "~/middleware/logger";
+import { globalMiddleware } from "~/middleware/globalMiddleware";
 import { staticDataMiddleware } from "~/middleware/static";
 import * as developerRepository from "~/repositories/developerRepository"
 
 export const getDevelopersFn = createServerFn()
-    .middleware([loggerMiddleware, staticDataMiddleware])
+    .middleware([globalMiddleware, staticDataMiddleware])
     .handler(async () => {        
         const devs = await developerRepository.findAll()
         return devs
     })
 
 export const getDeveloperFn = createServerFn()
-    .middleware([loggerMiddleware, staticDataMiddleware])
+    .middleware([globalMiddleware, staticDataMiddleware])
     .inputValidator((developerId: number) => {
         if (Number.isNaN(developerId) || developerId < 1) throw notFound()
         return developerId
@@ -38,7 +38,7 @@ const developerEditSchema = developerCreateSchema.partial().extend({
 })
 
 export const createDeveloperFn = createServerFn({method: "POST"}) 
-    .middleware([loggerMiddleware, adminOnlyMiddleware])
+    .middleware([globalMiddleware, adminOnlyMiddleware])
     .inputValidator(developerCreateSchema)
     .handler(async ({data}) => {
         const dev = await developerRepository.createDeveloper(data)
@@ -46,7 +46,7 @@ export const createDeveloperFn = createServerFn({method: "POST"})
     })
 
 export const editDeveloperFn = createServerFn({method: "POST"})   
-    .middleware([loggerMiddleware, adminOnlyMiddleware])
+    .middleware([globalMiddleware, adminOnlyMiddleware])
     .inputValidator(developerEditSchema)
     .handler(async ({data}) => {
         const {developerId, ...rest} = data

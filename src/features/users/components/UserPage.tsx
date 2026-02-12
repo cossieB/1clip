@@ -73,7 +73,7 @@ export function UserPage(props: Props) {
                         <li>
                             <img src="/favicon.ico" alt="" />
                             <Link to="/users/$username" params={{ username: props.user.username! }}>
-                                {`${SITE_URL}/users/${props.user.username}`}
+                                {`${SITE_URL}users/${props.user.username}`}
                             </Link>
                         </li>
                         <For each={props.user.links}>

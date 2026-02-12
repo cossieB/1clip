@@ -10,12 +10,12 @@ false && clickOutside
 export function Nav(props: { setOpen: Setter<boolean> }) {
     const session = authClient.useSession()
     return (
-        <nav 
-        use:clickOutside={() => {
-            if (window.innerWidth < 768)
-                props.setOpen(false)
-        }} 
-        class={styles.nav} >
+        <nav
+            use:clickOutside={() => {
+                if (window.innerWidth < 768)
+                    props.setOpen(false)
+            }}
+            class={styles.nav} >
             <div class={styles.topItem}>
                 <button class={styles.toggleBtn} onclick={() => props.setOpen(prev => !prev)}>
                     <MenuIcon />
@@ -29,7 +29,7 @@ export function Nav(props: { setOpen: Setter<boolean> }) {
                     to="/posts"
                     label="Home"
                     icon={<HouseIcon />}
-                />                
+                />
                 <NavItem
                     to="/games"
                     label="Games"
@@ -55,7 +55,7 @@ export function Nav(props: { setOpen: Setter<boolean> }) {
                         to="/posts/create"
                         icon={<CirclePlus />}
                         label="Create"
-                        style={{color: "var(--neon-pink)"}}
+                        style={{ color: "var(--neon-pink)" }}
                     />
                 </Show>
                 <UserComponent />

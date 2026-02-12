@@ -9,9 +9,17 @@
     }
     li {
         cursor: pointer;
+        position: relative;
         padding: 0.5rem;
         &:hover {
             background-color: slategray;
         }
+    }
+    a {
+        position: absolute;
+        inset: 0;
+    }
+    button {
+        padding: 0;
     }
 }

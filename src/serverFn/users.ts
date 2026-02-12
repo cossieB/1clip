@@ -7,10 +7,10 @@ import { verifiedOnlyMiddleware } from "~/middleware/authorization";
 import { AppError } from "~/utils/AppError";
 import * as uploadService from "~/integrations/uploadService/cloudflareUploadService"
 import { HttpStatusCode } from "~/utils/statusCodes";
-import { loggerMiddleware } from "~/middleware/logger";
+import { globalMiddleware } from "~/middleware/globalMiddleware";
 
 export const getLoggedInUser = createServerFn()
-    .middleware([loggerMiddleware])
+    .middleware([globalMiddleware])
     .handler(async () => {
         const session = await getCurrentUser()
         if (!session) throw notFound()
@@ -22,7 +22,7 @@ export const getLoggedInUser = createServerFn()
     })
 
 export const getUserByUsernameFn = createServerFn()
-    .middleware([loggerMiddleware])
+    .middleware([globalMiddleware])
     .inputValidator((username: string) => username)
     .handler(async ({ data }) => {
         const u = await getCurrentUser()
@@ -33,7 +33,7 @@ export const getUserByUsernameFn = createServerFn()
     })
 
 export const getUserByIdFn = createServerFn()
-    .middleware([loggerMiddleware])
+    .middleware([globalMiddleware])
     .inputValidator((id: unknown) => {
         const validated = z.uuid().safeParse(id)
         if (validated.error)
@@ -49,7 +49,7 @@ export const getUserByIdFn = createServerFn()
     })
 
 export const updateCurrentUser = createServerFn({ method: "POST" })
-    .middleware([loggerMiddleware, verifiedOnlyMiddleware])
+    .middleware([globalMiddleware, verifiedOnlyMiddleware])
     .inputValidator(z.object({
         displayName: z.string().min(3).max(15).optional(),
         bio: z.string().max(255).optional(),
@@ -63,22 +63,16 @@ export const updateCurrentUser = createServerFn({ method: "POST" })
 
         if (Object.keys(data).length === 0) throw new AppError("Nothing to update", HttpStatusCode.BAD_REQUEST)
 
-        try {
             const old = (await userRepository.updateUser(user.id, data))[0]
             if (data.banner != old.oldBanner)
                 uploadService.deleteObject(old.oldBanner)
             if (data.image != old.oldAvatar)
                 uploadService.deleteObject(old.oldAvatar)
             return new Response(null, { status: 200 })
-        }
-        catch (error) {
-            console.log(error)
-            throw new AppError("Something went wrong", HttpStatusCode.INTERNAL_SERVER_ERROR)
-        }
     })
 
 export const followUserFn = createServerFn({ method: "POST" })
-    .middleware([loggerMiddleware, verifiedOnlyMiddleware])
+    .middleware([globalMiddleware, verifiedOnlyMiddleware])
     .inputValidator(z.uuidv7())
     .handler(async ({ data, context: { user } }) => {
         if (data == user.id) throw new AppError("You can't follow yourself", HttpStatusCode.BAD_REQUEST)

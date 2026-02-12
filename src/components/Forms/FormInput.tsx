@@ -51,7 +51,12 @@ export function FormInput<T>(props: Props<T>) {
 export function StandaloneInput(props: Props) {
     return (
         <div role="group" class={styles.formControl}>
-            <input onchange={e => props.setter(e.currentTarget.value)} value={props.value} />
+            <input
+                onchange={e => props.setter(e.currentTarget.value)}
+                value={props.value}
+                placeholder=" "
+                type={props.type}
+            />
             <label > {props.label} </label>
         </div>
     )

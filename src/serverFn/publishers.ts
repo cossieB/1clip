@@ -2,19 +2,19 @@ import { notFound } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start";
 import z from "zod";
 import { adminOnlyMiddleware } from "~/middleware/authorization";
-import { loggerMiddleware } from "~/middleware/logger";
+import { globalMiddleware } from "~/middleware/globalMiddleware";
 import { staticDataMiddleware } from "~/middleware/static";
 import * as publisherRepository from "~/repositories/publisherRepository"
 
 export const getPublishersFn = createServerFn()
-    .middleware([loggerMiddleware, staticDataMiddleware])
+    .middleware([globalMiddleware, staticDataMiddleware])
     .handler(async () => {        
         const pubs = await publisherRepository.findAll()
         return pubs
     })
 
 export const getPublisherFn = createServerFn()
-    .middleware([loggerMiddleware, staticDataMiddleware])
+    .middleware([globalMiddleware, staticDataMiddleware])
     .inputValidator((id: number) => {
         if (Number.isNaN(id) || id < 1) throw notFound()
         return id
@@ -38,7 +38,7 @@ const publisherEditSchema = publisherCreateSchema.partial().extend({
 })    
 
 export const createPublisherFn = createServerFn({method: "POST"}) 
-    .middleware([loggerMiddleware, adminOnlyMiddleware])
+    .middleware([globalMiddleware, adminOnlyMiddleware])
     .inputValidator(publisherCreateSchema)
     .handler(async ({data}) => {
         const pub = await publisherRepository.createPublisher(data)
@@ -46,7 +46,7 @@ export const createPublisherFn = createServerFn({method: "POST"})
     })
 
 export const editPublisherFn = createServerFn({method: "POST"})   
-    .middleware([loggerMiddleware, adminOnlyMiddleware])
+    .middleware([globalMiddleware, adminOnlyMiddleware])
     .inputValidator(publisherEditSchema)
     .handler(async ({data}) => {
         const {publisherId, ...rest} = data

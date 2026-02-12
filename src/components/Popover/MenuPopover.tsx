@@ -4,6 +4,6 @@ import styles from "./MenuPopover.module.css"
 export function MenuPopover(props: {id: string} & ComponentProps<'div'>) {
 
     return (
-        <div {...props} class={`${styles.menu} ${styles.class}`} popover="auto" />
+        <div {...props} class={`${styles.menu} ${styles.class}`} popover="auto" >{props.children}</div>
     )
 }

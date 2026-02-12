@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/solid-query'
 import { createFileRoute, notFound } from '@tanstack/solid-router'
 import { Suspense } from 'solid-js'
+import { commentListQueryOpts } from '~/features/comments/utils/commentListQueryOpts'
 import { PostId } from '~/features/posts/components/PostId'
 import { postQueryOpts, postsQueryOpts } from '~/features/posts/utils/postQueryOpts'
 
@@ -12,6 +13,7 @@ export const Route = createFileRoute('/_pub/posts/$postId')({
     },
     loader: async ({ context, params: { postId }, }) => {
         if (Number.isNaN(postId)) throw notFound()
+        await context.queryClient.ensureQueryData(commentListQueryOpts({postId}))
         return await context.queryClient.ensureQueryData(postQueryOpts(postId))
     },
     head: ({ loaderData }) => ({

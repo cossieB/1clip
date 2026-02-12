@@ -10,10 +10,10 @@ import { rateLimiter } from "~/utils/rateLimiter";
 import { HttpStatusCode } from "~/utils/statusCodes";
 import { getRequestIP } from "@tanstack/solid-start/server";
 import { redis } from "~/utils/redis";
-import { loggerMiddleware } from "~/middleware/logger";
+import { globalMiddleware } from "~/middleware/globalMiddleware";
 
 export const createPostFn = createServerFn({ method: "POST" })
-    .middleware([loggerMiddleware, verifiedOnlyMiddleware])
+    .middleware([globalMiddleware, verifiedOnlyMiddleware])
     .inputValidator(z.object({
         title: z.string().min(3).max(30),
         text: z.string().max(variables.POST_LIMIT),
@@ -32,7 +32,7 @@ export const createPostFn = createServerFn({ method: "POST" })
     })
 
 export const getPostFn = createServerFn()
-    .middleware([loggerMiddleware])
+    .middleware([globalMiddleware])
     .inputValidator((postId: number) => {
         if (postId < 1) throw notFound()
         return postId
@@ -45,7 +45,7 @@ export const getPostFn = createServerFn()
     })
 
 export const getPostsFn = createServerFn()
-    .middleware([loggerMiddleware])    
+    .middleware([globalMiddleware])    
     .inputValidator(z.object({
         username: z.string(),
         authorId: z.string(),
@@ -54,15 +54,16 @@ export const getPostsFn = createServerFn()
         tag: z.string(),
         limit: z.number(),
         cursor: z.number(),
-        followerId: z.uuidv7()
+        followerId: z.uuidv7(),
+        gameId: z.number()
     }).partial().optional())
     .handler(async ({ data }) => {
-        const user = await getCurrentUser()
+        const user = await getCurrentUser(); 
         return postRepository.findAll(data, user?.id)
     })
 
 export const reactToPostFn = createServerFn({ method: "POST" })
-    .middleware([loggerMiddleware, verifiedOnlyMiddleware])
+    .middleware([globalMiddleware, verifiedOnlyMiddleware])
     .inputValidator(z.object({
         postId: z.number(),
         reaction: z.enum(["like", "dislike"])
@@ -73,7 +74,7 @@ export const reactToPostFn = createServerFn({ method: "POST" })
     })
 
 export const deletePostFn = createServerFn({ method: "POST" })
-    .middleware([loggerMiddleware, verifiedOnlyMiddleware])
+    .middleware([globalMiddleware, verifiedOnlyMiddleware])
     .inputValidator(z.object({
         postId: z.number()
     }))
@@ -84,7 +85,7 @@ export const deletePostFn = createServerFn({ method: "POST" })
     })
 
 export const viewPostFn = createServerFn({ method: "POST" })
-    .middleware([loggerMiddleware])
+    .middleware([globalMiddleware])
     .inputValidator(z.array(z.number()))
     .handler(async ({ data }) => {
         if (data.length == 0) return
@@ -99,7 +100,7 @@ export const viewPostFn = createServerFn({ method: "POST" })
     })
 
 export const searchPostsFn = createServerFn()
-    .middleware([loggerMiddleware])
+    .middleware([globalMiddleware])
     .inputValidator(z.string())
     .handler(async ({data}) => {
         return postRepository.searchPosts(data)

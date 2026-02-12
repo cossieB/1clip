@@ -1,23 +1,15 @@
 import { redirect } from "@tanstack/solid-router"
-import { createIsomorphicFn, createServerFn } from "@tanstack/solid-start"
+import { createServerFn } from "@tanstack/solid-start"
 import { getRequestHeaders } from "@tanstack/solid-start/server"
 import { auth } from "~/auth/server"
-import { authClient } from "~/auth/authClient"
 import * as userRepository from "~/repositories/userRepository"
 
-export const checkSessionFn = createIsomorphicFn().server(async () => {
+export const checkSessionFn = createServerFn().handler(async () => {
     const headers = getRequestHeaders()
     const session = await auth.api.getSession({
         headers
     })
     if (session) throw redirect({
-        to: "/settings/profile", search: {
-            toasts: [{ text: "Already logged in", type: "info", autoFade: true }]
-        }
-    })
-}).client(async () => {
-    const session = authClient.useSession()
-    if (session()?.data?.session) throw redirect({
         to: "/settings/profile", search: {
             toasts: [{ text: "Already logged in", type: "info", autoFade: true }]
         }

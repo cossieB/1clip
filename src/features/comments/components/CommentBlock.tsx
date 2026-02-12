@@ -41,7 +41,7 @@ export function CommentBlock(props: Props) {
                     <span>{props.comment.user.username}</span>
                 </Link>
                 <span class={styles.createdAt}>{getRelativeTime(props.comment.createdAt)}</span>
-                <button style={{ "--anchor-name": "--commentMenuBtn" }} popoverTarget={'comment-popover'+props.comment.commentId}>
+                <button style={{ "--anchor-name": "--commentMenuBtn" }} popoverTarget={'comment-popover-'+props.comment.commentId}>
                     <EllipsisVerticalIcon />
                 </button>
             </div>
@@ -97,24 +97,29 @@ export function CommentBlock(props: Props) {
                 />
             </div>
             <MenuPopover
-                id={"comment-popover" + props.comment.commentId}
-                style={{ "position-anchor": "postMenuBtn", "position-area": "bottom left" }}
+                id={"comment-popover-" + props.comment.commentId}
+                style={{ "position-anchor": "commentMenuBtn", "position-area": "bottom left" }}
             >
                 <ul>
+                    <li>
+                        {props.comment.user.username}'s profile
+                        <Link to="/users/$username" params={{username: props.comment.user.username}} />
+                    </li>
                     <Show when={session().data && session().data!.user.id === props.comment.userId}>
-                        <li>
+                        <li
+                            onclick={() => {
+                                document.getElementById('del-comment-warn-'+props.comment.commentId)?.showPopover()
+                            }}
+                        >
+                            Delete
                             <ConfirmPopoverWithButton
                                 popover={{
-                                    id: `del-comment-${props.comment.commentId}`,
-                                    text: "Delete Comment?",
-                                    onConfirm: () => deleteMutation.mutate({
-                                        data: {
-                                            commentId: props.comment.commentId
-                                        }
-                                    })
+                                    id: "del-comment-warn-"+props.comment.commentId,
+                                    text: 'Delete Comment? ',
+                                    onConfirm: () => deleteMutation.mutate({ data: { commentId: props.comment.commentId } })
                                 }}
                                 button={{
-                                    children: "Delete"
+                                    hidden: true
                                 }}
                             />
                         </li>
