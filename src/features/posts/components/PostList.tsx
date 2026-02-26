@@ -15,7 +15,7 @@ export function PostList(props: { filters?: PostFilters }) {
             entries.forEach((entry, i) => {
                 const postId = Number((entry.target as HTMLDivElement).dataset.postid)
                 if (entry.isIntersecting) addPostToSet(postId)
-                if (i = entries.length - 1)
+                if ((i = entries.length - 1) && entry.isIntersecting)
                     result.fetchNextPage()
             })
         })

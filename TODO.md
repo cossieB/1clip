@@ -1,2 +1,3 @@
-XP system
-friends and followers
+- [x] followers
+- [ ] XP system
+- [ ] game reviews

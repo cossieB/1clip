@@ -33,8 +33,8 @@ export const Route = createRootRouteWithContext<{
                 content: 'width=device-width, initial-scale=1',
             },
             ...seo({
-                title: 'GG',
-                description: `1Clip is the ultimate gamer handgout. It is a place where gamers can showcase their skills, their screenshots, fanart or even fanfic.`,
+                title: '1Clip',
+                description: `1Clip is the place to show off your best gaming moments, epic screenshots, hilarious clips, jaw-dropping fanart, and immersive fanfic — all in one place.`,
             }),
         ],
         links: [
