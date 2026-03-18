@@ -1,5 +1,5 @@
 import { CircleStopIcon, PlayIcon } from "lucide-solid"
-import { createEffect, createSignal, onMount, Show } from "solid-js"
+import { createEffect, createSignal, onCleanup, onMount, Show } from "solid-js"
 import { type getGameFn } from "~/serverFn/games"
 import { STORAGE_DOMAIN } from "~/utils/env"
 import styles from "./GamePage.module.css"
@@ -10,16 +10,28 @@ type Props = {
 
 export function GameAudio(props: Props) {
     const song = () => props.media.find(m => m.contentType.startsWith("audio"))
-    let audioRef!: HTMLAudioElement
+    let audioRef!: HTMLAudioElement | undefined
+    let div!: HTMLDivElement
     const [volume, setVolume] = createSignal(0.25)
     const [isPlaying, setIsPlaying] = createSignal(false)
 
+    function handleScroll(e: Event) {
+        if (window.scrollY > 200) 
+            div.classList.add(styles.tiny)
+        else 
+            div.classList.remove(styles.tiny)
+    }
+
     onMount(() => {
-        setVolume(Number(localStorage.getItem("volume")) || 0.25)
+        setVolume(Number(localStorage.getItem("volume")) || 0.25);
+        document.addEventListener("scroll", handleScroll);
+
+        onCleanup(() => document.removeEventListener("scroll", handleScroll))
     })
 
     createEffect(() => {
-        audioRef.volume = volume()
+        if (audioRef)
+            audioRef.volume = volume()
     })
 
     return (
@@ -35,19 +47,22 @@ export function GameAudio(props: Props) {
                 autoplay
                 loop
             ></audio>
-            <div class={styles.player} >
+            <div
+                ref={div}
+                class={styles.player}
+            >
                 <button
                     onclick={() => {
                         if (isPlaying())
-                            audioRef.pause()
+                            audioRef?.pause()
                         else
-                            audioRef.play()
+                            audioRef?.play()
                     }}
                 >
                     <Show when={isPlaying()}
-                        fallback={<PlayIcon />}
+                        fallback={<PlayIcon  size={48} />}
                     >
-                        <CircleStopIcon />                        
+                        <CircleStopIcon color="var(--neon-green)" size={48} />
                     </Show>
                 </button>
                 <span class={styles.song}> {song()!.metadata.title} </span>
@@ -66,3 +81,4 @@ export function GameAudio(props: Props) {
         </Show>
     )
 }
+
