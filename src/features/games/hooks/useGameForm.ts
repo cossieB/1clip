@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/solid-query"
 import { useNavigate } from "@tanstack/solid-router"
 import { useServerFn } from "@tanstack/solid-start"
-import { createStore } from "solid-js/store"
+import { createStore, unwrap } from "solid-js/store"
 import { useToastContext } from "~/hooks/useToastContext"
 import { useUpload } from "~/hooks/useUpload"
 import { createGameFn, getGameFn, updateGameFn } from "~/serverFn/games"
@@ -12,7 +12,7 @@ export type Game = Awaited<ReturnType<typeof getGameFn>>
 export enum MediaField {
     Cover = "cover",
     Banner = "banner",
-    Screenshots = "screenshots"
+    Media = "media"
 }
 
 export function useGameForm(props: { game?: Game }) {
@@ -45,7 +45,8 @@ export function useGameForm(props: { game?: Game }) {
         mutationFn: useServerFn(createGameFn)
     }))
     async function handleSubmit(e: SubmitEvent) {
-        e.preventDefault()
+        e.preventDefault();
+
         try {
             const uploadResult = await upload();
             const newCover = uploadResult.find(x => x.field == MediaField.Cover)?.key
@@ -54,10 +55,10 @@ export function useGameForm(props: { game?: Game }) {
                 ...newCover && { cover: newCover },
                 ...newBanner && { banner: newBanner },
                 media: [
-                    ...game.media,
+                    ...game.media.filter(m => !m.key.startsWith("blob")),
                     ...uploadResult
-                        .filter(x => x.field === MediaField.Screenshots)
-                        .map(x => ({ key: x.key, contentType: x.file.type }))]
+                        .filter(x => x.field === MediaField.Media)
+                        .map(x => ({ key: x.key, contentType: x.file.type, metadata: x.metadata! }))]
             })
             const { gameId, ...rest } = game
             if (gameId) {

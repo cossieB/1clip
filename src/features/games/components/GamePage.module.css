@@ -8,8 +8,6 @@
     }
 }
 
-
-
 .body {
     padding-top: 0.5rem;
     width: 100%;
@@ -105,6 +103,45 @@
     }
 }
 
+.player {
+    position: fixed;
+    right: 2rem;
+    top: 2rem;
+    height: 5rem;
+    padding-inline: 2rem;
+    background-color: var(--gray1);
+    border-radius: 0 0.5rem;
+    corner-shape: bevel;
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    grid-template-columns: 1fr 1fr;
+    opacity: 0.5;
+    transition: opacity 250ms ease;
+    button {
+        grid-row: span 2;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: color 250ms ease;
+        &:hover {
+            color: var(--neon-green);
+        }
+    }
+
+    .song {
+        font-weight: bold;
+    }
+
+    input {
+        grid-column: span 2;
+        accent-color: var(--neon-pink);
+    }
+    &:hover {
+        opacity: 1;
+    }
+}
 
 @media (width < 1024px) {
     .company {

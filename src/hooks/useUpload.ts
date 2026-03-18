@@ -13,7 +13,12 @@ export function useUpload(
     const {addToast} = useToastContext()
     const [state, setState] = createStore({
         isUploading: false,
-        files: [] as {file: File, field: string, objectUrl: string}[]
+        files: [] as {
+            file: File, 
+            field: string, 
+            objectUrl: string,
+            metadata?: Record<string, string>
+        }[]
     })
 
     async function upload() {
@@ -25,24 +30,44 @@ export function useUpload(
                 files: state.files.map(f =>  ({
                     contentLength: f.file.size,
                     contentType: f.file.type,
-                    filename: f.file.name
+                    filename: f.file.name,
+                    metadata: f.metadata
                 }))
             }})
             if (urls.length != state.files.length) 
                 throw addToast({text: "Something went wrong. Please try again later", type: "error"})
 
-            const promises = state.files.map((f, i) => uploadToSignedUrl(urls[i].signedUrl, f.file, {signal: abortController?.signal}))
+            const promises = state.files.map((f, i) => uploadToSignedUrl(
+                urls[i].signedUrl, 
+                f.file, 
+                {
+                    signal: abortController?.signal,
+                }
+            ))
             await Promise.all(promises)
             return mergeObjectArrays(state.files, urls)
         } 
         catch (error) {
+            console.error(error)
             throw error
-        } 
+        }
         finally {
-            setState('isUploading', false)            
+            setState('isUploading', false)
         }
     }
-    const setFiles = (files: typeof state.files | ((prev: typeof state.files) => typeof state.files)) => setState('files', files)
+
+    function setFiles(files: typeof state.files): void;
+    function setFiles(files: ((prev: typeof state.files) => typeof state.files)): void;
+    function setFiles (i: number, file: Partial<typeof state.files[number]>): void;
+
+    function setFiles(arg1: number | typeof state.files | ((prev: typeof state.files) => typeof state.files), file?: Partial<typeof state.files[number]>) {
+        if (typeof arg1 === "object" || typeof arg1 == "function") {
+            return setState('files', arg1)
+        }
+        if (!file) throw new Error("File argument not provided");
+        return setState('files', arg1, prev => ({...prev, ...file}))
+    }
+
     
     return {
         upload,

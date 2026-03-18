@@ -46,7 +46,8 @@ const GameCreateSchema = z.object({
     trailer: z.string().nullish(),
     media: z.array(z.object({
         key: z.string(),
-        contentType: z.string()
+        contentType: z.string(),
+        metadata: z.record(z.string(), z.string()).optional()
     })),
     platforms: z.number().array(),
     genres: z.string().array()

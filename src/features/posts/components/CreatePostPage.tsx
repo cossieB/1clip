@@ -3,7 +3,7 @@ import styles from "./CreatePostPage.module.css"
 import { Form } from "~/components/Forms/Form"
 import { UploadBox } from "~/components/UploadBox/UploadBox"
 import { useCreatePost } from "../hooks/useCreatePost"
-import { ImagePreview } from "~/components/ImagePreview"
+import { ImagePreview } from "~/features/games/components/ImagePreview"
 import { AsyncSelect } from "~/components/Forms/AsyncSelect"
 import { gamesQueryOpts } from "~/features/games/utils/gameQueryOpts"
 import { variables } from "~/utils/variables"
@@ -55,6 +55,7 @@ export function CreatePostPage() {
                             onDelete={() => {
                                 setFiles(prev => prev.filter((_, j) => j != i()))
                             }}
+                            metadata={{}}
                         />}
                     </For>
                 </div>

@@ -10,9 +10,16 @@ export const getSignedUrls = createServerFn()
         files: z.array(z.object({
             filename: z.string(),
             contentType: z.string().refine(val => /^(image|video|audio)/.test(val)),
-            contentLength: z.number()
+            contentLength: z.number(),
+            metadata: z.record(z.string(), z.string()).optional()
         }))
     }))
     .handler(async ({ data, context: {user} }) => {
-        return await Promise.all(data.files.map(obj => generateSignedUrl(obj.filename, obj.contentType, obj.contentLength, [...data.paths, user.id])))
+        return await Promise.all(data.files.map(obj => generateSignedUrl(
+            obj.filename, 
+            obj.contentType, 
+            obj.contentLength, 
+            [...data.paths, user.id],
+            obj.metadata
+        )))
     })

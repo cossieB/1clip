@@ -8,6 +8,8 @@ import { Carousel } from "~/components/Carousel/Carousel"
 import { YouTubeIframe } from "~/components/YoutubeIframe"
 import { STORAGE_DOMAIN } from "~/utils/env"
 import { HeroHeader } from "~/components/Hero/HeroHeader"
+import { Screenshots } from "./Screenshots"
+import { GameAudio } from "./GameAudio"
 
 type Props = {
     game: Awaited<ReturnType<typeof getGameFn>>
@@ -88,18 +90,9 @@ export function GamePage(props: Props) {
                         getParam={actor => ({ actorId: actor.actorId })}
                     />
                 </Show>
-                <Show when={props.game.media.length > 0}>
-                    <h2>Screenshots</h2>
-                    <Carousel
-                        media={props.game.media.map(m => ({
-                            contentType: m.contentType,
-                            url: STORAGE_DOMAIN + m.key
-                        }))}
-                        showNextBtn
-                        showPrevBtn
-                    />
-                </Show>
+                <Screenshots media={props.game.media} />
             </div>
+            <GameAudio media={props.game.media} />              
         </div>
     )
 }
@@ -109,7 +102,7 @@ function ReleaseDate(props: { date: string }) {
     return (
         <div class={`${styles.date} cutout`}>
             <span> {date[2]} </span>
-            <span> {new Date(2000, parseInt(date[1]) - 1, 1).toLocaleString('default', {month: 'long'})} </span>
+            <span> {new Date(2000, parseInt(date[1]) - 1, 1).toLocaleString('default', { month: 'long' })} </span>
             <span> {date[0]} </span>
         </div>
     )

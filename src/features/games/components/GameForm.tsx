@@ -7,7 +7,7 @@ import { mediaSrc } from "~/utils/mediaSrc";
 import { AsyncSelect } from "~/components/Forms/AsyncSelect";
 import { developersQueryOpts } from "~/features/developers/utils/developerQueryOpts";
 import { publishersQueryOpts } from "~/features/publishers/utils/publisherQueryOpts";
-import { ImagePreview } from "~/components/ImagePreview";
+import { ImagePreview } from "~/features/games/components/ImagePreview";
 import { AsyncChecklist } from "~/components/Forms/AsyncChecklist";
 import { platformsQueryOpts } from "~/features/platforms/utils/platformQueryOpts";
 import { Game, MediaField, useGameForm } from "../hooks/useGameForm";
@@ -83,21 +83,22 @@ export function GameForm(props: { game?: Game }) {
             <div class={styles.screenshotbox}>
 
                 <UploadBox
-                    label="Screenshots"
+                    label="Media"
                     onSuccess={async files => {
                         setGame('media', prev => [
                             ...prev,
                             ...files.map(x => ({
                                 key: x.objectUrl,
-                                contentType: x.file.type
+                                contentType: x.file.type,
+                                metadata: {}
                             }))
                         ])
-                        setFiles(files.map(f => ({ ...f, field: MediaField.Screenshots })))
+                        setFiles(files.map(f => ({ ...f, field: MediaField.Media })))
                     }}
                     accept={{
                         image: true,
-                        video: false,
-                        audio: false
+                        video: true,
+                        audio: true
                     }}
                     limit={Infinity}
                     maxSize={4}
@@ -105,14 +106,19 @@ export function GameForm(props: { game?: Game }) {
             </div>
             <div class={styles.screenshots}>
                 <For each={game.media}>
-                    {(m, i) => <ImagePreview
-                        url={mediaSrc(m.key)}
-                        contentType={m.contentType}
-                        onDelete={() => {
-                            setGame('media', prev => prev.filter(f => f.key != m.key))
-                            setFiles(prev => prev.filter(a => a.objectUrl != m.key))
-                        }}
-                    />}
+                    {(m, i) =>
+                        <ImagePreview
+                            {...m}
+                            url={mediaSrc(m.key)}
+                            onDelete={() => {
+                                setGame('media', prev => prev.filter(f => f.key != m.key))
+                                setFiles(prev => prev.filter(a => a.objectUrl != m.key))
+                            }}
+                            setMetadata={metadata => {
+                                setFiles(i(), {metadata})
+                                setGame('media', i(), prev => ({...prev, metadata}))
+                            }}
+                        />}
                 </For>
             </div>
             <div style={{ "margin-top": "1.5rem" }}>
@@ -175,3 +181,4 @@ export function GameForm(props: { game?: Game }) {
         </Form>
     )
 }
+

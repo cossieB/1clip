@@ -2,7 +2,6 @@ import { UploadIcon } from "lucide-solid"
 import { useToastContext } from "~/hooks/useToastContext"
 import styles from "./UploadBox.module.css"
 import { ComponentProps, mergeProps, onCleanup, splitProps } from "solid-js"
-import { MIME_TYPES } from "~/utils/MIME"
 
 type P = {
     label: string
@@ -24,8 +23,8 @@ export function UploadBox(props: P) {
     const objectUrls: string[] = []
 
     const accepts = Object.entries(props.accept).reduce((acc, curr) => {
-        const [type, bool] = curr as [keyof typeof MIME_TYPES, boolean]
-        if (bool) return [...acc, ...MIME_TYPES[type]]
+        const [type, bool] = curr 
+        if (bool) return [...acc, type + "/*"]
         return acc
     }, [] as string[])
 
@@ -40,7 +39,8 @@ export function UploadBox(props: P) {
                 addToast({ text: `File too big: ${file.name}`, type: "warning", autoFades: true })
                 continue
             };
-            if (!accepts.includes(file.type.toLowerCase())) {
+            const type = file.type.slice(0, file.type.lastIndexOf("/")) as keyof typeof props.accept
+            if (!props.accept[type]) {
                 addToast({ text: `Invalid format: ${file.name}`, type: "warning", autoFades: true })
                 continue;
             };

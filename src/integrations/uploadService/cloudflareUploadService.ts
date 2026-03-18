@@ -28,7 +28,7 @@ export function uploadFromServer(file: File, ...pathSegments: string[]) {
     return upload.done()
 }
 
-export async function generateSignedUrl(filename: string, contentType: string, contentLength: number, pathSegments: string[]) {
+export async function generateSignedUrl(filename: string, contentType: string, contentLength: number, pathSegments: string[], metadata?: Record<string, string>) {
     const ext = filename.slice(filename.lastIndexOf("."))
     const key = join(...pathSegments, crypto.randomUUID() + ext)
     const signedUrl = await getSignedUrl(
@@ -37,7 +37,8 @@ export async function generateSignedUrl(filename: string, contentType: string, c
             Bucket: "clipz",
             Key: key,
             ContentType: contentType,
-            ContentLength: contentLength
+            ContentLength: contentLength,
+            Metadata: metadata,            
         }), {
         expiresIn: 5 * 60,
     })

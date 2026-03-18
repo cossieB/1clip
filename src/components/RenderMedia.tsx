@@ -12,7 +12,7 @@ export function RenderMedia(props: { contentType: string, url: string }) {
                 </video>
             </Match>
             <Match when={props.contentType.startsWith("audio")}>
-                <audio src={props.url}>
+                <audio controls src={props.url}>
                     Your browser does not support the audio element.
                 </audio>
             </Match>

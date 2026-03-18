@@ -79,14 +79,25 @@
             height: 100%;
             width: 100%;
         }
+        audio {
+            place-self: center;
+        }
 
-        button {
+        .delBtn {
             all: unset;
             position: absolute;
             top: 0;
             right: 0;
             padding: 0.25rem;
             background-color: red;
+        }
+        .metadataBtn {
+            all: unset;
+            position: absolute;
+            right: 0;
+            bottom: 0;            
+            padding: 0.25rem;
+            background-color: blue;
         }
     }
 }
@@ -102,3 +113,4 @@
         gap: 0.25rem;
     }
 }
+

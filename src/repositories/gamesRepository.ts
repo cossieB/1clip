@@ -205,9 +205,10 @@ function detailedGames(obj: Args = { filters: []}) {
     const mediaQuery = db.$with("mq").as(
         db.select({
             gameId: media.gameId,
-            media: sql<{ key: string, contentType: string }[]>`JSONB_AGG(JSONB_BUILD_OBJECT(
+            media: sql`JSONB_AGG(JSONB_BUILD_OBJECT(
                 'key', ${media.key},
-                'contentType', ${media.contentType}
+                'contentType', ${media.contentType},
+                'metadata', ${media.metadata}
             ))`.as("m_arr")
         })
             .from(media)
@@ -223,7 +224,7 @@ function detailedGames(obj: Args = { filters: []}) {
             genres: sql<string[]>`COALESCE(${genresQuery.tags}, '{}')`,
             platforms: sql<Platform[]>`COALESCE(${platformQuery.platformArr}, '[]'::JSONB)`,
             actors: sql<(Actor & { character: string })[]>`COALESCE(${actorQuery.actorArr}, '[]'::JSONB)`,
-            media: sql<{ key: string, contentType: string }[]>`COALESCE(${mediaQuery.media}, '[]'::JSONB)`
+            media: sql<{ key: string, contentType: string, metadata: Record<string, string> }[]>`COALESCE(${mediaQuery.media}, '[]'::JSONB)`
         })
         .from(games)
         .innerJoin(developers, eq(games.developerId, developers.developerId))

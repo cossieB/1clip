@@ -4,7 +4,7 @@ import { StandaloneInput } from "../Forms/FormInput";
 
 type NewType = {
     children: JSXElement;
-    id: string
+    id?: string
     ref?: HTMLDivElement | ((ref: HTMLDivElement) => void);
 };
 
