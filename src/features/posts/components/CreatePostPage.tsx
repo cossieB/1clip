@@ -1,4 +1,4 @@
-import { For } from "solid-js"
+import { For, Match, Switch } from "solid-js"
 import styles from "./CreatePostPage.module.css"
 import { Form } from "~/components/Forms/Form"
 import { UploadBox } from "~/components/UploadBox/UploadBox"
@@ -7,6 +7,11 @@ import { ImagePreview } from "~/features/games/components/ImagePreview"
 import { AsyncSelect } from "~/components/Forms/AsyncSelect"
 import { gamesQueryOpts } from "~/features/games/utils/gameQueryOpts"
 import { variables } from "~/utils/variables"
+import { TwitchEmbed } from "~/components/embeds/TwitchIframe"
+import { YouTubeIframe } from "~/components/embeds/YoutubeIframe"
+import { FormSelect } from "~/components/Forms/Select"
+import { RadioInput } from "~/components/Forms/Radio"
+import { StandaloneInput } from "~/components/Forms/FormInput"
 
 export function CreatePostPage() {
     const { handleSubmit,
@@ -32,33 +37,64 @@ export function CreatePostPage() {
                     required
                     minLength={3}
                 />
-                <UploadBox
-                    label='Images'
-                    maxSize={4}
-                    onSuccess={async (array) => {
-                        setFiles(array.map(x => ({ field: "media", ...x })))
-                    }}
-                    style={{ height: "10rem" }}
-                    accept={{
-                        audio: false,
-                        image: true,
-                        video: true
-                    }}
-                    limit={4}
-                />
-                <div class={styles.imgs}>
-                    <For each={files()}>
-                        {(file, i) => <ImagePreview
-                            contentType={file.file.type}
-                            class={styles.preview}
-                            url={file.objectUrl}
-                            onDelete={() => {
-                                setFiles(prev => prev.filter((_, j) => j != i()))
-                            }}
-                            metadata={{}}
-                        />}
-                    </For>
+                <div class={styles.modeselect}>
+                    <RadioInput
+                        list={["upload", "youtube", "twitch"]}
+                        value={input.mode}
+                        setValue={mode => setInput({ mode: mode as "upload" | "youtube" | "twitch" })}
+                        name="create-post"
+                    />
                 </div>
+                <Switch>
+                    <Match when={input.mode == "upload"}>
+                        <UploadBox
+                            label='Images'
+                            maxSize={4}
+                            onSuccess={async (array) => {
+                                setFiles(array.map(x => ({ field: "media", ...x })))
+                            }}
+                            style={{ height: "10rem" }}
+                            accept={{
+                                audio: false,
+                                image: true,
+                                video: true
+                            }}
+                            limit={4}
+                        />
+                        <div class={styles.imgs}>
+                            <For each={files()}>
+                                {(file, i) => <ImagePreview
+                                    contentType={file.file.type}
+                                    class={styles.preview}
+                                    url={file.objectUrl}
+                                    onDelete={() => {
+                                        setFiles(prev => prev.filter((_, j) => j != i()))
+                                    }}
+                                    metadata={{}}
+                                />}
+                            </For>
+                        </div>
+                    </Match>
+                    <Match when={input.mode == "youtube"}>
+                        <StandaloneInput
+                            field=""
+                            label="Youtube Video Link"
+                            value={input.clipLink}
+                            setter={val => setInput({ clipLink: val })}
+                        />
+                        <YouTubeIframe link={input.clipLink} />
+                    </Match>
+                    <Match when={input.mode == "twitch"}>
+                        <StandaloneInput
+                            field=""
+                            label="Twitch Clip Link"
+                            value={input.clipLink}
+                            setter={val => setInput({ clipLink: val })}
+                        />
+                        <TwitchEmbed link={input.clipLink} />
+                    </Match>
+                </Switch>
+
                 <Form.Textarea<typeof input>
                     field="text"
                     setter={val => {
@@ -74,7 +110,7 @@ export function CreatePostPage() {
                     getLabel={game => game.title}
                     getValue={game => game.gameId}
                     selected={input.game?.gameId ?? null}
-                    setSelected={game => setInput({game})}
+                    setSelected={game => setInput({ game })}
                 />
                 <Form.TagsInput
                     tagLimit={5}
@@ -84,6 +120,15 @@ export function CreatePostPage() {
                 />
             </Form>
         </div>
+    )
+}
+
+function ClipLinkInput(props: {
+    value: string
+    onChange: (val: string) => void
+}) {
+    return (
+        <input type="text" value={props.value} onchange={e => props.onChange(e.currentTarget.value)} />
     )
 }
 

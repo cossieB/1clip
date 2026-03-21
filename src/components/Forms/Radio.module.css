@@ -1,0 +1,10 @@
+.radios {
+    display: flex;
+
+    div {
+        margin-right: 1rem;
+    }
+    input {
+        margin-right: 0.25rem;
+    }
+}

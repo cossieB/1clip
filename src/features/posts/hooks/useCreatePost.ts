@@ -8,7 +8,6 @@ import { useToastContext } from "~/hooks/useToastContext"
 import { useUpload } from "~/hooks/useUpload"
 import { createPostFn } from "~/serverFn/posts"
 import { postsQueryOpts } from "../utils/postQueryOpts"
-import { onCleanup } from "solid-js"
 
 export function useCreatePost() {
     const { addToast } = useToastContext()
@@ -17,8 +16,7 @@ export function useCreatePost() {
     const result = useGamesQuery()
     
     const abortController = useAbortController();
-    onCleanup(() => abortController.abort())
-
+    
     const { isUploading, setFiles, upload, files } = useUpload(["media"], abortController)
     const createAction = useServerFn(createPostFn)
 
@@ -30,6 +28,8 @@ export function useCreatePost() {
         title: "",
         text: "",
         game: null as { gameId: number, title: string } | null,
+        mode: "upload" as "upload" | "youtube" | "twitch",
+        clipLink: "",
         tags: [] as string[],
     })
     

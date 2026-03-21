@@ -16,9 +16,9 @@ export function GameAudio(props: Props) {
     const [isPlaying, setIsPlaying] = createSignal(false)
 
     function handleScroll(e: Event) {
-        if (window.scrollY > 200) 
+        if (window.scrollY > 200)
             div.classList.add(styles.tiny)
-        else 
+        else
             div.classList.remove(styles.tiny)
     }
 
@@ -51,6 +51,20 @@ export function GameAudio(props: Props) {
                 ref={div}
                 class={styles.player}
             >
+                <div>
+                    <span class={styles.song}> {song()!.metadata.title} </span>
+                    <span class={styles.artist}> {song()!.metadata.artist} </span>
+                    <input
+                        type="range"
+                        min={0}
+                        max={1}
+                        step={0.05}
+                        value={volume()}
+                        onChange={e => {
+                            setVolume(Number(e.currentTarget.value))
+                        }}
+                    />
+                </div>
                 <button
                     onclick={() => {
                         if (isPlaying())
@@ -60,23 +74,11 @@ export function GameAudio(props: Props) {
                     }}
                 >
                     <Show when={isPlaying()}
-                        fallback={<PlayIcon  size={48} />}
+                        fallback={<PlayIcon size={48} />}
                     >
                         <CircleStopIcon color="var(--neon-green)" size={48} />
                     </Show>
                 </button>
-                <span class={styles.song}> {song()!.metadata.title} </span>
-                <span class={styles.artist}> {song()!.metadata.artist} </span>
-                <input
-                    type="range"
-                    min={0}
-                    max={1}
-                    step={0.05}
-                    value={volume()}
-                    onChange={e => {
-                        setVolume(Number(e.currentTarget.value))
-                    }}
-                />
             </div>
         </Show>
     )

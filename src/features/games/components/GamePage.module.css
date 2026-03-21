@@ -106,50 +106,64 @@
 .player {
     position: fixed;
     z-index: 99;
-    right: 2rem;
-    top: 2rem;
+    right: 0.5rem;
+    top: 0.5rem;
     height: 5rem;
-    padding-inline: 2rem;
+    padding-inline: 0.5rem;
     background-color: var(--gray1);
     border-radius: 0 0.5rem;
     corner-shape: bevel;
-    display: grid;
+    display: flex;
     justify-content: center;
     align-items: center;
-    grid-template-columns: 2.5rem 1fr;
     opacity: 0.5;
     transition: opacity 250ms ease;
     overflow: hidden;
     box-shadow: 0 0 10px black;
+
+    div {
+        display: flex;
+        flex-direction: column;
+        transition: width 250ms ease;
+        overflow: hidden;
+    }
+
     button {
-        grid-row: span 2;
         height: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
         transition: color 250ms ease;
+
         &:hover {
             color: var(--neon-green);
         }
     }
-    span, input {
-        transition: width 250ms ease;
+
+    @media (width > 768px) {
+        right: 2rem;
+        top: 2rem;
+    }
+
+    span {
         text-wrap: nowrap;
     }
+
     &.tiny:not(:hover) {
-        span, input {
+
+        div {
             width: 0;
-            overflow: hidden;
         }
     }
+
     .song {
         font-weight: bold;
     }
 
     input {
-        grid-column: span 2;
         accent-color: var(--neon-pink);
     }
+
     &:hover {
         opacity: 1;
     }

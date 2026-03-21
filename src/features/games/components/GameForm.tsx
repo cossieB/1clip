@@ -1,7 +1,7 @@
 import { Form } from "~/components/Forms/Form";
 import { UploadBox } from "~/components/UploadBox/UploadBox";
 import { For, Show } from "solid-js";
-import { YouTubeIframe } from "~/components/YoutubeIframe";
+import { YouTubeIframe } from "~/components/embeds/YoutubeIframe";
 import { ContentEditable } from "~/components/Forms/ContentEditable";
 import { mediaSrc } from "~/utils/mediaSrc";
 import { AsyncSelect } from "~/components/Forms/AsyncSelect";

@@ -19,7 +19,7 @@ export const getGamesFn = createServerFn()
     }).partial().optional())
 
     .handler(async ({ data }) => {
-        const games = await gamesRepository.findGamesWithDetails(data)
+        const games = await gamesRepository.findGamesWithDetails(data);
         return games
     })
 
