@@ -25,6 +25,13 @@
     }
 }
 
+.embeds {
+    iframe {
+        width: 100%;
+        aspect-ratio: 16/9;
+    }
+}
+
 .modeselect {
     margin-bottom: 0.5rem;
 }

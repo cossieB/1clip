@@ -16,7 +16,10 @@ export function RadioInput(props: Props) {
                 {item =>
                     <div>
                         <label>
-                            <input type="radio" checked={props.value == item} name={props.name} onchange={e => props.setValue(item)} />
+                            <input type="radio" 
+                            checked={props.value == item} 
+                            name={props.name} 
+                            onchange={() => props.setValue(item)} />
                             {titleCase(item)}
                         </label>
                     </div>

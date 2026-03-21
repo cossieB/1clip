@@ -1,18 +1,22 @@
-import { Show } from "solid-js"
-import { validateUrl } from "~/lib/validateUrl"
+import { createEffect, Setter, Show } from "solid-js"
 
 type Props = {
     link: string
+    setError?: Setter<boolean>
 }
 
 export function YouTubeIframe(props: Props) {
-    const id = () => getYoutubeVideoId(props.link)
+    const slug = () => getYoutubeVideoId(props.link)
+    createEffect(() => {
+        if (slug() instanceof Error) props.setError?.(true)
+    })
     return (
-        <Show when={id()}>
+        <Show
+            when={typeof slug() == "string"}
+            fallback={<p> {(slug() as Error).message} </p>}            
+        >
             <iframe
-                width="560"
-                height="315"
-                src={`https://www.youtube.com/embed/${id()}`}
+                src={`https://www.youtube.com/embed/${slug()}`}
                 title="YouTube video player"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowfullscreen
@@ -30,31 +34,43 @@ export function YouTubeIframe(props: Props) {
  * - https://www.youtube.com/live/dQw4w9WgXcQ (Live)
  * - https://www.youtube.com/embed/dQw4w9WgXcQ (Embed)
  */
-function getYoutubeVideoId(urlString: string): string | null {
+function getYoutubeVideoId(urlString: string): string | Error {
+    if (!urlString) return new Error("")
+    let url: URL;
+
     try {
-        const url = new URL(urlString);
-
-        // 1. Handle Shortened URLs (youtu.be/ID)
-        if (url.hostname === 'youtu.be') {
-            return url.pathname.slice(1) || null;
-        }
-
-        // 2. Handle Standard URLs (youtube.com/watch?v=ID)
-        if (url.pathname === '/watch') {
-            return url.searchParams.get('v');
-        }
-
-        // 3. Handle Path-based URLs (/shorts/ID, /live/ID, /embed/ID)
-        const pathSegments = url.pathname.split('/').filter(Boolean);
-        const triggerSegments = ['shorts', 'live', 'embed', 'v'];
-
-        // Check if the first segment is one of our triggers
-        if (triggerSegments.includes(pathSegments[0])) {
-            return pathSegments[1] || null;
-        }
-
-        return null;
+        url = new URL(urlString);
     } catch (e) {
-        return null; // Invalid URL string
+        return new Error("Invalid URL: The string provided is not a well-formed URL.");
     }
+
+    // 1. Handle Shortened URLs (youtu.be/{ID})
+    if (url.hostname === 'youtu.be') {
+        const id = url.pathname.slice(1);
+        if (id) return id;
+        return new Error("Missing ID: youtu.be link found, but the video ID is missing.");
+    }
+
+    // Check if it's even a YouTube domain before proceeding
+    if (!url.hostname.endsWith('youtube.com')) {
+        return new Error("Wrong Domain: The provided URL is not a YouTube domain.");
+    }
+
+    // 2. Handle Standard URLs (youtube.com/watch?v={ID})
+    if (url.pathname === '/watch') {
+        const id = url.searchParams.get('v');
+        if (id) return id;
+        return new Error("Missing Parameter: Standard YouTube URL found, but the 'v' parameter is missing.");
+    }
+
+    // 3. Handle Path-based URLs (/shorts/{ID}, /live/{ID}, /embed/{ID})
+    const pathSegments = url.pathname.split('/').filter(Boolean);
+    const triggerSegments = ['shorts', 'live', 'embed', 'v'];
+
+    if (triggerSegments.includes(pathSegments[0])) {
+        if (pathSegments[1]) return pathSegments[1];
+        return new Error(`Missing ID: YouTube ${pathSegments[0]} link found, but no video ID followed the path.`);
+    }
+
+    return new Error("Identification Failed: This is a YouTube URL, but no recognizable video ID format was detected.");
 }

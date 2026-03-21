@@ -1,28 +1,25 @@
-import { ErrorBoundary, Show } from "solid-js"
-import { validateUrl } from "~/lib/validateUrl"
+import { createEffect, ErrorBoundary, Setter, Show } from "solid-js"
 
-function TwitchIframe(props: { link: string }) {
-    const id = () => getTwitchClipSlug(props.link)
+type Props = {
+    link: string
+    setError?: Setter<boolean>
+}
 
+export function TwitchIframe(props: Props) {
+    const slug = () => getTwitchClipSlug(props.link)
+    createEffect(() => {
+        if (slug() instanceof Error) props.setError?.(true)
+    })
     return (
-        <Show when={id()}>
+        <Show
+            when={typeof slug() == "string"}
+            fallback={<p> {(slug() as Error).message} </p>}
+        >
             <iframe
-                src={`https://clips.twitch.tv/embed?clip=${id()}&parent=localhost&parent=1clip.cossie.dev&preload=metadata`}
-                height={720}
-                width={1280}
+                src={`https://clips.twitch.tv/embed?clip=${slug()}&parent=localhost&parent=1clip.cossie.dev&preload=metadata`}
                 allowfullscreen
             />
         </Show>
-    )
-}
-
-export function TwitchEmbed(props: { link: string }) {
-    return (
-        <ErrorBoundary
-            fallback={error => <div>{error}</div>}
-        >
-            <TwitchIframe link={props.link} />
-        </ErrorBoundary>
     )
 }
 
@@ -32,36 +29,31 @@ export function TwitchEmbed(props: { link: string }) {
  * - https://www.twitch.tv/{user}/clip/{slug}
  * - https://clips.twitch.tv/{slug}
  */
-function getTwitchClipSlug(urlString: string): string | null {
+function getTwitchClipSlug(urlString: string): string | Error {
+    if (!urlString) return new Error("")
+    let url: URL;
     try {
-        const url = new URL(urlString);
-        const pathSegments = url.pathname.split('/').filter(segment => segment.length > 0);
-
-        // Format: clips.twitch.tv/{slug}
-        if (url.hostname === 'clips.twitch.tv') {
-            return pathSegments[0] ?? null;
-        }
-
-        // Format: twitch.tv/{user}/clip/{slug}
-        if (url.hostname.includes('twitch.tv')) {
-            const clipIndex = pathSegments.indexOf('clip');
-
-            // Ensure "clip" exists and there is a segment after it
-            if (clipIndex !== -1 && pathSegments[clipIndex + 1]) {
-                return pathSegments[clipIndex + 1];
-            }
-        }
-
-        return null;
+        url = new URL(urlString);
     } catch (e) {
-        // Returns null if the string is not a valid URL
-        return null;
+        return new Error("Invalid URL: The string provided is not a well-formed URL.");
     }
+
+    const pathSegments = url.pathname.split('/').filter(Boolean);
+
+    // Handle clips.twitch.tv/{slug}
+    if (url.hostname === 'clips.twitch.tv') {
+        if (pathSegments[0]) return pathSegments[0];
+        return new Error("Missing Slug: clips.twitch.tv URL found, but no slug was present in the path.");
+    }
+
+    // Handle www.twitch.tv/{user}/clip/{slug}
+    if (url.hostname.includes('twitch.tv')) {
+        const clipIndex = pathSegments.indexOf('clip');
+        if (clipIndex !== -1 && pathSegments[clipIndex + 1]) {
+            return pathSegments[clipIndex + 1];
+        }
+        return new Error("Missing Slug: Twitch URL found, but it doesn't appear to be a clip link.");
+    }
+
+    return new Error("Wrong Domain: The provided URL is not a Twitch domain.");
 }
-
-// --- Examples ---
-console.log(getTwitchClipSlug("https://www.twitch.tv/shroud/clip/RelentlessSparklingWaffle-12345?tt_medium=redt"));
-// Output: "RelentlessSparklingWaffle-12345"
-
-console.log(getTwitchClipSlug("https://clips.twitch.tv/ShortExampleSlug"));
-// Output: "ShortExampleSlug"
