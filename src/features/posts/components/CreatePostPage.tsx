@@ -7,10 +7,10 @@ import { ImagePreview } from "~/features/games/components/ImagePreview"
 import { AsyncSelect } from "~/components/Forms/AsyncSelect"
 import { gamesQueryOpts } from "~/features/games/utils/gameQueryOpts"
 import { variables } from "~/utils/variables"
-import { TwitchIframe } from "~/components/embeds/TwitchIframe"
 import { YouTubeIframe } from "~/components/embeds/YoutubeIframe"
 import { RadioInput } from "~/components/Forms/Radio"
 import { StandaloneInput } from "~/components/Forms/FormInput"
+import { IframeFactory } from "~/components/embeds/IframeFactory"
 
 export function CreatePostPage() {
     const { handleSubmit,
@@ -44,11 +44,11 @@ export function CreatePostPage() {
                 />
                 <div class={styles.modeselect}>
                     <RadioInput
-                        list={["upload", "youtube", "twitch"]}
+                        list={["text", "upload", "Youtube / Twitch"]}
                         value={input.mode}
                         setValue={mode => {
                             setEmbedError(false)
-                            setInput({ mode: mode as "upload" | "youtube" | "twitch" })
+                            setInput({ mode: mode as "text" | "upload" | "Youtube / Twitch" })
                         }}
                         name="create-post"
                     />
@@ -84,10 +84,10 @@ export function CreatePostPage() {
                                 </For>
                             </div>
                         </Match>
-                        <Match when={input.mode == "youtube"}>
+                        <Match when={input.mode == "Youtube / Twitch"}>
                             <StandaloneInput
                                 field=""
-                                label="Youtube Video Link"
+                                label="Link to Youtube or Twitch clip"
                                 value={input.clipLink}
                                 setter={val => {
                                     setEmbedError(false)
@@ -95,20 +95,8 @@ export function CreatePostPage() {
                                 }}
                                 style={{width: "unset", margin: "0.75rem 0"}}                                
                             />
-                            <YouTubeIframe link={input.clipLink} setError={setEmbedError} />
-                        </Match>
-                        <Match when={input.mode == "twitch"}>
-                            <StandaloneInput
-                                field=""
-                                label="Twitch Clip Link"
-                                value={input.clipLink}
-                                setter={val => {
-                                    setEmbedError(false)
-                                    setInput({ clipLink: val });
-                                }}
-                                style={{width: "unset", margin: "0.75rem 0"}}
-                            />
-                            <TwitchIframe link={input.clipLink} setError={setEmbedError} />
+
+                            <IframeFactory link={input.clipLink} setError={setEmbedError} />
                         </Match>
                     </Switch>
                 </div>

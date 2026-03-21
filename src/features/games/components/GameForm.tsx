@@ -1,7 +1,6 @@
 import { Form } from "~/components/Forms/Form";
 import { UploadBox } from "~/components/UploadBox/UploadBox";
 import { For, Show } from "solid-js";
-import { YouTubeIframe } from "~/components/embeds/YoutubeIframe";
 import { ContentEditable } from "~/components/Forms/ContentEditable";
 import { mediaSrc } from "~/utils/mediaSrc";
 import { AsyncSelect } from "~/components/Forms/AsyncSelect";
@@ -12,6 +11,7 @@ import { AsyncChecklist } from "~/components/Forms/AsyncChecklist";
 import { platformsQueryOpts } from "~/features/platforms/utils/platformQueryOpts";
 import { Game, MediaField, useGameForm } from "../hooks/useGameForm";
 import styles from "./GameForm.module.css"
+import { IframeFactory } from "~/components/embeds/IframeFactory";
 
 export function GameForm(props: { game?: Game }) {
     const {
@@ -171,7 +171,7 @@ export function GameForm(props: { game?: Game }) {
             />
 
             <Show when={game.trailer}>
-                <YouTubeIframe link={game.trailer!} />
+                <IframeFactory link={game.trailer!} />
             </Show>
             <Form.TagsInput
                 setTags={tags => setGame('genres', tags)}

@@ -9,6 +9,7 @@ import { STORAGE_DOMAIN } from "~/utils/env"
 import { HeroHeader } from "~/components/Hero/HeroHeader"
 import { Screenshots } from "./Screenshots"
 import { GameAudio } from "./GameAudio"
+import { IframeFactory } from "~/components/embeds/IframeFactory"
 
 type Props = {
     game: Awaited<ReturnType<typeof getGameFn>>
@@ -75,7 +76,7 @@ export function GamePage(props: Props) {
                 </div>
                 <Show when={!!props.game.trailer}>
                     <div class={styles.iframe}>
-                        <YouTubeIframe link={props.game.trailer!} />
+                        <IframeFactory link={props.game.trailer!} />
                     </div>
                 </Show>
                 <Show when={props.game.actors.length > 0}>

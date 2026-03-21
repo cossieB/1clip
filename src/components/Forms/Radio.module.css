@@ -6,5 +6,6 @@
     }
     input {
         margin-right: 0.25rem;
+        accent-color: var(--neon-pink);
     }
 }
