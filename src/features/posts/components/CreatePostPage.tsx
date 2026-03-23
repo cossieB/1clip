@@ -7,7 +7,6 @@ import { ImagePreview } from "~/features/games/components/ImagePreview"
 import { AsyncSelect } from "~/components/Forms/AsyncSelect"
 import { gamesQueryOpts } from "~/features/games/utils/gameQueryOpts"
 import { variables } from "~/utils/variables"
-import { YouTubeIframe } from "~/components/embeds/YoutubeIframe"
 import { RadioInput } from "~/components/Forms/Radio"
 import { StandaloneInput } from "~/components/Forms/FormInput"
 import { IframeFactory } from "~/components/embeds/IframeFactory"
@@ -29,7 +28,7 @@ export function CreatePostPage() {
             <Form
                 disabled={
                     input.title.length < 3 || 
-                    input.text.length + files().length == 0 ||
+                    input.text.length + input.link.length + files().length == 0 ||
                     embedError()
                 }
                 isPending={mutation.isPending || isUploading()}
@@ -88,15 +87,15 @@ export function CreatePostPage() {
                             <StandaloneInput
                                 field=""
                                 label="Link to Youtube or Twitch clip"
-                                value={input.clipLink}
+                                value={input.link}
                                 setter={val => {
                                     setEmbedError(false)
-                                    setInput({ clipLink: val });
+                                    setInput({ link: val });
                                 }}
                                 style={{width: "unset", margin: "0.75rem 0"}}                                
                             />
 
-                            <IframeFactory link={input.clipLink} setError={setEmbedError} />
+                            <IframeFactory link={input.link} setError={setEmbedError} />
                         </Match>
                     </Switch>
                 </div>

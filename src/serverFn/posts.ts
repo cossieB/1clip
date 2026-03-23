@@ -11,6 +11,7 @@ import { HttpStatusCode } from "~/utils/statusCodes";
 import { getRequestIP } from "@tanstack/solid-start/server";
 import { redis } from "~/utils/redis";
 import { globalMiddleware } from "~/middleware/globalMiddleware";
+import { parseVideoUrl } from "~/components/embeds/IframeFactory";
 
 export const createPostFn = createServerFn({ method: "POST" })
     .middleware([globalMiddleware, verifiedOnlyMiddleware])
@@ -22,11 +23,21 @@ export const createPostFn = createServerFn({ method: "POST" })
             contentType: z.string()
         })),
         tags: z.string().toLowerCase().array(),
-        gameId: z.number().optional()
+        gameId: z.number().optional(),
+        link: z.url().optional()
     }))
     .handler(async ({ data, context: { user } }) => {
-        await rateLimiter("post:create", user.id, 5, 60)
-        if (data.text.length + data.media.length === 0) throw new AppError("Empty post", HttpStatusCode.BAD_REQUEST)
+        await rateLimiter("post:create", user.id, 5, 60);
+
+        if ((data.text.length + data.media.length === 0) && !data.link)
+            throw new AppError("Empty post", HttpStatusCode.BAD_REQUEST)
+        
+        if (data.media.length > 0)
+            delete data.link
+        
+        if (data.link && !parseVideoUrl(new URL(data.link))) 
+            throw new AppError("Unsupported link", HttpStatusCode.BAD_REQUEST)
+
         const post = await postRepository.createPost({ ...data, userId: user.id, })
         return { ...post, user }
     })
@@ -45,7 +56,7 @@ export const getPostFn = createServerFn()
     })
 
 export const getPostsFn = createServerFn()
-    .middleware([globalMiddleware])    
+    .middleware([globalMiddleware])
     .inputValidator(z.object({
         username: z.string(),
         authorId: z.string(),
@@ -58,7 +69,7 @@ export const getPostsFn = createServerFn()
         gameId: z.number()
     }).partial().optional())
     .handler(async ({ data }) => {
-        const user = await getCurrentUser(); 
+        const user = await getCurrentUser();
         return postRepository.findAll(data, user?.id)
     })
 
@@ -102,6 +113,6 @@ export const viewPostFn = createServerFn({ method: "POST" })
 export const searchPostsFn = createServerFn()
     .middleware([globalMiddleware])
     .inputValidator(z.string())
-    .handler(async ({data}) => {
+    .handler(async ({ data }) => {
         return postRepository.searchPosts(data)
     })

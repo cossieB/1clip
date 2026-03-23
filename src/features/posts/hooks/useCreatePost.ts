@@ -29,7 +29,7 @@ export function useCreatePost() {
         text: "",
         game: null as { gameId: number, title: string } | null,
         mode: "text" as "text" | "upload" | "Youtube / Twitch",
-        clipLink: "",
+        link: "",
         tags: [] as string[],
     })
     

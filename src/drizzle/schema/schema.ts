@@ -104,9 +104,11 @@ export const posts = pgTable('posts', {
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     editedOn: timestamp("edited_on", { withTimezone: true }).notNull().$onUpdateFn(() => new Date()),
     views: integer("views").notNull().default(0),
+    link: text("link"),    
     searchVector: customType({ dataType: () => 'tsvector' })('search_vector').generatedAlwaysAs(sql`(setweight(to_tsvector('english'::regconfig, (COALESCE(title, ''::character varying))::text), 'A'::"char") || setweight(to_tsvector('english'::regconfig, (COALESCE(text, ''::character varying))::text), 'B'::"char"))`),
 }, table => [
-    index().using("gin", table.searchVector)
+    index().using("gin", table.searchVector),
+    // index().on(table.userId)
 ])
 
 export const comments = pgTable("comments", {

@@ -12,7 +12,7 @@ export function IframeFactory(props: Props) {
     const res = () => {
         let url = validateUrl(props.link);
         if (!url) return null;
-        return getVideo(url)
+        return parseVideoUrl(url)
     }
 
     createEffect(() => {
@@ -50,7 +50,7 @@ export function IframeFactory(props: Props) {
     )
 }
 
-function getVideo(url: URL) {
+export function parseVideoUrl(url: URL) {
 
     const pathSegments = url.pathname.split('/').filter(Boolean);
 
