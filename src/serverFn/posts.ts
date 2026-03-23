@@ -23,7 +23,7 @@ export const createPostFn = createServerFn({ method: "POST" })
         })),
         tags: z.string().toLowerCase().array(),
         gameId: z.number().optional(),
-        link: z.url().optional()
+        link: z.url().optional().catch(undefined)
     }))
     .handler(async ({ data, context: { user } }) => {
         await rateLimiter("post:create", user.id, 5, 60);
