@@ -12,6 +12,7 @@ import { useReactToPost } from '../hooks/useReactToPost'
 import { useDeletePost } from '../hooks/useDeletePost'
 import { ConfirmPopoverWithButton } from '~/components/Popover/Popover'
 import styles from "./Post.module.css"
+import { IframeFactory } from '~/components/embeds/IframeFactory'
 
 type Props = {
     post: Awaited<ReturnType<typeof getPostFn>>
@@ -50,6 +51,11 @@ export function PostBlock(props: Props) {
                         showNextBtn
                         showPrevBtn
                     />
+                </Show>
+                <Show when={props.post.link}>
+                    <div class={styles.iframe}>
+                        <IframeFactory link={props.post.link!} />
+                    </div>
                 </Show>
                 <div class={styles.main} innerHTML={props.post.text} />
                 <Show when={props.post.tags.length > 0}>

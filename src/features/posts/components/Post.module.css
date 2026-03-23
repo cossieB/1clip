@@ -18,6 +18,7 @@
     button,
     audio,
     [data-func="carousel"],
+    .iframe,
     span {
         z-index: 5;
     }
@@ -186,4 +187,14 @@
 .page {
     width: min(90%, 1200px);
     margin: 0 auto;
+}
+
+
+.iframe {
+    width: 100%;
+    
+    iframe {
+        width: 100%;
+        aspect-ratio: 16/9;
+    }
 }
