@@ -6,10 +6,9 @@ import { getCurrentUser } from "./auth";
 import { AppError } from "~/utils/AppError";
 import { rateLimiter } from "~/utils/rateLimiter";
 import { HttpStatusCode } from "~/utils/statusCodes";
-import { globalMiddleware } from "~/middleware/globalMiddleware";
 
 export const addCommentFn = createServerFn({ method: "POST" })
-    .middleware([globalMiddleware, verifiedOnlyMiddleware])
+    .middleware([verifiedOnlyMiddleware])
     .inputValidator(z.object({
         text: z.string().trim(),
         postId: z.number(),
@@ -21,7 +20,6 @@ export const addCommentFn = createServerFn({ method: "POST" })
     })
 
 export const getCommentsByPostIdFn = createServerFn()
-    .middleware([globalMiddleware])
     .inputValidator(z.object({
         postId: z.number(),
         replyTo: z.number().optional()
@@ -33,7 +31,7 @@ export const getCommentsByPostIdFn = createServerFn()
     })
 
 export const reactToCommentFn = createServerFn({ method: "POST" })
-    .middleware([globalMiddleware, verifiedOnlyMiddleware])
+    .middleware([verifiedOnlyMiddleware])
     .inputValidator(z.object({
         commentId: z.number(),
         reaction: z.enum(["like", "dislike"])
@@ -44,7 +42,7 @@ export const reactToCommentFn = createServerFn({ method: "POST" })
     })
 
 export const deleteCommentFn = createServerFn({ method: "POST" })
-    .middleware([globalMiddleware, verifiedOnlyMiddleware])
+    .middleware([verifiedOnlyMiddleware])
     .inputValidator(z.object({
         commentId: z.number()
     }))

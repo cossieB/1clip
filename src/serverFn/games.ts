@@ -2,12 +2,11 @@ import { notFound } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start"
 import z from "zod";
 import { adminOnlyMiddleware } from "~/middleware/authorization";
-import { globalMiddleware } from "~/middleware/globalMiddleware";
 import { staticDataMiddleware } from "~/middleware/static";
 import * as gamesRepository from "~/repositories/gamesRepository";
 
 export const getGamesFn = createServerFn()
-    .middleware([globalMiddleware, staticDataMiddleware])
+    .middleware([staticDataMiddleware])
     .inputValidator(z.object({
         developerId: z.number(),
         publisherId: z.number(),
@@ -24,7 +23,7 @@ export const getGamesFn = createServerFn()
     })
 
 export const getGameFn = createServerFn()
-    .middleware([globalMiddleware, staticDataMiddleware])
+    .middleware([staticDataMiddleware])
     .inputValidator((gameId: number) => {
         if (Number.isNaN(gameId) || gameId < 1) throw notFound()
         return gameId
@@ -56,7 +55,7 @@ const GameCreateSchema = z.object({
 const GameEditSchema = GameCreateSchema.partial().extend({ gameId: z.number() })
 
 export const createGameFn = createServerFn({ method: "POST" })
-    .middleware([globalMiddleware, adminOnlyMiddleware])
+    .middleware([adminOnlyMiddleware])
     .inputValidator(GameCreateSchema)
     .handler(async ({ data }) => {
         const { media, platforms, genres, ...game } = data
@@ -64,7 +63,7 @@ export const createGameFn = createServerFn({ method: "POST" })
     })
 
 export const updateGameFn = createServerFn({ method: "POST" })
-    .middleware([globalMiddleware, adminOnlyMiddleware])
+    .middleware([adminOnlyMiddleware])
     .inputValidator(GameEditSchema)
     .handler(async ({ data }) => {
         const { gameId, media, platforms, genres, ...game } = data
@@ -72,11 +71,10 @@ export const updateGameFn = createServerFn({ method: "POST" })
     })
 
 export const getGamesWithoutExtras = createServerFn()
-    .middleware([globalMiddleware, staticDataMiddleware])
+    .middleware([staticDataMiddleware])
     .handler(async () => gamesRepository.findAll())
 
 export const searchGamesFn = createServerFn()
-    .middleware([globalMiddleware])
     .inputValidator(z.string())
     .handler(async ({ data }) => {
         return gamesRepository.searchGames(data)

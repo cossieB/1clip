@@ -2,19 +2,18 @@ import { notFound } from "@tanstack/solid-router"
 import { createServerFn } from "@tanstack/solid-start"
 import z from "zod"
 import { adminOnlyMiddleware } from "~/middleware/authorization"
-import { globalMiddleware } from "~/middleware/globalMiddleware"
 import { staticDataMiddleware } from "~/middleware/static"
 import * as platformRepository from "~/repositories/platformRepository"
 
 export const getPlatformsFn = createServerFn()
-    .middleware([globalMiddleware, staticDataMiddleware])
+    .middleware([staticDataMiddleware])
     .handler(async () => {        
         const platforms = await platformRepository.findAll()
         return platforms
     })
 
 export const getPlatformFn = createServerFn()
-    .middleware([globalMiddleware, staticDataMiddleware])
+    .middleware([staticDataMiddleware])
     .inputValidator((id: number) => {
         if (Number.isNaN(id) || id < 1) throw notFound()
         return id
@@ -35,7 +34,7 @@ const platformCreateSchema = z.object({
 const platformEditSchema = platformCreateSchema.partial().extend({platformId: z.number()})
 
 export const createPlatformFn = createServerFn({method: "POST"})    
-    .middleware([globalMiddleware, adminOnlyMiddleware])
+    .middleware([adminOnlyMiddleware])
     .inputValidator(platformCreateSchema)
     .handler(async ({data}) => {
         const platform =  await platformRepository.createPlatform(data)
@@ -43,7 +42,7 @@ export const createPlatformFn = createServerFn({method: "POST"})
     })
 
 export const editPlatformFn = createServerFn({method: "POST"})    
-    .middleware([globalMiddleware, adminOnlyMiddleware])
+    .middleware([adminOnlyMiddleware])
     .inputValidator(platformEditSchema)
     .handler(async ({data}) => {
         const {platformId, ...rest} = data

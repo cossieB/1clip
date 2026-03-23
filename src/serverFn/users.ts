@@ -7,10 +7,8 @@ import { verifiedOnlyMiddleware } from "~/middleware/authorization";
 import { AppError } from "~/utils/AppError";
 import * as uploadService from "~/integrations/uploadService/cloudflareUploadService"
 import { HttpStatusCode } from "~/utils/statusCodes";
-import { globalMiddleware } from "~/middleware/globalMiddleware";
 
 export const getLoggedInUser = createServerFn()
-    .middleware([globalMiddleware])
     .handler(async () => {
         const session = await getCurrentUser()
         if (!session) throw notFound()
@@ -22,7 +20,6 @@ export const getLoggedInUser = createServerFn()
     })
 
 export const getUserByUsernameFn = createServerFn()
-    .middleware([globalMiddleware])
     .inputValidator((username: string) => username)
     .handler(async ({ data }) => {
         const u = await getCurrentUser()
@@ -33,7 +30,6 @@ export const getUserByUsernameFn = createServerFn()
     })
 
 export const getUserByIdFn = createServerFn()
-    .middleware([globalMiddleware])
     .inputValidator((id: unknown) => {
         const validated = z.uuid().safeParse(id)
         if (validated.error)
@@ -49,7 +45,7 @@ export const getUserByIdFn = createServerFn()
     })
 
 export const updateCurrentUser = createServerFn({ method: "POST" })
-    .middleware([globalMiddleware, verifiedOnlyMiddleware])
+    .middleware([verifiedOnlyMiddleware])
     .inputValidator(z.object({
         displayName: z.string().min(3).max(15).optional(),
         bio: z.string().max(255).optional(),
@@ -72,7 +68,7 @@ export const updateCurrentUser = createServerFn({ method: "POST" })
     })
 
 export const followUserFn = createServerFn({ method: "POST" })
-    .middleware([globalMiddleware, verifiedOnlyMiddleware])
+    .middleware([verifiedOnlyMiddleware])
     .inputValidator(z.uuidv7())
     .handler(async ({ data, context: { user } }) => {
         if (data == user.id) throw new AppError("You can't follow yourself", HttpStatusCode.BAD_REQUEST)
