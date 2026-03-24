@@ -49,7 +49,10 @@ export function GameForm(props: { game?: Game }) {
                         const file = files.at(0)
                         if (!file) return
                         setGame({ cover: file.objectUrl })
-                        setFiles(prev => [...prev.filter(x => x.field != MediaField.Cover), { ...file, field: MediaField.Cover }])
+                        setFiles(prev => [
+                            ...prev.filter(x => x.field != MediaField.Cover),
+                            { ...file, field: MediaField.Cover }
+                        ])
                     }}
                     maxSize={1}
                     limit={1}
@@ -65,7 +68,10 @@ export function GameForm(props: { game?: Game }) {
                         const file = files.at(0)
                         if (!file) return
                         setGame({ banner: file.objectUrl })
-                        setFiles(prev => [...prev.filter(x => x.field != MediaField.Banner), { ...file, field: MediaField.Banner }])
+                        setFiles(prev => [
+                            ...prev.filter(x => x.field != MediaField.Banner), 
+                            { ...file, field: MediaField.Banner }
+                        ])
                     }}
                     maxSize={4}
                     limit={1}
@@ -93,7 +99,10 @@ export function GameForm(props: { game?: Game }) {
                                 metadata: {}
                             }))
                         ])
-                        setFiles(files.map(f => ({ ...f, field: MediaField.Media })))
+                        setFiles(prev => [
+                            ...prev,
+                            ...files.map(f => ({ ...f, field: MediaField.Media }))
+                        ])
                     }}
                     accept={{
                         image: true,
@@ -115,8 +124,8 @@ export function GameForm(props: { game?: Game }) {
                                 setFiles(prev => prev.filter(a => a.objectUrl != m.key))
                             }}
                             setMetadata={metadata => {
-                                setFiles(i(), {metadata})
-                                setGame('media', i(), prev => ({...prev, metadata}))
+                                setFiles(i(), { metadata })
+                                setGame('media', i(), prev => ({ ...prev, metadata }))
                             }}
                         />}
                 </For>
