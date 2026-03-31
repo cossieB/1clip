@@ -7,6 +7,7 @@ import { GamePage } from '~/features/games/components/GamePage'
 import { gameQueryOpts } from '~/features/games/utils/gameQueryOpts'
 import { platformQueryOpts } from '~/features/platforms/utils/platformQueryOpts'
 import { publisherQueryOpts } from '~/features/publishers/utils/publisherQueryOpts'
+import { STORAGE_DOMAIN } from '~/utils/env'
 
 export const Route = createFileRoute('/_pub/_static/games/$gameId/')({
     component: RouteComponent,
@@ -16,7 +17,12 @@ export const Route = createFileRoute('/_pub/_static/games/$gameId/')({
         return await context.queryClient.ensureQueryData(gameQueryOpts(gameId))
     },
     head: ({ loaderData }) => ({
-        meta: loaderData ? [{ title: loaderData.title + " :: 1Clip" }] : undefined,
+        meta: loaderData ? [{ 
+            title: loaderData.title + " :: 1Clip",
+        }, {
+            name: "og:image",
+            content: STORAGE_DOMAIN + loaderData.banner
+        }] : undefined,
     }),
     notFoundComponent: () => <NotFound message="These Aren't The Games You're Looking For" />,    
 })

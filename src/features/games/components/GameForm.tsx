@@ -1,6 +1,6 @@
 import { Form } from "~/components/Forms/Form";
 import { UploadBox } from "~/components/UploadBox/UploadBox";
-import { For, Show } from "solid-js";
+import { Index, Show } from "solid-js";
 import { ContentEditable } from "~/components/Forms/ContentEditable";
 import { mediaSrc } from "~/utils/mediaSrc";
 import { AsyncSelect } from "~/components/Forms/AsyncSelect";
@@ -114,21 +114,20 @@ export function GameForm(props: { game?: Game }) {
                 />
             </div>
             <div class={styles.screenshots}>
-                <For each={game.media}>
+                <Index each={game.media}>
                     {(m, i) =>
                         <ImagePreview
-                            {...m}
-                            url={mediaSrc(m.key)}
+                            {...m()}
+                            url={mediaSrc(m().key)}
                             onDelete={() => {
-                                setGame('media', prev => prev.filter(f => f.key != m.key))
-                                setFiles(prev => prev.filter(a => a.objectUrl != m.key))
+                                setGame('media', prev => prev.filter(f => f.key != m().key))
+                                setFiles(prev => prev.filter(a => a.objectUrl != m().key))
                             }}
                             setMetadata={metadata => {
-                                setFiles(i(), { metadata })
-                                setGame('media', i(), prev => ({ ...prev, metadata }))
+                                setGame('media', i, prev => ({ ...prev, metadata }))
                             }}
                         />}
-                </For>
+                </Index>
             </div>
             <div style={{ "margin-top": "1.5rem" }}>
                 <ContentEditable

@@ -1,5 +1,5 @@
 import { useServerFn } from "@tanstack/solid-start";
-import { createStore } from "solid-js/store";
+import { createStore, unwrap } from "solid-js/store";
 import { getSignedUrls } from "~/integrations/uploadService";
 import { uploadToSignedUrl } from "~/utils/uploadToSignedUrl";
 import { useToastContext } from "./useToastContext";
@@ -22,6 +22,7 @@ export function useUpload(
     })
 
     async function upload() {
+
         try {
             if (state.files.length === 0) return [];
             setState({isUploading: true})

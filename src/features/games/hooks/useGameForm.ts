@@ -46,11 +46,11 @@ export function useGameForm(props: { game?: Game }) {
     }))
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault();
-
         try {
             const uploadResult = await upload();
             const newCover = uploadResult.find(x => x.field == MediaField.Cover)?.key
             const newBanner = uploadResult.find(x => x.field == MediaField.Banner)?.key
+            
             setGame({
                 ...newCover && { cover: newCover },
                 ...newBanner && { banner: newBanner },
