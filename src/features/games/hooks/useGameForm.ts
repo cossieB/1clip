@@ -6,6 +6,7 @@ import { useToastContext } from "~/hooks/useToastContext"
 import { useUpload } from "~/hooks/useUpload"
 import { createGameFn, getGameFn, updateGameFn } from "~/serverFn/games"
 import { gameQueryOpts, gamesQueryOpts, gamesWithExtrasQueryOpts } from "../utils/gameQueryOpts"
+import { createEffect } from "solid-js"
 
 export type Game = Awaited<ReturnType<typeof getGameFn>>
 
@@ -19,6 +20,7 @@ export function useGameForm(props: { game?: Game }) {
     const { addToast } = useToastContext();
     const queryClient = useQueryClient()
     const navigate = useNavigate()
+
     const [game, setGame] = createStore({
         gameId: props.game?.gameId,
         title: props.game?.title ?? "",
@@ -35,7 +37,7 @@ export function useGameForm(props: { game?: Game }) {
         actors: props.game?.actors ?? []
     })
     const paths = game.gameId ? ["games", game.gameId.toString()] : ["games"]
-    const { setFiles, isUploading, upload } = useUpload(paths)
+    const { setFiles, isUploading, upload, files } = useUpload(paths)
 
     const editGameMutation = useMutation(() => ({
         mutationFn: useServerFn(updateGameFn)
@@ -44,13 +46,15 @@ export function useGameForm(props: { game?: Game }) {
     const createGameMutation = useMutation(() => ({
         mutationFn: useServerFn(createGameFn)
     }))
+
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault();
+
         try {
             const uploadResult = await upload();
             const newCover = uploadResult.find(x => x.field == MediaField.Cover)?.key
             const newBanner = uploadResult.find(x => x.field == MediaField.Banner)?.key
-            
+
             setGame({
                 ...newCover && { cover: newCover },
                 ...newBanner && { banner: newBanner },
@@ -102,5 +106,14 @@ export function useGameForm(props: { game?: Game }) {
 
         }
     }
-    return { game, setGame, isUploading, createGameMutation, editGameMutation, setFiles, handleSubmit }
+    return {
+        game,
+        setGame,
+        isUploading,
+        createGameMutation,
+        editGameMutation,
+        setFiles,
+        handleSubmit,
+        files
+    }
 }

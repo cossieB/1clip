@@ -68,7 +68,7 @@ export async function findById(gameId: number) {
 type GameInsert = {
     platforms: number[]
     genres: string[]
-    media: { key: string, contentType: string }[]
+    media: { key: string, contentType: string, metadata?: Record<string, string> }[]
 }
 
 export async function createGame(game: InferInsertModel<typeof games>, other: GameInsert) {
@@ -91,6 +91,7 @@ export async function createGame(game: InferInsertModel<typeof games>, other: Ga
 }
 
 export async function updateGame(gameId: number, game: Partial<InferSelectModel<typeof games>>, other: Partial<GameInsert>) {
+
     return db.transaction(async tx => {
         await tx.update(games).set(game).where(eq(games.gameId, gameId))
         if (other.platforms) {
@@ -136,8 +137,27 @@ export async function updateGame(gameId: number, game: Partial<InferSelectModel<
         if (other.media) {
             if (other.media.length == 0)
                 await tx.update(media).set({ gameId: null }).where(eq(media.gameId, gameId))
-            else
-                await tx.insert(media).values(other.media.map(m => ({ ...m, gameId }))).onConflictDoNothing()
+            else {
+                await tx
+                    .update(media)
+                    .set({gameId: null})
+                    .where(
+                        and(
+                            eq(media.gameId, gameId),
+                            notInArray(media.key, other.media.map(m => m.key))
+                        )
+                    )
+                await tx
+                    .insert(media)
+                    .values(other.media.map(m => ({ ...m, gameId })))
+                    .onConflictDoUpdate({
+                        set: {
+                            contentType: sql.raw(`EXCLUDED.${media.contentType.name}`),
+                            metadata: sql.raw(`EXCLUDED.${media.metadata.name}`),
+                        },
+                        target: media.key
+                    })
+            }
         }
     })
 }
@@ -149,9 +169,9 @@ export function searchGames(query: string) {
         gameId: games.gameId,
         releaseDate: games.releaseDate
     })
-    .from(games)
-    .where(sql`${games.searchVector} @@ websearch_to_tsquery('english', ${query})`)
-    .limit(50)
+        .from(games)
+        .where(sql`${games.searchVector} @@ websearch_to_tsquery('english', ${query})`)
+        .limit(50)
 }
 
 type Args = {
@@ -159,8 +179,8 @@ type Args = {
     limit?: number
 }
 
-function detailedGames(obj: Args = { filters: []}) {
-    const {searchVector, ...gamesColumns} = getColumns(games)
+function detailedGames(obj: Args = { filters: [] }) {
+    const { searchVector, ...gamesColumns } = getColumns(games)
     const actorQuery = db.$with("aq").as(
         db.select({
             gameId: gameActors.gameId,

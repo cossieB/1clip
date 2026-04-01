@@ -22,7 +22,7 @@ export function useUpload(
     })
 
     async function upload() {
-
+        
         try {
             if (state.files.length === 0) return [];
             setState({isUploading: true})

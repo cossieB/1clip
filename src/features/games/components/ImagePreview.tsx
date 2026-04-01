@@ -1,5 +1,5 @@
 import { InfoIcon, MinusIcon, PlusIcon, Trash2Icon } from "lucide-solid"
-import { ComponentProps, createEffect, createSignal, For, Show, splitProps } from "solid-js"
+import { ComponentProps, Show, splitProps } from "solid-js"
 import { RenderMedia } from "../../../components/RenderMedia"
 import styles from "./GameForm.module.css"
 import { Popover } from "~/components/Popover/Popover"
@@ -14,7 +14,7 @@ type Props = {
 } & ComponentProps<'div'>
 
 export function ImagePreview(props: Props) {
-    const [_, rest] = splitProps(props, ['url', 'onDelete', 'setMetadata'])
+    const [_, rest] = splitProps(props, ['url', 'onDelete', 'setMetadata', 'contentType', 'metadata'])
     return (
         <div {...rest}>
             <RenderMedia {...props} />
@@ -29,15 +29,11 @@ export function ImagePreview(props: Props) {
                 <button
                     class={styles.metadataBtn}
                     type="button"
-
-                    popoverTarget="autoPopover"
-                    onclick={() => {
-
-                    }}
+                    popoverTarget={props.url}
                 >
                     <InfoIcon size={16} />
                 </button>
-                <Popover>
+                <Popover id={props.url}>
                     <MetadataEdit
                         metadata={props.metadata}
                         setMetadata={props.setMetadata!}
@@ -51,15 +47,10 @@ export function ImagePreview(props: Props) {
 
 type P = {
     metadata: Record<string, string>
-    setMetadata(metadata: Record<string, string>): void
+    setMetadata(metadata: Record<string, string | undefined>): void
 }
 
 function MetadataEdit(props: P) {
-    const [newMetadata, setNewMetadata] = createStore<Record<string, string>>({
-        ...props.metadata,
-    })
-
-    createEffect(() => props.setMetadata(newMetadata))
 
     const [input, setInput] = createStore({
         key: "",
@@ -69,14 +60,14 @@ function MetadataEdit(props: P) {
     return (
         <div
             class={styles.metadataPopover}
-        >
+        >            
             <div class={styles.inputs}>
                 <input value="artist" type="text" disabled />
-                <input type="text" value={newMetadata.artist} oninput={e => setNewMetadata({ artist: e.currentTarget.value || undefined })} />
+                <input type="text" value={props.metadata.artist} oninput={e => props.setMetadata({ ...props.metadata, artist: e.currentTarget.value || undefined })} />
             </div>
             <div class={styles.inputs}>
                 <input value="title" type="text" disabled />
-                <input type="text" value={newMetadata.title} oninput={e => setNewMetadata({ title: e.currentTarget.value || undefined })} />
+                <input type="text" value={props.metadata.title} oninput={e => props.setMetadata({ ...props.metadata, title: e.currentTarget.value || undefined })} />
             </div>
 
             <div class={styles.inputs}>
@@ -87,7 +78,7 @@ function MetadataEdit(props: P) {
                     disabled={!input.key || !input.value}
                     type="button"
                     onclick={() => {
-                        setNewMetadata({ [input.key]: input.value })
+                        props.setMetadata({ ...props.metadata, [input.key]: input.value || undefined })
                         setInput({
                             key: "",
                             value: ""
@@ -101,7 +92,7 @@ function MetadataEdit(props: P) {
                     class={`${styles.rmBtn} ${styles.btn}`}
                     disabled={!input.key}
                     onclick={() => {
-                        setNewMetadata({ [input.key]: undefined })
+                        props.setMetadata({ ...props.metadata, [input.key]: undefined })
                         setInput({
                             key: "",
                             value: ""
@@ -112,7 +103,7 @@ function MetadataEdit(props: P) {
                 </button>
             </div>
             <pre>
-                {JSON.stringify(newMetadata, null, 4)}
+                {JSON.stringify(props.metadata, null, 4)}
             </pre>
         </div>
     )

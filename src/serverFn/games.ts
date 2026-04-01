@@ -66,6 +66,7 @@ export const updateGameFn = createServerFn({ method: "POST" })
     .middleware([adminOnlyMiddleware])
     .inputValidator(GameEditSchema)
     .handler(async ({ data }) => {
+        
         const { gameId, media, platforms, genres, ...game } = data
         await gamesRepository.updateGame(gameId, game, { platforms, media, genres })
     })

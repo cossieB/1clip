@@ -1,6 +1,6 @@
 import { Form } from "~/components/Forms/Form";
 import { UploadBox } from "~/components/UploadBox/UploadBox";
-import { Index, Show } from "solid-js";
+import { For, Index, Show } from "solid-js";
 import { ContentEditable } from "~/components/Forms/ContentEditable";
 import { mediaSrc } from "~/utils/mediaSrc";
 import { AsyncSelect } from "~/components/Forms/AsyncSelect";
@@ -20,6 +20,7 @@ export function GameForm(props: { game?: Game }) {
         isUploading,
         createGameMutation,
         editGameMutation,
+        files,
         setFiles,
         handleSubmit
     } = useGameForm(props)
@@ -69,7 +70,7 @@ export function GameForm(props: { game?: Game }) {
                         if (!file) return
                         setGame({ banner: file.objectUrl })
                         setFiles(prev => [
-                            ...prev.filter(x => x.field != MediaField.Banner), 
+                            ...prev.filter(x => x.field != MediaField.Banner),
                             { ...file, field: MediaField.Banner }
                         ])
                     }}
@@ -114,20 +115,24 @@ export function GameForm(props: { game?: Game }) {
                 />
             </div>
             <div class={styles.screenshots}>
-                <Index each={game.media}>
+                <For each={game.media}>
                     {(m, i) =>
                         <ImagePreview
-                            {...m()}
-                            url={mediaSrc(m().key)}
+                            contentType={m.contentType}
+                            metadata={m.metadata}
+                            url={mediaSrc(m.key)}
                             onDelete={() => {
-                                setGame('media', prev => prev.filter(f => f.key != m().key))
-                                setFiles(prev => prev.filter(a => a.objectUrl != m().key))
+                                setGame('media', prev => prev.filter(f => f.key != m.key))
+                                setFiles(prev => prev.filter(a => a.objectUrl != m.key))
                             }}
                             setMetadata={metadata => {
-                                setGame('media', i, prev => ({ ...prev, metadata }))
+                                setGame('media', i(), prev => ({ ...prev, metadata }));
+                                if (files()[i()])
+                                    setFiles(i(), { metadata })
                             }}
-                        />}
-                </Index>
+                        />
+                        }
+                </For>
             </div>
             <div style={{ "margin-top": "1.5rem" }}>
                 <ContentEditable
