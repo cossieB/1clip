@@ -8,7 +8,7 @@ export default defineConfig({
     port: 1337,
   },
   plugins: [
-    // nitro(),
+    nitro(),
     tanstackStart(),
     viteSolid({ ssr: true }),
   ],
