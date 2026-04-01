@@ -1,21 +1,26 @@
 .comment {
     margin: 1rem 0;
+
     .user {
         display: flex;
         align-items: center;
         height: 2rem;
         gap: 0.5rem;
+
         img {
             height: 100%;
         }
+
         span:not(.createdAt) {
             font-weight: bold;
         }
     }
 }
+
 .createdAt {
-    font-size: small;
+    font-size: x-small;
     margin-left: auto;
+    color: gray;
 }
 
 .buttons {
@@ -37,6 +42,7 @@
         &:hover {
             background-color: rgb(from var(--neon-green) r g b / 0.25);
         }
+
         &.liked {
             color: var(--neon-green);
         }
@@ -45,6 +51,7 @@
             &:hover {
                 background-color: rgb(from red r g b / 0.25);
             }
+
             &.disliked {
                 color: red
             }

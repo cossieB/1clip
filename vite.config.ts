@@ -3,16 +3,16 @@ import { defineConfig } from 'vite'
 import viteSolid from 'vite-plugin-solid'
 import {nitro} from "nitro/vite"
 
-export default defineConfig({
+export default defineConfig(({command}) => ({
   server: {
     port: 1337,
   },
   plugins: [
-    nitro(),
+    command === "build" ? nitro() : null,
     tanstackStart(),
     viteSolid({ ssr: true }),
-  ],
+  ].filter(Boolean),
   resolve: {
     tsconfigPaths: true
   }
-})
+}))

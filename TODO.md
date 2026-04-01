@@ -1,3 +1,4 @@
 - [x] followers
 - [ ] XP system
 - [ ] game reviews
+- [ ] live notifications

@@ -100,7 +100,7 @@ export const viewPostFn = createServerFn({ method: "POST" })
         const user = await getCurrentUser()
         if (!ip) return
         // Only count a view if user hasn't viewed the post within the past day
-        const cached = await redis.mGet(data.map(String))
+        const cached = await redis.mGet(data.map(postId => `view:${postId}:${ip}`))
         const postIds = data.filter((_, i) => cached[i] === null)
         await postRepository.viewPosts(postIds);
         await Promise.all(postIds.map(postId => redis.setEx(`view:${postId}:${ip}`, 86400, user?.id ?? "Anon")))
