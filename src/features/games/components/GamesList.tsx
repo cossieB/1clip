@@ -1,7 +1,7 @@
 import { PhotoCardGrid } from "../../../components/CardLink/PhotoCardLink"
 import { useGamesQuery } from "~/features/games/hooks/useGameQuery"
 import { STORAGE_DOMAIN } from "~/utils/env"
-import { GameQueryFilters } from "~/repositories/gamesRepository"
+import { type GameQueryFilters } from "~/repositories/gamesRepository"
 import { createEffect, onMount } from "solid-js"
 
 

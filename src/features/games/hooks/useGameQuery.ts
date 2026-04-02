@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useQueryClient } from "@tanstack/solid-query"
 import { createEffect } from "solid-js"
-import { GameQueryFilters } from "~/repositories/gamesRepository"
+import { type GameQueryFilters } from "~/repositories/gamesRepository"
 import { gameQueryOpts, gamesWithExtrasQueryOpts } from "../utils/gameQueryOpts"
 import { developerQueryOpts } from "~/features/developers/utils/developerQueryOpts"
 import { publisherQueryOpts } from "~/features/publishers/utils/publisherQueryOpts"
