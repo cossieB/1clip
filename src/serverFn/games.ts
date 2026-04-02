@@ -1,9 +1,13 @@
 import { notFound } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start"
+import { setResponseHeader, setResponseHeaders } from "@tanstack/solid-start/server";
 import z from "zod";
+import { cacheService } from "~/integrations/cacheService";
+import { sleep } from "~/lib/sleep";
 import { adminOnlyMiddleware } from "~/middleware/authorization";
 import { staticDataMiddleware } from "~/middleware/static";
 import * as gamesRepository from "~/repositories/gamesRepository";
+import { cacheAside } from "~/utils/cacheAside";
 
 export const getGamesFn = createServerFn()
     .middleware([staticDataMiddleware])
@@ -65,8 +69,7 @@ export const createGameFn = createServerFn({ method: "POST" })
 export const updateGameFn = createServerFn({ method: "POST" })
     .middleware([adminOnlyMiddleware])
     .inputValidator(GameEditSchema)
-    .handler(async ({ data }) => {
-        
+    .handler(async ({ data }) => {        
         const { gameId, media, platforms, genres, ...game } = data
         await gamesRepository.updateGame(gameId, game, { platforms, media, genres })
     })
@@ -79,4 +82,11 @@ export const searchGamesFn = createServerFn()
     .inputValidator(z.string())
     .handler(async ({ data }) => {
         return gamesRepository.searchGames(data)
+    })
+
+export const getSimilarGames = createServerFn()
+    .inputValidator(z.number().positive())
+    .middleware([staticDataMiddleware])
+    .handler(async ({data}) => {
+        return await cacheAside(`similar:${data}`, () => gamesRepository.similarGames(data), 604800);        
     })

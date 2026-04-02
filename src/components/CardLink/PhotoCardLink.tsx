@@ -13,8 +13,9 @@ export function PhotoCardLink(props: Props) {
     const key = Object.keys(props.params)[0];
     // @ts-expect-error
     const value = props.params[key];
+
     return (
-        <div data-type="card" class={styles.card}>
+        <div data-type="card" class={styles.card} >
             <div class={`${styles.imgWrapper} cutout`}>
                 <img
                     style={{ "view-transition-name": key + value }}
