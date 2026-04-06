@@ -1,5 +1,5 @@
 import { BriefcaseBusiness, LockOpenIcon, MenuIcon, CodeIcon, Dice5Icon, HouseIcon, CirclePlus, Search, BellIcon } from "lucide-solid";
-import { createSignal, onCleanup, Setter, Show } from "solid-js";
+import { Setter, Show } from "solid-js";
 import { authClient } from "~/auth/authClient";
 import { STORAGE_DOMAIN } from "~/utils/env";
 import { NavItem } from "./NavItem";
@@ -112,9 +112,11 @@ function NavNotifications() {
                 icon={<BellIcon />}
                 label="Notifications"
             />
-            <span class={styles.notifNum}>
-                {notifications().length}
-            </span>
+            <Show when={notifications().length > 0}>
+                <span class={styles.notifNum}>
+                    {Math.min(notifications().length, 9)}
+                </span>
+            </Show>
         </div>
     )
 }

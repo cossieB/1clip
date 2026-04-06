@@ -86,7 +86,8 @@ export const reactToPostFn = createServerFn({ method: "POST" })
             void notificationsService.addNotification(data.authorId, {
                 message: `${user.name} liked your post`,
                 type: "LIKE",
-                postId: data.postId.toString()
+                postId: data.postId.toString(),
+                date: new Date()
             })
         }
     })

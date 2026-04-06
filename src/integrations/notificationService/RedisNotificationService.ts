@@ -9,7 +9,8 @@ export class RedisNotificationService implements NotificationService {
             await redis.xGroupCreate(`notifications:user:${userId}`, `group:user:${userId}`, '0', {
                 MKSTREAM: true
             });
-        } catch (err: any) {
+        } 
+        catch (err: any) {
             if (!err.message.includes('BUSYGROUP')) throw err;
         }
     }
@@ -43,9 +44,8 @@ export class RedisNotificationService implements NotificationService {
     async *listenForNotifications(userId: string) {
         await this.createTempRedis();
         while (true) {
-            if (!this.consumer) break;
             try {
-                const streams = await this.consumer
+                const streams = await this.consumer!
                     .xReadGroup(
                         `group:user:${userId}`,
                         "server-a", {

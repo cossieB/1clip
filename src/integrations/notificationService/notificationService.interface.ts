@@ -1,7 +1,8 @@
 export type NotifMessage = {
     message: string
-    type: "LIKE" | "REPLY",
+    type: "LIKE" | "REPLY" | "FOLLOW",
     postId: string
+    date: Date
 }
 
 export interface NotificationService {
