@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/solid-query';
 import { createFileRoute, useLocation } from '@tanstack/solid-router'
-import { For, Suspense } from 'solid-js';
+import { Suspense } from 'solid-js';
 import { PhotoCardGrid } from '~/components/CardLink/PhotoCardLink';
 import { searchGamesFn } from '~/serverFn/games';
 import { STORAGE_DOMAIN } from '~/utils/env';

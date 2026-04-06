@@ -1,10 +1,14 @@
-import { BriefcaseBusiness, LockOpenIcon, MenuIcon, CodeIcon, Dice5Icon, HouseIcon, CirclePlus, Search } from "lucide-solid";
-import { Setter, Show } from "solid-js";
+import { BriefcaseBusiness, LockOpenIcon, MenuIcon, CodeIcon, Dice5Icon, HouseIcon, CirclePlus, Search, BellIcon } from "lucide-solid";
+import { createSignal, onCleanup, Setter, Show } from "solid-js";
 import { authClient } from "~/auth/authClient";
 import { STORAGE_DOMAIN } from "~/utils/env";
 import { NavItem } from "./NavItem";
 import styles from "./MainLayout.module.css"
 import clickOutside from "~/lib/clickOutside";
+import { NotificationsProvider } from "../Notifications/NotificationsProvider";
+import { useNotificationContext } from "~/hooks/useNotificationContext";
+import { NotifMessage } from "~/integrations/notificationService/notificationService.interface";
+import { ClientOnly } from "@tanstack/solid-router";
 false && clickOutside
 
 export function Nav(props: { setOpen: Setter<boolean> }) {
@@ -50,21 +54,26 @@ export function Nav(props: { setOpen: Setter<boolean> }) {
                     label="Search"
                     icon={<Search />}
                 />
-                <Show when={session().data && session().data!.user.emailVerified}>
-                    <NavItem
-                        to="/posts/create"
-                        icon={<CirclePlus />}
-                        label="Create"
-                        style={{ color: "var(--neon-pink)" }}
-                    />
+                <Show when={session().data?.user}>
+                    <>
+                        <NavItem
+                            to="/posts/create"
+                            icon={<CirclePlus />}
+                            label="Create"
+                            style={{ color: "var(--neon-pink)" }}
+                        />
+                        <ClientOnly>
+                            <NotificationsProvider>
+                                <NavNotifications />
+                            </NotificationsProvider>
+                        </ClientOnly>
+                    </>
                 </Show>
                 <UserComponent />
             </ul>
         </nav>
     )
 }
-
-
 
 function UserComponent() {
     const session = authClient.useSession()
@@ -87,5 +96,25 @@ function UserComponent() {
                 />
             }
         </Show>
+    )
+}
+
+function NavNotifications() {
+    const { notifications, setNotifications } = useNotificationContext()
+    const stream = new EventSource("/api/notifications")
+    stream.onmessage = (event: MessageEvent<NotifMessage>) => {
+        setNotifications(prev => [...prev, event.data])
+    }
+    return (
+        <div class={styles.notifs}>
+            <NavItem
+                to="/"
+                icon={<BellIcon />}
+                label="Notifications"
+            />
+            <span class={styles.notifNum}>
+                {notifications().length}
+            </span>
+        </div>
     )
 }

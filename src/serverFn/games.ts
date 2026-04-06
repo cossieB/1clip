@@ -1,9 +1,6 @@
 import { notFound } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start"
-import { setResponseHeader, setResponseHeaders } from "@tanstack/solid-start/server";
 import z from "zod";
-import { cacheService } from "~/integrations/cacheService";
-import { sleep } from "~/lib/sleep";
 import { adminOnlyMiddleware } from "~/middleware/authorization";
 import { staticDataMiddleware } from "~/middleware/static";
 import * as gamesRepository from "~/repositories/gamesRepository";

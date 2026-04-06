@@ -119,7 +119,8 @@ export async function reactToPost(postId: number, userId: string, reaction: "lik
         SELECT ${postId}, ${userId}, ${reaction}
         WHERE NOT EXISTS (
             SELECT 1 FROM deleted WHERE reaction = ${reaction}
-        );
+        )
+        RETURNING *
     `)
 }
 

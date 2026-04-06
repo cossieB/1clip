@@ -21,3 +21,5 @@ Show off your best gaming moments, epic screenshots, hilarious clips, jaw-droppi
 
 ## Techniques
 I used Intersection Observer and Tanstack Query to implement infinite scrolling. I combined this with keyset database pagination to provide a seamless blazing fast user experience.
+
+I used Redis Streams and server-sent event to deliver realtime notifications to the user.

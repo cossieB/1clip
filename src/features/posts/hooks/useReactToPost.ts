@@ -22,7 +22,8 @@ export function useReactToPost(post: Awaited<ReturnType<typeof getPostFn>>) {
             mutation.mutate({
                 data: {
                     postId: post.postId,
-                    reaction
+                    authorId: post.userId,
+                    reaction,
                 }
             }, {
                 onSuccess(data, variables, onMutateResult, context) {

@@ -11,6 +11,7 @@ import { HttpStatusCode } from "~/utils/statusCodes";
 import { getRequestIP } from "@tanstack/solid-start/server";
 import { redis } from "~/utils/redis";
 import { parseVideoUrl } from "~/components/embeds/IframeFactory";
+import { notificationsService } from "~/integrations/notificationService";
 
 export const createPostFn = createServerFn({ method: "POST" })
     .middleware([verifiedOnlyMiddleware])
@@ -74,11 +75,20 @@ export const reactToPostFn = createServerFn({ method: "POST" })
     .middleware([verifiedOnlyMiddleware])
     .inputValidator(z.object({
         postId: z.number(),
-        reaction: z.enum(["like", "dislike"])
+        reaction: z.enum(["like", "dislike"]),
+        authorId: z.uuid()
     }))
     .handler(async ({ data, context: { user } }) => {
         await rateLimiter("post:react", user.id, 10, 60)
-        await postRepository.reactToPost(data.postId, user.id, data.reaction)
+        const res = await postRepository.reactToPost(data.postId, user.id, data.reaction)
+
+        if (user.id != data.authorId && res.rows.at(0)?.reaction === "like" ) {
+            void notificationsService.addNotification(data.authorId, {
+                message: `${user.name} liked your post`,
+                type: "LIKE",
+                postId: data.postId.toString()
+            })
+        }
     })
 
 export const deletePostFn = createServerFn({ method: "POST" })
