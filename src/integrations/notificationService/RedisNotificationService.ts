@@ -1,5 +1,6 @@
 import { redis } from "~/utils/redis";
-import type { NotificationService, NotifMessage } from "./notificationService.interface";
+import type { NotificationService } from "./notificationService.interface";
+import { UserNotification } from "~/features/notifications/utils/NotificationsSchema";
 
 export class RedisNotificationService implements NotificationService {
     private consumer: ReturnType<typeof redis.duplicate> | null = null
@@ -27,7 +28,7 @@ export class RedisNotificationService implements NotificationService {
         this.consumer = null;
     }
 
-    addNotification = async (userId: string, data: NotifMessage) => {
+    addNotification = async (userId: string, data: UserNotification) => {
         const message = { ...data, date: new Date().toISOString() }
         try {
             await redis.xAdd(

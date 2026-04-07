@@ -31,11 +31,14 @@
         grid-column: span 3;
     }
 
-    svg {
-        justify-self: center;
+    svg {        
         color: var(--neon-green);
         fill: var(--neon-green);
         flex-shrink: 0;
+
+        @media (width > 768px) {
+            justify-self: center;
+        }
     }
 
     span {

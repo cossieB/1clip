@@ -79,7 +79,7 @@ export const reactToPostFn = createServerFn({ method: "POST" })
         authorId: z.uuid()
     }))
     .handler(async ({ data, context: { user } }) => {
-        await rateLimiter("post:react", user.id, 10, 60)
+        // await rateLimiter("post:react", user.id, 10, 60)
         const res = await postRepository.reactToPost(data.postId, user.id, data.reaction)
 
         if (user.id != data.authorId && res.rows.at(0)?.reaction === "like" ) {

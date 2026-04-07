@@ -5,10 +5,10 @@ import { STORAGE_DOMAIN } from "~/utils/env";
 import { NavItem } from "./NavItem";
 import styles from "./MainLayout.module.css"
 import clickOutside from "~/lib/clickOutside";
-import { NotificationsProvider } from "../Notifications/NotificationsProvider";
-import { useNotificationContext } from "~/hooks/useNotificationContext";
-import { NotifMessage } from "~/integrations/notificationService/notificationService.interface";
+import { useNotificationContext } from "~/features/notifications/hooks/useNotificationContext";
 import { ClientOnly } from "@tanstack/solid-router";
+import { useLocalStorage } from "~/hooks/useLocalStorage";
+import { NotificationsSchema, UserNotification } from "~/features/notifications/utils/NotificationsSchema";
 false && clickOutside
 
 export function Nav(props: { setOpen: Setter<boolean> }) {
@@ -63,9 +63,7 @@ export function Nav(props: { setOpen: Setter<boolean> }) {
                             style={{ color: "var(--neon-pink)" }}
                         />
                         <ClientOnly>
-                            <NotificationsProvider>
-                                <NavNotifications />
-                            </NotificationsProvider>
+                            <NavNotifications />
                         </ClientOnly>
                     </>
                 </Show>
@@ -102,13 +100,18 @@ function UserComponent() {
 function NavNotifications() {
     const { notifications, setNotifications } = useNotificationContext()
     const stream = new EventSource("/api/notifications")
-    stream.onmessage = (event: MessageEvent<NotifMessage>) => {
-        setNotifications(prev => [...prev, event.data])
+    const {getItem, setItem} = useLocalStorage("notifications", NotificationsSchema.array())
+    
+    stream.onmessage = (event: MessageEvent) => {
+        const oldNotifications = getItem() ?? []
+        const data = JSON.parse(event.data)
+        setNotifications(prev => [...prev, data])
+        setItem([...oldNotifications, data].toReversed())
     }
     return (
         <div class={styles.notifs}>
             <NavItem
-                to="/"
+                to="/notifications"
                 icon={<BellIcon />}
                 label="Notifications"
             />

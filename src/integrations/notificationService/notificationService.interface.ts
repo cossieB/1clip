@@ -1,14 +1,9 @@
-export type NotifMessage = {
-    message: string
-    type: "LIKE" | "REPLY" | "FOLLOW",
-    postId: string
-    date: Date
-}
+import { UserNotification } from "~/features/notifications/utils/NotificationsSchema";
 
 export interface NotificationService {
     setup(userId: string): Promise<void>;
     close(): void
-    addNotification(userId: string, data: NotifMessage): Promise<void>
+    addNotification(userId: string, data: UserNotification): Promise<void>
     listenForNotifications(userId: string): AsyncGenerator<{
         id: string;
         message: Record<string, string>;

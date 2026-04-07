@@ -1,5 +1,5 @@
 import { useContext } from "solid-js";
-import { NotificationsContext } from "~/components/Notifications/NotificationsContext";
+import { NotificationsContext } from "~/features/notifications/components/NotificationsContext";
 
 export function useNotificationContext() {
     const ctx = useContext(NotificationsContext)

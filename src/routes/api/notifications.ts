@@ -20,6 +20,7 @@ export const Route = createFileRoute('/api/notifications')({
                             controller.enqueue(encoder.encode(":\n\n"))
                         }, 30000)
                         for await (const msg of notificationsService.listenForNotifications(user.id)) {
+                            console.log(msg.message)
                             controller.enqueue(encoder.encode(`data: ${JSON.stringify(msg.message)}\n\n`))
                             await redis.xAck(`notifications:user:${user.id}`, `group:user:${user.id}`, msg.id)
                         }

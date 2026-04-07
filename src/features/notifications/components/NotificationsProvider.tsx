@@ -1,9 +1,10 @@
 import { createSignal, JSXElement } from "solid-js";
 import { NotificationsContext } from "./NotificationsContext";
-import { NotifMessage } from "~/integrations/notificationService/notificationService.interface";
+import { UserNotification } from "../utils/NotificationsSchema";
 
 export function NotificationsProvider(props: {children: JSXElement}) {
-    const [notifications, setNotifications] = createSignal<NotifMessage[]>([])
+    const [notifications, setNotifications] = createSignal<UserNotification[]>([])
+
     return (
         <NotificationsContext.Provider
             value={{notifications, setNotifications}}
