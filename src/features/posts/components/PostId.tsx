@@ -41,13 +41,16 @@ export function PostId(props: Props) {
                 submit={() => {
                     mutation.mutate({
                         data: {
-                            postId: props.post.postId,
+                            originalPost: {
+                                postId: props.post.postId,
+                                authorId: props.post.userId
+                            },                            
                             text: comment(),
                         }
                     })
                 }}
             />
-            <CommentList postId={props.post.postId} />
+            <CommentList originalPost={{authorId: props.post.userId, postId: props.post.postId}} />
         </div>
     )
 }

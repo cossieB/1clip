@@ -1,16 +1,37 @@
 import { useQuery } from "@tanstack/solid-query";
-import { createEffect, For, Suspense } from "solid-js";
+import { For, Suspense } from "solid-js";
 import { CommentBlock } from "./CommentBlock";
 import { commentListQueryOpts } from "../utils/commentListQueryOpts";
 
-export function CommentList(props: { postId: number, replyTo?: number, enabled?: boolean }) {
-    const result = useQuery(() => commentListQueryOpts({postId: props.postId, replyTo: props.replyTo}, props.enabled))
+type Props = {
+    originalPost: {
+        postId: number;
+        authorId: string
+    }
+    originalComment?: {
+        commentId: number,
+        authorId: string
+    }
+    enabled?: boolean;
+};
+
+export function CommentList(props: Props) {
+    const result = useQuery(() => commentListQueryOpts({
+        postId: props.originalPost.postId,
+        replyTo: props.originalComment?.commentId
+    },
+        props.enabled))
 
     return (
         <Suspense>
             <div>
                 <For each={result.data ?? []}>
-                    {comment => <CommentBlock comment={comment} postId={props.postId} replyTo={props.replyTo} />}
+                    {comment =>
+                        <CommentBlock
+                            comment={comment}
+                            originalPost={{...props.originalPost}}
+                            replyTo={props.originalComment?.commentId}
+                        />}
                 </For>
             </div>
         </Suspense>

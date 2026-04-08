@@ -6,7 +6,10 @@ export const Route = createFileRoute('/_pub/notifications')({
     component: RouteComponent,
     beforeLoad: async ({ context }) => {
         if (!context.user) throw redirect({ to: "/" })
-    }
+    },
+    head: () => ({
+        meta: [{ title: "Notifications :: 1Clip" }],
+    }),
 })
 
 function RouteComponent() {
