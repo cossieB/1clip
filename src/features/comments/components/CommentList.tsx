@@ -29,7 +29,7 @@ export function CommentList(props: Props) {
                     {comment =>
                         <CommentBlock
                             comment={comment}
-                            originalPost={{...props.originalPost}}
+                            originalPost={props.originalPost}
                             replyTo={props.originalComment?.commentId}
                         />}
                 </For>

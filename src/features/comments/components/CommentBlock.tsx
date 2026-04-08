@@ -97,7 +97,7 @@ export function CommentBlock(props: Props) {
             </Show>
             <div class={styles.replies}>
                 <CommentList
-                    originalPost={{...props.originalPost}}
+                    originalPost={props.originalPost}
                     originalComment={{
                         authorId: props.comment.userId,
                         commentId: props.comment.commentId

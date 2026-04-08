@@ -7,6 +7,7 @@ import { verifiedOnlyMiddleware } from "~/middleware/authorization";
 import { AppError } from "~/utils/AppError";
 import * as uploadService from "~/integrations/uploadService/cloudflareUploadService"
 import { HttpStatusCode } from "~/utils/statusCodes";
+import { notificationsService } from "~/integrations/notificationService";
 
 export const getLoggedInUser = createServerFn()
     .handler(async () => {
@@ -73,5 +74,13 @@ export const followUserFn = createServerFn({ method: "POST" })
     .handler(async ({ data, context: { user } }) => {
         if (data == user.id) throw new AppError("You can't follow yourself", HttpStatusCode.BAD_REQUEST)
         const res = await userRepository.followUser(user.id, data)
-        return res.rowCount === 1
+        const success = res.rowCount === 1
+        if (success) 
+            notificationsService.addNotification(data, {
+                date: new Date().toISOString(),
+                message: `You have a new follower! ${user.displayUsername} has followed you.`,
+                postId: "",
+                type: "FOLLOW"
+            })
+        return success
     })

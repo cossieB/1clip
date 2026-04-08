@@ -6,6 +6,7 @@ export class AppError extends Error {
         public readonly message: string, 
         public readonly status: HttpStatusCode) {
         super(message);
-        setResponseStatus(status)
+        setResponseStatus(status);
+        this.name = "AppError";
     }
 }

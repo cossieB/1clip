@@ -46,6 +46,7 @@ export async function generateSignedUrl(filename: string, contentType: string, c
 }
 
 export function deleteObject(key: string) {
+    if (["users/default_banner.jpg", "users/default_avatar.png"].includes(key)) return
     return S3.send(new DeleteObjectCommand({
         Bucket: "clipz",
         Key: key,

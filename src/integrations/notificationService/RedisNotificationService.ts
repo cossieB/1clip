@@ -63,7 +63,10 @@ export class RedisNotificationService implements NotificationService {
                     }
                 }
             }
-            catch (error) {
+            catch (error: any) {                
+                if (error.name !== "DisconnectsClientError") {
+                    console.error(error)
+                }
                 break
             }
         }
