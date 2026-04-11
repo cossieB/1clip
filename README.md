@@ -16,10 +16,9 @@ Show off your best gaming moments, epic screenshots, hilarious clips, jaw-droppi
 - [Nodemailer](https://nodemailer.com/)
 - [Railway](https://railway.com/)
 
-## Auth
+### Auth
 [Better Auth](https://www.better-auth.com/) is used to handle authentication and Nodemailer to send confirmation emails. Users can change usernames, emails, passwords, reset passwords and delete their entire account. 
 
-## Techniques
-I used Intersection Observer and Tanstack Query to implement infinite scrolling. I combined this with keyset database pagination to provide a seamless blazing fast user experience.
-
-I used Redis Streams and server-sent event to deliver realtime notifications to the user.
+### Techniques
+Intersection Observer and Tanstack Query to implement infinite scrolling, combined with keyset database pagination to provide a seamless blazing fast user experience.
+Redis Streams and server-sent event to deliver realtime notifications to the user.

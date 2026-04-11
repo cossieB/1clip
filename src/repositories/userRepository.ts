@@ -1,7 +1,8 @@
-import { and, eq, exists, getColumns, sql, SQL } from "drizzle-orm";
+import { and, count, eq, exists, getColumns, sql, SQL, sum } from "drizzle-orm";
+import { unionAll } from "drizzle-orm/pg-core";
 import { db } from "~/drizzle/db";
 import { User } from "~/drizzle/models";
-import { followerFollowee } from "~/drizzle/schema";
+import { commentReactions, comments, followerFollowee, postReactions, posts } from "~/drizzle/schema";
 import { users } from "~/drizzle/schema/auth";
 
 export async function findById(userId: string, loggedInUserId?: string) {
@@ -82,4 +83,70 @@ export async function followUser(followerId: string, followeeId: string) {
             )
             RETURNING *
         `)
+}
+
+export function calculateXP(userId: string) {
+    const numPosts = db
+        .select({
+            userId: posts.userId,
+            score: count().as("score")
+        })
+        .from(posts)
+        .groupBy(posts.userId)
+        .where(eq(posts.userId, userId))
+
+    const postReactionScore = db
+        .select({
+            userId: posts.userId,
+            score: sql<number>`
+                LEAST(SUM(
+                    CASE 
+                        WHEN ${postReactions.reaction} = 'like' THEN 2
+                        ELSE -1
+                    END
+                ), 100)
+            `.as("score")
+        })
+        .from(postReactions)
+        .innerJoin(posts, eq(posts.postId, postReactions.postId))
+        .groupBy(posts.userId)
+        .where(eq(posts.userId, userId))
+
+    const numComments = db
+        .select({
+            userId: comments.userId,
+            score: count().as("score")
+        })        
+        .from(comments)
+        .groupBy(comments.userId)
+        .where(eq(comments.userId, userId))
+
+    const commentReactionsScores = db
+        .select({
+            userId: comments.userId,
+            score: sql<number>`
+                LEAST(SUM(
+                    CASE 
+                        WHEN ${commentReactions.reaction} = 'like' THEN 1
+                        ELSE -1
+                    END
+                ), 10)
+            `.as("score")
+        })
+        .from(commentReactions)
+        .innerJoin(comments, eq(commentReactions.commentId, comments.commentId))
+        .groupBy(comments.userId)
+        .where(eq(comments.userId, userId))
+
+    const cte = db.$with("temp").as(unionAll(numPosts, postReactionScore, numComments, commentReactionsScores))
+
+    return db
+        .with(cte)
+        .select({
+            userId: cte.userId,
+            reputation: sql<number>`SUM(${cte.score})::INT`
+        })
+        .from(cte)
+        .groupBy(cte.userId)
+        .where(eq(cte.userId, userId))
 }

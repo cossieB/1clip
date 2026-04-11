@@ -8,6 +8,7 @@ import { AppError } from "~/utils/AppError";
 import * as uploadService from "~/integrations/uploadService/cloudflareUploadService"
 import { HttpStatusCode } from "~/utils/statusCodes";
 import { notificationsService } from "~/integrations/notificationService";
+import { cacheAside } from "~/utils/cacheAside";
 
 export const getLoggedInUser = createServerFn()
     .handler(async () => {
@@ -84,3 +85,10 @@ export const followUserFn = createServerFn({ method: "POST" })
             })
         return success
     })
+
+export const getUserReputation = createServerFn()
+    .inputValidator(z.uuidv7())
+    .handler(async ({data}) => {
+        const res = await cacheAside(`xp:${data}`, () => userRepository.calculateXP(data));
+        return res.at(0)
+    })    

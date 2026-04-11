@@ -19,7 +19,7 @@ function RouteComponent() {
                 <div class={styles.more}>
                     <h2>Level Up Your Legacy</h2>
                     <p>
-                        Stop letting your greatest gaming moments gather digital dust. Whether you just pulled off a 1-in-a-million trickshot, penned a soul-crushing alternate ending for your favorite RPG, or spent forty hours perfecting a digital portrait, <span>1Clip</span> is where it belongs. <br />
+                        Show off your best gaming moments, epic screenshots, hilarious clips, jaw-dropping fanart, and immersive fanfic — all in one place. Whether you're here to flex your skills, share your stories, or just vibe with fellow gamers, this is your arena. Upload, explore, and connect with a community that celebrates every pixel and every word. <br />
                         <Link class={styles.call} to='/posts'>Browse</Link>
                         <Link class={styles.call} to='/auth/signup'>Join the Community</Link>
                     </p>
@@ -27,7 +27,6 @@ function RouteComponent() {
             </div>
             <h3>Show Off. Speak Up. Stay Inspired.</h3>
             <div class={styles.columns}>
-
                 <div><header>The Clip Vault</header> Upload high-res gameplay and let the world see that "accidental" pentakill.</div>
                 <div><header>The Gallery</header> From stunning screenshots to professional-grade fanart, put your vision on the main stage.</div>
                 <div><header>The Archive</header> Post your fanfic and lore theories for a community that actually breathes the story.</div>
