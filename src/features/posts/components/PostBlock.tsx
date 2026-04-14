@@ -10,10 +10,10 @@ import { authClient } from '~/auth/authClient'
 import { MenuPopover } from '~/components/Popover/MenuPopover'
 import { useReactToPost } from '../hooks/useReactToPost'
 import { useDeletePost } from '../hooks/useDeletePost'
-import { ConfirmPopoverWithButton } from '~/components/Popover/Popover'
 import { IframeFactory } from '~/components/embeds/IframeFactory'
 import { PostAuthor } from './PostAuthor'
 import styles from "./Post.module.css"
+import { ConfirmDialog } from '~/components/Popover/Confirm'
 
 type Props = {
     post: Awaited<ReturnType<typeof getPostFn>>
@@ -135,26 +135,21 @@ export function PostBlock(props: Props) {
                     <Show when={session().data && session().data!.user.id === props.post.userId}>
                         <li
                             onclick={() => {
-                                document.getElementById('del-post-warn-' + props.post.postId)?.showPopover()
+                                (document.getElementById('del-post-warn-' + props.post.postId) as HTMLDialogElement)?.showModal()
                             }}
                         >
                             Delete
-                            <ConfirmPopoverWithButton
-                                popover={{
-                                    id: "del-post-warn-" + props.post.postId,
-                                    text: 'Delete Post? ',
-                                    onConfirm: () => deleteMutation.mutate({ data: { postId: props.post.postId } })
-                                }}
-                                button={{
-                                    hidden: true
-                                }}
-                            />
                         </li>
                     </Show>
 
                 </ul>
             </MenuPopover>
+            <ConfirmDialog
+                id={'del-post-warn-' + props.post.postId}
+                headline='Delete Post?'
+                onConfirm={() => deleteMutation.mutate({ data: { postId: props.post.postId } })}
+            >
+            </ConfirmDialog>
         </div>
     )
 }
-

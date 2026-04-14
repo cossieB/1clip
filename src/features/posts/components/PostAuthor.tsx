@@ -71,6 +71,8 @@ function UserMiniProfile(props: Props) {
             id={"post-author-popover" + props.post.postId}
             style={{ "position-anchor": "--postAuthor" + props.post.postId, "position-area": "center right" }}
             ref={elem}
+            //@ts-expect-error
+            popover="hint"
         >
             <Suspense
                 fallback={

@@ -2,7 +2,6 @@ import { getLoggedInUser } from "~/serverFn/users";
 import styles from "./ProfilePage.module.css"
 import { Form } from "~/components/Forms/Form";
 import { UploadBox } from "~/components/UploadBox/UploadBox";
-import { ConfirmPopoverWithButton } from "~/components/Popover/Popover";
 import { useEditProfile } from "../hooks/useEditProfile";
 import { useLogout } from "~/hooks/useLogout";
 import { STORAGE_DOMAIN } from "~/utils/env";
@@ -11,6 +10,7 @@ import { XIcon } from "lucide-solid";
 import { validateUrl } from "~/lib/validateUrl";
 import { useToastContext } from "~/hooks/useToastContext";
 import { InputWithPlusBtn } from "~/components/Forms/InputWithPlusBtn";
+import { ConfirmDialog } from "~/components/Popover/Confirm";
 
 export function Profile(props: { user: Awaited<ReturnType<typeof getLoggedInUser>> }) {
     const {
@@ -22,7 +22,7 @@ export function Profile(props: { user: Awaited<ReturnType<typeof getLoggedInUser
         isUploading
     } = useEditProfile(props)
 
-    const {addToast} = useToastContext()
+    const { addToast } = useToastContext()
     const logout = useLogout()
 
     return (
@@ -97,8 +97,8 @@ export function Profile(props: { user: Awaited<ReturnType<typeof getLoggedInUser
                     label="Add link"
                     onAdd={val => {
                         const link = validateUrl(val)
-                        if (!link) return addToast({text: "Invalid link. Copy and paste your link here including the \"https\"", type: "info"})
-                        if (user.links.includes(val)) return 
+                        if (!link) return addToast({ text: "Invalid link. Copy and paste your link here including the \"https\"", type: "info" })
+                        if (user.links.includes(val)) return
                         setUser('links', prev => [...prev, val])
                     }}
                 />
@@ -119,18 +119,20 @@ export function Profile(props: { user: Awaited<ReturnType<typeof getLoggedInUser
                     </For>
                 </ul>
             </Form>
-
-            <ConfirmPopoverWithButton
-                popover={{
-                    text: "Are you sure you want to logout?",
-                    onConfirm: logout,
-                    id: "logout-warn"
+            <button
+                class={styles.dangerBtn}
+                onClick={() => {
+                    (document.getElementById("logout-warn") as HTMLDialogElement)?.showModal()
                 }}
-                button={{
-                    class: styles.dangerBtn,
-                    children: "Logout"
-                }}
+            >
+                Logout
+            </button>
+            <ConfirmDialog
+                headline="Are you sure you want to logout?"
+                onConfirm={logout}
+                id="logout-warn"
             />
+
         </div>
     )
 }

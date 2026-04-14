@@ -5,7 +5,7 @@ import { Form } from '~/components/Forms/Form'
 import { useToastContext } from '~/hooks/useToastContext'
 import styles from "./ProfilePage.module.css"
 import { useNavigate } from '@tanstack/solid-router'
-import { ConfirmPopover, ConfirmPopoverWithButton } from '~/components/Popover/Popover'
+import { ConfirmDialog } from '~/components/Popover/Confirm'
 
 export function SecurityPage() {
     const { addToast } = useToastContext()
@@ -160,23 +160,25 @@ export function SecurityPage() {
                     maxLength={15}
                 />
             </Form>
+            <button
+                class={styles.dangerBtn}
+                onClick={() => {
+                    (document.getElementById("del-account-warn") as HTMLDialogElement)?.showModal()
+                }}
+            >
+                Delete Account
+            </button>
 
-            <ConfirmPopoverWithButton
-                popover={{
-                    text: "This is irreversible. All your posts and data will be deleted forever. Enter your password to confirm",
-                    setChallengeAnswer: val => setInput({ challengeAnswer: val }),
-                    challengeAnswer: input.challengeAnswer,
-                    onConfirm: deleteAccount,
-                    type: 'password',
-                    label: 'Password',
-                    id: 'del-account-warn',
-                }}
-                button={{
-                    class: styles.dangerBtn,
-                    children: "Delete Account"
-                }}
+            <ConfirmDialog
+                headline='Delete Account?'
+                additionalText="This is irreversible. All your posts and data will be deleted forever. Enter your password to confirm"
+                onConfirm={deleteAccount}
+                type='password'
+                label='Password'
+                id="del-account-warn"
+                challengeAnswer={input.challengeAnswer}
+                setChallengeAnswer={val => setInput({challengeAnswer: val})}
             />
-
         </div>
     )
 }

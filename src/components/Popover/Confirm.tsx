@@ -17,7 +17,7 @@ type ValueProps =
     | { challengeAnswer?: never; setChallengeAnswer?: never; };
 
 type Props = ComponentProps<"dialog"> & {
-    children: JSXElement
+    
 } & BaseProps & ValueProps
 
 export function ConfirmDialog(props: Props) {

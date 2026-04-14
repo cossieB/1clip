@@ -11,8 +11,8 @@ import { useReactToComment } from "../hooks/useReactToComment";
 import { useReplyToComment } from "../hooks/useReplyToComment";
 import { MenuPopover } from "~/components/Popover/MenuPopover";
 import { useDeleteComment } from "../hooks/useDeleteComment";
-import { ConfirmPopoverWithButton } from "~/components/Popover/Popover";
 import { authClient } from "~/auth/authClient";
+import { ConfirmDialog } from "~/components/Popover/Confirm";
 
 type Props = {
     comment: Awaited<ReturnType<typeof getCommentsByPostIdFn>>[number];
@@ -44,7 +44,7 @@ export function CommentBlock(props: Props) {
                     <span>{props.comment.user.username}</span>
                 </Link>
                 <span class={styles.createdAt}>{getRelativeTime(props.comment.createdAt)}</span>
-                <button popoverTarget={'comment-popover-'+props.comment.commentId}>
+                <button popoverTarget={'comment-popover-' + props.comment.commentId}>
                     <EllipsisVerticalIcon />
                 </button>
             </div>
@@ -112,29 +112,24 @@ export function CommentBlock(props: Props) {
                 <ul>
                     <li>
                         {props.comment.user.username}'s profile
-                        <Link to="/users/$username" params={{username: props.comment.user.username}} />
+                        <Link to="/users/$username" params={{ username: props.comment.user.username }} />
                     </li>
                     <Show when={session().data && session().data!.user.id === props.comment.userId}>
                         <li
                             onclick={() => {
-                                document.getElementById('del-comment-warn-'+props.comment.commentId)?.showPopover()
+                                document.getElementById('del-comment-warn-' + props.comment.commentId)?.showPopover()
                             }}
                         >
                             Delete
-                            <ConfirmPopoverWithButton
-                                popover={{
-                                    id: "del-comment-warn-"+props.comment.commentId,
-                                    text: 'Delete Comment? ',
-                                    onConfirm: () => deleteMutation.mutate({ data: { commentId: props.comment.commentId } })
-                                }}
-                                button={{
-                                    hidden: true
-                                }}
-                            />
                         </li>
                     </Show>
                 </ul>
             </MenuPopover>
+            <ConfirmDialog
+                id={"del-comment-warn-" + props.comment.commentId}
+                headline='Delete Comment? '
+                onConfirm={() => deleteMutation.mutate({ data: { commentId: props.comment.commentId } })}
+            />
         </div>
     )
 }
