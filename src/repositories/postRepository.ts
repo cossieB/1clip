@@ -206,13 +206,13 @@ function detailedPosts(obj: Args = { filters: [], limit: 1 }, userId?: string) {
         media: sql<{ key: string, contentType: string }[]>`COALESCE(${mediaQuery.media}, '[]'::JSONB)`,
         tags: sql<string[]>`COALESCE(${tagsQuery.tags}, '{}')`,
         user: {
-            userId: users.id,
+            id: users.id,
             displayName: users.displayName,
             bio: users.bio,
             image: users.image,
             banner: users.banner,
             username: users.username,
-            displayUsername: users.displayName,
+            displayUsername: users.displayUsername,
             dob: users.dob,
             location: users.location
         },

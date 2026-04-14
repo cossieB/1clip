@@ -99,12 +99,12 @@ export function calculateXP(userId: string) {
         .select({
             userId: posts.userId,
             score: sql<number>`
-                LEAST(SUM(
+                GREATEST(LEAST(SUM(
                     CASE 
                         WHEN ${postReactions.reaction} = 'like' THEN 2
                         ELSE -1
                     END
-                ), 100)
+                ), 100), -100)
             `.as("score")
         })
         .from(postReactions)
@@ -125,12 +125,12 @@ export function calculateXP(userId: string) {
         .select({
             userId: comments.userId,
             score: sql<number>`
-                LEAST(SUM(
+                GREATEST(LEAST(SUM(
                     CASE 
                         WHEN ${commentReactions.reaction} = 'like' THEN 1
                         ELSE -1
                     END
-                ), 10)
+                ), 10), -10)
             `.as("score")
         })
         .from(commentReactions)

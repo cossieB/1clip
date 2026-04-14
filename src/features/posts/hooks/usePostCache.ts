@@ -1,7 +1,6 @@
-import { useInfiniteQuery, useQueryClient, UseQueryResult } from "@tanstack/solid-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/solid-query";
 import { createEffect } from "solid-js";
 import { PostFilters } from "~/repositories/postRepository";
-import { getPostsFn } from "~/serverFn/posts";
 import { postsQueryOpts } from "../utils/postQueryOpts";
 
 export function usePostQuery(opts?: PostFilters) {
@@ -12,7 +11,6 @@ export function usePostQuery(opts?: PostFilters) {
         if (result.data) {
             for (const post of result.data.pages.flat()) {
                 queryClient.setQueryData(["post", post.postId], post)
-                queryClient.setQueryData(["users", post.user.userId], post.user)
             }
         }
     })

@@ -9,6 +9,7 @@ import * as uploadService from "~/integrations/uploadService/cloudflareUploadSer
 import { HttpStatusCode } from "~/utils/statusCodes";
 import { notificationsService } from "~/integrations/notificationService";
 import { cacheAside } from "~/utils/cacheAside";
+import { getRank } from "~/utils/getRank";
 
 export const getLoggedInUser = createServerFn()
     .handler(async () => {
@@ -27,7 +28,7 @@ export const getUserByUsernameFn = createServerFn()
         const u = await getCurrentUser()
         
         const user = await userRepository.findByUsername(data, u?.id);
-        if (!user) throw notFound()
+        if (!user) throw notFound();
         return user
     })
 
@@ -41,7 +42,7 @@ export const getUserByIdFn = createServerFn()
     })
     .handler(async ({ data }) => {
         const u = await getCurrentUser()
-        const user = await userRepository.findById(data, u?.id)
+        const user = await userRepository.findById(data, u?.id);
         if (!user) throw notFound();
         return user
     })
@@ -89,6 +90,14 @@ export const followUserFn = createServerFn({ method: "POST" })
 export const getUserReputation = createServerFn()
     .inputValidator(z.uuidv7())
     .handler(async ({data}) => {
-        const res = await cacheAside(`xp:${data}`, () => userRepository.calculateXP(data));
-        return res.at(0)
+        const res = (await cacheAside(
+            `xp:${data}`, 
+            () => userRepository.calculateXP(data),
+            86400
+        )).at(0)
+        if (!res) throw new Response(null, {status: 404})
+        return {
+            xp: res.reputation,
+            rank: getRank(res.reputation)
+        } 
     })    

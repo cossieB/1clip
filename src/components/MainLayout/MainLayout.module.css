@@ -16,6 +16,7 @@
 @media (width < 768px) {
     .navOpen .nav {
         width: 70vw;
+
         &::after {
             content: "";
             backdrop-filter: blur(5px) grayscale(90%);
@@ -34,15 +35,21 @@
     display: flex;
     align-items: center;
 
-    >aside {
-        font-family: "Press Start 2P", system-ui;
-        flex: 1;
-        text-align: center;
-        color: #00ff7f;
-
-        &::first-letter {
-            color: #F0F;
+    >.siteTitle {
+        @media (width <= 768px) {
+            display: none;
         }
+    }
+}
+
+.siteTitle {
+    font-family: "Press Start 2P", system-ui;
+    flex: 1;
+    text-align: center;
+    color: #00ff7f;
+
+    &::first-letter {
+        color: #F0F;
     }
 }
 
@@ -54,7 +61,7 @@
     z-index: 1000;
     overflow: hidden;
     transition: width 200ms ease;
-    
+
     @media (width >=768px) {
         width: var(--nav-size);
         height: 100%;
@@ -62,15 +69,35 @@
 
     @media (width < 768px) {
         width: 0;
+        .siteTitle {
+            display: none;
+        }
     }
 }
 
 .main {
     height: 100vh;
 
+    @media (width < 768px) {
+        padding-top: 2.5rem;
+        >.siteTitle {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            text-align: center;
+            height: 2.5rem;
+            z-index: 7;
+            background-color: var(--bg-clr);
+            align-content: center;
+        }
+    }
+
     @media (width >=768px) {
         transition: margin-left 200ms ease;
         margin-left: var(--nav-size);
+        >.siteTitle {
+            display: none;
+        }
     }
 }
 
@@ -80,8 +107,9 @@
     height: 2.5rem;
     border-radius: 0.5rem;
     transition: background-color 250ms ease;
-    
-    >svg,img {
+
+    >svg,
+    img {
         width: var(--icon-width);
         height: 100%;
         flex-shrink: 0;
@@ -142,18 +170,19 @@
         height: 1px;
         margin-bottom: 1rem;
     }
+
     padding: 1rem;
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    
+
     svg {
         display: inline;
         height: 1.5rem;
         width: 1.5rem;
     }
-    
+
     a {
         font-weight: bold;
         margin-left: 0.5rem;

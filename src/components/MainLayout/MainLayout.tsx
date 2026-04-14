@@ -19,6 +19,7 @@ export function MainLayout(props: { children: JSXElement }) {
         <div id="gl" class={styles.root} classList={{ [styles.navOpen]: showNav() }}>
             <Nav setOpen={setShowNav} />
             <main class={styles.main}>
+                <div class={styles.siteTitle}>1Clip</div>
                 {props.children}
                 <Footer />
             </main>

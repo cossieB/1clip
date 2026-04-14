@@ -44,7 +44,7 @@ export function CommentBlock(props: Props) {
                     <span>{props.comment.user.username}</span>
                 </Link>
                 <span class={styles.createdAt}>{getRelativeTime(props.comment.createdAt)}</span>
-                <button style={{ "--anchor-name": "--commentMenuBtn" }} popoverTarget={'comment-popover-'+props.comment.commentId}>
+                <button popoverTarget={'comment-popover-'+props.comment.commentId}>
                     <EllipsisVerticalIcon />
                 </button>
             </div>
@@ -107,7 +107,7 @@ export function CommentBlock(props: Props) {
             </div>
             <MenuPopover
                 id={"comment-popover-" + props.comment.commentId}
-                style={{ "position-anchor": "commentMenuBtn", "position-area": "bottom left" }}
+                style={{ "position-anchor": "commentMenuBtn", "position-area": "center left" }}
             >
                 <ul>
                     <li>

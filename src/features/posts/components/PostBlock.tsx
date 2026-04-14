@@ -11,8 +11,9 @@ import { MenuPopover } from '~/components/Popover/MenuPopover'
 import { useReactToPost } from '../hooks/useReactToPost'
 import { useDeletePost } from '../hooks/useDeletePost'
 import { ConfirmPopoverWithButton } from '~/components/Popover/Popover'
-import styles from "./Post.module.css"
 import { IframeFactory } from '~/components/embeds/IframeFactory'
+import { PostAuthor } from './PostAuthor'
+import styles from "./Post.module.css"
 
 type Props = {
     post: Awaited<ReturnType<typeof getPostFn>>
@@ -25,20 +26,14 @@ export function PostBlock(props: Props) {
 
     return (
         <div data-type="post" data-postId={props.post.postId} class={styles.postContainer}>
-            <div class={styles.user}>
-                <div>
-                    <img src={STORAGE_DOMAIN + props.post.user.image} />
-                    {props.post.user.displayUsername}
-                    <Link to='/users/$username' params={{ username: props.post.user.username! }} />
-                </div>
-            </div>
+            <PostAuthor post={props.post} />
             <div class={styles.content}>
                 <div class={styles.header}>
                     <h2> {props.post.title} </h2>
                     <span title={formatDate(props.post.createdAt)}>
                         {getRelativeTime(props.post.createdAt)}
                     </span>
-                    <button style={{ "--anchor-name": "--postMenuBtn" }} popoverTarget={'post-popover-' + props.post.postId}>
+                    <button  popoverTarget={'post-popover-' + props.post.postId}>
                         <EllipsisVerticalIcon />
                     </button>
                 </div>
@@ -110,7 +105,7 @@ export function PostBlock(props: Props) {
             </div>
             <MenuPopover
                 id={'post-popover-' + props.post.postId}
-                style={{ "position-anchor": "postMenuBtn", "position-area": "bottom left" }}
+                style={{ "position-area": "center left" }}
             >
                 <ul>
                     <li
@@ -140,13 +135,13 @@ export function PostBlock(props: Props) {
                     <Show when={session().data && session().data!.user.id === props.post.userId}>
                         <li
                             onclick={() => {
-                                document.getElementById('del-post-warn-'+props.post.postId)?.showPopover()
+                                document.getElementById('del-post-warn-' + props.post.postId)?.showPopover()
                             }}
                         >
                             Delete
                             <ConfirmPopoverWithButton
                                 popover={{
-                                    id: "del-post-warn-"+props.post.postId,
+                                    id: "del-post-warn-" + props.post.postId,
                                     text: 'Delete Post? ',
                                     onConfirm: () => deleteMutation.mutate({ data: { postId: props.post.postId } })
                                 }}
@@ -162,3 +157,4 @@ export function PostBlock(props: Props) {
         </div>
     )
 }
+

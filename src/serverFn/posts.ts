@@ -37,7 +37,6 @@ export const createPostFn = createServerFn({ method: "POST" })
         
         if (data.link && !parseVideoUrl(new URL(data.link))) 
             throw new AppError("Unsupported link", HttpStatusCode.BAD_REQUEST)
-
         const post = await postRepository.createPost({ ...data, userId: user.id, })
         return { ...post, user }
     })

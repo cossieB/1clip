@@ -116,8 +116,8 @@ function RootDocument(props: { children: Solid.JSX.Element }) {
             <body>
                 <HeadContent />
                 {props.children}
-                <TanStackRouterDevtools position="bottom-right" />
-                <SolidQueryDevtools buttonPosition="bottom-left" />
+                {/* <TanStackRouterDevtools position="bottom-right" />
+                <SolidQueryDevtools buttonPosition="bottom-left" /> */}
                 <Scripts />
             </body>
         </html>

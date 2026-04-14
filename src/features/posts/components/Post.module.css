@@ -35,17 +35,18 @@
     align-items: center;
     gap: 0.5rem;
     position: relative;
-    
-    div {
+
+    div:not([popover]) {
         position: relative;
         display: flex;
         flex-direction: row;
-        align-items: center;        
+        align-items: center;
     }
-    
+
     @media (width > 768px) {
         width: 5rem;
-        div {
+
+        div:not([popover]) {
             flex-direction: column;
         }
     }
@@ -54,6 +55,7 @@
         width: 100%;
         aspect-ratio: 1;
     }
+
     a {
         position: absolute;
         inset: 0;
@@ -132,6 +134,7 @@
         &:hover {
             background-color: rgb(from var(--neon-green) r g b / 0.25);
         }
+
         &.liked {
             color: var(--neon-green);
         }
@@ -140,6 +143,7 @@
             &:hover {
                 background-color: rgb(from red r g b / 0.25);
             }
+
             &.disliked {
                 color: red
             }
@@ -154,26 +158,32 @@
     position: relative;
     font-size: 0.75rem;
     height: 3rem;
+
     @media (width > 768px) {
         font-size: 1rem;
         height: 5rem;
     }
+
     &:hover {
         background-color: var(--gray2);
     }
+
     >div {
         display: flex;
         flex-direction: column;
         justify-content: center;
+
         :last-child {
             color: gray;
         }
     }
+
     img {
         all: unset;
         height: 100% !important;
         width: auto !important;
     }
+
     a {
         position: absolute;
         inset: 0;
@@ -185,6 +195,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+
     span {
         font-size: x-small;
         color: gray;
@@ -199,9 +210,69 @@
 
 .iframe {
     width: 100%;
-    
+
     iframe {
         width: 100%;
         aspect-ratio: 16/9;
+    }
+}
+
+.miniProfile {
+    background-position: center;
+    background-size: cover;
+    width: 15rem;
+    position: relative;
+    background-color: rgba(0,0,0,0.65);
+    background-blend-mode: darken;
+    img {
+        width: unset;
+    }
+    &.wait {
+        background: black;
+        height: 10rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        svg {
+            animation: spin infinite 2s linear;
+        }
+    }
+    >section:first-of-type {
+        display: flex;
+        justify-content: space-between;
+        padding-inline: 1rem;
+        height: 5rem;
+        align-items: center;
+
+        img {
+            height: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            box-shadow: 0 0 10px 2px black;
+        }
+    }
+
+    .rank {
+        height: 5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        img {
+            max-height: 100%;
+        }
+
+        span {
+            color: var(--neon-green);
+        }
+    }
+}
+
+@keyframes spin {
+    from {
+        rotate: 0deg;
+    }
+
+    to {
+        rotate: 360deg;
     }
 }

@@ -14,6 +14,10 @@ export function useFollowUser(user: {username: string, id: string}) {
                 if (!old) return;
                 return {...old, isFollowing: data}
             })
+            queryClient.setQueryData(["users", user.id], (old: User | undefined): User | undefined => {
+                if (!old) return;
+                return {...old, isFollowing: data}
+            })
         },
     }))
     return followUser

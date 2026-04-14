@@ -1,6 +1,7 @@
 import { redis } from "~/utils/redis";
 import type { NotificationService } from "./notificationService.interface";
 import { UserNotification } from "~/features/notifications/utils/NotificationsSchema";
+import { DisconnectsClientError } from "redis";
 
 export class RedisNotificationService implements NotificationService {
     private consumer: ReturnType<typeof redis.duplicate> | null = null
@@ -63,8 +64,8 @@ export class RedisNotificationService implements NotificationService {
                     }
                 }
             }
-            catch (error: any) {                
-                if (error.name !== "DisconnectsClientError") {
+            catch (error: any) {    
+                if (!(error instanceof DisconnectsClientError)) {
                     console.error(error)
                 }
                 break

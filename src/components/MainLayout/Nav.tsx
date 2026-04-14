@@ -22,7 +22,7 @@ export function Nav(props: { setOpen: Setter<boolean> }) {
                 <button class={styles.toggleBtn} onclick={() => props.setOpen(prev => !prev)}>
                     <MenuIcon />
                 </button>
-                <aside>
+                <aside class={styles.siteTitle}>
                     1Clip
                 </aside>
             </div>
