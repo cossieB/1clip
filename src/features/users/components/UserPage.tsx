@@ -1,5 +1,5 @@
 import { CalendarPlus2Icon, CakeIcon, MapPinIcon, PlusIcon, MinusIcon } from "lucide-solid";
-import { createEffect, For, Show } from "solid-js";
+import { For, Show } from "solid-js";
 import { HeroHeader } from "~/components/Hero/HeroHeader";
 import { formatDate } from "~/lib/formatDate";
 import { type getUserByUsernameFn } from "~/serverFn/users";
@@ -9,7 +9,6 @@ import { validateUrl } from "~/lib/validateUrl";
 import styles from "./UserPage.module.css"
 import { useFollowUser } from "../hooks/useFollowUser";
 import { authClient } from "~/auth/authClient";
-import { unwrap } from "solid-js/store";
 
 type Props = {
     user: NonNullable<Awaited<ReturnType<typeof getUserByUsernameFn>>>

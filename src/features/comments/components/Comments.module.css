@@ -1,20 +1,35 @@
 .comment {
     margin: 1rem 0;
 
-    .user {
+    .header {
         display: flex;
+        height: 3rem;
         align-items: center;
-        height: 2rem;
-        gap: 0.5rem;
+    }
+    .user {
+        height: 100%;
 
-        img {
+        > div:first-child {
+            position: relative;
             height: 100%;
-        }
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
 
-        span:not(.createdAt) {
-            font-weight: bold;
+            span {
+                font-size: small;
+            }
+
+            a {
+                position: absolute;
+                inset: 0;
+            }
         }
     }
+    img {
+        height: 100%;
+    }
+    
 }
 
 .createdAt {

@@ -1,4 +1,4 @@
-import { ComponentProps, JSXElement, mergeProps, Show, splitProps } from "solid-js"
+import { ComponentProps, Show, splitProps } from "solid-js"
 import styles from "./Confirm.module.css"
 import { StandaloneInput } from "../Forms/FormInput"
 import clickOutside from "~/lib/clickOutside";

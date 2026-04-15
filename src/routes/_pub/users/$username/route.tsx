@@ -8,6 +8,11 @@ import { getUserByUsernameFn } from '~/serverFn/users'
 
 export const Route = createFileRoute('/_pub/users/$username')({
     component: RouteComponent,
+    params:{
+        parse: params => ({
+            username: params.username.toLowerCase()
+        })
+    },
     loader: async ({ params, context: { queryClient } }) => {
         await queryClient.ensureQueryData({
             queryKey: ["users", params.username],

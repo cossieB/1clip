@@ -1,6 +1,5 @@
 import { getRelativeTime } from "~/lib/getRelativeTime";
 import { getCommentsByPostIdFn } from "~/serverFn/comments";
-import { STORAGE_DOMAIN } from "~/utils/env";
 import { MessageCircleIcon, ThumbsUpIcon, ThumbsDownIcon, EllipsisVerticalIcon } from "lucide-solid";
 import { CommentInput } from "./CommentInput";
 import { Show } from "solid-js";
@@ -13,6 +12,7 @@ import { MenuPopover } from "~/components/Popover/MenuPopover";
 import { useDeleteComment } from "../hooks/useDeleteComment";
 import { authClient } from "~/auth/authClient";
 import { ConfirmDialog } from "~/components/Popover/Confirm";
+import { PostAuthor } from "~/features/posts/components/PostAuthor";
 
 type Props = {
     comment: Awaited<ReturnType<typeof getCommentsByPostIdFn>>[number];
@@ -35,19 +35,17 @@ export function CommentBlock(props: Props) {
             data-commentId={props.comment.commentId}
             class={styles.comment}
         >
-            <div class={styles.user}>
-                <img
-                    src={STORAGE_DOMAIN + props.comment.user.image}
-                    alt={`Avatar of ${props.comment.user.username}`}
+            <div class={styles.header} >
+            <PostAuthor
+                class={styles.user}
+                entityId={props.comment.commentId}
+                user={{ ...props.comment.user, id: props.comment.userId }}
                 />
-                <Link to="/users/$username" params={{ username: props.comment.user.username! }}>
-                    <span>{props.comment.user.username}</span>
-                </Link>
-                <span class={styles.createdAt}>{getRelativeTime(props.comment.createdAt)}</span>
-                <button popoverTarget={'comment-popover-' + props.comment.commentId}>
-                    <EllipsisVerticalIcon />
-                </button>
-            </div>
+            <span class={styles.createdAt}>{getRelativeTime(props.comment.createdAt)}</span>
+            <button popoverTarget={'comment-popover-' + props.comment.commentId}>
+                <EllipsisVerticalIcon />
+            </button>
+                </div>
             <div class={styles.text}> {props.comment.text} </div>
             <div class={styles.buttons}>
                 <div>
@@ -117,7 +115,7 @@ export function CommentBlock(props: Props) {
                     <Show when={session().data && session().data!.user.id === props.comment.userId}>
                         <li
                             onclick={() => {
-                                document.getElementById('del-comment-warn-' + props.comment.commentId)?.showPopover()
+                                (document.getElementById('del-comment-warn-' + props.comment.commentId) as HTMLDialogElement)?.showModal()
                             }}
                         >
                             Delete

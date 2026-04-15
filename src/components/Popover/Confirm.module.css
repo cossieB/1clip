@@ -39,4 +39,7 @@
             flex: 1;
         }
     }
+    div[role="group"] {
+        width: 100%;
+    }
 }

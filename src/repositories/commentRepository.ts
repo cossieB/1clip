@@ -45,7 +45,7 @@ export function findCommentsByPostId(postId: number, replyTo?: number, userId?: 
             image: users.image,
             banner: users.banner,
             username: users.username,
-            displayUsername: users.displayName,
+            displayUsername: users.displayUsername,
             dob: users.dob,
             location: users.location
         },
