@@ -1,0 +1,65 @@
+import { useQuery } from "@tanstack/solid-query"
+import { LoaderIcon } from "lucide-solid"
+import { createSignal, onMount, onCleanup, Suspense, Show } from "solid-js"
+import { MenuPopover } from "~/components/Popover/MenuPopover"
+import { UserRank } from "~/components/UserRank"
+import { STORAGE_DOMAIN } from "~/utils/env"
+import { userQueryOpts } from "../utils/userQueryOpts"
+import { FollowBtn } from "./UserPage"
+import styles from "./MiniProfle.module.css"
+
+type Props = {
+    entityId: string | number
+    userId: string
+}
+
+export function UserMiniProfile(props: Props) {
+    let elem!: HTMLDivElement
+    const [enabled, setEnabled] = createSignal(false)
+    const result = useQuery(() => ({
+        ...userQueryOpts(props.userId),
+        enabled: enabled()
+    }))
+    const listener = (event: ToggleEvent) => {
+        if (event.newState == "open") {
+            setEnabled(true)
+        }
+    }
+    onMount(() => {
+        elem.addEventListener("toggle", listener)
+        onCleanup(() => {
+            elem.removeEventListener("toggle", listener)
+        })
+    })
+    return (
+        <MenuPopover
+            id={"post-author-popover" + props.entityId}
+            style={{ "position-anchor": "--postAuthor" + props.entityId, "position-area": "center right" }}
+            ref={elem}
+            //@ts-expect-error
+            popover="hint"
+        >
+            <Suspense
+                fallback={
+                    <section class={`${styles.miniProfile} ${styles.wait}`}>
+                        <LoaderIcon />
+                    </section>
+                }
+            >
+                <section class={styles.miniProfile} style={{ "background-image": `url(${STORAGE_DOMAIN + result.data?.banner})` }}>
+                    <section >
+                        <img src={STORAGE_DOMAIN + result.data?.image} alt="" />
+                        <Show when={result.data}>
+                            {user => <FollowBtn user={user()} />}
+                        </Show>
+
+                    </section>
+                    <section class={styles.rank}>
+                        {result.data?.displayName}
+                        <UserRank userId={props.userId} enabled={enabled()} />
+                    </section>
+                </section>
+            </Suspense>
+        </MenuPopover>
+    )
+}
