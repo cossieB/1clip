@@ -22,6 +22,7 @@
     padding: 0.5rem;
     border-radius: 0 0.5rem;
     corner-shape: bevel;
+    position: relative;
 
     @media (width <=768px) {
         grid-row: span 3;
@@ -46,5 +47,9 @@
         font-size: x-small;
         color: gray;
         margin-left: auto;
+    }
+    a {
+        position: absolute;
+        inset: 0;
     }
 }

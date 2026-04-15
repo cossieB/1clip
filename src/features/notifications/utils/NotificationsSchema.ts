@@ -3,7 +3,7 @@ import z from "zod";
 export const NotificationsSchema = z.object({
     message: z.string(),
     type: z.enum(["LIKE", "REPLY", "FOLLOW"]),
-    postId: z.string(),
+    link: z.string(),
     date: z.iso.datetime()
 })
 

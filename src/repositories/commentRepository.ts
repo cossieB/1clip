@@ -7,6 +7,16 @@ export async function addComment(comment: InferInsertModel<typeof comments>) {
 }
 
 export function findCommentsByPostId(postId: number, replyTo?: number, userId?: string) {
+    const filter = replyTo ? eq(comments.replyTo, replyTo) : isNull(comments.replyTo);
+    return detailedComment([filter], postId, userId)
+}
+
+export async function getById(commentId: number, postId: number, userId?: string) {
+    const result = await detailedComment([eq(comments.commentId, commentId)], postId, userId);
+    return result.at(0)
+}
+
+async function detailedComment(filter: SQL[], postId: number, userId?: string) {
     const reactionQuery = db.$with("rq").as(
         db.select({
             commentId: commentReactions.commentId,
@@ -33,8 +43,6 @@ export function findCommentsByPostId(postId: number, replyTo?: number, userId?: 
             .from(comments)
             .groupBy(comments.replyTo)
     )
-
-    const filter = replyTo ? eq(comments.replyTo, replyTo) : isNull(comments.replyTo);
 
     const query = db.with(reactionQuery, userReactionQuery, repliesQuery).select({
         ...getColumns(comments),
@@ -64,14 +72,14 @@ export function findCommentsByPostId(postId: number, replyTo?: number, userId?: 
         .leftJoin(repliesQuery, eq(comments.commentId, repliesQuery.commentId))
         .where(and(
             eq(comments.postId, postId),
-            filter
+            ...filter
         ))
         .orderBy(desc(comments.createdAt))
 
-        if (userId)
-            query.leftJoin(userReactionQuery, eq(userReactionQuery.commentId, comments.commentId))
+    if (userId)
+        query.leftJoin(userReactionQuery, eq(userReactionQuery.commentId, comments.commentId))
 
-        return query
+    return query
 }
 
 export async function deleteComment(commentId: number, userId: string) {
@@ -79,7 +87,7 @@ export async function deleteComment(commentId: number, userId: string) {
         eq(comments.commentId, commentId),
         eq(comments.userId, userId)
     ))
-    .returning({commentId: comments.commentId})
+        .returning({ commentId: comments.commentId })
 }
 
 export async function reactToComment(commentId: number, userId: string, reaction: "like" | "dislike") {
@@ -94,5 +102,5 @@ export async function reactToComment(commentId: number, userId: string, reaction
         WHERE NOT EXISTS (
             SELECT 1 FROM deleted WHERE reaction = ${reaction}
         );
-    `)        
+    `)
 }

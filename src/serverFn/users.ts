@@ -81,7 +81,7 @@ export const followUserFn = createServerFn({ method: "POST" })
             notificationsService.addNotification(data, {
                 date: new Date().toISOString(),
                 message: `You have a new follower! ${user.displayUsername} has followed you.`,
-                postId: "",
+                link: "/users/" + user.username,
                 type: "FOLLOW"
             })
         return success

@@ -4,21 +4,15 @@ import { CommentBlock } from "./CommentBlock";
 import { commentListQueryOpts } from "../utils/commentListQueryOpts";
 
 type Props = {
-    originalPost: {
-        postId: number;
-        authorId: string
-    }
-    originalComment?: {
-        commentId: number,
-        authorId: string
-    }
+    originalPost: number
+    originalComment?: number
     enabled?: boolean;
 };
 
 export function CommentList(props: Props) {
     const result = useQuery(() => commentListQueryOpts({
-        postId: props.originalPost.postId,
-        replyTo: props.originalComment?.commentId
+        postId: props.originalPost,
+        replyTo: props.originalComment
     },
         props.enabled))
 
@@ -30,7 +24,7 @@ export function CommentList(props: Props) {
                         <CommentBlock
                             comment={comment}
                             originalPost={props.originalPost}
-                            replyTo={props.originalComment?.commentId}
+                            replyTo={props.originalComment}
                         />}
                 </For>
             </div>

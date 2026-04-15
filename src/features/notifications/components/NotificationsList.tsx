@@ -6,6 +6,7 @@ import { getRelativeTime } from "~/lib/getRelativeTime";
 import styles from "./Notifications.module.css"
 import { useLocalStorage } from "~/hooks/useLocalStorage";
 import { NotificationsSchema, UserNotification } from "../utils/NotificationsSchema";
+import { Link } from "@tanstack/solid-router";
 
 export function NotificationsList() {
     const { notifications } = useNotificationContext()
@@ -38,6 +39,7 @@ function Notif(props: { notification: UserNotification }) {
             <span>
                 {getRelativeTime(new Date(props.notification.date))}
             </span>
+            <Link to={props.notification.link} />
         </div>
     )
 }

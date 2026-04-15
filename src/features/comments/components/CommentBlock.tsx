@@ -16,19 +16,16 @@ import { PostAuthor } from "~/features/posts/components/PostAuthor";
 
 type Props = {
     comment: Awaited<ReturnType<typeof getCommentsByPostIdFn>>[number];
-    originalPost: {
-        postId: number;
-        authorId: string
-    }
+    originalPost: number
     replyTo?: number
 };
 
 export function CommentBlock(props: Props) {
 
-    const { fn, isPending } = useReactToComment(props.comment, props.originalPost.postId);
-    const { setCommentState, commentState, replyMutation } = useReplyToComment(props.comment, props.originalPost.postId)
+    const { fn, isPending } = useReactToComment(props.comment, props.originalPost);
+    const { setCommentState, commentState, replyMutation } = useReplyToComment(props.comment, props.originalPost)
     const session = authClient.useSession()
-    const { deleteMutation } = useDeleteComment(props.comment, props.originalPost.postId, props.replyTo)
+    const { deleteMutation } = useDeleteComment(props.comment, props.originalPost, props.replyTo)
 
     return (
         <div
@@ -79,10 +76,8 @@ export function CommentBlock(props: Props) {
                             data: {
                                 originalPost: props.originalPost,
                                 text: commentState.comment,
-                                replyTo: {
-                                    authorId: props.comment.userId,
-                                    commentId: props.comment.commentId
-                                }
+                                replyTo: props.comment.commentId,
+                                notifyee: props.comment.userId,                                
                             }
                         })
                     }}
@@ -96,10 +91,7 @@ export function CommentBlock(props: Props) {
             <div class={styles.replies}>
                 <CommentList
                     originalPost={props.originalPost}
-                    originalComment={{
-                        authorId: props.comment.userId,
-                        commentId: props.comment.commentId
-                    }}
+                    originalComment={props.comment.commentId}
                     enabled={commentState.showReplies}
                 />
             </div>
