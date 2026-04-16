@@ -41,9 +41,9 @@ export function UserMiniProfile(props: Props) {
         >
             <Suspense
                 fallback={
-                    <section class={`${styles.miniProfile} ${styles.wait}`}>
+                    <div class={`${styles.miniProfile} ${styles.wait}`} >
                         <LoaderIcon />
-                    </section>
+                    </div>
                 }
             >
                 <section class={styles.miniProfile} style={{ "background-image": `url(${STORAGE_DOMAIN + result.data?.banner})` }}>
