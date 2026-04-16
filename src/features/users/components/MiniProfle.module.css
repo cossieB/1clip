@@ -6,15 +6,6 @@
     background-color: rgba(0,0,0,0.65);
     background-blend-mode: darken;
 
-    &.wait {
-        height: 10rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        svg {
-            animation: spin infinite 2s linear;
-        }
-    }
     >section:first-of-type {
         display: flex;
         justify-content: space-between;
@@ -41,6 +32,15 @@
 
         span {
             color: var(--neon-green);
+        }
+    }
+    .wait {
+        height: 10rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        svg {
+            animation: spin infinite 2s linear;
         }
     }
 }

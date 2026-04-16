@@ -80,6 +80,7 @@ export function FollowBtn(props: Props) {
         <Show when={session().data && session().data!.user.id != props.user.id}>
             <div class={styles.follow}>
                 <button
+                    class={styles.button}
                     onclick={() => followUser.mutate()}
                     disabled={followUser.isPending}
                 >

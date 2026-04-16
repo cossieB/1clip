@@ -15,6 +15,7 @@ type Props = {
 
 export function UserMiniProfile(props: Props) {
     let elem!: HTMLDivElement
+    let el!: HTMLElement
     const [enabled, setEnabled] = createSignal(false)
     const result = useQuery(() => ({
         ...userQueryOpts(props.userId),
@@ -32,6 +33,12 @@ export function UserMiniProfile(props: Props) {
         })
     })
 
+    createEffect(() => {
+        if (result.data) {
+            el.style.backgroundImage = `url(${STORAGE_DOMAIN + result.data.banner})`
+        }
+    })
+
     return (
         <MenuPopover
             id={"post-author-popover" + props.entityId}
@@ -40,10 +47,10 @@ export function UserMiniProfile(props: Props) {
             //@ts-expect-error
             popover="hint"
         >
-            <section class={styles.miniProfile} style={{ "background-image": `url(${STORAGE_DOMAIN + result.data?.banner})` }}>
+            <section ref={el} class={styles.miniProfile}>
                 <Suspense
                     fallback={
-                        <div class={`${styles.miniProfile} ${styles.wait}`} >
+                        <div class={`${styles.wait}`} >
                             <LoaderIcon />
                         </div>
                     }
