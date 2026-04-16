@@ -33,12 +33,6 @@ export function UserMiniProfile(props: Props) {
         })
     })
 
-    createEffect(() => {
-        if (result.data) {
-            el.style.backgroundImage = `url(${STORAGE_DOMAIN + result.data.banner})`
-        }
-    })
-
     return (
         <MenuPopover
             id={"post-author-popover" + props.entityId}
@@ -66,6 +60,8 @@ export function UserMiniProfile(props: Props) {
                         {result.data?.displayName}
                         <UserRank userId={props.userId} enabled={enabled()} />
                     </section>
+                    <img class={styles.bg} src={STORAGE_DOMAIN + result.data?.banner} alt="" />
+                    <div class={styles.shade} />
                 </Suspense>
             </section>
         </MenuPopover>

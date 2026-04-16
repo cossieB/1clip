@@ -18,7 +18,6 @@ export function PostAuthor(props: Props) {
         <>
             <div
                 class={props.class}
-                id={"postAuthor"}
                 onMouseEnter={(e) => {
                     window.clearTimeout(timerId)
                     e.preventDefault()
