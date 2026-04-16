@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/solid-query"
 import { LoaderIcon } from "lucide-solid"
-import { createSignal, onMount, onCleanup, Suspense, Show } from "solid-js"
+import { createSignal, onMount, onCleanup, Suspense, Show, createEffect } from "solid-js"
 import { MenuPopover } from "~/components/Popover/MenuPopover"
 import { UserRank } from "~/components/UserRank"
 import { STORAGE_DOMAIN } from "~/utils/env"
@@ -31,6 +31,7 @@ export function UserMiniProfile(props: Props) {
             elem.removeEventListener("toggle", listener)
         })
     })
+
     return (
         <MenuPopover
             id={"post-author-popover" + props.entityId}
@@ -39,14 +40,14 @@ export function UserMiniProfile(props: Props) {
             //@ts-expect-error
             popover="hint"
         >
-            <Suspense
-                fallback={
-                    <div class={`${styles.miniProfile} ${styles.wait}`} >
-                        <LoaderIcon />
-                    </div>
-                }
-            >
-                <section class={styles.miniProfile} style={{ "background-image": `url(${STORAGE_DOMAIN + result.data?.banner})` }}>
+            <section class={styles.miniProfile} style={{ "background-image": `url(${STORAGE_DOMAIN + result.data?.banner})` }}>
+                <Suspense
+                    fallback={
+                        <div class={`${styles.miniProfile} ${styles.wait}`} >
+                            <LoaderIcon />
+                        </div>
+                    }
+                >
                     <section >
                         <img src={STORAGE_DOMAIN + result.data?.image} alt="" />
                         <Show when={result.data}>
@@ -58,8 +59,8 @@ export function UserMiniProfile(props: Props) {
                         {result.data?.displayName}
                         <UserRank userId={props.userId} enabled={enabled()} />
                     </section>
-                </section>
-            </Suspense>
+                </Suspense>
+            </section>
         </MenuPopover>
     )
 }
