@@ -4,11 +4,12 @@ import { HeroHeader } from "~/components/Hero/HeroHeader";
 import { formatDate } from "~/lib/formatDate";
 import { type getUserByUsernameFn } from "~/serverFn/users";
 import { SITE_URL, STORAGE_DOMAIN } from "~/utils/env";
-import { Link } from "@tanstack/solid-router";
+import { ClientOnly, Link } from "@tanstack/solid-router";
 import { validateUrl } from "~/lib/validateUrl";
 import styles from "./UserPage.module.css"
 import { useFollowUser } from "../hooks/useFollowUser";
 import { authClient } from "~/auth/authClient";
+import { UserRank } from "~/components/UserRank";
 
 type Props = {
     user: NonNullable<Awaited<ReturnType<typeof getUserByUsernameFn>>>
@@ -69,12 +70,17 @@ export function UserPage(props: Props) {
                     </ul>
                 </div>
             </div>
+            <div class={styles.rank}>
+                <ClientOnly>
+                    <UserRank userId={props.user.id} />
+                </ClientOnly>
+            </div>
         </div>
     )
 }
 
 export function FollowBtn(props: Props) {
-    const followUser = useFollowUser(props.user)    
+    const followUser = useFollowUser(props.user)
     const session = authClient.useSession()
     return (
         <Show when={session().data && session().data!.user.id != props.user.id}>
