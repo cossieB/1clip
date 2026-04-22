@@ -3,9 +3,6 @@
     > div {
         flex: 1;
     }
-    > div:nth-child(2) {
-        flex: 2;
-    }
     @media (width < 1024px) {
         flex-direction: column;
     }
@@ -38,22 +35,5 @@
         align-items: center;
         justify-content: center;
         background-color: var(--neon-pink);
-    }
-}
-
-.rank {
-    position: absolute;
-    top: 2.5rem;
-    right: 1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    img {
-        height: 5rem;
-        box-shadow: 0 0 10px black;
-    }
-    span {
-        color: var(--neon-green);
-        font-size: small;
     }
 }
