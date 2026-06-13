@@ -1,9 +1,9 @@
-import { SolidQueryOptions, useQuery } from "@tanstack/solid-query"
+import { QueryOptions, useQuery } from "@tanstack/solid-query"
 import { FormSelect } from "./Select"
 import { createEffect, Suspense } from "solid-js"
 
 type Props<T, V extends string | number> = {
-    queryOptions: SolidQueryOptions<T[] | undefined> & {initialData: undefined}
+    queryOptions: QueryOptions<T[] | undefined> & {initialData: undefined}
     getValue: (item: T) => V
     getLabel: (item: T) => string
     field: string 

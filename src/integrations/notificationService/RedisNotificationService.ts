@@ -1,10 +1,11 @@
 import { redis } from "~/utils/redis";
 import type { NotificationService } from "./notificationService.interface";
 import { UserNotification } from "~/features/notifications/utils/NotificationsSchema";
-import { DisconnectsClientError } from "redis";
+import { DisconnectsClientError, RedisDefaultModules } from "redis";
+import { RedisClientType } from "@redis/client";
 
 export class RedisNotificationService implements NotificationService {
-    private consumer: ReturnType<typeof redis.duplicate> | null = null
+    private consumer: RedisClientType<RedisDefaultModules, {}, {}, 3, {}> | null = null;
 
     setup = async (userId: string) => {
         try {

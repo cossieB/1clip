@@ -1,9 +1,9 @@
 import { createEffect, createResource, For, Suspense } from "solid-js"
-import { SolidQueryOptions, useQuery } from "@tanstack/solid-query"
+import { QueryOptions, useQuery } from "@tanstack/solid-query"
 import { getPlatformsFn } from "~/serverFn/platforms"
 
 type Props<T, V extends string | number> = {
-    queryOptions: SolidQueryOptions<T[] | undefined> & { initialData: undefined }
+    queryOptions: QueryOptions<T[] | undefined> & { initialData: undefined }
     getLabel: (item: T) => string
     getValue: (item: T) => V
     setter: (values: T[]) => void
