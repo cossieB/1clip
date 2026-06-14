@@ -10,8 +10,8 @@ export function findById(actorId: number) {
     })
 }
 
-export async function findAll() {
-    return db.query.actors.findMany()
+export async function findAll(filters?: {limit?: number, offset?: number}) {
+    return db.query.actors.findMany(filters)
 }
 
 type Char = {
@@ -23,7 +23,7 @@ type Char = {
 
 export function createActor(actor: InferInsertModel<typeof actors>, characters: Omit<Char, 'appearanceId'>[]) {
     return db.transaction(async tx => {
-        const a = (await tx.insert(actors).values(actor).returning())[0]
+        const [a] = await tx.insert(actors).values(actor).returning()
         if (characters.length > 0)
             await tx.insert(gameActors).values(characters.map(char => ({ ...char, actorId: a.actorId })))
         return a
@@ -33,7 +33,7 @@ export function createActor(actor: InferInsertModel<typeof actors>, characters: 
 export async function editActor(actorId: number, actor: Partial<InferSelectModel<typeof actors>>, characters?: Char[]) {
     if (!characters) return db.update(actors).set(actor).where(eq(actors.actorId, actorId))
 
-    db.transaction(async tx => {
+    await db.transaction(async tx => {
         await tx.update(actors).set(actor).where(eq(actors.actorId, actorId))
         if (characters.length == 0)
             await tx.delete(gameActors).where(eq(gameActors.actorId, actorId))

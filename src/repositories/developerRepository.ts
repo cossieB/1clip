@@ -2,7 +2,7 @@ import { eq, InferInsertModel, InferSelectModel } from "drizzle-orm";
 import { db } from "~/drizzle/db";
 import { developers } from "~/drizzle/schema";
 
-export async function findAll(filters?: { limit: number, offset: number }) {
+export async function findAll(filters?: { limit?: number, offset?: number }) {
     return await db.query.developers.findMany({
         orderBy: {
             name: "asc"

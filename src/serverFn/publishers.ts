@@ -1,14 +1,16 @@
 import { notFound } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start";
-import z from "zod";
 import { adminOnlyMiddleware } from "~/middleware/authorization";
 import { staticDataMiddleware } from "~/middleware/static";
 import * as publisherRepository from "~/repositories/publisherRepository"
+import { LimitOffsetSchema } from "~/zod/common";
+import { publisherCreateSchema, publisherEditSchema } from "~/zod/publishers";
 
 export const getPublishersFn = createServerFn()
     .middleware([staticDataMiddleware])
-    .handler(async () => {        
-        const pubs = await publisherRepository.findAll()
+    .inputValidator(LimitOffsetSchema)
+    .handler(async ({data}) => {        
+        const pubs = await publisherRepository.findAll(data)
         return pubs
     })
 
@@ -24,17 +26,6 @@ export const getPublisherFn = createServerFn()
         return dev
     })
 
-const publisherCreateSchema = z.object({
-        name: z.string(),
-        logo: z.string(),
-        summary: z.string().default(""),
-        headquarters: z.string().nullish(),
-        country: z.string().nullish()
-    })
-
-const publisherEditSchema = publisherCreateSchema.partial().extend({
-    publisherId: z.number()
-})    
 
 export const createPublisherFn = createServerFn({method: "POST"}) 
     .middleware([adminOnlyMiddleware])

@@ -5,18 +5,11 @@ import { adminOnlyMiddleware } from "~/middleware/authorization";
 import { staticDataMiddleware } from "~/middleware/static";
 import * as gamesRepository from "~/repositories/gamesRepository";
 import { cacheAside } from "~/utils/cacheAside";
+import { GameCreateSchema, GameEditSchema, GetGamesSchema } from "~/zod/games";
 
 export const getGamesFn = createServerFn()
     .middleware([staticDataMiddleware])
-    .inputValidator(z.object({
-        developerId: z.number(),
-        publisherId: z.number(),
-        actorId: z.number(),
-        platformId: z.number(),
-        genre: z.string(),
-        limit: z.number(),
-        cursor: z.number()
-    }).partial().optional())
+    .inputValidator(GetGamesSchema)
 
     .handler(async ({ data }) => {
         const games = await gamesRepository.findGamesWithDetails(data);
@@ -35,25 +28,7 @@ export const getGameFn = createServerFn()
         return game
     })
 
-const GameCreateSchema = z.object({
-    title: z.string(),
-    developerId: z.number(),
-    publisherId: z.number(),
-    banner: z.string(),
-    cover: z.string(),
-    summary: z.string().optional(),
-    releaseDate: z.iso.date(),
-    trailer: z.string().nullish(),
-    media: z.array(z.object({
-        key: z.string(),
-        contentType: z.string(),
-        metadata: z.record(z.string(), z.string()).optional()
-    })),
-    platforms: z.number().array(),
-    genres: z.string().array()
-})
 
-const GameEditSchema = GameCreateSchema.partial().extend({ gameId: z.number() })
 
 export const createGameFn = createServerFn({ method: "POST" })
     .middleware([adminOnlyMiddleware])
@@ -66,7 +41,7 @@ export const createGameFn = createServerFn({ method: "POST" })
 export const updateGameFn = createServerFn({ method: "POST" })
     .middleware([adminOnlyMiddleware])
     .inputValidator(GameEditSchema)
-    .handler(async ({ data }) => {        
+    .handler(async ({ data }) => {
         const { gameId, media, platforms, genres, ...game } = data
         await gamesRepository.updateGame(gameId, game, { platforms, media, genres })
     })
@@ -84,6 +59,6 @@ export const searchGamesFn = createServerFn()
 export const getSimilarGames = createServerFn()
     .inputValidator(z.number().positive())
     .middleware([staticDataMiddleware])
-    .handler(async ({data}) => {
-        return await cacheAside(`similar:${data}`, () => gamesRepository.similarGames(data), 604800);        
+    .handler(async ({ data }) => {
+        return await cacheAside(`similar:${data}`, () => gamesRepository.similarGames(data), 604800);
     })

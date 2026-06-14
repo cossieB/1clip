@@ -2,11 +2,12 @@ import { eq, InferInsertModel, InferSelectModel } from "drizzle-orm";
 import { db } from "~/drizzle/db";
 import { platforms } from "~/drizzle/schema";
 
-export function findAll() {
+export function findAll(filters?: {limit?: number, offset?: number}) {
     return db.query.platforms.findMany({
         orderBy: {
             releaseDate: 'desc'
-        }
+        },
+        ...filters
     })
 }
 

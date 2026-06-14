@@ -5,7 +5,7 @@ import { type GameQueryFilters } from "~/repositories/gamesRepository"
 import { createEffect, onMount } from "solid-js"
 
 
-export function GamesList(props: { filters: GameQueryFilters }) {
+export function GamesList(props: { filters?: GameQueryFilters }) {
     const result = useGamesQuery(props.filters)
     let observer: IntersectionObserver
     let lastItem: HTMLDivElement | undefined

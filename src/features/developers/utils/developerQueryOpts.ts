@@ -8,9 +8,9 @@ export function developerQueryOpts(developerId: number) {
     })
 }
 
-export function developersQueryOpts() {
+export function developersQueryOpts(limit = 50, offset = 0) {
     return queryOptions({
         queryKey: ["developers"],
-        queryFn: () => getDevelopersFn()
+        queryFn: () => getDevelopersFn({data: {limit, offset}})
     })
 }

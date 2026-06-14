@@ -8,10 +8,10 @@ export function actorQueryOpts(actorId: number) {
     })
 }
 
-export function actorsQueryOpts() {
+export function actorsQueryOpts(limit = 50, offset = 0) {
     return queryOptions({
         queryKey: ["actors"],
-        queryFn: () => getActorsFn()
+        queryFn: () => getActorsFn({data: {limit, offset}})
     })
 }
 

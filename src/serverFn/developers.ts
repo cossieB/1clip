@@ -1,14 +1,16 @@
 import { notFound } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start";
-import z from "zod";
 import { adminOnlyMiddleware } from "~/middleware/authorization";
 import { staticDataMiddleware } from "~/middleware/static";
 import * as developerRepository from "~/repositories/developerRepository"
+import { LimitOffsetSchema } from "~/zod/common";
+import { developerCreateSchema, developerEditSchema } from "~/zod/developers";
 
 export const getDevelopersFn = createServerFn()
     .middleware([staticDataMiddleware])
-    .handler(async () => {        
-        const devs = await developerRepository.findAll()
+    .inputValidator(LimitOffsetSchema)
+    .handler(async ({data}) => {        
+        const devs = await developerRepository.findAll(data)
         return devs
     })
 
@@ -23,18 +25,6 @@ export const getDeveloperFn = createServerFn()
         if (!dev) throw notFound()
         return dev
     })
-
-const developerCreateSchema = z.object({
-        name: z.string(),
-        logo: z.string(),
-        summary: z.string().default(""),
-        location: z.string().nullish(),
-        country: z.string().nullish()
-    })
-
-const developerEditSchema = developerCreateSchema.partial().extend({
-    developerId: z.number()
-})
 
 export const createDeveloperFn = createServerFn({method: "POST"}) 
     .middleware([adminOnlyMiddleware])

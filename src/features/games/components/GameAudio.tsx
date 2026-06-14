@@ -11,15 +11,15 @@ type Props = {
 export function GameAudio(props: Props) {
     const song = () => props.media.find(m => m.contentType.startsWith("audio"))
     let audioRef!: HTMLAudioElement | undefined
-    let div!: HTMLDivElement
+    let div: HTMLDivElement | undefined
     const [volume, setVolume] = createSignal(0.25)
     const [isPlaying, setIsPlaying] = createSignal(false)
 
     function handleScroll(e: Event) {
         if (window.scrollY > 200)
-            div.classList.add(styles.tiny)
+            div?.classList.add(styles.tiny)
         else
-            div.classList.remove(styles.tiny)
+            div?.classList.remove(styles.tiny)
     }
 
     onMount(() => {
