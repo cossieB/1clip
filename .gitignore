@@ -1,21 +1,29 @@
-node_modules
-yarn.lock
-
-.DS_Store
-.cache
-.env
-.env.test
-.env.local
-.vercel
+dist
+.wrangler
 .output
-/build/
-/api/
-/server/build
-/public/build# Sentry Config File
-.env.sentry-build-plugin
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
-src/routeTree.gen.ts
-.tanstack
+.vercel
+.netlify
+.vinxi
+app.config.timestamp_*.js
+
+# Environment
+.env
+.env*.local
+.env.test
+
+# dependencies
+/node_modules
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+*.launch
+.settings/
+
+# Temp
+gitignore
+
+# System Files
+.DS_Store
+Thumbs.db

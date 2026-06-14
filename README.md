@@ -1,24 +1,32 @@
-# 1Clip.
+# SolidStart
 
-Level up your creativity!
-Show off your best gaming moments, epic screenshots, hilarious clips, jaw-dropping fanart, and immersive fanfic — all in one place. Whether you’re here to flex your skills, share your stories, or just vibe with fellow gamers, this is your arena. Upload, explore, and connect with a community that celebrates every pixel and every word.
+Everything you need to build a Solid project, powered by [`solid-start`](https://start.solidjs.com);
 
-## Stack
-- Typescript
-- Node JS
-- [Tanstack Start](https://tanstack.com/start/latest)
-- [SolidJS](https://www.solidjs.com/)
-- [Tanstack Query](https://tanstack.com/query/latest)
-- PostgreSQL 18 via [Neon](https://neon.com/)
-- Redis
-- [Drizzle ORM](https://orm.drizzle.team/)
-- [Cloudflare R2](https://developers.cloudflare.com/r2/)
-- [Nodemailer](https://nodemailer.com/)
-- [Railway](https://railway.com/)
+## Creating a project
 
-### Auth
-[Better Auth](https://www.better-auth.com/) is used to handle authentication and Nodemailer to send confirmation emails. Users can change usernames, emails, passwords, reset passwords and delete their entire account. 
+```bash
+# create a new project in the current directory
+npm init solid@latest
 
-### Techniques
-Intersection Observer and Tanstack Query to implement infinite scrolling, combined with keyset database pagination to provide a seamless blazing fast user experience.
-Redis Streams and server-sent event to deliver realtime notifications to the user.
+# create a new project in my-app
+npm init solid@latest my-app
+```
+
+## Developing
+
+Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+
+```bash
+npm run dev
+
+# or start the server and open the app in a new browser tab
+npm run dev -- --open
+```
+
+## Building
+
+Solid apps are built with _presets_, which optimise your project for deployment to different environments.
+
+By default, `npm run build` will generate a Node app that you can run with `npm start`. To use a different preset, add it to the `devDependencies` in `package.json` and specify in your `app.config.js`.
+
+## This project was created with the [Solid CLI](https://github.com/solidjs-community/solid-cli)

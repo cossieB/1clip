@@ -1,18 +1,14 @@
-import { tanstackStart } from '@tanstack/solid-start/plugin/vite'
-import { defineConfig } from 'vite'
-import viteSolid from 'vite-plugin-solid'
-import {nitro} from "nitro/vite"
+import { defineConfig } from "vite";
+import { nitroV2Plugin as nitro } from "@solidjs/vite-plugin-nitro-2";
 
-export default defineConfig(({command}) => ({
+import { solidStart } from "@solidjs/start/config";
+
+export default defineConfig({
   server: {
-    port: 1337,
+    port: 1337
   },
   plugins: [
-    command === "build" ? nitro() : null,
-    tanstackStart(),
-    viteSolid({ ssr: true }),
-  ].filter(Boolean),
-  resolve: {
-    tsconfigPaths: true
-  }
-}))
+    solidStart(),
+    nitro()
+  ]
+});
