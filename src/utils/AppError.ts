@@ -1,4 +1,4 @@
-import { setResponseStatus } from "@tanstack/solid-start/server";
+import { setResponseStatus } from "@solidjs/start/http";
 import { HttpStatusCode } from "./statusCodes";
 
 export class AppError extends Error {

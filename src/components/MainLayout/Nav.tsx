@@ -4,10 +4,12 @@ import { authClient } from "~/auth/authClient";
 import { NavItem } from "./NavItem";
 import styles from "./MainLayout.module.css"
 import clickOutside from "~/lib/clickOutside";
-import { ClientOnly } from "@tanstack/solid-router";
-import { NavNotifications } from "./NavNotifications";
 import { NavUserComponent } from "./NavUserComponent";
+import { clientOnly } from "@solidjs/start";
+
 false && clickOutside
+
+const NavNotifications = clientOnly(() => import("./NavNotifications"))
 
 export function Nav(props: { setOpen: Setter<boolean> }) {
     const session = authClient.useSession()
@@ -28,41 +30,39 @@ export function Nav(props: { setOpen: Setter<boolean> }) {
             </div>
             <ul>
                 <NavItem
-                    to="/"
+                    href="/"
                     label="Home"
                     icon={<HouseIcon />}
                 />
                 <NavItem
-                    to="/games"
+                    href="/games"
                     label="Games"
                     icon={<Dice5Icon />}
                 />
                 <NavItem
-                    to="/developers"
+                    href="/developers"
                     label="Developers"
                     icon={<CodeIcon />}
                 />
                 <NavItem
-                    to="/publishers"
+                    href="/publishers"
                     label="Publishers"
                     icon={<BriefcaseBusiness />}
                 />
                 <NavItem
-                    to="/search/posts"
+                    href="/search/posts"
                     label="Search"
                     icon={<Search />}
                 />
                 <Show when={session().data?.user}>
                     <>
                         <NavItem
-                            to="/posts/create"
+                            href="/posts/create"
                             icon={<CirclePlus />}
                             label="Create"
                             style={{ color: "var(--neon-pink)" }}
                         />
-                        <ClientOnly>
                             <NavNotifications />
-                        </ClientOnly>
                     </>
                 </Show>
                 <NavUserComponent />

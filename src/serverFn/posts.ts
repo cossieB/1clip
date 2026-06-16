@@ -1,0 +1,99 @@
+import { notFound } from "@tanstack/solid-router";
+import { createServerFn } from "@tanstack/solid-start";
+import z from "zod";
+import { verifiedOnlyMiddleware } from "~/middleware/authorization";
+import * as postRepository from "~/repositories/postRepository"
+import { getCurrentUser } from "./auth";
+import { AppError } from "~/utils/AppError";
+import { variables } from "~/utils/variables";
+import { rateLimiter } from "~/utils/rateLimiter";
+import { HttpStatusCode } from "~/utils/statusCodes";
+import { getRequestIP } from "@tanstack/solid-start/server";
+import { redis } from "~/utils/redis";
+import { parseVideoUrl } from "~/components/embeds/IframeFactory";
+import { notificationsService } from "~/integrations/notificationService";
+
+export const createPostFn = createServerFn({ method: "POST" })
+    .middleware([verifiedOnlyMiddleware])
+    .inputValidator()
+    .handler(async ({ data, context: { user } }) => {
+        await rateLimiter("post:create", user.id, 5, 60);
+
+        if ((data.text.length + data.media.length === 0) && !data.link)
+            throw new AppError("Empty post", HttpStatusCode.BAD_REQUEST)
+        
+        if (data.media.length > 0)
+            delete data.link
+        
+        if (data.link && !parseVideoUrl(new URL(data.link))) 
+            throw new AppError("Unsupported link", HttpStatusCode.BAD_REQUEST)
+        const post = await postRepository.createPost({ ...data, userId: user.id, })
+        return { ...post, user }
+    })
+
+export const getPostFn = createServerFn()
+    .inputValidator((postId: number) => {
+        if (postId < 1) throw notFound()
+        return postId
+    })
+    .handler(async ({ data }) => {
+        const user = await getCurrentUser()
+        const post = await postRepository.findById(data, user?.id)
+        if (!post) throw notFound()
+        return post
+    })
+
+export const getPostsFn = createServerFn()
+    .inputValidator()
+    .handler(async ({ data }) => {
+        const user = await getCurrentUser();
+        return postRepository.findAll(data, user?.id)
+    })
+
+export const reactToPostFn = createServerFn({ method: "POST" })
+    .middleware([verifiedOnlyMiddleware])
+    .inputValidator()
+    .handler(async ({ data, context: { user } }) => {
+        await rateLimiter("post:react", user.id, 10, 60)
+        const res = await postRepository.reactToPost(data.postId, user.id, data.reaction)
+
+        if (user.id != data.authorId && res.rows.at(0)?.reaction === "like" ) {
+            void notificationsService.addNotification(data.authorId, {
+                message: `${user.name} liked your post`,
+                type: "LIKE",
+                link: "/posts/" + data.postId,
+                date: new Date().toISOString()
+            })
+        }
+    })
+
+export const deletePostFn = createServerFn({ method: "POST" })
+    .middleware([verifiedOnlyMiddleware])
+    .inputValidator(z.object({
+        postId: z.number()
+    }))
+    .handler(async ({ data, context: { user } }) => {
+        await rateLimiter("post:delete", user.id, 5, 60)
+        const result = await postRepository.deletePost(data.postId, user.id);
+        if (result.length == 0) throw new AppError("Failed to delete", HttpStatusCode.INTERNAL_SERVER_ERROR)
+    })
+
+export const viewPostFn = createServerFn({ method: "POST" })
+    .inputValidator(z.array(z.number()))
+    .handler(async ({ data }) => {
+        if (data.length == 0) return
+        const ip = getRequestIP();
+        const user = await getCurrentUser()
+        if (!ip) return
+        // Only count a view if user hasn't viewed the post within the past day
+        const cached = await redis.mGet(data.map(postId => `view:${postId}:${ip}`))
+        const postIds = data.filter((_, i) => cached[i] === null)
+        await postRepository.viewPosts(postIds);
+        await Promise.all(postIds.map(postId => redis.setEx(`view:${postId}:${ip}`, 86400, user?.id ?? "Anon")))
+    })
+
+export const searchPostsFn = createServerFn()
+    .inputValidator(z.string())
+    .handler(async ({ data }) => {
+        return postRepository.searchPosts(data)
+    })

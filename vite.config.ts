@@ -8,7 +8,9 @@ export default defineConfig({
     port: 1337
   },
   plugins: [
-    solidStart(),
+    solidStart({
+      middleware: "src/middleware/index.ts"
+    }),
     nitro()
   ]
 });

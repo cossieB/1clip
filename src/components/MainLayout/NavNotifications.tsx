@@ -6,7 +6,7 @@ import { useLocalStorage } from "~/hooks/useLocalStorage"
 import { NavItem } from "./NavItem"
 import styles from "./MainLayout.module.css"
 
-export function NavNotifications() {
+export default function NavNotifications() {
     const { notifications, setNotifications } = useNotificationContext()
     const stream = new EventSource("/api/notifications")
     const {getItem, setItem} = useLocalStorage("notifications", NotificationsSchema.array())
@@ -20,7 +20,7 @@ export function NavNotifications() {
     return (
         <div class={styles.notifs}>
             <NavItem
-                to="/notifications"
+                href="/notifications"
                 icon={<BellIcon />}
                 label="Notifications"
             />

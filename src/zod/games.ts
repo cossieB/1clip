@@ -27,8 +27,8 @@ export const GetGamesSchema = z.object({
     platformId: z.number(),
     genre: z.string(),
     cursor: z.number()
-}).partial()
+})
+    .partial()
     .extend({
         limit: z.number().default(50)
     })
-    .optional()

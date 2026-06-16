@@ -12,14 +12,14 @@ export function NavUserComponent() {
             when={session().data?.user}
             fallback={
                 <NavItem
-                    to="/auth/signin"
+                    href="/auth/signin"
                     icon={<LockOpenIcon />}
                     label="Login"
                 />
             }>
             {user =>
                 <NavItem
-                    to="/settings/profile"
+                    href="/settings/profile"
                     icon={<img src={STORAGE_DOMAIN + user().image} />}
                     label={user().displayUsername!}
                 />
