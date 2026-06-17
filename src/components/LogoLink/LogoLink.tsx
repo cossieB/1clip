@@ -22,13 +22,13 @@ const map = {
 
 export function LogoLink(props: P) {
     const icon = map[props.href]
-    const param = props.href+"Id" as `${P['href']}Id`
+
     return (
         <div class={`${props.className} ${styles.logo} cutout`} title={`${titleCase(props.href)}: ${props.item.name}`}>
             <Dynamic component={icon} />
-            <img style={{"view-transition-name": `${param}${props.item.id}`}} src={props.item.logo} alt="" />   
+            <img style={{"view-transition-name": `${props.href}${props.item.id}`}} src={props.item.logo} alt="" />   
             
-            <A href={`/${props.href}s/${param}`} />         
+            <A href={`/${props.href}s/${props.item.id}`} />         
         </div>
     )
 }
