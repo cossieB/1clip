@@ -1,24 +1,21 @@
-import { Link, type LinkComponentProps } from "@tanstack/solid-router"
 import styles from "./PhotoCardLink.module.css"
 import type { Require } from "~/lib/utilityTypes"
-import { For, Suspense } from "solid-js"
+import { ComponentProps, For, Suspense } from "solid-js"
+import { A } from "@solidjs/router"
 
 type Props = {
     label: string
     picture: string
     sublabel?: string
-} & Require<LinkComponentProps, 'to' | 'params'>
+} & ComponentProps<typeof A>
 
 export function PhotoCardLink(props: Props) {
-    const key = Object.keys(props.params)[0];
-    // @ts-expect-error
-    const value = props.params[key];
 
     return (
         <div data-type="card" class={styles.card} >
             <div class={`${styles.imgWrapper} cutout`}>
                 <img
-                    style={{ "view-transition-name": key + value }}
+                    // style={{ "view-transition-name": key + value }}
                     src={props.picture}
                     loading="lazy"
                     alt=""
@@ -28,7 +25,7 @@ export function PhotoCardLink(props: Props) {
                 {props.label}
                 <span>{props.sublabel}</span>
             </label>
-            <Link viewTransition class={styles.a} to={props.to} params={props.params} />
+            <A class={styles.a} href={props.href}  />
         </div>
     )
 }
@@ -37,9 +34,9 @@ type P<T> = {
     arr: T[]
     getLabel: (item: T) => string
     getPic: (item: T) => string
-    getParam: (item: T) => NonNullable<LinkComponentProps['params']>
     getSublabel?: (item: T) => string
-} & Require<LinkComponentProps, 'to'>
+    getHref: (item: T) => string
+} 
 
 export function PhotoCardGrid<T>(props: P<T>) {
     return (
@@ -50,8 +47,7 @@ export function PhotoCardGrid<T>(props: P<T>) {
                         <PhotoCardLink
                             label={props.getLabel(item)}
                             picture={props.getPic(item)}
-                            to={props.to}
-                            params={props.getParam(item)}
+                            href={props.getHref(item) }                            
                             sublabel={props.getSublabel?.(item)}
                         />
                     }
@@ -64,7 +60,7 @@ export function PhotoCardGrid<T>(props: P<T>) {
 export function PhotoCardGridSkeleton() {
     return (
         <div class={styles.grid}>
-            <For each={new Array(50).fill(null)}>
+            <For each={Array.from({length: 50})}>
                 {_ =>
                     <div class={styles.card} style={{ "pointer-events": "none" }}>
                         <div class="pulse" style={{ height: "15rem" }} />

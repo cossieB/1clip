@@ -1,12 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/solid-query"
-import { useNavigate } from "@tanstack/solid-router"
-import { useServerFn } from "@tanstack/solid-start"
 import { createStore, unwrap } from "solid-js/store"
 import { useToastContext } from "~/hooks/useToastContext"
 import { useUpload } from "~/hooks/useUpload"
-import { createGameFn, getGameFn, updateGameFn } from "~/serverFn/games"
 import { gameQueryOpts, gamesQueryOpts, gamesWithExtrasQueryOpts } from "../utils/gameQueryOpts"
 import { createEffect } from "solid-js"
+import { useNavigate } from "@solidjs/router"
+import { getGameFn, updateGameFn, createGameFn } from "~/services/gamesService"
 
 export type Game = Awaited<ReturnType<typeof getGameFn>>
 
@@ -40,11 +39,11 @@ export function useGameForm(props: { game?: Game }) {
     const { setFiles, isUploading, upload, files } = useUpload(paths)
 
     const editGameMutation = useMutation(() => ({
-        mutationFn: useServerFn(updateGameFn)
+        mutationFn: updateGameFn
     }))
 
     const createGameMutation = useMutation(() => ({
-        mutationFn: useServerFn(createGameFn)
+        mutationFn: createGameFn
     }))
 
     async function handleSubmit(e: SubmitEvent) {
@@ -67,11 +66,9 @@ export function useGameForm(props: { game?: Game }) {
             const { gameId, ...rest } = game
             if (gameId) {
                 return editGameMutation.mutate({
-                    data: {
-                        ...rest,
-                        gameId,
-                        platforms: rest.platforms.map(platform => platform.platformId)
-                    }
+                    ...rest,
+                    gameId,
+                    platforms: rest.platforms.map(platform => platform.platformId)
                 }, {
                     onSuccess(data, variables, onMutateResult, context) {
                         addToast({ text: "Successfully edited game, ", type: "info" })
@@ -85,17 +82,15 @@ export function useGameForm(props: { game?: Game }) {
                 })
             }
             return createGameMutation.mutate({
-                data: {
                     ...rest,
                     platforms: rest.platforms.map(platform => platform.platformId)
-                }
             }, {
                 onSuccess(data, variables, onMutateResult, context) {
                     addToast({ text: "Successfully created game, " + data, type: "info" })
                     queryClient.invalidateQueries(gamesWithExtrasQueryOpts())
                     queryClient.invalidateQueries(gameQueryOpts(data))
                     queryClient.invalidateQueries(gamesQueryOpts())
-                    navigate({ to: "/admin/games/$gameId/edit", params: { gameId: data } })
+                    navigate(`/admin/games/${gameId}/edit`)
                 },
                 onError(error, variables, onMutateResult, context) {
                     addToast({ text: error.message, type: "error" })

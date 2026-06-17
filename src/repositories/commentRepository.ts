@@ -1,3 +1,5 @@
+'use server'
+
 import { InferInsertModel, SQL, and, count, desc, eq, getColumns, isNull, sql } from "drizzle-orm";
 import { db } from "~/drizzle/db";
 import { commentReactions, comments, users } from "~/drizzle/schema";

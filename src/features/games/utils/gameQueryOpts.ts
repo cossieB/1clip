@@ -1,11 +1,11 @@
 import { infiniteQueryOptions, queryOptions } from "@tanstack/solid-query";
 import {type GameQueryFilters } from "~/repositories/gamesRepository";
-import { getGameFn, getGamesFn, getGamesWithoutExtras } from "~/serverFn/games";
+import { getGameFn, getGamesFn, getGamesWithoutExtras } from "~/services/gamesService";
 
 export function gamesWithExtrasQueryOpts(filters?: GameQueryFilters) {
     return infiniteQueryOptions({
         queryKey: ["games", filters],
-        queryFn: (key) => getGamesFn({ data: {...filters, cursor: key.pageParam} }),
+        queryFn: (key) => getGamesFn({...filters, cursor: key.pageParam} ),
         getNextPageParam: (lastPage, pages) => lastPage.at(-1)?.gameId,
         initialPageParam: undefined as number | undefined
     })
@@ -14,7 +14,7 @@ export function gamesWithExtrasQueryOpts(filters?: GameQueryFilters) {
 export function gameQueryOpts(gameId: number) {
     return queryOptions({
         queryKey: ["game", gameId],
-        queryFn: () => getGameFn({data: gameId})
+        queryFn: () => getGameFn(gameId)
     })
 }
 

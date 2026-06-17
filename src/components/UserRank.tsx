@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/solid-query";
 import { Suspense } from "solid-js";
-import { getUserReputation } from "~/serverFn/users";
+import { getUserReputation } from "~/services/userService";
 import { STORAGE_DOMAIN } from "~/utils/env";
 
-export function UserRank(props: {userId: string, enabled?: boolean}) {
+export default function UserRank(props: {userId: string, enabled?: boolean}) {
     const result = useQuery(() => ({
         queryKey: ["xp", props.userId],
-        queryFn: () => getUserReputation({data: props.userId}),
+        queryFn: () => getUserReputation(props.userId),
         enabled: props.enabled ?? true
     }))
 

@@ -1,3 +1,5 @@
+'use server'
+
 import { eq } from "drizzle-orm"
 import { games } from "~/drizzle/schema"
 import { detailedGames } from "./detail"

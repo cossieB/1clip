@@ -1,11 +1,9 @@
 import { getRelativeTime } from "~/lib/getRelativeTime";
-import { getCommentsByPostIdFn } from "~/serverFn/comments";
 import { MessageCircleIcon, ThumbsUpIcon, ThumbsDownIcon, EllipsisVerticalIcon } from "lucide-solid";
 import { CommentInput } from "./CommentInput";
 import { Show } from "solid-js";
 import styles from "./Comments.module.css"
 import { CommentList } from "./CommentList";
-import { Link } from "@tanstack/solid-router";
 import { useReactToComment } from "../hooks/useReactToComment";
 import { useReplyToComment } from "../hooks/useReplyToComment";
 import { MenuPopover } from "~/components/Popover/MenuPopover";
@@ -13,6 +11,8 @@ import { useDeleteComment } from "../hooks/useDeleteComment";
 import { authClient } from "~/auth/authClient";
 import { ConfirmDialog } from "~/components/Popover/Confirm";
 import { PostAuthor } from "~/features/posts/components/PostAuthor";
+import { getCommentsByPostIdFn } from "~/services/comments";
+import { A } from "@solidjs/router";
 
 type Props = {
     comment: Awaited<ReturnType<typeof getCommentsByPostIdFn>>[number];
@@ -33,16 +33,16 @@ export function CommentBlock(props: Props) {
             class={styles.comment}
         >
             <div class={styles.header} >
-            <PostAuthor
-                class={styles.user}
-                entityId={props.comment.commentId}
-                user={{ ...props.comment.user, id: props.comment.userId }}
+                <PostAuthor
+                    class={styles.user}
+                    entityId={props.comment.commentId}
+                    user={{ ...props.comment.user, id: props.comment.userId }}
                 />
-            <span class={styles.createdAt}>{getRelativeTime(props.comment.createdAt)}</span>
-            <button popoverTarget={'comment-popover-' + props.comment.commentId}>
-                <EllipsisVerticalIcon />
-            </button>
-                </div>
+                <span class={styles.createdAt}>{getRelativeTime(props.comment.createdAt)}</span>
+                <button popoverTarget={'comment-popover-' + props.comment.commentId}>
+                    <EllipsisVerticalIcon />
+                </button>
+            </div>
             <div class={styles.text}> {props.comment.text} </div>
             <div class={styles.buttons}>
                 <div>
@@ -73,12 +73,10 @@ export function CommentBlock(props: Props) {
                     setComment={comment => setCommentState({ comment })}
                     submit={() => {
                         replyMutation.mutate({
-                            data: {
-                                originalPost: props.originalPost,
-                                text: commentState.comment,
-                                replyTo: props.comment.commentId,
-                                notifyee: props.comment.userId,                                
-                            }
+                            originalPost: props.originalPost,
+                            text: commentState.comment,
+                            replyTo: props.comment.commentId,
+                            notifyee: props.comment.userId,
                         })
                     }}
                 />
@@ -102,7 +100,7 @@ export function CommentBlock(props: Props) {
                 <ul>
                     <li>
                         {props.comment.user.username}'s profile
-                        <Link to="/users/$username" params={{ username: props.comment.user.username }} />
+                        <A href={"/users/" + props.comment.user.username}  />
                     </li>
                     <Show when={session().data && session().data!.user.id === props.comment.userId}>
                         <li
@@ -118,7 +116,7 @@ export function CommentBlock(props: Props) {
             <ConfirmDialog
                 id={"del-comment-warn-" + props.comment.commentId}
                 headline='Delete Comment? '
-                onConfirm={() => deleteMutation.mutate({ data: { commentId: props.comment.commentId } })}
+                onConfirm={() => deleteMutation.mutate(props.comment.commentId)}
             />
         </div>
     )

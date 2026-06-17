@@ -11,7 +11,7 @@ type Props = {
 }
 
 export function CompanyPage(props: Props) {
-
+    
     return (
         <div>
             <div class={styles.header} >

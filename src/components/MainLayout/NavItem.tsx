@@ -11,7 +11,7 @@ type NavItemProps = {
 export function NavItem(props: NavItemProps) {
     const [_, toProps] = splitProps(props, ["label", "icon"])
     return (
-        <A {...toProps} activeClass={ styles.active} >
+        <A {...toProps} activeClass={ styles.active} end>
             <li class={`${styles.navItem}`}>
                 {props.icon}
                 <span> {props.label} </span>

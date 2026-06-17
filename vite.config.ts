@@ -1,16 +1,19 @@
 import { defineConfig } from "vite";
-import { nitroV2Plugin as nitro } from "@solidjs/vite-plugin-nitro-2";
-
+import { nitro } from "nitro/vite";
 import { solidStart } from "@solidjs/start/config";
+import "dotenv/config"
 
 export default defineConfig({
   server: {
-    port: 1337
+    port: 1337,
   },
   plugins: [
     solidStart({
-      middleware: "src/middleware/index.ts"
+      middleware: "src/middleware/index.ts",
+      ssr: true
     }),
-    nitro()
+    nitro({
+      preset: "node-server"
+    })
   ]
 });

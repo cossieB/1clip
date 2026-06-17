@@ -1,4 +1,3 @@
-import { useServerFn } from "@tanstack/solid-start";
 import { createStore, unwrap } from "solid-js/store";
 import { getSignedUrls } from "~/integrations/uploadService";
 import { uploadToSignedUrl } from "~/utils/uploadToSignedUrl";
@@ -9,7 +8,6 @@ export function useUpload(
     pathSegments: string[],
     abortController?: AbortController
 ) {
-    const getUrls = useServerFn(getSignedUrls)
     const { addToast } = useToastContext()
     const [state, setState] = createStore({
         isUploading: false,
@@ -22,20 +20,18 @@ export function useUpload(
     })
 
     async function upload() {
-        
+
         try {
             if (state.files.length === 0) return [];
-            setState({isUploading: true})
-            const urls = await getUrls({
-                data: {
-                    paths: pathSegments,
-                    files: state.files.map(f => ({
-                        contentLength: f.file.size,
-                        contentType: f.file.type,
-                        filename: f.file.name,
-                        metadata: f.metadata
-                    }))
-                }
+            setState({ isUploading: true })
+            const urls = await getSignedUrls({
+                paths: pathSegments,
+                files: state.files.map(f => ({
+                    contentLength: f.file.size,
+                    contentType: f.file.type,
+                    filename: f.file.name,
+                    metadata: f.metadata
+                }))
             })
             if (urls.length != state.files.length)
                 throw addToast({ text: "Something went wrong. Please try again later", type: "error" })
@@ -55,7 +51,7 @@ export function useUpload(
             throw error
         }
         finally {
-            setState({isUploading: false})
+            setState({ isUploading: false })
         }
     }
 

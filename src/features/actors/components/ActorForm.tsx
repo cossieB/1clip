@@ -1,9 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/solid-query"
-import { useServerFn } from "@tanstack/solid-start"
 import { createStore, unwrap } from "solid-js/store"
 import { useToastContext } from "~/hooks/useToastContext"
 import { useUpload } from "~/hooks/useUpload"
-import { createActorFn, editActorFn, getActorsWithCharacters } from "~/serverFn/actors"
+import { createActorFn, editActorFn, getActorsWithCharactersFn } from "~/services/actorsService"
 import { actorQueryOpts, actorsQueryOpts } from "../utils/actorQueryOpts"
 import { Form } from "~/components/Forms/Form"
 import { ContentEditable } from "~/components/Forms/ContentEditable"
@@ -17,7 +16,7 @@ import styles from "./ActorForm.module.css"
 import { CirclePlusIcon, Trash2Icon } from "lucide-solid"
 import { Optional } from "~/lib/utilityTypes"
 
-type Actor = Awaited<ReturnType<typeof getActorsWithCharacters>>
+type Actor = Awaited<ReturnType<typeof getActorsWithCharactersFn>>
 type Char = Actor['characters'][number]
 
 export function ActorForm(props: { actor?: Omit<Actor, 'characters'> & { characters: Optional<Char, 'appearanceId'>[] } }) {
@@ -25,10 +24,10 @@ export function ActorForm(props: { actor?: Omit<Actor, 'characters'> & { charact
     const { addToast } = useToastContext()
     const queryClient = useQueryClient()
     const createActorMutation = useMutation(() => ({
-        mutationFn: useServerFn(createActorFn)
+        mutationFn: createActorFn
     }))
     const editActorMutation = useMutation(() => ({
-        mutationFn: useServerFn(editActorFn)
+        mutationFn: editActorFn
     }))
     const [actor, setActor] = createStore(props.actor ?? {
         name: "",
@@ -45,7 +44,7 @@ export function ActorForm(props: { actor?: Omit<Actor, 'characters'> & { charact
         const f = files.at(0)
         if (f) setActor({ photo: f.key })
         if ('actorId' in actor) {
-            return editActorMutation.mutate({ data: actor }, {
+            return editActorMutation.mutate(actor , {
                 onSuccess(data, variables, onMutateResult, context) {
                     addToast({ text: "Successfully edited actor, " + actor.actorId, type: "info" })
                     queryClient.setQueryData(actorQueryOpts(actor.actorId).queryKey, actor)
@@ -56,7 +55,7 @@ export function ActorForm(props: { actor?: Omit<Actor, 'characters'> & { charact
                 },
             })
         }
-        createActorMutation.mutate({ data: actor }, {
+        createActorMutation.mutate(actor, {
             onSuccess(data, variables, onMutateResult, context) {
                 addToast({ text: "Successfully created actor, " + data.actorId, type: "info" })
                 queryClient.setQueryData(actorQueryOpts(data.actorId).queryKey, data)

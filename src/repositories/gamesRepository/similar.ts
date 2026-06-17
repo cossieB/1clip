@@ -1,3 +1,5 @@
+'use server'
+
 import { and, eq, ne, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { db } from "~/drizzle/db";

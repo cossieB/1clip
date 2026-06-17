@@ -1,9 +1,9 @@
 import { queryOptions } from "@tanstack/solid-query";
-import { getUserByIdFn } from "~/serverFn/users";
+import { getUserByIdFn } from "~/services/userService";
 
 export function userQueryOpts(userId: string) {
     return queryOptions({
         queryKey: ["users", userId],
-        queryFn: () => getUserByIdFn({data: userId})
+        queryFn: () => getUserByIdFn(userId)
     })
 }

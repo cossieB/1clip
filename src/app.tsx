@@ -6,39 +6,40 @@ import { MainLayout } from "./components/MainLayout/MainLayout";
 import { ToastProvider } from "./components/Toast/ToastProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
 
+const client = new QueryClient({
+    defaultOptions: {
+        queries: {
+            suspense: true,
+            gcTime: Infinity,
+            refetchOnMount: false,
+            retry: false,
+            // retry(failureCount, error) {
+            //     return failureCount < 3
+            // },
+            refetchOnWindowFocus: false,
+            staleTime: Infinity,
+            throwOnError: true,
+        },
+    }
+})
 export default function App() {
-    const client = new QueryClient({
-        defaultOptions: {
-            queries: {
-                gcTime: Infinity,
-                refetchOnMount: false,
-                retry: false,
-                // retry(failureCount, error) {
-                //     return failureCount < 3
-                // },
-                refetchOnWindowFocus: false,
-                staleTime: Infinity,
-                throwOnError: true,
-            },
-        }
-    })
     return (
-        <QueryClientProvider client={client}>
-            <Router
-                root={props => (
+        <Router
+            root={props => (
+                <QueryClientProvider client={client}>
                     <MetaProvider>
                         <ToastProvider>
-                            <MainLayout>
-                                <ErrorBoundary fallback={e => <span>{e}</span>}>
+                            <ErrorBoundary fallback={e => <span>{e}</span>}>
+                                <MainLayout>
                                     <Suspense>{props.children}</Suspense>
-                                </ErrorBoundary>
-                            </MainLayout>
+                                </MainLayout>
+                            </ErrorBoundary>
                         </ToastProvider>
                     </MetaProvider>
-                )}
-            >
-                <FileRoutes />
-            </Router>
-        </QueryClientProvider>
+                </QueryClientProvider>
+            )}
+        >
+            <FileRoutes />
+        </Router>
     );
 }

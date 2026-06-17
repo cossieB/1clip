@@ -1,3 +1,5 @@
+'use server'
+
 import { and, count, eq, exists, getColumns, sql, SQL, sum } from "drizzle-orm";
 import { unionAll } from "drizzle-orm/pg-core";
 import { db } from "~/drizzle/db";

@@ -1,17 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/solid-query"
-import { useNavigate } from "@tanstack/solid-router"
-import { useServerFn } from "@tanstack/solid-start"
 import { useToastContext } from "~/hooks/useToastContext"
-import { deletePostFn, getPostFn } from "~/serverFn/posts"
 import { postsQueryOpts } from "../utils/postQueryOpts"
+import { useNavigate } from "@solidjs/router";
+import { deletePostFn, getPostFn } from "~/services/postService";
 
 export function useDeletePost(post: Awaited<ReturnType<typeof getPostFn>>) {
-    const delPost = useServerFn(deletePostFn);
     const navigate = useNavigate()
     const { addToast } = useToastContext();
     const queryClient = useQueryClient()
     const deleteMutation = useMutation(() => ({
-        mutationFn: delPost,
+        mutationFn: deletePostFn,
         onSuccess() {
             addToast({ text: "Post deleted", type: "info" })
             queryClient.setQueryData(postsQueryOpts().queryKey, (data) => {
@@ -22,7 +20,7 @@ export function useDeletePost(post: Awaited<ReturnType<typeof getPostFn>>) {
                 }
                 return {...data, pages}
             });
-            navigate({to: "/"})
+            navigate("/")
         },
         onError(error, variables, onMutateResult, context) {
             addToast({ text: error.message, type: "error" })

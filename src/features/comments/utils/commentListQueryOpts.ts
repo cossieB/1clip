@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/solid-query";
-import { getCommentsByPostIdFn } from "~/serverFn/comments";
+import { getCommentsByPostIdFn } from "~/services/comments";
 
 type Opts = {
     postId: number,
@@ -10,8 +10,6 @@ export function commentListQueryOpts(key: Opts, enabled = true) {
     return queryOptions({
         enabled,
         queryKey: ["comments", key],
-        queryFn: () => getCommentsByPostIdFn({
-            data: key
-        })
+        queryFn: () => getCommentsByPostIdFn(key)
     })
 }

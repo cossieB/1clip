@@ -1,6 +1,6 @@
 import { authClient } from "~/auth/authClient";
 import { useToastContext } from "./useToastContext";
-import { useNavigate } from "@tanstack/solid-router";
+import { useNavigate } from "@solidjs/router";
 
 export function useLogout() {
     const navigate = useNavigate()
@@ -9,7 +9,7 @@ export function useLogout() {
     return async function logout() {
         try {
             await authClient.signOut();
-            navigate({ to: "/" })
+            navigate("/")
         }
         catch (error) {
             console.error(error)

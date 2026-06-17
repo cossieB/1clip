@@ -1,32 +1,28 @@
 import { PostBlock } from "./PostBlock";
-import { type getPostsFn } from "~/serverFn/posts";
+import { type getPostsFn } from "~/services/postService";
 import { createSignal } from "solid-js";
-import { useServerFn } from "@tanstack/solid-start";
 import { useMutation, useQueryClient } from "@tanstack/solid-query";
-import { addCommentFn } from "~/serverFn/comments";
-
-import { CommentList } from "~/features/comments/components/CommentList";
+import { addCommentFn } from "~/services/comments";
 import { CommentInput } from "~/features/comments/components/CommentInput";
 import { commentListQueryOpts } from "~/features/comments/utils/commentListQueryOpts";
-import { useLocation } from "@tanstack/solid-router";
+import { useLocation } from "@solidjs/router";
 
 type Props = {
     post: Awaited<ReturnType<typeof getPostsFn>>[number]
 }
 
 export function PostId(props: Props) {
-    const commentOnPost = useServerFn(addCommentFn);
     const queryClient = useQueryClient()
     const location = useLocation()
 
     const [comment, setComment] = createSignal("")
     const mutation = useMutation(() => ({
-        mutationFn: commentOnPost,
+        mutationFn: addCommentFn,
         onSuccess(data, variables, onMutateResult, context) {
             setComment("")
             queryClient.invalidateQueries(commentListQueryOpts({
-                    postId: props.post.postId
-                }))
+                postId: props.post.postId
+            }))
         },
         onError(error, variables, onMutateResult, context) {
 
@@ -42,11 +38,9 @@ export function PostId(props: Props) {
                 setComment={setComment}
                 submit={() => {
                     mutation.mutate({
-                        data: {
-                            originalPost: props.post.postId,
-                            notifyee: props.post.userId,                                                  
-                            text: comment(),
-                        }
+                        originalPost: props.post.postId,
+                        notifyee: props.post.userId,
+                        text: comment(),
                     })
                 }}
             />

@@ -11,6 +11,18 @@ import { HttpStatusCode } from "~/utils/statusCodes";
 import { notificationsService } from "~/integrations/notificationService";
 import { cacheAside } from "~/utils/cacheAside";
 import { getRank } from "~/utils/getRank";
+import { forceLogin } from "./authService";
+
+export const getLoggedInUser = createServerFunction()
+    .handler(async () => {
+        const session = getRequestEvent()?.locals.user
+        if (!session) throw notFound()
+        const user = await userRepository.findById(session.id);
+        if (!user) {
+            return forceLogin()
+        }
+        return user        
+    })
 
 export const getUserByUsernameFn = createServerFunction()
     .setValidator(z.coerce.string())
@@ -27,6 +39,7 @@ export const getUserByIdFn = createServerFunction()
         const u = getRequestEvent()?.locals.user
         const user = await userRepository.findById(userId, u?.id);
         if (!user) throw notFound();
+        return user
     })
 
 export const updateCurrentUser = createServerFunction()

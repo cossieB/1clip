@@ -31,9 +31,6 @@ export function GamesList(props: { filters?: GameQueryFilters }) {
         arr={result.data?.pages.flat() ?? []}
         getLabel={game => game.title}
         getPic={game => STORAGE_DOMAIN + game.cover}
-        getParam={game => ({
-            gameId: game.gameId
-        })}
-        to='/games/$gameId'
+        getHref={game => "/games/" + game.gameId}        
     />
 }

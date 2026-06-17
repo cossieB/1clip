@@ -1,6 +1,6 @@
 import { STORAGE_DOMAIN } from "~/utils/env"
-import { Link } from '@tanstack/solid-router'
 import { UserMiniProfile } from "~/features/users/components/MiniProfile"
+import { A } from "@solidjs/router"
 
 type Props = {
     entityId: string | number
@@ -35,7 +35,7 @@ export function PostAuthor(props: Props) {
                 >
                     <img src={STORAGE_DOMAIN + props.user.image} />
                     <span data-for="user">{props.user.displayUsername}</span>
-                    <Link to='/users/$username' params={{ username: props.user.displayUsername! }} />
+                    <A href={'/users/' + props.user.displayUsername} />
                     <UserMiniProfile entityId={props.entityId} userId={props.user.id} />
                 </div>
             </div>

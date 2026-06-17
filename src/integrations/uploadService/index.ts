@@ -1,11 +1,10 @@
-import { createServerFn } from "@tanstack/solid-start";
 import z from "zod";
-import { verifiedOnlyMiddleware } from "~/middleware/authorization";
 import { generateSignedUrl } from "./cloudflareUploadService";
+import { createServerFunction } from "~/utils/createServerFunction";
+import { authedOnly } from "~/middleware/authedOnly";
 
-export const getSignedUrls = createServerFn()
-    .middleware([verifiedOnlyMiddleware])
-    .inputValidator(z.object({
+export const getSignedUrls = createServerFunction()
+    .setValidator(z.object({
         paths: z.string().array(),
         files: z.array(z.object({
             filename: z.string(),
@@ -14,7 +13,8 @@ export const getSignedUrls = createServerFn()
             metadata: z.record(z.string(), z.string()).optional()
         }))
     }))
-    .handler(async ({ data, context: {user} }) => {
+    .handler(async data => {
+        const user = authedOnly()
         return await Promise.all(data.files.map(obj => generateSignedUrl(
             obj.filename, 
             obj.contentType, 

@@ -1,3 +1,5 @@
+"use server"
+
 import { InferInsertModel } from "drizzle-orm"
 import { GameInsert } from "./types"
 import { gameGenres, gamePlatforms, games, genres, media } from "~/drizzle/schema"

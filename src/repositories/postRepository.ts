@@ -1,3 +1,5 @@
+'use server'
+
 import { and, count, desc, eq, getColumns, gt, inArray, lt, SQL, sql } from "drizzle-orm";
 import { db } from "~/drizzle/db";
 import { comments, followerFollowee, games, media, postReactions, posts, postTags, users } from "~/drizzle/schema";

@@ -1,13 +1,11 @@
 import { useQueryClient, useMutation } from "@tanstack/solid-query";
-import { useServerFn } from "@tanstack/solid-start";
 import { createStore } from "solid-js/store";
 import { useAbortController } from "~/hooks/useAbortController";
 import { useToastContext } from "~/hooks/useToastContext";
 import { useUpload } from "~/hooks/useUpload";
-import { getLoggedInUser, updateCurrentUser } from "~/serverFn/users";
+import { getLoggedInUser, updateCurrentUser } from "~/services/userService";
 
 export function useEditProfile(props: { user: Awaited<ReturnType<typeof getLoggedInUser>> }) {
-    const updateUser = useServerFn(updateCurrentUser);
     const abortController = useAbortController()
     const { setFiles, upload, isUploading } = useUpload(["users"], abortController)
 
@@ -15,7 +13,7 @@ export function useEditProfile(props: { user: Awaited<ReturnType<typeof getLogge
     const queryClient = useQueryClient()
 
     const mutation = useMutation(() => ({
-        mutationFn: updateUser,
+        mutationFn: updateCurrentUser,
         onSuccess: () => {
             addToast({ text: "Success", type: "info" })
             queryClient.setQueryData(["users", user.id], user)
@@ -40,7 +38,7 @@ export function useEditProfile(props: { user: Awaited<ReturnType<typeof getLogge
                 ...newBanner && { banner: newBanner.key }
             })
 
-            await mutation.mutateAsync({ data: user, signal: abortController.signal },)
+            await mutation.mutateAsync(user)
         }
         catch (error) {
             console.error(error)

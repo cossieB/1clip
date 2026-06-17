@@ -1,9 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/solid-query"
-import { useServerFn } from "@tanstack/solid-start"
 import { createStore } from "solid-js/store"
 import { useToastContext } from "~/hooks/useToastContext"
 import { useUpload } from "~/hooks/useUpload"
-import { createPlatformFn, editPlatformFn, getPlatformFn } from "~/serverFn/platforms"
+import { createPlatformFn, editPlatformFn, getPlatformFn } from "~/services/platformService"
 import { platformQueryOpts, platformsQueryOpts } from "../utils/platformQueryOpts"
 import { Form } from "~/components/Forms/Form"
 import { ContentEditable } from "~/components/Forms/ContentEditable"
@@ -16,11 +15,11 @@ export function PlatformForm(props: { platform?: Platform }) {
     const queryClient = useQueryClient()
 
     const createPlatformMutation = useMutation(() => ({
-        mutationFn: useServerFn(createPlatformFn)
+        mutationFn: createPlatformFn
     }))
 
     const editPlatformMutation = useMutation(() => ({
-        mutationFn: useServerFn(editPlatformFn)
+        mutationFn: editPlatformFn
     }))
 
     const [platform, setPlatform] = createStore(props.platform ?? {
@@ -38,7 +37,7 @@ export function PlatformForm(props: { platform?: Platform }) {
         const f = files.at(0)
         if (f) setPlatform({ logo: f.key })
         if ('platformId' in platform) {
-            return editPlatformMutation.mutate({ data: platform }, {
+            return editPlatformMutation.mutate(platform, {
                 onSuccess(data, variables, onMutateResult, context) {
                     addToast({ text: "Successfully edited platform, " + platform.platformId, type: "info" })
                     queryClient.setQueryData(platformQueryOpts(platform.platformId).queryKey, platform)
@@ -49,7 +48,7 @@ export function PlatformForm(props: { platform?: Platform }) {
                 },
             })
         }
-        createPlatformMutation.mutate({ data: platform }, {
+        createPlatformMutation.mutate(platform, {
             onSuccess(data, variables, onMutateResult, context) {
                 addToast({ text: "Successfully created platform, " + data.platformId, type: "info" })
                 queryClient.setQueryData(platformQueryOpts(data.platformId).queryKey, data)

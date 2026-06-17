@@ -18,6 +18,7 @@ export const getDeveloperFn = createServerFunction()
         if (developerId < 1) throw notFound( "These aren't the developers you're looking for")
         const dev = await developerRepository.findById(developerId)
         if (!dev) throw notFound( "These aren't the developers you're looking for")
+        return dev            
     })    
 
 export const createDeveloperFn = createServerFunction()

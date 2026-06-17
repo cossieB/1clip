@@ -1,6 +1,6 @@
 import { CircleStopIcon, PlayIcon } from "lucide-solid"
 import { createEffect, createSignal, onCleanup, onMount, Show } from "solid-js"
-import { type getGameFn } from "~/serverFn/games"
+import { type getGameFn } from "~/services/gamesService"
 import { STORAGE_DOMAIN } from "~/utils/env"
 import styles from "./GamePage.module.css"
 

@@ -1,3 +1,5 @@
+'use server'
+
 import { and, eq, getColumns, InferInsertModel, InferSelectModel, notInArray, sql } from "drizzle-orm";
 import { db } from "~/drizzle/db";
 import { actors, gameActors, games } from "~/drizzle/schema";

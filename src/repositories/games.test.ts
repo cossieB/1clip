@@ -1,3 +1,5 @@
+'use server'
+
 import { expect, test } from 'vitest'
 
 test("init", () => {

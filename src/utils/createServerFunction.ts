@@ -22,18 +22,18 @@ export function createServerFunction() {
 
 class ServerFunctionBuilder {
 
-    setValidator = <T>(validator: z.ZodType<T>) => {
-        return new ServerFunctionWithValidator(validator)
+    setValidator = <Out, In>(validator: z.ZodType<Out, In>) => {
+        return new ServerFunctionWithValidator<Out, In>(validator)
     }
-    handler = <V>(cb: () => V): V => {
-        return cb()
+    handler = <V>(cb: () => V) => {
+        return cb
     }
 }
 
-class ServerFunctionWithValidator<T> {
-    constructor(private readonly validator: z.ZodType<T>) { }
-    handler = <V>(cb: (arg: T) => V) => {
-        return (input: T) => {
+class ServerFunctionWithValidator<Out, In> {
+    constructor(private readonly validator: z.ZodType<Out>) { }
+    handler = <V>(cb: (arg: Out) => V) => {
+        return (input: In) => {
             const validated = this.validator.safeParse(input);
             if (!validated.success) throw new AppError(String(validated.error), HttpStatusCode.BAD_REQUEST);
             return cb(validated.data)

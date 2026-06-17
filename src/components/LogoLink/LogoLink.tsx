@@ -1,8 +1,8 @@
 import { BriefcaseBusinessIcon, CodeIcon, GamepadIcon } from "lucide-solid"
 import styles from "./LogoLink.module.css"
-import { Link } from "@tanstack/solid-router"
 import titleCase from "~/lib/titleCase"
 import { Dynamic } from "solid-js/web"
+import { A } from "@solidjs/router"
 
 type P = {
     item: {
@@ -27,8 +27,8 @@ export function LogoLink(props: P) {
         <div class={`${props.className} ${styles.logo} cutout`} title={`${titleCase(props.href)}: ${props.item.name}`}>
             <Dynamic component={icon} />
             <img style={{"view-transition-name": `${param}${props.item.id}`}} src={props.item.logo} alt="" />   
-            {/* @ts-expect-error */}
-            <Link viewTransition to={`/${props.href}s/$${param}`} params={{[param]: props.item.id}}/>         
+            
+            <A href={`/${props.href}s/${param}`} />         
         </div>
     )
 }

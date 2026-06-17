@@ -1,3 +1,5 @@
+"use server"
+
 export * from "./create"
 export * from "./findAll"
 export * from "./findAllWithDetails"

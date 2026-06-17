@@ -1,3 +1,5 @@
+'use server'
+
 import { and, eq, InferSelectModel, notInArray, sql } from "drizzle-orm";
 import { db } from "~/drizzle/db";
 import { gamePlatforms, gameGenres, media, games } from "~/drizzle/schema/schema";

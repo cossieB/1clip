@@ -1,6 +1,6 @@
 import { type QueryClient } from "@tanstack/solid-query";
-import { type getPostFn } from "~/serverFn/posts";
 import { postsQueryOpts } from "./postQueryOpts";
+import { getPostFn } from "~/services/postService";
 
 type Post = Awaited<ReturnType<typeof getPostFn>>
 

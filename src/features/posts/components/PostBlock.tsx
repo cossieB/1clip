@@ -1,9 +1,8 @@
-import { getPostFn } from '~/serverFn/posts'
+import { getPostFn } from '~/services/postService'
 import { For, Show } from 'solid-js'
 import { EllipsisVerticalIcon, EyeIcon, MessageCircleIcon, ThumbsDownIcon, ThumbsUpIcon } from 'lucide-solid'
 import { getRelativeTime } from '~/lib/getRelativeTime'
 import { formatDate } from '~/lib/formatDate'
-import { Link } from '@tanstack/solid-router'
 import { Carousel } from '~/components/Carousel/Carousel'
 import { STORAGE_DOMAIN } from '~/utils/env'
 import { authClient } from '~/auth/authClient'
@@ -14,6 +13,7 @@ import { IframeFactory } from '~/components/embeds/IframeFactory'
 import { PostAuthor } from './PostAuthor'
 import styles from "./Post.module.css"
 import { ConfirmDialog } from '~/components/Popover/Confirm'
+import { A } from '@solidjs/router'
 
 type Props = {
     post: Awaited<ReturnType<typeof getPostFn>>
@@ -63,7 +63,7 @@ export function PostBlock(props: Props) {
                             {tag =>
                                 <div class="cutout">
                                     {tag}
-                                    <Link to='/posts/tags/$tag' params={{ tag }} />
+                                    <A href={'/posts/tags/' + tag}/>
                                 </div>}
                         </For>
                     </div>
@@ -75,7 +75,7 @@ export function PostBlock(props: Props) {
                             <span> {props.post.game?.title} </span>
                             <span> {props.post.game?.releaseDate.split("-")[0]} </span>
                         </div>
-                        <Link to='/posts/games/$gameId' params={{ gameId: props.post.gameId! }} />
+                        <A href={'/posts/games/' + props.post.gameId} />
                     </div>
                 </Show>
                 <div class={styles.buttons}>
@@ -105,7 +105,7 @@ export function PostBlock(props: Props) {
                     </div>
 
                 </div>
-                <Link class={styles.a} to='/posts/$postId' params={{ postId: props.post.postId }} />
+                <A class={styles.a} href={'/posts/' + props.post.postId} />
             </div>
             <MenuPopover
                 id={'post-popover-' + props.post.postId}
@@ -124,16 +124,16 @@ export function PostBlock(props: Props) {
                     </li>
                     <li>
                         {props.post.user.username}'s Profile
-                        <Link to="/users/$username" params={{ username: props.post.user.username }} />
+                        <A href={"/users/" + props.post.user.username} />
                     </li>
                     <Show when={props.post.gameId}>
                         <li>
                             {props.post.game!.title} Posts
-                            <Link to='/posts/games/$gameId' params={{ gameId: props.post.gameId! }} />
+                            <A href={'/posts/games/' + props.post.gameId} />
                         </li>
                         <li>
                             {props.post.game!.title} Details
-                            <Link to='/games/$gameId' params={{ gameId: props.post.gameId! }} />
+                            <A href={'/games/' + props.post.gameId} />
                         </li>
                     </Show>
                     <Show when={session().data && session().data!.user.id === props.post.userId}>
@@ -151,7 +151,7 @@ export function PostBlock(props: Props) {
             <ConfirmDialog
                 id={'del-post-warn-' + props.post.postId}
                 headline='Delete Post?'
-                onConfirm={() => deleteMutation.mutate({ data: { postId: props.post.postId } })}
+                onConfirm={() => deleteMutation.mutate(props.post.postId )}
             >
             </ConfirmDialog>
         </div>

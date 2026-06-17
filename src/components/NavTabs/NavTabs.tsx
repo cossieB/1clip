@@ -1,10 +1,9 @@
-import { Link, LinkComponentProps, useMatchRoute } from "@tanstack/solid-router"
-import { createEffect, createSignal, For, splitProps } from "solid-js"
-import { Require } from "~/lib/utilityTypes"
+import { ComponentProps, createEffect, createSignal, For, splitProps } from "solid-js"
 import styles from "./NavTabs.module.css"
+import { A, useMatch } from "@solidjs/router"
 
 type Props = {
-    tabs: Array<Require<LinkComponentProps, 'to'> & { label: string }>
+    tabs: Array<ComponentProps<typeof A> & {label: string}>
 }
 
 export function NavTabs(props: Props) {
@@ -26,8 +25,8 @@ export function NavTabs(props: Props) {
 function Tab(props: Props["tabs"][number] & { setIdx(): void }) {
     const [div, linkProps] = splitProps(props, ['label', 'setIdx'])
 
-    const matchRoute = useMatchRoute();
-    const match = matchRoute({to: props.to})
+    const match = useMatch(() => props.href);
+    
     
     createEffect(() => {
         if (match())
@@ -37,7 +36,7 @@ function Tab(props: Props["tabs"][number] & { setIdx(): void }) {
     return (
         <div class={`${styles.tab} cutout`}>
             {div.label}
-            <Link {...linkProps} search />
+            <A {...linkProps} />
         </div>
     )
 }

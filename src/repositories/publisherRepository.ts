@@ -1,3 +1,5 @@
+'use server'
+
 import { eq, InferInsertModel, InferSelectModel } from "drizzle-orm";
 import { db } from "~/drizzle/db";
 import { publishers } from "~/drizzle/schema";

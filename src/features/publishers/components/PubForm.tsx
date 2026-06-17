@@ -1,12 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/solid-query";
-import { useServerFn } from "@tanstack/solid-start";
 import { createStore } from "solid-js/store";
 import { ContentEditable } from "~/components/Forms/ContentEditable";
 import { Form } from "~/components/Forms/Form";
-import { UploadBox } from "~/components/UploadBox/UploadBox";
 import { useToastContext } from "~/hooks/useToastContext";
 import { useUpload } from "~/hooks/useUpload";
-import { createPublisherFn, editPublisherFn, getPublisherFn } from "~/serverFn/publishers";
+import { createPublisherFn, editPublisherFn, getPublisherFn } from "~/services/publisherService";
 import { countryList } from "~/utils/countryList";
 import { mediaSrc } from "~/utils/mediaSrc";
 import { publisherQueryOpts, publishersQueryOpts } from "../utils/publisherQueryOpts";
@@ -19,11 +17,11 @@ export function PubForm(props: { publisher?: Publisher }) {
     const queryClient = useQueryClient()
 
     const createPubMutation = useMutation(() => ({
-        mutationFn: useServerFn(createPublisherFn)
+        mutationFn: createPublisherFn
     }))
 
     const editPubMutation = useMutation(() => ({
-        mutationFn: useServerFn(editPublisherFn)
+        mutationFn: editPublisherFn
     }))
 
     const [publisher, setPublisher] = createStore(props.publisher ?? {
@@ -42,7 +40,7 @@ export function PubForm(props: { publisher?: Publisher }) {
         const f = files.at(0)
         if (f) setPublisher({ logo: f.key })
         if ('publisherId' in publisher) {
-            return editPubMutation.mutate({ data: publisher }, {
+            return editPubMutation.mutate(publisher, {
                 onSuccess(data, variables, onMutateResult, context) {
                     addToast({ text: "Successfully edited publisher, " + publisher.publisherId, type: "info" })
                     queryClient.setQueryData(publisherQueryOpts(publisher.publisherId).queryKey, publisher)
@@ -53,7 +51,7 @@ export function PubForm(props: { publisher?: Publisher }) {
                 },
             })
         }
-        createPubMutation.mutate({ data: publisher }, {
+        createPubMutation.mutate(publisher, {
             onSuccess(data, variables, onMutateResult, context) {
                 addToast({ text: "Successfully created publisher, " + data.publisherId, type: "info" })
                 queryClient.setQueryData(publisherQueryOpts(data.publisherId).queryKey, data)

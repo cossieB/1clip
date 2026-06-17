@@ -4,8 +4,8 @@ import { authClient } from '~/auth/authClient'
 import { Form } from '~/components/Forms/Form'
 import { useToastContext } from '~/hooks/useToastContext'
 import styles from "./ProfilePage.module.css"
-import { useNavigate } from '@tanstack/solid-router'
 import { ConfirmDialog } from '~/components/Popover/Confirm'
+import { useNavigate } from '@solidjs/router'
 
 export function SecurityPage() {
     const { addToast } = useToastContext()

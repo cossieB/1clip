@@ -1,15 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/solid-query"
-import { useServerFn } from "@tanstack/solid-start"
 import { useToastContext } from "~/hooks/useToastContext"
-import { deleteCommentFn, getCommentsByPostIdFn } from "~/serverFn/comments"
 import { commentListQueryOpts } from "../utils/commentListQueryOpts"
+import { deleteCommentFn, getCommentsByPostIdFn } from "~/services/comments"
 
 export function useDeleteComment(comment: Awaited<ReturnType<typeof getCommentsByPostIdFn>>[number], postId: number, replyTo?: number) {
     const { addToast } = useToastContext()
     const queryClient = useQueryClient()
-    const delComment = useServerFn(deleteCommentFn)
     const deleteMutation = useMutation(() => ({
-        mutationFn: delComment,
+        mutationFn: deleteCommentFn,
         onSuccess() {
             queryClient.setQueryData(
                 commentListQueryOpts({postId, replyTo}).queryKey,

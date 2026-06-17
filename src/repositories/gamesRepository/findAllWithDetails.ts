@@ -1,3 +1,5 @@
+'use server'
+
 import { eq, inArray, lt, SQL } from "drizzle-orm"
 import { type GameQueryFilters } from "./types"
 import { gameActors, gameGenres, gamePlatforms, games } from "~/drizzle/schema"

@@ -49,7 +49,7 @@ export async function revokeSession() {
         })
 }
 
-export async function forceLogin() {
+export async function forceLogin(): Promise<never> {
     await revokeSession();
     throw redirect("/auth/signin")
 }

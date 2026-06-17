@@ -1,7 +1,6 @@
-import { getSimilarGames, type getGameFn } from "~/serverFn/games"
+import { type getGameFn } from "~/services/gamesService"
 import styles from "./GamePage.module.css"
-import { createEffect, createSignal, For, Show, Suspense } from "solid-js"
-import { ClientOnly, Link } from "@tanstack/solid-router"
+import { For, Show } from "solid-js"
 import { LogoLink } from "~/components/LogoLink/LogoLink"
 import { PhotoCardGrid } from "~/components/CardLink/PhotoCardLink"
 import { STORAGE_DOMAIN } from "~/utils/env"
@@ -9,9 +8,10 @@ import { HeroHeader } from "~/components/Hero/HeroHeader"
 import { Screenshots } from "./Screenshots"
 import { GameAudio } from "./GameAudio"
 import { IframeFactory } from "~/components/embeds/IframeFactory"
-import { useQuery } from "@tanstack/solid-query"
-import { useServerFn } from "@tanstack/solid-start"
-import { useInView } from "~/hooks/useInView"
+import { A } from "@solidjs/router"
+import { clientOnly } from "@solidjs/start";
+
+const SimilarGames = clientOnly(() => import("./SimilarGames"))
 
 type Props = {
     game: Awaited<ReturnType<typeof getGameFn>>
@@ -70,7 +70,7 @@ export function GamePage(props: Props) {
                             {genre =>
                                 <div class="cutout">
                                     {genre}
-                                    <Link to="/games/genres/$genre" params={{ genre }} />
+                                    <A href={"/games/genres/" + genre} />
                                 </div>
                             }
                         </For>
@@ -88,45 +88,19 @@ export function GamePage(props: Props) {
                         getLabel={actor => actor.name}
                         getPic={actor => STORAGE_DOMAIN + actor.photo}
                         getSublabel={actor => actor.character}
-                        to="/actors/$actorId"
-                        getParam={actor => ({ actorId: actor.actorId })}
+                        getHref={actor => "/actors/" + actor.actorId}
                     />
                 </Show>
                 <Screenshots media={props.game.media} />
             </div>
             <h2>Similar Games</h2>
-            <ClientOnly>
-                <SimilarGames gameId={props.game.gameId} />
-            </ClientOnly>
+            <SimilarGames gameId={props.game.gameId} />
             <GameAudio media={props.game.media} />
         </div>
     )
 }
 
-function SimilarGames(props: { gameId: number }) {
-    const [ref, setRef] = createSignal<HTMLDivElement>()
-    const isInView = useInView(ref)
-    const queryFn = useServerFn(getSimilarGames)
-    const result = useQuery(() => ({
-        enabled: isInView(),
-        queryKey: ["games", "similarTo", props.gameId],
-        queryFn: () => queryFn({ data: props.gameId })
-    }))
 
-    return (
-        <div ref={setRef}>
-
-            <PhotoCardGrid
-                arr={result.data ?? []}
-                getLabel={game => game.title}
-                getPic={game => STORAGE_DOMAIN + game.cover}
-                getParam={game => ({ gameId: game.gameId })}
-                to="/games/$gameId"
-
-            />
-        </div>
-    )
-}
 
 function ReleaseDate(props: { date: string }) {
     const date = props.date.split(/[\-\/]/)

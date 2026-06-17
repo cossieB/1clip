@@ -1,6 +1,6 @@
 import { Show } from "solid-js"
 import { Carousel } from "~/components/Carousel/Carousel"
-import {type getGameFn } from "~/serverFn/games"
+import { type getGameFn } from "~/services/gamesService"
 import { STORAGE_DOMAIN } from "~/utils/env"
 
 type Props = {

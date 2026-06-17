@@ -26,9 +26,7 @@ export const GetGamesSchema = z.object({
     actorId: z.number(),
     platformId: z.number(),
     genre: z.string(),
-    cursor: z.number()
+    cursor: z.number(),
+    limit: z.number().default(50)
 })
     .partial()
-    .extend({
-        limit: z.number().default(50)
-    })

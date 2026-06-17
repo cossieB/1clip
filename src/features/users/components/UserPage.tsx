@@ -2,14 +2,16 @@ import { CalendarPlus2Icon, CakeIcon, MapPinIcon, PlusIcon, MinusIcon } from "lu
 import { For, Show } from "solid-js";
 import { HeroHeader } from "~/components/Hero/HeroHeader";
 import { formatDate } from "~/lib/formatDate";
-import { type getUserByUsernameFn } from "~/serverFn/users";
+import { type getUserByUsernameFn } from "~/services/userService";
 import { SITE_URL, STORAGE_DOMAIN } from "~/utils/env";
-import { ClientOnly, Link } from "@tanstack/solid-router";
 import { validateUrl } from "~/lib/validateUrl";
 import styles from "./UserPage.module.css"
 import { useFollowUser } from "../hooks/useFollowUser";
 import { authClient } from "~/auth/authClient";
-import { UserRank } from "~/components/UserRank";
+import { A } from "@solidjs/router";
+import { clientOnly } from "@solidjs/start";
+
+const UserRank = clientOnly(() => import("~/components/UserRank"))
 
 type Props = {
     user: NonNullable<Awaited<ReturnType<typeof getUserByUsernameFn>>>
@@ -52,9 +54,9 @@ export function UserPage(props: Props) {
                     <ul>
                         <li>
                             <img src="/favicon.ico" alt="" />
-                            <Link to="/users/$username" params={{ username: props.user.username! }}>
+                            <A href={"/users/" + props.user.username} >
                                 {`${SITE_URL}users/${props.user.username}`}
-                            </Link>
+                            </A>
                         </li>
                         <For each={props.user.links}>
                             {link =>
@@ -71,9 +73,7 @@ export function UserPage(props: Props) {
                 </div>
             </div>
             <div class={styles.rank}>
-                <ClientOnly>
-                    <UserRank userId={props.user.id} />
-                </ClientOnly>
+                <UserRank userId={props.user.id} />
             </div>
         </div>
     )

@@ -1,5 +1,5 @@
 import { type QueryClient } from "@tanstack/solid-query";
-import { type getCommentsByPostIdFn } from "~/serverFn/comments";
+import { type getCommentsByPostIdFn } from "~/services/comments";
 
 type Comment = Awaited<ReturnType<typeof getCommentsByPostIdFn>>[number]
 

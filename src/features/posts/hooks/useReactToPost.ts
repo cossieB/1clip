@@ -1,18 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/solid-query";
-import { useServerFn } from "@tanstack/solid-start";
-import { getPostFn, reactToPostFn } from "~/serverFn/posts";
 import { modifyPostCache } from "../utils/modifyCache";
 import { useToastContext } from "~/hooks/useToastContext";
 import { authClient } from "~/auth/authClient";
+import { getPostFn, reactToPostFn } from "~/services/postService";
 
 export function useReactToPost(post: Awaited<ReturnType<typeof getPostFn>>) {
     const session = authClient.useSession()
     const { addToast } = useToastContext()
-    const react = useServerFn(reactToPostFn);
-        const queryClient = useQueryClient()
+    const queryClient = useQueryClient()
 
     const mutation = useMutation(() => ({
-        mutationFn: react,
+        mutationFn: reactToPostFn,
     }))
 
     function fn(reaction: "like" | "dislike") {
@@ -20,11 +18,9 @@ export function useReactToPost(post: Awaited<ReturnType<typeof getPostFn>>) {
             if (!session().data) return addToast({ text: "Please login first", type: "warning" })
             if (!session().data?.user.emailVerified) return addToast({ text: "Please verify your account", type: "warning" })
             mutation.mutate({
-                data: {
-                    postId: post.postId,
-                    authorId: post.userId,
-                    reaction,
-                }
+                postId: post.postId,
+                authorId: post.userId,
+                reaction,
             }, {
                 onSuccess(data, variables, onMutateResult, context) {
                     modifyPostCache(queryClient, post.postId, reaction)
@@ -35,5 +31,5 @@ export function useReactToPost(post: Awaited<ReturnType<typeof getPostFn>>) {
             })
         }
     }
-    return {fn, isPending: () => mutation.isPending}
+    return { fn, isPending: () => mutation.isPending }
 }

@@ -1,5 +1,5 @@
 import { onCleanup, onMount } from "solid-js";
-import { viewPostFn } from "~/serverFn/posts";
+import { viewPostFn } from "~/services/postService";
 
 export function useViewPost() {
     const viewedPosts = new Set<number>()
@@ -10,7 +10,7 @@ export function useViewPost() {
     async function send() {
         const diff = viewedPosts.difference(aknowledgedViews);
         if (diff.size == 0) return
-        await viewPostFn({data: Array.from(diff)})
+        await viewPostFn(Array.from(diff))
         diff.forEach(postId => aknowledgedViews.add(postId))
     }
     onMount(() => {
