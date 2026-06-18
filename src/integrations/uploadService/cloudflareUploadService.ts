@@ -1,3 +1,5 @@
+'use server'
+
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
@@ -15,6 +17,7 @@ const S3 = new S3Client({
 });
 
 export function uploadFromServer(file: File, ...pathSegments: string[]) {
+    'use server'
     const key = join(...pathSegments, file.name)
     const upload = new Upload({
         client: S3,
@@ -29,6 +32,7 @@ export function uploadFromServer(file: File, ...pathSegments: string[]) {
 }
 
 export async function generateSignedUrl(filename: string, contentType: string, contentLength: number, pathSegments: string[], metadata?: Record<string, string>) {
+    'use server'
     const ext = filename.slice(filename.lastIndexOf("."))
     const key = join(...pathSegments, crypto.randomUUID() + ext)
     const signedUrl = await getSignedUrl(

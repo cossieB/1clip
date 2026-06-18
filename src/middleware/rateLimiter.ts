@@ -1,6 +1,8 @@
-import { AppError } from "./AppError"
-import { redis } from "./redis"
-import { HttpStatusCode } from "./statusCodes"
+'use server';
+
+import { AppError } from "../utils/AppError"
+import { redis } from "../utils/redis"
+import { HttpStatusCode } from "../utils/statusCodes"
 
 export async function rateLimiter(prefix: string, user: string, limit: number, window: number) {
     const key = `${prefix}:${user}`

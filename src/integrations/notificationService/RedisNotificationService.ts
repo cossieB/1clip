@@ -1,3 +1,5 @@
+'use server';
+
 import { redis } from "~/utils/redis";
 import type { NotificationService } from "./notificationService.interface";
 import { UserNotification } from "~/features/notifications/utils/NotificationsSchema";

@@ -1,0 +1,28 @@
+import { useQueryClient, useQuery } from "@tanstack/solid-query"
+import { createEffect, Match, Suspense, Switch } from "solid-js"
+import { Profile } from "~/features/users/components/ProfilePage"
+import { getLoggedInUser } from "~/services/userService"
+
+export default function ProfileRoute() {
+    const queryClient = useQueryClient()
+    const user = useQuery(() => ({
+        queryKey: ["you"],
+        queryFn: () => getLoggedInUser()
+    }))
+
+    createEffect(() => {
+        if (user.data)
+            queryClient.setQueryData(["users", user.data.id], user.data)
+    })
+
+    return (
+        <Switch>
+            <Match when={user.data}>
+                <Profile user={user.data!} />
+            </Match>
+            <Match when={user.error}>
+                {user.error?.message}
+            </Match>
+        </Switch>
+    )
+}

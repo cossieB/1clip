@@ -1,10 +1,10 @@
-'use server'
+'use server';
 
 import { parseVideoUrl } from "~/components/embeds/IframeFactory";
 import { authedOnly } from "~/middleware/authedOnly";
 import { AppError } from "~/utils/AppError";
 import { createServerFunction } from "~/utils/createServerFunction";
-import { rateLimiter } from "~/utils/rateLimiter";
+import { rateLimiter } from "~/middleware/rateLimiter";
 import { HttpStatusCode } from "~/utils/statusCodes";
 import { GetPostsSchema, PostCreateSchema, ReactToPostSchema } from "~/zod/posts";
 import * as postRepository from "~/repositories/postRepository"

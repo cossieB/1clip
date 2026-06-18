@@ -1,7 +1,7 @@
 'use server'
 
 import { AppError } from "~/utils/AppError"
-import { rateLimiter } from "~/utils/rateLimiter"
+import { rateLimiter } from "~/middleware/rateLimiter"
 import * as commentsRepository from "~/repositories/commentRepository"
 import { CommentCreateSchema, GetCommentsSchema, ReactToCommentSchema } from "~/zod/comment"
 import { notificationsService } from "~/integrations/notificationService"

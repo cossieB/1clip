@@ -5,6 +5,7 @@ import { ErrorBoundary, Suspense } from "solid-js";
 import { MainLayout } from "./components/MainLayout/MainLayout";
 import { ToastProvider } from "./components/Toast/ToastProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
+import { NotificationsProvider } from "./features/notifications/components/NotificationsProvider";
 
 const client = new QueryClient({
     defaultOptions: {
@@ -29,11 +30,14 @@ export default function App() {
                 <QueryClientProvider client={client}>
                     <MetaProvider>
                         <ToastProvider>
-                            <ErrorBoundary fallback={e => <span>{String(e)}</span>}>
+                            <NotificationsProvider>
+
+                            {/* <ErrorBoundary fallback={e => <span>{String(e)}</span>}> */}
                                 <MainLayout>
                                     <Suspense>{props.children}</Suspense>
                                 </MainLayout>
-                            </ErrorBoundary>
+                            {/* </ErrorBoundary> */}
+                            </NotificationsProvider>
                         </ToastProvider>
                     </MetaProvider>
                 </QueryClientProvider>
