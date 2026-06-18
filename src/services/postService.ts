@@ -1,3 +1,5 @@
+'use server'
+
 import { parseVideoUrl } from "~/components/embeds/IframeFactory";
 import { authedOnly } from "~/middleware/authedOnly";
 import { AppError } from "~/utils/AppError";

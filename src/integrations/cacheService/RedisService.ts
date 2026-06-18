@@ -1,3 +1,5 @@
+'use server'
+
 import { redis } from "~/utils/redis";
 import { CacheService } from "./cacheService.interface";
 

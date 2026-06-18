@@ -60,7 +60,7 @@ export function GameAudio(props: Props) {
                         max={1}
                         step={0.05}
                         value={volume()}
-                        onChange={e => {
+                        onInput={e => {
                             setVolume(Number(e.currentTarget.value))
                         }}
                     />

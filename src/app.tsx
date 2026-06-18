@@ -9,7 +9,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
 const client = new QueryClient({
     defaultOptions: {
         queries: {
-            suspense: true,
+            
             gcTime: Infinity,
             refetchOnMount: false,
             retry: false,
@@ -29,7 +29,7 @@ export default function App() {
                 <QueryClientProvider client={client}>
                     <MetaProvider>
                         <ToastProvider>
-                            <ErrorBoundary fallback={e => <span>{e}</span>}>
+                            <ErrorBoundary fallback={e => <span>{String(e)}</span>}>
                                 <MainLayout>
                                     <Suspense>{props.children}</Suspense>
                                 </MainLayout>

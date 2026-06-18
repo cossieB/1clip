@@ -1,7 +1,7 @@
 import { Title } from "@solidjs/meta";
 import { useParams } from "@solidjs/router";
 import { useQuery } from "@tanstack/solid-query";
-import { Show, Suspense } from "solid-js";
+import { Match, Switch } from "solid-js";
 import { CompanyPage } from "~/components/CompanyPage/CompanyPage";
 import { NotFound } from "~/components/NotFound/NotFound";
 import { actorQueryOpts } from "~/features/actors/utils/actorQueryOpts";
@@ -9,15 +9,15 @@ import { GamesList } from "~/features/games/components/GamesList";
 import { STORAGE_DOMAIN } from "~/utils/env";
 
 export default function ActorId() {
-    const {actorId: a} = useParams()
+    const { actorId: a } = useParams()
     const actorId = Number(a)
     if (!actorId || actorId < 1) return <NotFound />
-    
+
     const actorResult = useQuery(() => actorQueryOpts(actorId))
 
     return (
-        <>
-            <Suspense >
+        <Switch>
+            <Match when={actorResult.data} >
                 <Title> {actorResult.data?.name} </Title>
                 <CompanyPage
                     id={actorResult.data!.actorId}
@@ -27,10 +27,13 @@ export default function ActorId() {
                     type='actor'
                     showName
                 />
-            </Suspense>
-            <GamesList
-                filters={{ actorId }}
-            />
-        </>
+                <GamesList
+                    filters={{ actorId }}
+                />
+            </Match>
+            <Match when={actorResult.error}>
+                Errored
+            </Match>
+        </Switch>
     )
 }

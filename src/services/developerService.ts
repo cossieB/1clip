@@ -1,3 +1,5 @@
+'use server'
+
 import { createServerFunction } from "~/utils/createServerFunction";
 import { LimitOffsetSchema } from "~/zod/common";
 import * as developerRepository from "~/repositories/developerRepository"

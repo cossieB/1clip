@@ -1,6 +1,6 @@
 import { type getGameFn } from "~/services/gamesService"
 import styles from "./GamePage.module.css"
-import { For, Show } from "solid-js"
+import { For, Show, Suspense } from "solid-js"
 import { LogoLink } from "~/components/LogoLink/LogoLink"
 import { PhotoCardGrid } from "~/components/CardLink/PhotoCardLink"
 import { STORAGE_DOMAIN } from "~/utils/env"
@@ -94,13 +94,13 @@ export function GamePage(props: Props) {
                 <Screenshots media={props.game.media} />
             </div>
             <h2>Similar Games</h2>
-            <SimilarGames gameId={props.game.gameId} />
+            <Suspense>
+                <SimilarGames gameId={props.game.gameId} />
+            </Suspense>
             <GameAudio media={props.game.media} />
         </div>
     )
 }
-
-
 
 function ReleaseDate(props: { date: string }) {
     const date = props.date.split(/[\-\/]/)

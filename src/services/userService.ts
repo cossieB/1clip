@@ -1,3 +1,5 @@
+'use server'
+
 import z from "zod";
 import { createServerFunction } from "~/utils/createServerFunction";
 import * as userRepository from "~/repositories/userRepository"

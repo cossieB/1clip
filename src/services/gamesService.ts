@@ -1,4 +1,4 @@
-"use server"
+'use server'
 
 import { createServerFunction } from "~/utils/createServerFunction";
 import { GameCreateSchema, GameEditSchema, GetGamesSchema } from "~/zod/games";
@@ -45,6 +45,6 @@ export const searchGamesFn = createServerFunction()
 
 export const getSimilarGames = createServerFunction()
     .setValidator(z.number().positive())
-    .handler(gameId => {
-        return cacheAside(`similar:${gameId}`, () => gamesRepository.similarGames(gameId), 604800)
+    .handler(async gameId => {
+        return await gamesRepository.similarGames(gameId)
     })

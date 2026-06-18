@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/solid-query"
-import { createSignal } from "solid-js"
+import { createEffect, createSignal, Match, Switch } from "solid-js"
 import { PhotoCardGrid } from "~/components/CardLink/PhotoCardLink"
 import { useInView } from "~/hooks/useInView"
 import { getSimilarGames } from "~/services/gamesService"
@@ -17,13 +17,22 @@ export default function SimilarGames(props: { gameId: number }) {
 
     return (
         <div ref={setRef}>
-
-            <PhotoCardGrid
-                arr={result.data ?? []}
-                getLabel={game => game.title}
-                getPic={game => STORAGE_DOMAIN + game.cover}
-                getHref={game => "/games/" + game.gameId}
-            />
+            <Switch>
+                <Match when={result.isSuccess}>
+                    <PhotoCardGrid
+                        arr={result.data ?? []}
+                        getLabel={game => game.title}
+                        getPic={game => STORAGE_DOMAIN + game.cover}
+                        getHref={game => "/games/" + game.gameId}
+                    />
+                </Match>
+                <Match when={result.isPending}>
+                    <span>Loading</span>
+                </Match>
+                <Match when={result.isError}>
+                    <span>Errored</span>
+                </Match>
+            </Switch>            
         </div>
     )
 }
