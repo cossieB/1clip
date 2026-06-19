@@ -1,3 +1,4 @@
+import { Meta, Title } from "@solidjs/meta"
 import { useParams } from "@solidjs/router"
 import { useQuery } from "@tanstack/solid-query"
 import { Suspense } from "solid-js"
@@ -14,6 +15,8 @@ export default function PublisherIdPage() {
     return (
         <>
             <Suspense>
+                <Title> {devResult.data!.name} </Title>     
+                <Meta name="og:image" content={STORAGE_DOMAIN + devResult.data?.logo} />
                 <CompanyPage
                     id={devResult.data!.publisherId}
                     logo={STORAGE_DOMAIN + devResult.data!.logo}

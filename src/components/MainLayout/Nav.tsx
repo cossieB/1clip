@@ -30,7 +30,7 @@ export function Nav(props: { setOpen: Setter<boolean> }) {
             </div>
             <ul>
                 <NavItem
-                    href="/"
+                    href="/posts"
                     label="Home"
                     icon={<HouseIcon />}
                 />

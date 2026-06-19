@@ -1,3 +1,4 @@
+import { Meta, Title } from "@solidjs/meta"
 import { useParams } from "@solidjs/router"
 import { useQuery } from "@tanstack/solid-query"
 import { Suspense } from "solid-js"
@@ -14,6 +15,8 @@ export default function PlatformIdPage() {
     return (
         <>
             <Suspense>
+                <Title> {devResult.data!.name} </Title>
+                <Meta name="og:image" content={STORAGE_DOMAIN + devResult.data?.logo} />                                
                 <CompanyPage
                     id={devResult.data!.platformId}
                     logo={STORAGE_DOMAIN + devResult.data!.logo}
@@ -23,8 +26,8 @@ export default function PlatformIdPage() {
                 />
             </Suspense>
             <GamesList
-                filters={{platformId: Number(params.platformId)}}
+                filters={{ platformId: Number(params.platformId) }}
             />
         </>
-    )    
+    )
 }
