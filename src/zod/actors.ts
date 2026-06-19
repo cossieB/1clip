@@ -1,6 +1,6 @@
 import z from "zod"
 
-export const actorCreateSchema = z.object({
+export const ActorCreateSchema = z.object({
     name: z.string(),
     bio: z.string().optional(),
     photo: z.string().nullish(),
@@ -12,4 +12,4 @@ export const actorCreateSchema = z.object({
     }))
 })    
 
-export const actorEditSchema = actorCreateSchema.partial().extend({actorId: z.number()})
+export const ActorEditSchema = ActorCreateSchema.partial().extend({actorId: z.number()})

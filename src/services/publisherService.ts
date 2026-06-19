@@ -1,37 +1,33 @@
 'use server'
 
-import { createServerFunction } from "~/utils/createServerFunction";
 import { LimitOffsetSchema } from "~/zod/common";
 import * as publisherRepository from "~/repositories/publisherRepository"
 import z from "zod";
 import { notFound } from "~/utils/notFound";
-import { publisherCreateSchema, publisherEditSchema } from "~/zod/publishers";
+import { PublisherCreateSchema, PublisherEditSchema } from "~/zod/publishers";
+import { parseZod } from "~/utils/parseZod";
 
-export const getPublishersFn = createServerFunction()
-    .setValidator(LimitOffsetSchema)
-    .handler(async data => {
-        const pubs = await publisherRepository.findAll(data)
-        return pubs        
-    })
+export async function getPublishersFn(args: z.input<typeof LimitOffsetSchema>) {
+    const data = parseZod(LimitOffsetSchema, args)
+    const devs = await publisherRepository.findAll(data)
+    return devs
+}
+export async function getPublisherFn(publisherId: number) {
+    parseZod(z.number(), publisherId)
+    if (publisherId < 1) throw notFound("These aren't the publishers you're looking for")
+    const dev = await publisherRepository.findById(publisherId)
+    if (!dev) throw notFound("These aren't the publishers you're looking for")
+    return dev
+}
 
-export const getPublisherFn = createServerFunction()
-    .setValidator(z.number())
-    .handler(async data => {
-        const dev = await publisherRepository.findById(data)
-        if (!dev) throw notFound()
-        return dev        
-    })
+export async function createPublisherFn(arg: z.input<typeof PublisherCreateSchema>) {
+    const data = parseZod(PublisherCreateSchema, arg)
+    const dev = await publisherRepository.createPublisher(data)
+    return dev
+}
 
-export const createPublisherFn = createServerFunction()
-    .setValidator(publisherCreateSchema)
-    .handler(async data => {
-        const pub = await publisherRepository.createPublisher(data)
-        return pub        
-    })
-
-export const editPublisherFn = createServerFunction()
-    .setValidator(publisherEditSchema)
-    .handler(async data => {
-        const {publisherId, ...rest} = data
-        await publisherRepository.editPublisher(publisherId, rest)        
-    })
+export async function editPublisherFn(arg: z.input<typeof PublisherEditSchema>) {
+    const data = parseZod(PublisherEditSchema, arg)
+    const { publisherId, ...rest } = data
+    await publisherRepository.editPublisher(publisherId, rest)
+}

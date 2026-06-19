@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/solid-query"
 import { useToastContext } from "~/hooks/useToastContext"
 import { commentListQueryOpts } from "../utils/commentListQueryOpts"
-import { deleteCommentFn, getCommentsByPostIdFn } from "~/services/comments"
+import { deleteCommentFn, getCommentsByPostIdFn } from "~/services/commentService"
 
 export function useDeleteComment(comment: Awaited<ReturnType<typeof getCommentsByPostIdFn>>[number], postId: number, replyTo?: number) {
     const { addToast } = useToastContext()

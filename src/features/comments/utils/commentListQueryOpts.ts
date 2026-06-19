@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/solid-query";
-import { getCommentsByPostIdFn } from "~/services/comments";
+import { getCommentsByPostIdFn } from "~/services/commentService";
 
 type Opts = {
     postId: number,

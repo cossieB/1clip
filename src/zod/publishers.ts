@@ -1,6 +1,6 @@
 import z from "zod"
 
-export const publisherCreateSchema = z.object({
+export const PublisherCreateSchema = z.object({
         name: z.string(),
         logo: z.string(),
         summary: z.string().default(""),
@@ -8,6 +8,6 @@ export const publisherCreateSchema = z.object({
         country: z.string().nullish()
     })
 
-export const publisherEditSchema = publisherCreateSchema.partial().extend({
+export const PublisherEditSchema = PublisherCreateSchema.partial().extend({
     publisherId: z.number()
 })    

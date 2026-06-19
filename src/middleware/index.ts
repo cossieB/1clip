@@ -1,9 +1,6 @@
 import { createMiddleware } from "@solidjs/start/middleware";
-import { getCurrentUser } from "~/services/authService";
+import { authenticate } from "./authenticate";
 
 export default createMiddleware({
-    onBeforeResponse: async (event) => {
-        const user = await getCurrentUser();
-        event.locals.user = user
-    }
+    onRequest: [authenticate],
 })

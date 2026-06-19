@@ -2,7 +2,7 @@ import { PostBlock } from "./PostBlock";
 import { type getPostsFn } from "~/services/postService";
 import { createSignal } from "solid-js";
 import { useMutation, useQueryClient } from "@tanstack/solid-query";
-import { addCommentFn } from "~/services/comments";
+import { addCommentFn } from "~/services/commentService";
 import { CommentInput } from "~/features/comments/components/CommentInput";
 import { commentListQueryOpts } from "~/features/comments/utils/commentListQueryOpts";
 import { useLocation } from "@solidjs/router";

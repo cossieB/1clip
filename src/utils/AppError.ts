@@ -1,4 +1,4 @@
-import { setResponseStatus } from "@solidjs/start/http";
+import { setResponseHeader, setResponseStatus } from "@solidjs/start/http";
 import { HttpStatusCode } from "./statusCodes";
 
 export class AppError extends Error {
@@ -7,6 +7,7 @@ export class AppError extends Error {
         public readonly status: HttpStatusCode) {
         super(message);
         setResponseStatus(status);
+        setResponseHeader("X-Status", status.toString())
         this.name = "AppError";
     }
 }

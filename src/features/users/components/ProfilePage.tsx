@@ -15,11 +15,10 @@ import { ConfirmDialog } from "~/components/Popover/Confirm";
 export function Profile(props: { user: Awaited<ReturnType<typeof getLoggedInUser>> }) {
     const {
         handleSubmit,
-        mutation,
         setUser,
         user,
         setFiles,
-        isUploading
+        isPending
     } = useEditProfile(props)
 
     const { addToast } = useToastContext()
@@ -27,7 +26,7 @@ export function Profile(props: { user: Awaited<ReturnType<typeof getLoggedInUser
 
     return (
         <div class={`${styles.profile} flexCenter`}>
-            <Form onSubmit={handleSubmit} isPending={mutation.isPending || isUploading()}>
+            <Form onSubmit={handleSubmit} isPending={isPending()}>
                 <Form.Input<typeof user>
                     field="displayName"
                     label='Display Name'

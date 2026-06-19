@@ -1,25 +1,18 @@
 import z from "zod";
 import { generateSignedUrl } from "./cloudflareUploadService";
-import { createServerFunction } from "~/utils/createServerFunction";
-import { authedOnly } from "~/middleware/authedOnly";
+import { authedOnly } from "~/middleware/authenticate";
+import { SignedUrlSchema } from "~/zod/upload";
+import { parseZod } from "~/utils/parseZod";
 
-export const getSignedUrls = createServerFunction()
-    .setValidator(z.object({
-        paths: z.string().array(),
-        files: z.array(z.object({
-            filename: z.string(),
-            contentType: z.string().refine(val => /^(image|video|audio)/.test(val)),
-            contentLength: z.number(),
-            metadata: z.record(z.string(), z.string()).optional()
-        }))
-    }))
-    .handler(async data => {
-        const user = authedOnly()
-        return await Promise.all(data.files.map(obj => generateSignedUrl(
-            obj.filename, 
-            obj.contentType, 
-            obj.contentLength, 
-            [...data.paths, user.id],
-            obj.metadata
-        )))
-    })
+export async function getSignedUrls(args: z.input<typeof SignedUrlSchema>) {
+    'use server'
+    const data = parseZod(SignedUrlSchema, args)
+    const user = authedOnly()
+    return await Promise.all(data.files.map(obj => generateSignedUrl(
+        obj.filename,
+        obj.contentType,
+        obj.contentLength,
+        [...data.paths, user.id],
+        obj.metadata
+    )))
+}    

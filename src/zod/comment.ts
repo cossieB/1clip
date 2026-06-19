@@ -12,6 +12,11 @@ export const GetCommentsSchema = z.object({
     replyTo: z.number().optional()
 })
 
+export const GetCommentSchema = z.object({
+    postId: z.number(),
+    commentId: z.number()
+})
+
 export const ReactToCommentSchema = z.object({
     commentId: z.number(),
     reaction: z.enum(["like", "dislike"])

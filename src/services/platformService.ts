@@ -1,38 +1,33 @@
 'use server'
 
-import { createServerFunction } from "~/utils/createServerFunction";
 import { LimitOffsetSchema } from "~/zod/common";
 import * as platformRepository from "~/repositories/platformRepository"
 import z from "zod";
-import { HttpStatusCode } from "~/utils/statusCodes";
-import { platformCreateSchema, platformEditSchema } from "~/zod/platforms";
+import { PlatformCreateSchema, PlatformEditSchema } from "~/zod/platforms";
 import { notFound } from "~/utils/notFound";
+import { parseZod } from "~/utils/parseZod";
 
-export const getPlatformsFn = createServerFunction()
-    .setValidator(LimitOffsetSchema)
-    .handler(async (data) => {
-        const platforms = await platformRepository.findAll(data)
-        return platforms        
-    })
+export async function getPlatformsFn(args: z.input<typeof LimitOffsetSchema>) {
+    const data = parseZod(LimitOffsetSchema, args)
+    const devs = await platformRepository.findAll(data)
+    return devs
+}
+export async function getPlatformFn(platformId: number) {
+    parseZod(z.number(), platformId)
+    if (platformId < 1) throw notFound("These aren't the platforms you're looking for")
+    const dev = await platformRepository.findById(platformId)
+    if (!dev) throw notFound("These aren't the platforms you're looking for")
+    return dev
+}
 
-export const getPlatformFn = createServerFunction()
-    .setValidator(z.number())    
-    .handler(async data => {
-        const platform = await platformRepository.findById(data)
-        if (!platform) throw notFound( "These aren't the platforms you're looking for")
-        return platform        
-    })
+export async function createPlatformFn(arg: z.input<typeof PlatformCreateSchema>) {
+    const data = parseZod(PlatformCreateSchema, arg)
+    const dev = await platformRepository.createPlatform(data)
+    return dev
+}
 
-export const createPlatformFn = createServerFunction()
-    .setValidator(platformCreateSchema)
-    .handler(async data => {
-        const platform =  await platformRepository.createPlatform(data)
-        return platform        
-    })
-
-export const editPlatformFn = createServerFunction()
-    .setValidator(platformEditSchema)
-    .handler(async data => {
-        const {platformId, ...rest} = data
-        await platformRepository.editPlatform(platformId, rest)        
-    })
+export async function editPlatformFn(arg: z.input<typeof PlatformEditSchema>) {
+    const data = parseZod(PlatformEditSchema, arg)
+    const { platformId, ...rest } = data
+    await platformRepository.editPlatform(platformId, rest)
+}

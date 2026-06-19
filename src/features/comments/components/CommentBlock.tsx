@@ -11,7 +11,7 @@ import { useDeleteComment } from "../hooks/useDeleteComment";
 import { authClient } from "~/auth/authClient";
 import { ConfirmDialog } from "~/components/Popover/Confirm";
 import { PostAuthor } from "~/features/posts/components/PostAuthor";
-import { getCommentsByPostIdFn } from "~/services/comments";
+import { getCommentsByPostIdFn } from "~/services/commentService";
 import { A } from "@solidjs/router";
 
 type Props = {
