@@ -1,6 +1,6 @@
 import { getRelativeTime } from "~/lib/getRelativeTime";
 import { MessageCircleIcon, ThumbsUpIcon, ThumbsDownIcon, EllipsisVerticalIcon } from "lucide-solid";
-import { CommentInput } from "./CommentInput";
+import CommentInput from "./CommentInput";
 import { Show } from "solid-js";
 import styles from "./Comments.module.css"
 import { CommentList } from "./CommentList";
@@ -21,7 +21,7 @@ type Props = {
 };
 
 export function CommentBlock(props: Props) {
-
+    
     const { fn, isPending } = useReactToComment(props.comment, props.originalPost);
     const { setCommentState, commentState, replyMutation } = useReplyToComment(props.comment, props.originalPost)
     const session = authClient.useSession()

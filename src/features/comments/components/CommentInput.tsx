@@ -1,8 +1,9 @@
 import { ComponentProps, Show, splitProps } from "solid-js";
-import { authClient } from "~/auth/authClient";
 import { StandaloneTextarea } from "~/components/Forms/FormTextarea";
 import { SubmitBtn } from "~/components/Forms/SubmitBtn";
 import styles from "./CommentInput.module.css"
+import { useQuery } from "@tanstack/solid-query";
+import { sessionQueryOpts } from "~/hooks/useServerSession";
 
 type P = {
     comment: string;
@@ -11,15 +12,16 @@ type P = {
     submit(): void
 } & ComponentProps<"textarea">
 
-export function CommentInput(props: P) {
-    const session = authClient.useSession();
+export default function CommentInput(props: P) {
+    const session = useQuery(() => sessionQueryOpts());
+    
     const [_, rest] = splitProps(props, ['comment', 'isPending', 'setComment', 'submit'])
     return (
         <div
             class={styles.commentArea}
             classList={{ [styles.nonEmpty]: props.comment.length > 0 }}
         >
-            <Show when={session().data?.user.emailVerified}>
+            <Show when={session.data?.emailVerified}>
                 <StandaloneTextarea
                     {...rest}
                     label="Add your comment..."

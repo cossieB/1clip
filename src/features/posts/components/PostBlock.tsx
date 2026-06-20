@@ -23,7 +23,7 @@ export function PostBlock(props: Props) {
     const session = authClient.useSession()
     const { fn, isPending } = useReactToPost(props.post)
     const { deleteMutation } = useDeletePost(props.post)
-
+    
     return (
         <div data-type="post" data-postId={props.post.postId} class={styles.postContainer}>
             <PostAuthor 

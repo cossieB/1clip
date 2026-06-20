@@ -5,8 +5,8 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { username } from "better-auth/plugins";
 import { db } from "~/drizzle/db";
 import { emailService } from "~/integrations/emailService";
-
 import * as schema from "~/drizzle/schema"
+import { redis } from "~/utils/redis";
 
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
@@ -111,20 +111,20 @@ export const auth = betterAuth({
             },
         }
     },
-    // secondaryStorage: {
-    //     async set(key, value, ttl) {
-    //         if (ttl)
-    //             await redis.setEx(key, ttl, value)
-    //         else
-    //             await redis.set(key, value)
-    //     },
-    //     async delete(key) {
-    //         await redis.del(key)
-    //     },
-    //     get(key) {
-    //         return redis.get(key)
-    //     },
-    // },
+    secondaryStorage: {
+        async set(key, value, ttl) {
+            if (ttl)
+                await redis.setEx(key, ttl, value)
+            else
+                await redis.set(key, value)
+        },
+        async delete(key) {
+            await redis.del(key)
+        },
+        get(key) {
+            return redis.get(key)
+        },
+    },
     rateLimit: {
         enabled: true,
         customRules: {

@@ -1,9 +1,10 @@
-'use server'
+'use server';
 
-import { redirect } from "@solidjs/router";
+import { query, redirect } from "@solidjs/router";
 import { getRequestHeaders } from "@solidjs/start/http"
 import { auth } from "~/auth/server";
 import * as userRepository from "~/repositories/userRepository"
+import { CustomSession } from "~/utils/types";
 
 export async function checkSession() {
     const headers = getRequestHeaders();
@@ -32,7 +33,7 @@ export async function getCurrentUser() {
         headers
     })
     if (!session) return null
-    return session.user
+    return session.user as CustomSession
 }
 
 export async function revokeSession() {

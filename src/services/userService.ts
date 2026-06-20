@@ -1,7 +1,6 @@
 'use server'
 
 import z from "zod";
-import { createServerFunction } from "~/utils/createServerFunction";
 import * as userRepository from "~/repositories/userRepository"
 import { notFound } from "~/utils/notFound";
 import { getRequestEvent } from "solid-js/web";
@@ -14,7 +13,6 @@ import { notificationsService } from "~/integrations/notificationService";
 import { cacheAside } from "~/utils/cacheAside";
 import { getRank } from "~/utils/getRank";
 import { forceLogin } from "./authService";
-import { redirect } from "@solidjs/router";
 import { parseZod } from "~/utils/parseZod";
 
 export async function getLoggedInUser() {

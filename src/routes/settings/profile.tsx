@@ -6,7 +6,7 @@ import { getLoggedInUser } from "~/services/userService"
 export default function ProfileRoute() {
     const queryClient = useQueryClient()
     const user = useQuery(() => ({
-        queryKey: ["you"],
+        queryKey: ["loggedInUser"],
         queryFn: () => getLoggedInUser()
     }))
 

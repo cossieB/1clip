@@ -9,7 +9,6 @@ import z from "zod"
 import { getCurrentUser } from "./authService"
 import { authedOnly } from "~/middleware/authenticate"
 import { HttpStatusCode } from "~/utils/statusCodes"
-import { redirect } from "@solidjs/router"
 import { parseZod } from "~/utils/parseZod"
 
 export async function addCommentFn(comment: z.input<typeof CommentCreateSchema>) {
@@ -62,6 +61,5 @@ export async function getCommentByIdFn(args: z.input<typeof GetCommentSchema>) {
     const data = parseZod(GetCommentSchema, args)
     const user = await getCurrentUser();
     const comment = await commentsRepository.getById(data.commentId, data.postId, user?.id)
-    if (!comment) throw redirect(`/posts/${data.postId}`)
-    return comment
+    return comment ?? null
 }

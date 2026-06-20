@@ -1,11 +1,13 @@
 import { PostBlock } from "./PostBlock";
 import { type getPostsFn } from "~/services/postService";
-import { createSignal } from "solid-js";
+import { createSignal, Suspense } from "solid-js";
 import { useMutation, useQueryClient } from "@tanstack/solid-query";
 import { addCommentFn } from "~/services/commentService";
-import { CommentInput } from "~/features/comments/components/CommentInput";
 import { commentListQueryOpts } from "~/features/comments/utils/commentListQueryOpts";
 import { useLocation } from "@solidjs/router";
+import { clientOnly } from "@solidjs/start";
+import CommentInput from "~/features/comments/components/CommentInput";
+
 
 type Props = {
     post: Awaited<ReturnType<typeof getPostsFn>>[number]
@@ -31,7 +33,8 @@ export function PostId(props: Props) {
 
     return (
         <>
-            <PostBlock post={props.post!} />
+            <PostBlock post={props.post} />
+
             <CommentInput
                 comment={comment()}
                 isPending={mutation.isPending}
