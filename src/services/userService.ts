@@ -24,17 +24,15 @@ export async function getLoggedInUser() {
 
 export async function getUserByUsernameFn(username: string) {
     const u = getRequestEvent()?.locals.user
-    const user = await userRepository.findByUsername(z.coerce.string().parse(username), u?.id);
-    if (!user) throw notFound();
-    return user
+    const user = await userRepository.findByUsername(z.coerce.string().toLowerCase().parse(username), u?.id);   
+    return user ?? null
 }
 
 export async function getUserByIdFn(userId: string) {
     parseZod(z.uuid(), userId)
     const u = getRequestEvent()?.locals.user
-    const user = await userRepository.findById(userId, u?.id);
-    if (!user) throw notFound();
-    return user
+    const user = await userRepository.findById(userId, u?.id);    
+    return user ?? null
 }
 
 export async function updateCurrentUser(arg: z.input<typeof UpdateUserSchema>) {

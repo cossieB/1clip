@@ -7,7 +7,7 @@ export default function GamesByGenreRoute() {
     const params = useParams()
     return (
         <>
-        <Title> {titleCase(decodeURIComponent(params.genre!))} </Title>
+        <Title> {titleCase(decodeURIComponent(params.genre!))} Games </Title>
         <GamesList filters={{genre: decodeURIComponent(params.genre!)}} />
         </>
     )

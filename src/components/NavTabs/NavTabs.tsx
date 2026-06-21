@@ -1,6 +1,6 @@
 import { ComponentProps, createEffect, createSignal, For, splitProps } from "solid-js"
 import styles from "./NavTabs.module.css"
-import { A, useMatch } from "@solidjs/router"
+import { A, useLocation, useMatch } from "@solidjs/router"
 
 type Props = {
     tabs: Array<ComponentProps<typeof A> & {label: string}>
@@ -26,7 +26,7 @@ function Tab(props: Props["tabs"][number] & { setIdx(): void }) {
     const [div, linkProps] = splitProps(props, ['label', 'setIdx'])
 
     const match = useMatch(() => props.href);
-    
+    const location = useLocation()
     
     createEffect(() => {
         if (match())
@@ -36,7 +36,7 @@ function Tab(props: Props["tabs"][number] & { setIdx(): void }) {
     return (
         <div class={`${styles.tab} cutout`}>
             {div.label}
-            <A {...linkProps} />
+            <A {...linkProps} href={linkProps.href + location.search} />
         </div>
     )
 }
