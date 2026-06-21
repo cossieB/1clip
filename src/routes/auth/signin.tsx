@@ -1,4 +1,4 @@
-import { A, revalidate, useNavigate, useSearchParams } from "@solidjs/router"
+import { A, revalidate, useLocation, useNavigate, useSearchParams } from "@solidjs/router"
 import { useQueryClient } from "@tanstack/solid-query"
 import { createSignal } from "solid-js"
 import { createStore } from "solid-js/store"
@@ -12,6 +12,7 @@ export default function SigninRoute() {
     const redirect = () => Array.isArray(search.redirect) ? search.redirect[0] : search.redirect
     const navigate = useNavigate()
     const [isSubmitting, setIsSubmitting] = createSignal(false);
+    const queryClient = useQueryClient()
 
     const [input, setInput] = createStore({
         username: "",
@@ -35,11 +36,13 @@ export default function SigninRoute() {
             },
             async onSuccess() {
                 await revalidate(getActiveSession.key)
+                queryClient.clear()
                 navigate(redirect() ?? "/settings/profile")
             }
         })
     }
-
+    const location = useLocation()
+    
     return (
         <div class='page flexCenter'>
             <Form
@@ -49,7 +52,7 @@ export default function SigninRoute() {
             >
                 <h1>Login</h1>
                 <aside>
-                    Don't have an account? <A href='/auth/signup'>Click here to register</A>
+                    Don't have an account? <A href={'/auth/signup' + location.search}>Click here to register</A>
                 </aside>
                 <Form.Input<typeof input>
                     field="username"

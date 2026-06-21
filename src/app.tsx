@@ -7,6 +7,8 @@ import { ToastProvider } from "./components/Toast/ToastProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
 import { NotificationsProvider } from "./features/notifications/components/NotificationsProvider";
 
+
+export default function App() {
 const client = new QueryClient({
     defaultOptions: {
         queries: {
@@ -22,8 +24,7 @@ const client = new QueryClient({
             throwOnError: true,
         },
     }
-})
-export default function App() {
+})    
     return (
         <Router
             root={props => (

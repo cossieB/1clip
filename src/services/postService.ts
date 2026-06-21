@@ -12,7 +12,6 @@ import { getRequestEvent } from "solid-js/web";
 import { notificationsService } from "~/integrations/notificationService";
 import { getRequestIP } from "@solidjs/start/http";
 import { redis } from "~/utils/redis";
-import { notFound } from "~/utils/notFound";
 import { parseZod } from "~/utils/parseZod";
 
 export async function createPostFn(arg: z.input<typeof PostCreateSchema>) {
@@ -36,8 +35,7 @@ export async function getPostFn(postId: number) {
     parseZod(z.number(), postId)
     const user = getRequestEvent()?.locals.user
     const post = await postRepository.findById(postId, user?.id)
-    if (!post) throw notFound()
-    return post
+    return post ?? null
 }
 
 export async function getPostsFn(filters: z.input<typeof GetPostsSchema>) {

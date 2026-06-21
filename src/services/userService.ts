@@ -12,17 +12,14 @@ import { HttpStatusCode } from "~/utils/statusCodes";
 import { notificationsService } from "~/integrations/notificationService";
 import { cacheAside } from "~/utils/cacheAside";
 import { getRank } from "~/utils/getRank";
-import { forceLogin } from "./authService";
 import { parseZod } from "~/utils/parseZod";
 
 export async function getLoggedInUser() {
     const session = getRequestEvent()?.locals.user
-    if (!session) throw notFound()
+    if (!session) return null
     const user = await userRepository.findById(session.id);
-    if (!user) {
-        return forceLogin()
-    }
-    return user
+    
+    return user ?? null
 }
 
 export async function getUserByUsernameFn(username: string) {

@@ -1,4 +1,5 @@
-import { A, revalidate, useNavigate } from "@solidjs/router"
+import { A, revalidate, useLocation, useNavigate } from "@solidjs/router"
+import { useQueryClient } from "@tanstack/solid-query"
 import { createSignal } from "solid-js"
 import { createStore } from "solid-js/store"
 import { authClient } from "~/auth/authClient"
@@ -18,6 +19,7 @@ export default function SignupRoute() {
     const [submitting, setSubmitting] = createSignal(false)
     const { addToast } = useToastContext()
     const navigate = useNavigate()
+    const queryClient = useQueryClient()
     const emptyInput = () => Object.values(input).some(val => !val)
 
     async function handleSubmit(e: SubmitEvent) {
@@ -33,7 +35,8 @@ export default function SignupRoute() {
                 setSubmitting(false)
             },
             async onSuccess() {
-                await revalidate(getActiveSession.key)            
+                await revalidate(getActiveSession.key)     
+                queryClient.clear()       
                 addToast({
                     type: "info",
                     text: "Successfully created your account. Click the link in your email to verify your account",
@@ -44,6 +47,8 @@ export default function SignupRoute() {
         })
     }
 
+    const location = useLocation()
+
     return (
         <div class="page flexCenter">
             <Form
@@ -53,7 +58,7 @@ export default function SignupRoute() {
             >
                 <h1>Register</h1>
                 <aside>
-                    Already have an account? <A href='/auth/signin'>Click here to login</A>
+                    Already have an account? <A href={'/auth/signin' + location.search}>Click here to login</A>
                 </aside>
                 <Form.Input<typeof input>
                     field="email"

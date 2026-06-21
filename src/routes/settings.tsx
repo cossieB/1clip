@@ -1,21 +1,32 @@
-import { useSearchParams } from "@solidjs/router";
+import { createAsync, Navigate, query, redirect, useSearchParams } from "@solidjs/router";
 import { JSXElement, Show } from "solid-js";
+import { getRequestEvent } from "solid-js/web";
 import { authClient } from "~/auth/authClient";
 import { NavTabs } from "~/components/NavTabs/NavTabs";
 import { useToastContext } from "~/hooks/useToastContext";
+import { HttpStatusCode } from "~/utils/statusCodes";
+
+const getSession = query(async () => {
+    'use server'
+    const user = getRequestEvent()?.locals.user
+    if (!user) throw redirect("/auth/signin", {
+        status: HttpStatusCode.TEMPORARY_REDIRECT,
+        headers: {
+            "Cache-Control": "no-store, no-cache"
+        }
+    })
+    return user
+}, "u")
 
 export default function RouteComponent(props: {children: JSXElement}) {
-    const session = authClient.useSession();
+    const session = createAsync(() => getSession())
     const {addToast} = useToastContext()
-    const isUnverified = () => {
-        const data = session().data
-        if (!data) return false
-        return !data.user.emailVerified
-    }
+    const isUnverified = () => session() && !session()?.emailVerified
     const [search, setSearch] = useSearchParams()
     
     return (
         <div class={"page"}>
+
             <Show when={isUnverified()}>
                 <aside
                     style={{ "background-color": "red", padding: "0.5rem 1rem" }}
@@ -24,7 +35,7 @@ export default function RouteComponent(props: {children: JSXElement}) {
                     Click{" "}
                     <button onclick={async (e) => {
                         await authClient.sendVerificationEmail({
-                            email: session().data!.user.email,
+                            email: session()!.email,
                             callbackURL: "/settings/profile"
                         }, {
                             onRequest() {
