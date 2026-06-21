@@ -1,14 +1,14 @@
-import { A, useNavigate } from "@solidjs/router"
-import { useQueryClient } from "@tanstack/solid-query"
+import { A, revalidate, useNavigate } from "@solidjs/router"
 import { createSignal } from "solid-js"
 import { createStore } from "solid-js/store"
 import { authClient } from "~/auth/authClient"
 import { Form } from "~/components/Forms/Form"
 import { useToastContext } from "~/hooks/useToastContext"
+import { getActiveSession } from "~/services/authService"
 
 export default function SignupRoute() {
     let btn!: HTMLButtonElement;
-    const queryClient = useQueryClient()
+    
     const [input, setInput] = createStore({
         email: "",
         password: "",
@@ -33,7 +33,7 @@ export default function SignupRoute() {
                 setSubmitting(false)
             },
             async onSuccess() {
-                await queryClient.invalidateQueries({queryKey: ["you"]})                
+                await revalidate(getActiveSession.key)            
                 addToast({
                     type: "info",
                     text: "Successfully created your account. Click the link in your email to verify your account",

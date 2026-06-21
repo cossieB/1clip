@@ -10,7 +10,7 @@ export function useReactToPost(post: Awaited<ReturnType<typeof getPostFn>>) {
     const queryClient = useQueryClient()
 
     const mutation = useMutation(() => ({
-        mutationFn: reactToPostFn,
+        mutationFn: (arg: Parameters<typeof reactToPostFn>[0]) => reactToPostFn(arg),
     }))
 
     function fn(reaction: "like" | "dislike") {

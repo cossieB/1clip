@@ -5,13 +5,10 @@ import { Form } from '~/components/Forms/Form'
 import { useToastContext } from '~/hooks/useToastContext'
 import styles from "./ProfilePage.module.css"
 import { ConfirmDialog } from '~/components/Popover/Confirm'
-import { useNavigate } from '@solidjs/router'
 
 export function SecurityPage() {
     const { addToast } = useToastContext()
     const [isPending, setIsPending] = createSignal(false)
-    const session = authClient.useSession()
-    const navigate = useNavigate()
 
     const [input, setInput] = createStore({
         email: "",

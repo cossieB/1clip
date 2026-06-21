@@ -2,7 +2,7 @@
 
 import { and, desc, eq, getColumns, SQL, sql } from "drizzle-orm";
 import { db } from "~/drizzle/db";
-import { gameActors, gamePlatforms, gameGenres, actors, platforms, media, games, publishers, developers, genres } from "~/drizzle/schema/schema";
+import { gameActors, gamePlatforms, gameGenres, actors, platforms, media, games, publishers, developers } from "~/drizzle/schema/schema";
 import { Actor, Platform } from "~/drizzle/models";
 
 type Args = {

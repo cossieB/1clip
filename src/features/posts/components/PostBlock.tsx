@@ -5,7 +5,6 @@ import { getRelativeTime } from '~/lib/getRelativeTime'
 import { formatDate } from '~/lib/formatDate'
 import { Carousel } from '~/components/Carousel/Carousel'
 import { STORAGE_DOMAIN } from '~/utils/env'
-import { authClient } from '~/auth/authClient'
 import { MenuPopover } from '~/components/Popover/MenuPopover'
 import { useReactToPost } from '../hooks/useReactToPost'
 import { useDeletePost } from '../hooks/useDeletePost'
@@ -13,14 +12,15 @@ import { IframeFactory } from '~/components/embeds/IframeFactory'
 import { PostAuthor } from './PostAuthor'
 import styles from "./Post.module.css"
 import { ConfirmDialog } from '~/components/Popover/Confirm'
-import { A } from '@solidjs/router'
+import { A, createAsync } from '@solidjs/router'
+import { getCurrentUser, getActiveSession } from '~/services/authService'
 
 type Props = {
     post: Awaited<ReturnType<typeof getPostFn>>
 }
 
 export function PostBlock(props: Props) {
-    const session = authClient.useSession()
+    const session = createAsync(() => getActiveSession())
     const { fn, isPending } = useReactToPost(props.post)
     const { deleteMutation } = useDeletePost(props.post)
     
@@ -136,7 +136,7 @@ export function PostBlock(props: Props) {
                             <A href={'/games/' + props.post.gameId} />
                         </li>
                     </Show>
-                    <Show when={session().data && session().data!.user.id === props.post.userId}>
+                    <Show when={session()?.id === props.post.userId}>
                         <li
                             onclick={() => {
                                 (document.getElementById('del-post-warn-' + props.post.postId) as HTMLDialogElement)?.showModal()

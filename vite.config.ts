@@ -3,7 +3,7 @@ import { nitro } from "nitro/vite";
 import { solidStart } from "@solidjs/start/config";
 import "dotenv/config"
 
-export default defineConfig({
+export default defineConfig(() => ({
   server: {
     port: 1337,
   },
@@ -16,4 +16,4 @@ export default defineConfig({
       preset: "node-server"
     })
   ]
-});
+}));

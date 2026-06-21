@@ -1,6 +1,6 @@
 import { redirect, useParams } from "@solidjs/router"
 import { useQuery } from "@tanstack/solid-query"
-import { JSXElement, Show, Suspense } from "solid-js"
+import { JSXElement, Show } from "solid-js"
 import { PostId } from "~/features/posts/components/PostId"
 import { postQueryOpts } from "~/features/posts/utils/postQueryOpts"
 import styles from "~/features/posts/components/PostId.module.css"

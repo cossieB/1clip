@@ -1,15 +1,16 @@
 import { LockOpenIcon } from "lucide-solid"
 import { Show } from "solid-js"
-import { authClient } from "~/auth/authClient"
 import { STORAGE_DOMAIN } from "~/utils/env"
 import { NavItem } from "./NavItem"
+import { createAsync } from "@solidjs/router"
+import { getActiveSession } from "~/services/authService"
+import { CustomSession } from "~/utils/types"
 
-export function NavUserComponent() {
-    const session = authClient.useSession()
-
+export function NavUserComponent(props: {session: CustomSession}) {
+    
     return (
         <Show
-            when={session().data?.user}
+            when={props.session}
             fallback={
                 <NavItem
                     href="/auth/signin"

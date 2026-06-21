@@ -7,9 +7,9 @@ import { SITE_URL, STORAGE_DOMAIN } from "~/utils/env";
 import { validateUrl } from "~/lib/validateUrl";
 import styles from "./UserPage.module.css"
 import { useFollowUser } from "../hooks/useFollowUser";
-import { authClient } from "~/auth/authClient";
-import { A } from "@solidjs/router";
+import { A, createAsync } from "@solidjs/router";
 import { clientOnly } from "@solidjs/start";
+import { getActiveSession } from "~/services/authService";
 
 const UserRank = clientOnly(() => import("~/components/UserRank"))
 
@@ -81,9 +81,9 @@ export function UserPage(props: Props) {
 
 export function FollowBtn(props: Props) {
     const followUser = useFollowUser(props.user)
-    const session = authClient.useSession()
+    const session = createAsync(() => getActiveSession())
     return (
-        <Show when={session().data && session().data!.user.id != props.user.id}>
+        <Show when={session() && session()!.id != props.user.id}>
             <div class={styles.follow}>
                 <button
                     class={styles.button}

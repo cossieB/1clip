@@ -1,4 +1,3 @@
-import { getLoggedInUser } from "~/services/userService";
 import styles from "./ProfilePage.module.css"
 import { Form } from "~/components/Forms/Form";
 import { UploadBox } from "~/components/UploadBox/UploadBox";
@@ -11,8 +10,9 @@ import { validateUrl } from "~/lib/validateUrl";
 import { useToastContext } from "~/hooks/useToastContext";
 import { InputWithPlusBtn } from "~/components/Forms/InputWithPlusBtn";
 import { ConfirmDialog } from "~/components/Popover/Confirm";
+import { type findById } from "~/repositories/userRepository";
 
-export function Profile(props: { user: Awaited<ReturnType<typeof getLoggedInUser>> }) {
+export function Profile(props: { user: NonNullable<Awaited<ReturnType<typeof findById>>> }) {
     const {
         handleSubmit,
         setUser,

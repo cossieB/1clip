@@ -1,11 +1,12 @@
 /// <reference types="@solidjs/start/env" />
 
 import { type getCurrentUser } from "./services/authService";
+import { CustomSession } from "./utils/types";
 
 declare global {
     namespace App {
         interface RequestEventLocals {
-            user: Awaited<ReturnType<typeof getCurrentUser>>
+            user: CustomSession | null
         }
     }
 }

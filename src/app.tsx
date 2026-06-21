@@ -1,7 +1,7 @@
-import { MetaProvider, Title } from "@solidjs/meta";
+import { MetaProvider } from "@solidjs/meta";
 import { Router } from "@solidjs/router";
 import { FileRoutes } from "@solidjs/start/router";
-import { ErrorBoundary, Suspense } from "solid-js";
+import { Suspense } from "solid-js";
 import { MainLayout } from "./components/MainLayout/MainLayout";
 import { ToastProvider } from "./components/Toast/ToastProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";

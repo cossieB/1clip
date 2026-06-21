@@ -1,16 +1,16 @@
 import { authClient } from "~/auth/authClient";
 import { useToastContext } from "./useToastContext";
-import { useNavigate } from "@solidjs/router";
-import { useQueryClient } from "@tanstack/solid-query";
+import { revalidate, useNavigate } from "@solidjs/router";
+import { getActiveSession } from "~/services/authService";
 
 export function useLogout() {
     const navigate = useNavigate()
     const { addToast } = useToastContext()
-    const queryClient = useQueryClient()
+    
     return async function logout() {
         try {
             await authClient.signOut();
-            await queryClient.invalidateQueries({queryKey: ["you"]})
+            await revalidate(getActiveSession.key)
             navigate("/")
         }
         catch (error) {

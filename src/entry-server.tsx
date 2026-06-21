@@ -19,6 +19,7 @@ export default createHandler(() => (
           <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Orbitron:wght@400..900&family=Press+Start+2P&display=swap" rel="stylesheet" />
           <link rel="stylesheet" href="/app.css" />
           <link rel="icon" href="/favicon.ico" />
+          <title>1Clip</title>
           {assets}
         </head>
         <body>

@@ -1,14 +1,14 @@
-import { A, useNavigate, useSearchParams } from "@solidjs/router"
+import { A, revalidate, useNavigate, useSearchParams } from "@solidjs/router"
 import { useQueryClient } from "@tanstack/solid-query"
 import { createSignal } from "solid-js"
 import { createStore } from "solid-js/store"
 import { authClient } from "~/auth/authClient"
 import { Form } from "~/components/Forms/Form"
 import { useToastContext } from "~/hooks/useToastContext"
+import { getActiveSession } from "~/services/authService"
 
 export default function SigninRoute() {
     const [search] = useSearchParams()
-    const queryClient = useQueryClient()
     const redirect = () => Array.isArray(search.redirect) ? search.redirect[0] : search.redirect
     const navigate = useNavigate()
     const [isSubmitting, setIsSubmitting] = createSignal(false);
@@ -34,7 +34,7 @@ export default function SigninRoute() {
                 setIsSubmitting(false)
             },
             async onSuccess() {
-                await queryClient.invalidateQueries({queryKey: ["you"]})
+                await revalidate(getActiveSession.key)
                 navigate(redirect() ?? "/settings/profile")
             }
         })

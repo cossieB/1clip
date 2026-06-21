@@ -6,6 +6,7 @@ import { usePostQuery } from "../hooks/usePostCache";
 import { useViewPost } from "../hooks/useViewPost";
 
 export function PostList(props: { filters?: PostFilters }) {
+    
     const result = usePostQuery(props.filters);
     const addPostToSet = useViewPost()
     let observer: IntersectionObserver

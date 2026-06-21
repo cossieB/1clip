@@ -1,7 +1,9 @@
+import { useAction } from "@solidjs/router";
 import { onCleanup, onMount } from "solid-js";
 import { viewPostFn } from "~/services/postService";
 
 export function useViewPost() {
+    const action = useAction(viewPostFn)
     const viewedPosts = new Set<number>()
     const aknowledgedViews = new Set<number>()
     let timer: number
@@ -10,7 +12,7 @@ export function useViewPost() {
     async function send() {
         const diff = viewedPosts.difference(aknowledgedViews);
         if (diff.size == 0) return
-        await viewPostFn(Array.from(diff))
+        await action(Array.from(diff))
         diff.forEach(postId => aknowledgedViews.add(postId))
     }
     onMount(() => {

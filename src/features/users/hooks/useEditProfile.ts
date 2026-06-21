@@ -4,11 +4,12 @@ import { createStore } from "solid-js/store";
 import { useAbortController } from "~/hooks/useAbortController";
 import { useToastContext } from "~/hooks/useToastContext";
 import { useUpload } from "~/hooks/useUpload";
-import { getLoggedInUser, updateCurrentUser } from "~/services/userService";
+import { updateCurrentUser } from "~/services/userService";
+import { type findById } from "~/repositories/userRepository";
 
 const a = action(updateCurrentUser)
 
-export function useEditProfile(props: { user: Awaited<ReturnType<typeof getLoggedInUser>> }) {
+export function useEditProfile(props: { user: NonNullable<Awaited<ReturnType<typeof findById>>>  }) {
     const actionFn = useAction(a)
     const submission = useSubmission(a)
     const abortController = useAbortController()

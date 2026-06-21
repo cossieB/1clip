@@ -8,11 +8,11 @@ import { useReactToComment } from "../hooks/useReactToComment";
 import { useReplyToComment } from "../hooks/useReplyToComment";
 import { MenuPopover } from "~/components/Popover/MenuPopover";
 import { useDeleteComment } from "../hooks/useDeleteComment";
-import { authClient } from "~/auth/authClient";
 import { ConfirmDialog } from "~/components/Popover/Confirm";
 import { PostAuthor } from "~/features/posts/components/PostAuthor";
 import { getCommentsByPostIdFn } from "~/services/commentService";
-import { A } from "@solidjs/router";
+import { A, createAsync } from "@solidjs/router";
+import { getActiveSession } from "~/services/authService";
 
 type Props = {
     comment: Awaited<ReturnType<typeof getCommentsByPostIdFn>>[number];
@@ -24,7 +24,7 @@ export function CommentBlock(props: Props) {
     
     const { fn, isPending } = useReactToComment(props.comment, props.originalPost);
     const { setCommentState, commentState, replyMutation } = useReplyToComment(props.comment, props.originalPost)
-    const session = authClient.useSession()
+    const session = createAsync(() => getActiveSession())
     const { deleteMutation } = useDeleteComment(props.comment, props.originalPost, props.replyTo)
 
     return (
@@ -102,7 +102,7 @@ export function CommentBlock(props: Props) {
                         {props.comment.user.username}'s profile
                         <A href={"/users/" + props.comment.user.username}  />
                     </li>
-                    <Show when={session().data && session().data!.user.id === props.comment.userId}>
+                    <Show when={session()?.id === props.comment.userId}>
                         <li
                             onclick={() => {
                                 (document.getElementById('del-comment-warn-' + props.comment.commentId) as HTMLDialogElement)?.showModal()

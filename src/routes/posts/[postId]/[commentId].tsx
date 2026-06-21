@@ -1,6 +1,6 @@
 import { useParams } from "@solidjs/router"
 import { useQuery } from "@tanstack/solid-query"
-import { Show, Suspense } from "solid-js"
+import { Show } from "solid-js"
 import { CommentBlock } from "~/features/comments/components/CommentBlock"
 import { getCommentByIdFn } from "~/services/commentService"
 

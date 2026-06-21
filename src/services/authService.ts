@@ -54,3 +54,5 @@ export async function forceLogin(): Promise<never> {
     await revokeSession();
     throw redirect("/auth/signin")
 }
+
+export const getActiveSession = query(getCurrentUser, "session")
