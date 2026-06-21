@@ -5,7 +5,7 @@ import { generateSignedUrl } from "./cloudflareUploadService";
 
 export const getSignedUrls = createServerFn()
     .middleware([verifiedOnlyMiddleware])
-    .inputValidator(z.object({
+    .validator(z.object({
         paths: z.string().array(),
         files: z.array(z.object({
             filename: z.string(),

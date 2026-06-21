@@ -11,7 +11,7 @@ import { redirect } from "@tanstack/solid-router";
 
 export const addCommentFn = createServerFn({ method: "POST" })
     .middleware([verifiedOnlyMiddleware])
-    .inputValidator(z.object({
+    .validator(z.object({
         text: z.string().trim(),
         originalPost: z.number(),
         replyTo: z.number().optional(),
@@ -42,7 +42,7 @@ export const addCommentFn = createServerFn({ method: "POST" })
     })
 
 export const getCommentsByPostIdFn = createServerFn()
-    .inputValidator(z.object({
+    .validator(z.object({
         postId: z.number(),
         replyTo: z.number().optional()
     }))
@@ -54,7 +54,7 @@ export const getCommentsByPostIdFn = createServerFn()
 
 export const reactToCommentFn = createServerFn({ method: "POST" })
     .middleware([verifiedOnlyMiddleware])
-    .inputValidator(z.object({
+    .validator(z.object({
         commentId: z.number(),
         reaction: z.enum(["like", "dislike"])
     }))
@@ -65,7 +65,7 @@ export const reactToCommentFn = createServerFn({ method: "POST" })
 
 export const deleteCommentFn = createServerFn({ method: "POST" })
     .middleware([verifiedOnlyMiddleware])
-    .inputValidator(z.object({
+    .validator(z.object({
         commentId: z.number()
     }))
     .handler(async ({ data, context: { user } }) => {
@@ -75,7 +75,7 @@ export const deleteCommentFn = createServerFn({ method: "POST" })
     })
 
 export const getCommentByIdFn = createServerFn()
-    .inputValidator(z.object({
+    .validator(z.object({
         postId: z.number(),
         commentId: z.number()
     }))

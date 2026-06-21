@@ -8,7 +8,7 @@ import { publisherCreateSchema, publisherEditSchema } from "~/zod/publishers";
 
 export const getPublishersFn = createServerFn()
     .middleware([staticDataMiddleware])
-    .inputValidator(LimitOffsetSchema)
+    .validator(LimitOffsetSchema)
     .handler(async ({data}) => {        
         const pubs = await publisherRepository.findAll(data)
         return pubs
@@ -16,7 +16,7 @@ export const getPublishersFn = createServerFn()
 
 export const getPublisherFn = createServerFn()
     .middleware([staticDataMiddleware])
-    .inputValidator((id: number) => {
+    .validator((id: number) => {
         if (Number.isNaN(id) || id < 1) throw notFound()
         return id
     })
@@ -29,7 +29,7 @@ export const getPublisherFn = createServerFn()
 
 export const createPublisherFn = createServerFn({method: "POST"}) 
     .middleware([adminOnlyMiddleware])
-    .inputValidator(publisherCreateSchema)
+    .validator(publisherCreateSchema)
     .handler(async ({data}) => {
         const pub = await publisherRepository.createPublisher(data)
         return pub
@@ -37,7 +37,7 @@ export const createPublisherFn = createServerFn({method: "POST"})
 
 export const editPublisherFn = createServerFn({method: "POST"})   
     .middleware([adminOnlyMiddleware])
-    .inputValidator(publisherEditSchema)
+    .validator(publisherEditSchema)
     .handler(async ({data}) => {
         const {publisherId, ...rest} = data
         await publisherRepository.editPublisher(publisherId, rest)

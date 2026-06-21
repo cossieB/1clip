@@ -23,7 +23,7 @@ export const getLoggedInUser = createServerFn()
     })
 
 export const getUserByUsernameFn = createServerFn()
-    .inputValidator((username: string) => username)
+    .validator((username: string) => username)
     .handler(async ({ data }) => {
         const u = await getCurrentUser()
         
@@ -33,7 +33,7 @@ export const getUserByUsernameFn = createServerFn()
     })
 
 export const getUserByIdFn = createServerFn()
-    .inputValidator((id: unknown) => {
+    .validator((id: unknown) => {
         const validated = z.uuid().safeParse(id)
         if (validated.error)
             throw notFound()
@@ -49,7 +49,7 @@ export const getUserByIdFn = createServerFn()
 
 export const updateCurrentUser = createServerFn({ method: "POST" })
     .middleware([verifiedOnlyMiddleware])
-    .inputValidator(z.object({
+    .validator(z.object({
         displayName: z.string().min(3).max(15).optional(),
         bio: z.string().max(255).optional(),
         image: z.string().optional(),
@@ -72,7 +72,7 @@ export const updateCurrentUser = createServerFn({ method: "POST" })
 
 export const followUserFn = createServerFn({ method: "POST" })
     .middleware([verifiedOnlyMiddleware])
-    .inputValidator(z.uuidv7())
+    .validator(z.uuidv7())
     .handler(async ({ data, context: { user } }) => {
         if (data == user.id) throw new AppError("You can't follow yourself", HttpStatusCode.BAD_REQUEST)
         const res = await userRepository.followUser(user.id, data)
@@ -88,7 +88,7 @@ export const followUserFn = createServerFn({ method: "POST" })
     })
 
 export const getUserReputation = createServerFn()
-    .inputValidator(z.uuidv7())
+    .validator(z.uuidv7())
     .handler(async ({data}) => {
         const res = (await cacheAside(
             `xp:${data}`, 

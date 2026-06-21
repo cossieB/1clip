@@ -8,7 +8,7 @@ import { platformCreateSchema, platformEditSchema } from "~/zod/platforms"
 
 export const getPlatformsFn = createServerFn()
     .middleware([staticDataMiddleware])
-    .inputValidator(LimitOffsetSchema)
+    .validator(LimitOffsetSchema)
     .handler(async ({data}) => {        
         const platforms = await platformRepository.findAll(data)
         return platforms
@@ -16,7 +16,7 @@ export const getPlatformsFn = createServerFn()
 
 export const getPlatformFn = createServerFn()
     .middleware([staticDataMiddleware])
-    .inputValidator((id: number) => {
+    .validator((id: number) => {
         if (Number.isNaN(id) || id < 1) throw notFound()
         return id
     })
@@ -28,7 +28,7 @@ export const getPlatformFn = createServerFn()
 
 export const createPlatformFn = createServerFn({method: "POST"})    
     .middleware([adminOnlyMiddleware])
-    .inputValidator(platformCreateSchema)
+    .validator(platformCreateSchema)
     .handler(async ({data}) => {
         const platform =  await platformRepository.createPlatform(data)
         return platform
@@ -36,7 +36,7 @@ export const createPlatformFn = createServerFn({method: "POST"})
 
 export const editPlatformFn = createServerFn({method: "POST"})    
     .middleware([adminOnlyMiddleware])
-    .inputValidator(platformEditSchema)
+    .validator(platformEditSchema)
     .handler(async ({data}) => {
         const {platformId, ...rest} = data
         await platformRepository.editPlatform(platformId, rest)

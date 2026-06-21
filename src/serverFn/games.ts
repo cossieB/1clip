@@ -9,7 +9,7 @@ import { GameCreateSchema, GameEditSchema, GetGamesSchema } from "~/zod/games";
 
 export const getGamesFn = createServerFn()
     .middleware([staticDataMiddleware])
-    .inputValidator(GetGamesSchema)
+    .validator(GetGamesSchema)
 
     .handler(async ({ data }) => {
         const games = await gamesRepository.findGamesWithDetails(data);
@@ -18,7 +18,7 @@ export const getGamesFn = createServerFn()
 
 export const getGameFn = createServerFn()
     .middleware([staticDataMiddleware])
-    .inputValidator((gameId: number) => {
+    .validator((gameId: number) => {
         if (Number.isNaN(gameId) || gameId < 1) throw notFound()
         return gameId
     })
@@ -32,7 +32,7 @@ export const getGameFn = createServerFn()
 
 export const createGameFn = createServerFn({ method: "POST" })
     .middleware([adminOnlyMiddleware])
-    .inputValidator(GameCreateSchema)
+    .validator(GameCreateSchema)
     .handler(async ({ data }) => {
         const { media, platforms, genres, ...game } = data
         return await gamesRepository.createGame(game, { platforms, media, genres })
@@ -40,7 +40,7 @@ export const createGameFn = createServerFn({ method: "POST" })
 
 export const updateGameFn = createServerFn({ method: "POST" })
     .middleware([adminOnlyMiddleware])
-    .inputValidator(GameEditSchema)
+    .validator(GameEditSchema)
     .handler(async ({ data }) => {
         const { gameId, media, platforms, genres, ...game } = data
         await gamesRepository.updateGame(gameId, game, { platforms, media, genres })
@@ -51,13 +51,13 @@ export const getGamesWithoutExtras = createServerFn()
     .handler(async () => gamesRepository.findAll())
 
 export const searchGamesFn = createServerFn()
-    .inputValidator(z.string())
+    .validator(z.string())
     .handler(async ({ data }) => {
         return gamesRepository.searchGames(data)
     })
 
 export const getSimilarGames = createServerFn()
-    .inputValidator(z.number().positive())
+    .validator(z.number().positive())
     .middleware([staticDataMiddleware])
     .handler(async ({ data }) => {
         return await cacheAside(`similar:${data}`, () => gamesRepository.similarGames(data), 604800);

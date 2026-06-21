@@ -8,7 +8,7 @@ import { useToastContext } from '~/hooks/useToastContext'
 import { getCurrentUser } from '~/serverFn/auth'
 
 const getSessionFn = createServerFn()
-    .inputValidator((str: string) => str)
+    .validator((str: string) => str)
     .handler(async ({ data }) => {
         const user = await getCurrentUser()
         if (!user) throw redirect({ to: "/auth/signin", replace: true, search: { redirect: data }, })

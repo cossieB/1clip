@@ -8,8 +8,8 @@ export default defineConfig(({command}) => ({
     port: 1337,
   },
   plugins: [
-    command === "build" ? nitro() : null,
     tanstackStart(),
+    nitro(),
     viteSolid({ ssr: true }),
   ].filter(Boolean),
   resolve: {

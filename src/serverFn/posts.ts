@@ -15,7 +15,7 @@ import { notificationsService } from "~/integrations/notificationService";
 
 export const createPostFn = createServerFn({ method: "POST" })
     .middleware([verifiedOnlyMiddleware])
-    .inputValidator(z.object({
+    .validator(z.object({
         title: z.string().min(3).max(30),
         text: z.string().max(variables.POST_LIMIT),
         media: z.array(z.object({
@@ -42,7 +42,7 @@ export const createPostFn = createServerFn({ method: "POST" })
     })
 
 export const getPostFn = createServerFn()
-    .inputValidator((postId: number) => {
+    .validator((postId: number) => {
         if (postId < 1) throw notFound()
         return postId
     })
@@ -54,7 +54,7 @@ export const getPostFn = createServerFn()
     })
 
 export const getPostsFn = createServerFn()
-    .inputValidator(z.object({
+    .validator(z.object({
         username: z.string(),
         authorId: z.string(),
         likerUsername: z.string(),
@@ -72,7 +72,7 @@ export const getPostsFn = createServerFn()
 
 export const reactToPostFn = createServerFn({ method: "POST" })
     .middleware([verifiedOnlyMiddleware])
-    .inputValidator(z.object({
+    .validator(z.object({
         postId: z.number(),
         reaction: z.enum(["like", "dislike"]),
         authorId: z.uuid()
@@ -93,7 +93,7 @@ export const reactToPostFn = createServerFn({ method: "POST" })
 
 export const deletePostFn = createServerFn({ method: "POST" })
     .middleware([verifiedOnlyMiddleware])
-    .inputValidator(z.object({
+    .validator(z.object({
         postId: z.number()
     }))
     .handler(async ({ data, context: { user } }) => {
@@ -103,7 +103,7 @@ export const deletePostFn = createServerFn({ method: "POST" })
     })
 
 export const viewPostFn = createServerFn({ method: "POST" })
-    .inputValidator(z.array(z.number()))
+    .validator(z.array(z.number()))
     .handler(async ({ data }) => {
         if (data.length == 0) return
         const ip = getRequestIP();
@@ -117,7 +117,7 @@ export const viewPostFn = createServerFn({ method: "POST" })
     })
 
 export const searchPostsFn = createServerFn()
-    .inputValidator(z.string())
+    .validator(z.string())
     .handler(async ({ data }) => {
         return postRepository.searchPosts(data)
     })

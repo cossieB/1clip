@@ -9,7 +9,7 @@ import { LimitOffsetSchema } from "~/zod/common";
 
 export const getActorFn = createServerFn()
     .middleware([staticDataMiddleware])
-    .inputValidator((id: number) => {
+    .validator((id: number) => {
         if (Number.isNaN(id) || id < 1) throw notFound()
         return id
     })
@@ -21,7 +21,7 @@ export const getActorFn = createServerFn()
 
 export const getActorsFn = createServerFn()
     .middleware([staticDataMiddleware])
-    .inputValidator(LimitOffsetSchema)
+    .validator(LimitOffsetSchema)
     .handler(async ({data}) => {
         const actors = await actorRepository.findAll(data)
         return actors
@@ -29,7 +29,7 @@ export const getActorsFn = createServerFn()
 
 export const createActorFn = createServerFn({method: "POST"})  
     .middleware([adminOnlyMiddleware])
-    .inputValidator(actorCreateSchema)
+    .validator(actorCreateSchema)
     .handler(async ({data}) => {
         const {characters, ...rest} = data
         const actor = await actorRepository.createActor(rest, characters)
@@ -38,14 +38,14 @@ export const createActorFn = createServerFn({method: "POST"})
 
 export const editActorFn = createServerFn({method: "POST"})    
     .middleware([adminOnlyMiddleware])
-    .inputValidator(actorEditSchema)
+    .validator(actorEditSchema)
     .handler(async ({data}) => {
         const {actorId, characters, ...rest} = data
         await actorRepository.editActor(actorId, rest, characters)
     })
 
 export const getActorsWithCharacters = createServerFn()
-    .inputValidator(z.number())
+    .validator(z.number())
     .handler(async ({data}) => {
         const actor = await actorRepository.findActorWithGames(data)
         if (!actor) throw notFound()                 

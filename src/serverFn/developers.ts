@@ -8,7 +8,7 @@ import { developerCreateSchema, developerEditSchema } from "~/zod/developers";
 
 export const getDevelopersFn = createServerFn()
     .middleware([staticDataMiddleware])
-    .inputValidator(LimitOffsetSchema)
+    .validator(LimitOffsetSchema)
     .handler(async ({data}) => {        
         const devs = await developerRepository.findAll(data)
         return devs
@@ -16,7 +16,7 @@ export const getDevelopersFn = createServerFn()
 
 export const getDeveloperFn = createServerFn()
     .middleware([staticDataMiddleware])
-    .inputValidator((developerId: number) => {
+    .validator((developerId: number) => {
         if (Number.isNaN(developerId) || developerId < 1) throw notFound()
         return developerId
     })
@@ -28,7 +28,7 @@ export const getDeveloperFn = createServerFn()
 
 export const createDeveloperFn = createServerFn({method: "POST"}) 
     .middleware([adminOnlyMiddleware])
-    .inputValidator(developerCreateSchema)
+    .validator(developerCreateSchema)
     .handler(async ({data}) => {
         const dev = await developerRepository.createDeveloper(data)
         return dev
@@ -36,7 +36,7 @@ export const createDeveloperFn = createServerFn({method: "POST"})
 
 export const editDeveloperFn = createServerFn({method: "POST"})   
     .middleware([adminOnlyMiddleware])
-    .inputValidator(developerEditSchema)
+    .validator(developerEditSchema)
     .handler(async ({data}) => {
         const {developerId, ...rest} = data
         await developerRepository.editDeveloper(developerId, rest)
