@@ -1,3 +1,4 @@
+import { Title } from "@solidjs/meta"
 import { A, revalidate, useLocation, useNavigate } from "@solidjs/router"
 import { useQueryClient } from "@tanstack/solid-query"
 import { createSignal } from "solid-js"
@@ -51,6 +52,7 @@ export default function SignupRoute() {
 
     return (
         <div class="page flexCenter">
+            <Title>Signup</Title>
             <Form
                 disabled={emptyInput()}
                 onSubmit={handleSubmit}

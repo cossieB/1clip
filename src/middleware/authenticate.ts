@@ -6,7 +6,6 @@ import { getCurrentUser } from "~/services/authService";
 export async function authenticate(event: FetchEvent) {
     const user = await getCurrentUser();
     event.locals.user = user
-    console.log(user)
 }
 
 export function authedOnly() {

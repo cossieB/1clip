@@ -1,3 +1,4 @@
+import { Title } from "@solidjs/meta"
 import { createAsync } from "@solidjs/router"
 import { Show } from "solid-js"
 import { PostList } from "~/features/posts/components/PostList"
@@ -7,6 +8,7 @@ export default function ForYouRoute() {
     const session = createAsync(() => getActiveSession())
     return (
         <Show when={session()}>
+            <Title>For You</Title>
             <PostList
                 filters={{
                     followerId: session()!.id

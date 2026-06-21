@@ -1,3 +1,4 @@
+import { Title } from "@solidjs/meta"
 import styles from "./NotFound.module.css"
 
 type Props = {
@@ -7,6 +8,7 @@ type Props = {
 export function NotFound(props: Props) {
     return (
         <div class={styles.nf}>
+            <Title>Not Found</Title>
             <h1>Not Found</h1>
             <span>{props.message ?? "Fission Mailed"}</span>
         </div>

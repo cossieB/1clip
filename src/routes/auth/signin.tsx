@@ -1,3 +1,4 @@
+import { Title } from "@solidjs/meta"
 import { A, revalidate, useLocation, useNavigate, useSearchParams } from "@solidjs/router"
 import { useQueryClient } from "@tanstack/solid-query"
 import { createSignal } from "solid-js"
@@ -45,6 +46,7 @@ export default function SigninRoute() {
     
     return (
         <div class='page flexCenter'>
+            <Title>Signin</Title>
             <Form
                 isPending={isSubmitting()}
                 disabled={!input.username || !input.password}

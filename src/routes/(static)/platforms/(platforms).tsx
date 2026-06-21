@@ -1,3 +1,4 @@
+import { Title } from "@solidjs/meta"
 import { useQueryClient, useQuery } from "@tanstack/solid-query"
 import { createEffect, Suspense, For } from "solid-js"
 import { LogoLink } from "~/components/LogoLink/LogoLink"
@@ -18,7 +19,7 @@ export default function PlatformsRoute() {
     
     return (
         <div class={"grid300"}>
-
+            <Title>Platforms</Title>
             <Suspense>
                 <For each={result.data}>
                     {dev =>
