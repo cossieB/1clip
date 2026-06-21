@@ -19,7 +19,7 @@ export function useCreatePost() {
     const { isUploading, setFiles, upload, files } = useUpload(["media"], abortController)
 
     const mutation = useMutation(() => ({
-        mutationFn: createPostFn,
+        mutationFn: (args: Parameters<typeof createPostFn>[0]) => createPostFn(args),
         
     }))
 
@@ -50,7 +50,7 @@ export function useCreatePost() {
                     addToast({ text: error.message, type: "error" })
                 },
                 onSuccess(response, variables) {
-                    queryClient.invalidateQueries(postsQueryOpts())
+                    queryClient.refetchQueries(postsQueryOpts())
                     navigate(`/posts/${response.postId}`)
                 },
             })

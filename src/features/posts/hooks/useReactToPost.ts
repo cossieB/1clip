@@ -4,7 +4,7 @@ import { useToastContext } from "~/hooks/useToastContext";
 import { authClient } from "~/auth/authClient";
 import { getPostFn, reactToPostFn } from "~/services/postService";
 
-export function useReactToPost(post: Awaited<ReturnType<typeof getPostFn>>) {
+export function useReactToPost(post: NonNullable<Awaited<ReturnType<typeof getPostFn>>>) {
     const session = authClient.useSession()
     const { addToast } = useToastContext()
     const queryClient = useQueryClient()

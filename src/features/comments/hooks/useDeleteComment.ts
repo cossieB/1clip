@@ -7,7 +7,7 @@ export function useDeleteComment(comment: Awaited<ReturnType<typeof getCommentsB
     const { addToast } = useToastContext()
     const queryClient = useQueryClient()
     const deleteMutation = useMutation(() => ({
-        mutationFn: deleteCommentFn,
+        mutationFn: (args: Parameters<typeof deleteCommentFn>[0]) => deleteCommentFn(args),
         onSuccess() {
             queryClient.setQueryData(
                 commentListQueryOpts({postId, replyTo}).queryKey,

@@ -4,9 +4,7 @@ import { createSignal } from "solid-js";
 import { useMutation, useQueryClient } from "@tanstack/solid-query";
 import { addCommentFn } from "~/services/commentService";
 import { commentListQueryOpts } from "~/features/comments/utils/commentListQueryOpts";
-import { useLocation } from "@solidjs/router";
 import CommentInput from "~/features/comments/components/CommentInput";
-
 
 type Props = {
     post: Awaited<ReturnType<typeof getPostsFn>>[number]
@@ -14,11 +12,10 @@ type Props = {
 
 export function PostId(props: Props) {
     const queryClient = useQueryClient()
-    const location = useLocation()
-
+    
     const [comment, setComment] = createSignal("")
     const mutation = useMutation(() => ({
-        mutationFn: addCommentFn,
+        mutationFn: (arg: Parameters<typeof addCommentFn>[0]) => addCommentFn(arg),
         onSuccess(data, variables, onMutateResult, context) {
             setComment("")
             queryClient.invalidateQueries(commentListQueryOpts({

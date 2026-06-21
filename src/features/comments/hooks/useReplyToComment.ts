@@ -13,7 +13,7 @@ export function useReplyToComment(comment: Awaited<ReturnType<typeof getComments
     })
 
     const replyMutation = useMutation(() => ({
-        mutationFn: addCommentFn,
+        mutationFn: (args: Parameters<typeof addCommentFn>[0]) => addCommentFn(args),
         onSuccess() {
             setCommentState({ showReplies: true, comment: "", showInput: false })
             queryClient.invalidateQueries(commentListQueryOpts({

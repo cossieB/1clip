@@ -127,13 +127,3 @@ export function CreatePostPage() {
         </div>
     )
 }
-
-function ClipLinkInput(props: {
-    value: string
-    onChange: (val: string) => void
-}) {
-    return (
-        <input type="text" value={props.value} onchange={e => props.onChange(e.currentTarget.value)} />
-    )
-}
-
