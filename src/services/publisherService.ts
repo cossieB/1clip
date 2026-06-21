@@ -6,10 +6,12 @@ import z from "zod";
 import { notFound } from "~/utils/notFound";
 import { PublisherCreateSchema, PublisherEditSchema } from "~/zod/publishers";
 import { parseZod } from "~/utils/parseZod";
+import { setResponseHeader } from "@solidjs/start/http";
 
 export async function getPublishersFn(args: z.input<typeof LimitOffsetSchema>) {
     const data = parseZod(LimitOffsetSchema, args)
     const devs = await publisherRepository.findAll(data)
+    setResponseHeader("cache-control", "max-age=86400, public, immutable, stale-while-revalidate=604800")    
     return devs
 }
 export async function getPublisherFn(publisherId: number) {
@@ -17,6 +19,7 @@ export async function getPublisherFn(publisherId: number) {
     if (publisherId < 1) throw notFound("These aren't the publishers you're looking for")
     const dev = await publisherRepository.findById(publisherId)
     if (!dev) throw notFound("These aren't the publishers you're looking for")
+    setResponseHeader("cache-control", "max-age=86400, public, immutable, stale-while-revalidate=604800")        
     return dev
 }
 

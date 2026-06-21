@@ -16,7 +16,7 @@ const getSession = query(async () => {
         }
     })
     return user
-}, "u")
+}, "getSession")
 
 export default function RouteComponent(props: {children: JSXElement}) {
     const session = createAsync(() => getSession())

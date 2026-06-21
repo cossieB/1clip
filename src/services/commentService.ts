@@ -6,10 +6,10 @@ import * as commentsRepository from "~/repositories/commentRepository"
 import { CommentCreateSchema, GetCommentSchema, GetCommentsSchema, ReactToCommentSchema } from "~/zod/comment"
 import { notificationsService } from "~/integrations/notificationService"
 import z from "zod"
-import { getCurrentUser } from "./authService"
 import { authedOnly } from "~/middleware/authenticate"
 import { HttpStatusCode } from "~/utils/statusCodes"
 import { parseZod } from "~/utils/parseZod"
+import { getRequestEvent } from "solid-js/web"
 
 export async function addCommentFn(comment: z.input<typeof CommentCreateSchema>) {
     const data = parseZod(CommentCreateSchema, comment)
@@ -38,7 +38,7 @@ export async function addCommentFn(comment: z.input<typeof CommentCreateSchema>)
 
 export async function getCommentsByPostIdFn(args: z.input<typeof GetCommentsSchema>) {
     const data = parseZod(GetCommentsSchema, args)
-    const user = await getCurrentUser();
+    const user = getRequestEvent()?.locals.user
     return await commentsRepository.findCommentsByPostId(data.postId, data.replyTo, user?.id);
 }
 
@@ -59,7 +59,7 @@ export async function deleteCommentFn(commentId: number) {
 
 export async function getCommentByIdFn(args: z.input<typeof GetCommentSchema>) {
     const data = parseZod(GetCommentSchema, args)
-    const user = await getCurrentUser();
+    const user = getRequestEvent()?.locals.user
     const comment = await commentsRepository.getById(data.commentId, data.postId, user?.id)
     return comment ?? null
 }

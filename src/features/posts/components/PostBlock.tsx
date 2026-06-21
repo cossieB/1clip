@@ -13,10 +13,10 @@ import { PostAuthor } from './PostAuthor'
 import styles from "./Post.module.css"
 import { ConfirmDialog } from '~/components/Popover/Confirm'
 import { A, createAsync } from '@solidjs/router'
-import { getCurrentUser, getActiveSession } from '~/services/authService'
+import { getActiveSession } from '~/services/authService'
 
 type Props = {
-    post: Awaited<ReturnType<typeof getPostFn>>
+    post: NonNullable<Awaited<ReturnType<typeof getPostFn>>>
 }
 
 export function PostBlock(props: Props) {

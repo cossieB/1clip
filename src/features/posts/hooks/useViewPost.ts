@@ -1,9 +1,11 @@
-import { useAction } from "@solidjs/router";
+import { action, useAction } from "@solidjs/router";
 import { onCleanup, onMount } from "solid-js";
 import { viewPostFn } from "~/services/postService";
 
+const viewPostAction = action(viewPostFn)
+
 export function useViewPost() {
-    const action = useAction(viewPostFn)
+    const action = useAction(viewPostAction)
     const viewedPosts = new Set<number>()
     const aknowledgedViews = new Set<number>()
     let timer: number

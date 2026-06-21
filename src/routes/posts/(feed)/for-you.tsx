@@ -1,15 +1,15 @@
-import { useQuery } from "@tanstack/solid-query"
+import { createAsync } from "@solidjs/router"
 import { Show } from "solid-js"
 import { PostList } from "~/features/posts/components/PostList"
-import { sessionQueryOpts } from "~/hooks/useServerSession"
+import { getActiveSession } from "~/services/authService"
 
 export default function ForYouRoute() {
-    const session = useQuery(() => sessionQueryOpts())
+    const session = createAsync(() => getActiveSession())
     return (
-        <Show when={session.data}>
+        <Show when={session()}>
             <PostList
                 filters={{
-                    followerId: session.data!.id
+                    followerId: session()!.id
                 }}
             />
         </Show>

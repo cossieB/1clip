@@ -2,7 +2,7 @@ import { type QueryClient } from "@tanstack/solid-query";
 import { postsQueryOpts } from "./postQueryOpts";
 import { getPostFn } from "~/services/postService";
 
-type Post = Awaited<ReturnType<typeof getPostFn>>
+type Post = NonNullable<Awaited<ReturnType<typeof getPostFn>>>
 
 export function modifyPostCache(queryClient: QueryClient, postId: number, reaction: "dislike" | "like") {
     queryClient.setQueryData(["post", postId], (data: Post) => modifyPostInCache(data, reaction))
