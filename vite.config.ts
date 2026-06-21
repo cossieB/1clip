@@ -8,10 +8,13 @@ export default defineConfig(({command}) => ({
     port: 1337,
   },
   plugins: [
-    tanstackStart(),
     nitro(),
+    tanstackStart(),
     viteSolid({ ssr: true }),
-  ].filter(Boolean),
+  ],
+  build: {
+    cssCodeSplit: false // there's an issue where css files don't get loaded in prod. this option fixes that at the expense of larger css bundles
+  },
   resolve: {
     tsconfigPaths: true
   }
