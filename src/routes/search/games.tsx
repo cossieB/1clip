@@ -1,8 +1,8 @@
-import { Title } from "@solidjs/meta";
 import { useSearchParams } from "@solidjs/router";
 import { useQuery } from "@tanstack/solid-query";
 import { Suspense } from "solid-js";
 import { PhotoCardGrid } from "~/components/CardLink/PhotoCardLink";
+import { MySiteTitle } from "~/components/MySiteTitle";
 import { searchGamesFn } from "~/services/gamesService";
 import { STORAGE_DOMAIN } from "~/utils/env";
 
@@ -18,7 +18,7 @@ export default function SearchGamesRoute() {
 
     return (
         <Suspense>
-            <Title>Search Games: {s()} </Title>            
+            <MySiteTitle>Search Games: {s()} </MySiteTitle>            
             <PhotoCardGrid
                 arr={result.data ?? []}
                 getLabel={game => game.title}

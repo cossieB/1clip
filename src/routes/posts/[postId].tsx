@@ -6,7 +6,7 @@ import { postQueryOpts } from "~/features/posts/utils/postQueryOpts"
 import styles from "~/features/posts/components/PostId.module.css"
 import NotFound from "../[...404]"
 import { HttpStatusCode } from "@solidjs/start";
-import { Title } from "@solidjs/meta"
+import { MySiteTitle } from "~/components/MySiteTitle"
 
 export default function PostIdRoute(props: { children: JSXElement }) {
     const params = useParams()
@@ -17,7 +17,7 @@ export default function PostIdRoute(props: { children: JSXElement }) {
     return (
         <Switch>
             <Match when={result.data}>
-                <Title>{result.data!.title}</Title>
+                <MySiteTitle>{result.data!.title}</MySiteTitle>
                 <div class={styles.container}>
                     <PostId post={result.data!} />
                     {props.children}

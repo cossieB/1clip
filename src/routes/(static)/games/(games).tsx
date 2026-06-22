@@ -1,10 +1,10 @@
-import { Title } from "@solidjs/meta";
+import { MySiteTitle } from "~/components/MySiteTitle";
 import { GamesList } from "~/features/games/components/GamesList";
 
 export default function GamesRoute() {
     return (
         <>
-            <Title>Games</Title>
+            <MySiteTitle>Games</MySiteTitle>
             <GamesList />
         </>
     )

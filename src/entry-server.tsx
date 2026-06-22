@@ -28,4 +28,6 @@ export default createHandler(() => (
       </html>
     )}
   />
-));
+), pageEvent => ({
+  nonce: pageEvent.locals.nonce,
+}));

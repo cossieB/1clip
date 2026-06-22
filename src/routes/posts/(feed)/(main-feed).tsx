@@ -1,11 +1,11 @@
-import { Title } from "@solidjs/meta";
+import { MySiteTitle } from "~/components/MySiteTitle";
 import { PostList } from "~/features/posts/components/PostList";
 
 export default function MainFeed() {
 
     return (
         <>
-            <Title>Home</Title>
+            <MySiteTitle>Home</MySiteTitle>
             <PostList />
         </>
     )

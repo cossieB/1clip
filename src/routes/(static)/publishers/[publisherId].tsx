@@ -1,8 +1,9 @@
-import { Meta, Title } from "@solidjs/meta"
+import { Meta } from "@solidjs/meta"
 import { useParams } from "@solidjs/router"
 import { useQuery } from "@tanstack/solid-query"
 import { Show, Suspense } from "solid-js"
 import { CompanyPage } from "~/components/CompanyPage/CompanyPage"
+import { MySiteTitle } from "~/components/MySiteTitle"
 import { GamesList } from "~/features/games/components/GamesList"
 import { publisherQueryOpts } from "~/features/publishers/utils/publisherQueryOpts"
 import { STORAGE_DOMAIN } from "~/utils/env"
@@ -15,7 +16,7 @@ export default function PublisherIdPage() {
     return (
         <>
             <Show when={result.data}>
-                <Title> {result.data!.name} </Title>     
+                <MySiteTitle> {result.data!.name} </MySiteTitle>     
                 <Meta name="og:image" content={STORAGE_DOMAIN + result.data?.logo} />
                 <CompanyPage
                     id={result.data!.publisherId}

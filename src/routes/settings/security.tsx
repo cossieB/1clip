@@ -1,10 +1,10 @@
-import { Title } from "@solidjs/meta";
+import { MySiteTitle } from "~/components/MySiteTitle";
 import { SecurityPage } from "~/features/users/components/SecurityPage";
 
 export default function SecurityRoute() {
     return (
         <>
-            <Title>Security</Title>
+            <MySiteTitle>Security</MySiteTitle>
             <SecurityPage />
         </>
     )

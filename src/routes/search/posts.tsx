@@ -1,7 +1,7 @@
-import { Title } from "@solidjs/meta"
 import { useSearchParams } from "@solidjs/router"
 import { useQuery } from "@tanstack/solid-query"
 import { Suspense, For } from "solid-js"
+import { MySiteTitle } from "~/components/MySiteTitle"
 import { PostBlock } from "~/features/posts/components/PostBlock"
 import { searchPostsFn } from "~/services/postService"
 
@@ -17,7 +17,7 @@ export default function SearchPostsRoute() {
 
     return (
         <Suspense >
-            <Title>Search Posts: {s()} </Title>
+            <MySiteTitle>Search Posts: {s()} </MySiteTitle>
             <For each={result.data}>
                 {post => <PostBlock post={post} />}
             </For>

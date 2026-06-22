@@ -1,10 +1,10 @@
-import { Title } from "@solidjs/meta"
 import { A, revalidate, useLocation, useNavigate } from "@solidjs/router"
 import { useQueryClient } from "@tanstack/solid-query"
 import { createSignal } from "solid-js"
 import { createStore } from "solid-js/store"
 import { authClient } from "~/auth/authClient"
 import { Form } from "~/components/Forms/Form"
+import { MySiteTitle } from "~/components/MySiteTitle"
 import { useToastContext } from "~/hooks/useToastContext"
 import { getActiveSession } from "~/services/authService"
 
@@ -52,7 +52,7 @@ export default function SignupRoute() {
 
     return (
         <div class="page flexCenter">
-            <Title>Signup</Title>
+            <MySiteTitle>Signup</MySiteTitle>
             <Form
                 disabled={emptyInput()}
                 onSubmit={handleSubmit}

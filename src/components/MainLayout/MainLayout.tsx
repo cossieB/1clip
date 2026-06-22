@@ -3,6 +3,7 @@ import styles from "./MainLayout.module.css"
 import { Nav } from "./Nav";
 import { ToastContainer } from "../Toast/Toast";
 import { useBeforeLeave, useIsRouting } from "@solidjs/router";
+import { Title } from "@solidjs/meta";
 
 export function MainLayout(props: { children: JSXElement }) {
    const [showNav, setShowNav] = createSignal(false)
@@ -19,6 +20,7 @@ export function MainLayout(props: { children: JSXElement }) {
         <div id="gl" class={styles.root} classList={{ [styles.navOpen]: showNav() }}>
             <Nav setOpen={setShowNav} />
             <main class={styles.main}>
+                <Title>1Clip</Title>
                 <div class={styles.siteTitle}>1Clip</div>
                 {props.children}
                 <Footer />

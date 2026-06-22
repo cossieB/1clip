@@ -6,7 +6,7 @@ import { UserPage } from "~/features/users/components/UserPage"
 import { userQueryOpts } from "~/features/users/utils/userQueryOpts"
 import { getUserByUsernameFn } from "~/services/userService"
 import NotFound from "../[...404]"
-import { Title } from "@solidjs/meta"
+import { MySiteTitle } from "~/components/MySiteTitle"
 
 export default function UserRoute(props: { children: JSXElement }) {
     const params = useParams()
@@ -25,7 +25,7 @@ export default function UserRoute(props: { children: JSXElement }) {
         <Switch>
 
             <Match when={result.data}>
-                <Title> {result.data!.displayName} </Title>
+                <MySiteTitle> {result.data!.displayName} </MySiteTitle>
                 <UserPage user={result.data!} />
                 <NavTabs
                     tabs={[{

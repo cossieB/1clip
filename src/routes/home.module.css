@@ -1,0 +1,105 @@
+.home {
+    width: 100%;
+    position: relative;
+
+    .more {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+
+        @media (width < 768px) {
+            flex-direction: column-reverse;
+            margin-top: 2rem;
+            padding-inline: 1rem;
+        }
+        span {
+            display: inline-block;
+            color: var(--neon-green);
+            &::first-letter {
+                color: var(--neon-pink);
+            }
+        }
+    }
+
+    h1 {
+        font-size: clamp(1rem, 5vw, 10rem);
+        color: var(--neon-pink);
+
+        &::first-letter {
+            color: var(--neon-green);
+        }
+    }
+    h3 {
+        font-size: clamp(1rem, 1.5vw, 3rem);
+        padding: 0.5rem;
+        text-align: center;
+    }
+
+    .columns {
+        display: flex;
+        gap: 2rem;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding-inline: 1rem;
+
+        div {
+            flex: 1;
+        }
+
+        header {
+            font-weight: bold;
+            color: var(--neon-green);
+        }
+    }
+    aside {
+        margin-top: 1rem;
+        text-align: center;
+    }
+}
+
+.hero {
+    height: 75vh;
+    position: relative;
+    place-content: center;
+    place-items: center;
+
+    h2 {
+        font-size: clamp(1rem, 2.5vw, 5rem);
+        text-wrap: unset;
+        text-align: center;
+    }
+
+    &::before {
+        content: "";
+        background: url("/image1.jpg");
+        position: absolute;
+        inset: 0;
+        z-index: -2;
+    }
+
+    &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        /* filter: brightness(25%); */
+        background-color: black;
+        opacity: 0.75;
+        z-index: -1;
+
+    }
+}
+
+.call {
+    display: inline-block;
+    padding: 0.5rem;
+    background-color: var(--neon-green);
+    margin-right: 1rem;
+    color: black !important;
+    margin-top: 0.5rem;
+    transition: background 250ms ease;
+    border-radius: 0 0.5rem;
+    corner-shape: bevel;
+    &:hover {
+        background-color: var(--neon-pink);
+    }
+}

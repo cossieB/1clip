@@ -1,8 +1,8 @@
-import { Title } from "@solidjs/meta";
 import { useParams } from "@solidjs/router";
 import { useQuery } from "@tanstack/solid-query";
 import { Match, Switch } from "solid-js";
 import { CompanyPage } from "~/components/CompanyPage/CompanyPage";
+import { MySiteTitle } from "~/components/MySiteTitle";
 import { NotFound } from "~/components/NotFound/NotFound";
 import { actorQueryOpts } from "~/features/actors/utils/actorQueryOpts";
 import { GamesList } from "~/features/games/components/GamesList";
@@ -18,7 +18,7 @@ export default function ActorId() {
     return (
         <Switch>
             <Match when={actorResult.data} >
-                <Title> {actorResult.data?.name} </Title>
+                <MySiteTitle> {actorResult.data?.name} </MySiteTitle>
                 <CompanyPage
                     id={actorResult.data!.actorId}
                     logo={STORAGE_DOMAIN + actorResult.data!.photo}

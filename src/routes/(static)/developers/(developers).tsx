@@ -1,7 +1,7 @@
-import { Title } from "@solidjs/meta"
 import { useQuery, useQueryClient } from "@tanstack/solid-query"
 import { createEffect, For, Suspense } from "solid-js"
 import { LogoLink } from "~/components/LogoLink/LogoLink"
+import { MySiteTitle } from "~/components/MySiteTitle"
 import { developerQueryOpts, developersQueryOpts } from "~/features/developers/utils/developerQueryOpts"
 import { STORAGE_DOMAIN } from "~/utils/env"
 
@@ -19,7 +19,7 @@ export default function DevelopersRoute() {
     
     return (
         <div class={"grid300"}>
-            <Title>Developers</Title>
+            <MySiteTitle>Developers</MySiteTitle>
             <Suspense>
                 <For each={result.data}>
                     {dev =>

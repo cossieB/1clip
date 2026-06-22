@@ -1,7 +1,7 @@
-import { Title } from "@solidjs/meta"
 import { useQueryClient, useQuery } from "@tanstack/solid-query"
 import { createEffect, Suspense, For } from "solid-js"
 import { LogoLink } from "~/components/LogoLink/LogoLink"
+import { MySiteTitle } from "~/components/MySiteTitle"
 import { publishersQueryOpts, publisherQueryOpts } from "~/features/publishers/utils/publisherQueryOpts"
 import { STORAGE_DOMAIN } from "~/utils/env"
 
@@ -19,7 +19,7 @@ export default function PublishersRoute() {
     
     return (
         <div class={"grid300"}>
-            <Title>Publishers</Title>
+            <MySiteTitle>Publishers</MySiteTitle>
             <Suspense>
                 <For each={result.data}>
                     {dev =>

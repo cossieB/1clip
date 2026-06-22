@@ -1,5 +1,5 @@
-import { Title } from "@solidjs/meta"
 import { useParams } from "@solidjs/router"
+import { MySiteTitle } from "~/components/MySiteTitle"
 import { PostList } from "~/features/posts/components/PostList"
 
 export default function PostsByTag() {
@@ -7,7 +7,7 @@ export default function PostsByTag() {
 
     return (
         <>
-            <Title> Posts tagged {params.tag} </Title>
+            <MySiteTitle> Posts tagged {params.tag} </MySiteTitle>
             <PostList filters={{tag: params.tag}} />
         </>
     )

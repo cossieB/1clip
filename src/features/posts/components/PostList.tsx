@@ -1,4 +1,4 @@
-import { createEffect, For, onMount } from "solid-js";
+import { createEffect, For, onCleanup, onMount } from "solid-js";
 import { PostBlock } from "./PostBlock";
 import styles from "./Post.module.css"
 import { type PostFilters } from "~/repositories/postRepository";
@@ -20,12 +20,15 @@ export function PostList(props: { filters?: PostFilters }) {
                     result.fetchNextPage()
             })
         })
+        onCleanup(() => observer?.disconnect())
     })
 
     createEffect(() => {
         if (result.data) {
-            const cards = document.querySelectorAll<HTMLDivElement>(`[data-type="post"]`)
-            cards.forEach(card => observer.observe(card))
+            setTimeout(() => {
+                const cards = document.querySelectorAll<HTMLDivElement>(`[data-type="post"]`)
+                cards.forEach(card => observer.observe(card))
+            }, 0)
         }
     })
 

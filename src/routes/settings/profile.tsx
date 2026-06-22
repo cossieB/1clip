@@ -1,6 +1,6 @@
-import { Title } from "@solidjs/meta"
 import { useQueryClient, useQuery } from "@tanstack/solid-query"
 import { createEffect, Match, Suspense, Switch } from "solid-js"
+import { MySiteTitle } from "~/components/MySiteTitle"
 import { Profile } from "~/features/users/components/ProfilePage"
 import { getLoggedInUser } from "~/services/userService"
 
@@ -19,7 +19,7 @@ export default function ProfileRoute() {
     return (
         <Switch>
             <Match when={user.data}>
-                <Title>Profile</Title>
+                <MySiteTitle>Profile</MySiteTitle>
                 <Profile user={user.data!} />
             </Match>
             <Match when={user.error}>

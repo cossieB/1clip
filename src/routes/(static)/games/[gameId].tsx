@@ -1,7 +1,8 @@
-import { Meta, Title } from "@solidjs/meta"
+import { Meta } from "@solidjs/meta"
 import { useParams } from "@solidjs/router"
 import { useQuery, useQueryClient } from "@tanstack/solid-query"
 import { createEffect, Match, Switch } from "solid-js"
+import { MySiteTitle } from "~/components/MySiteTitle"
 import { developerQueryOpts } from "~/features/developers/utils/developerQueryOpts"
 import { GamePage } from "~/features/games/components/GamePage"
 import { gameQueryOpts } from "~/features/games/utils/gameQueryOpts"
@@ -30,7 +31,7 @@ export default function GameIdRoute() {
         <Switch>
             <Match when={result.data}>
                 <Meta name="og:image" content={STORAGE_DOMAIN + result.data!.banner} />
-                <Title> {result.data!.title} </Title>
+                <MySiteTitle> {result.data!.title} </MySiteTitle>
                 <GamePage game={result.data!} />
             </Match>
             <Match when={result.error}>
