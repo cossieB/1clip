@@ -2,8 +2,7 @@ import { PhotoCardGrid } from "../../../components/CardLink/PhotoCardLink"
 import { useGamesQuery } from "~/features/games/hooks/useGameQuery"
 import { STORAGE_DOMAIN } from "~/utils/env"
 import { type GameQueryFilters } from "~/repositories/gamesRepository"
-import { createEffect, onMount } from "solid-js"
-
+import { createEffect, onCleanup, onMount } from "solid-js"
 
 export function GamesList(props: { filters?: GameQueryFilters }) {
     const result = useGamesQuery(props.filters)
@@ -15,15 +14,19 @@ export function GamesList(props: { filters?: GameQueryFilters }) {
             if (entries.at(-1)!.isIntersecting) 
                 result.fetchNextPage()
         })
+        onCleanup(() => observer?.disconnect())        
     })
 
     createEffect(() => {
         if (result.data) {
-            const cards = document.querySelectorAll<HTMLDivElement>(`[data-type="card"]`)
-            if (cards.length == 0) return;
-            lastItem && observer?.unobserve(lastItem)
-            lastItem = cards[cards.length - 1]
-            observer?.observe(lastItem)
+            // Ensure cards are rendered first. 
+            setTimeout(() => {
+                const cards = document.querySelectorAll<HTMLDivElement>(`[data-type="card"]`)                
+                if (cards.length == 0) return;
+                lastItem && observer?.unobserve(lastItem)
+                lastItem = cards[cards.length - 1]
+                observer?.observe(lastItem)
+            }, 0)
         }
     })
 

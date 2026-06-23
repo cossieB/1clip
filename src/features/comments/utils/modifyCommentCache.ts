@@ -5,14 +5,14 @@ type Comment = Awaited<ReturnType<typeof getCommentsByPostIdFn>>[number]
 
 export function modifyCommentCache(queryClient: QueryClient, postId: number, commentId: number, reaction: "dislike" | "like") {
 
-    queryClient.setQueriesData({queryKey: ["comments"]}, (data: Comment[] | undefined) => {
+    queryClient.setQueriesData({queryKey: ["comments"]}, (data: Comment[] | Comment | undefined) => {
         if (!data) return undefined;
+        if (!Array.isArray(data)) return modifyPostInCache(data, reaction)
         const i = data.findIndex(x => x.commentId == commentId);
         if (i == -1) return data;
         const oldPost = data[i]
         const newData = modifyPostInCache(oldPost, reaction)
         return data.toSpliced(i, 1, newData)
-
     })
 }
 
