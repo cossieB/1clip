@@ -24,8 +24,10 @@ export function PostList(props: { filters?: PostFilters }) {
 
     createEffect(() => {
         if (result.data) {
-            const cards = document.querySelectorAll<HTMLDivElement>(`[data-type="post"]`)
-            cards.forEach(card => observer.observe(card))
+            setTimeout(() => {
+                const cards = document.querySelectorAll<HTMLDivElement>(`[data-type="post"]`)
+                cards.forEach(card => observer.observe(card))
+            }, 50)
         }
     })
 

@@ -56,7 +56,10 @@ export function SecurityPage() {
     async function changeUsername(e: SubmitEvent) {
         e.preventDefault()
         setIsPending(true)
-        authClient.updateUser({ username: input.username }, {
+        authClient.updateUser({ 
+            username: input.username.toLowerCase(),
+            displayUsername: input.username
+        }, {
             onError({ error, }) {
                 addToast({ text: error.message, type: "error", autoFades: false })
             },
