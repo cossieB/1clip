@@ -10,6 +10,7 @@ export class RedisNotificationService implements NotificationService {
     private consumer: RedisClientType<RedisDefaultModules, {}, {}, 3, {}> | null = null;
 
     setup = async (userId: string) => {
+        'use server'
         try {
             await redis.xGroupCreate(`notifications:user:${userId}`, `group:user:${userId}`, '0', {
                 MKSTREAM: true
@@ -28,11 +29,13 @@ export class RedisNotificationService implements NotificationService {
     }
 
     close = () => {
+        'use server'
         this.consumer?.destroy();
         this.consumer = null;
     }
 
     addNotification = async (userId: string, data: UserNotification) => {
+        'use server'
         const message = { ...data, date: new Date().toISOString() }
         try {
             await redis.xAdd(
@@ -47,6 +50,7 @@ export class RedisNotificationService implements NotificationService {
         }
     }
     async *listenForNotifications(userId: string) {
+        'use server'
         await this.createTempRedis();
         while (true) {
             try {

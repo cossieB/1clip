@@ -1,5 +1,3 @@
-'use server';
-
 import { query, redirect } from "@solidjs/router";
 import { getRequestHeaders } from "@solidjs/start/http"
 import { auth } from "~/auth/server";
@@ -7,6 +5,7 @@ import * as userRepository from "~/repositories/userRepository"
 import { CustomSession } from "~/utils/types";
 
 export async function checkSession() {
+    'use server'
     const headers = getRequestHeaders();
     const session = await auth.api.getSession({
         headers
@@ -15,6 +14,7 @@ export async function checkSession() {
 }
 
 export async function getProfile() {
+    'use server'
     const headers = getRequestHeaders();
     const session = await auth.api.getSession({
         headers
@@ -28,6 +28,7 @@ export async function getProfile() {
 }
 
 export async function getCurrentUser() {
+    'use server'
     const headers = getRequestHeaders();
     const session = await auth.api.getSession({
         headers
@@ -37,6 +38,7 @@ export async function getCurrentUser() {
 }
 
 export async function revokeSession() {
+    'use server'
     const headers = getRequestHeaders();
     const session = await auth.api.getSession({
         headers
@@ -51,6 +53,7 @@ export async function revokeSession() {
 }
 
 export async function forceLogin(): Promise<never> {
+    'use server'
     await revokeSession();
     throw redirect("/auth/signin")
 }

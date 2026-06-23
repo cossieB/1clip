@@ -8,7 +8,7 @@ import { useLocalStorage } from "~/hooks/useLocalStorage";
 import { NotificationsSchema, UserNotification } from "../utils/NotificationsSchema";
 import { A } from "@solidjs/router";
 
-export function NotificationsList() {
+export default function NotificationsList() {
     const { notifications } = useNotificationContext()
     const {getItem} = useLocalStorage("notifications", NotificationsSchema.array())
     const oldNotifications = getItem() ?? []

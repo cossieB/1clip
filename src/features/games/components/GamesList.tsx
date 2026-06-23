@@ -28,7 +28,7 @@ export function GamesList(props: { filters?: GameQueryFilters }) {
                 lastItem && observer?.unobserve(lastItem)
                 lastItem = cards[cards.length - 1]
                 observer?.observe(lastItem)
-            }, 0)
+            }, 50)
         }
     })
 

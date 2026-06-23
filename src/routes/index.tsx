@@ -7,10 +7,11 @@ import { getRequestEvent } from "solid-js/web"
 
 const loader = query(async () => {
     'use server'
-    const visited = getCookie("visited")
+    const visited = getCookie("visited");
     if (visited) throw redirect("/posts")
     setCookie("visited", "1", {
-        path: "/",            
+        path: "/", 
+        maxAge: 31556926    
     })
     const user = getRequestEvent()?.locals.user
     if (user) throw redirect("/posts")

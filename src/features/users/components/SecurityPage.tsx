@@ -5,6 +5,8 @@ import { Form } from '~/components/Forms/Form'
 import { useToastContext } from '~/hooks/useToastContext'
 import styles from "./ProfilePage.module.css"
 import { ConfirmDialog } from '~/components/Popover/Confirm'
+import { revalidate } from '@solidjs/router'
+import { getActiveSession } from '~/services/authService'
 
 export function SecurityPage() {
     const { addToast } = useToastContext()
@@ -25,8 +27,9 @@ export function SecurityPage() {
             onError({ error }) {
                 addToast({ text: error.message, type: "error", autoFades: false })
             },
-            onSuccess() {
+            async onSuccess() {
                 addToast({ text: "Email successfully changed", type: "info" })
+                await revalidate(getActiveSession.key)
             },
             onResponse() {
                 setIsPending(false)
@@ -41,8 +44,9 @@ export function SecurityPage() {
             onError({ error }) {
                 addToast({ text: error.message, type: "error", autoFades: false })
             },
-            onSuccess() {
+            async onSuccess() {
                 addToast({ text: "Password successfully changed", type: "info" })
+                await revalidate(getActiveSession.key)
             },
             onResponse() {
                 setIsPending(false)
@@ -53,12 +57,16 @@ export function SecurityPage() {
     async function changeUsername(e: SubmitEvent) {
         e.preventDefault()
         setIsPending(true)
-        authClient.updateUser({ username: input.username }, {
+        authClient.updateUser({ 
+            username: input.username.toLowerCase(),
+            displayUsername: input.username
+         }, {
             onError({ error, }) {
                 addToast({ text: error.message, type: "error", autoFades: false })
             },
-            onSuccess() {
+            async onSuccess() {
                 addToast({ text: "Username successfully changed", type: "info" })
+                await revalidate(getActiveSession.key)
             },
             onResponse() {
                 setIsPending(false)

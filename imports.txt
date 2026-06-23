@@ -1,0 +1,2 @@
+import type { APIEvent } from "@solidjs/start/server";
+import { clientOnly } from "@solidjs/start";

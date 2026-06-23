@@ -28,7 +28,7 @@ export function PostList(props: { filters?: PostFilters }) {
             setTimeout(() => {
                 const cards = document.querySelectorAll<HTMLDivElement>(`[data-type="post"]`)
                 cards.forEach(card => observer.observe(card))
-            }, 0)
+            }, 50)
         }
     })
 

@@ -10,7 +10,7 @@ export function useReactToComment(comment: Awaited<ReturnType<typeof getComments
     const session = createAsync(() => getActiveSession())
     const { addToast } = useToastContext()
     const reactMutation = useMutation(() => ({
-        mutationFn: reactToCommentFn,
+        mutationFn: (args: Parameters<typeof reactToCommentFn>[0]) => reactToCommentFn(args),
     }))
     function fn(reaction: "like" | "dislike") {
         return function () {

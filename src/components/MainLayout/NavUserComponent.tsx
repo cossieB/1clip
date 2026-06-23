@@ -2,8 +2,6 @@ import { LockOpenIcon } from "lucide-solid"
 import { Show } from "solid-js"
 import { STORAGE_DOMAIN } from "~/utils/env"
 import { NavItem } from "./NavItem"
-import { createAsync } from "@solidjs/router"
-import { getActiveSession } from "~/services/authService"
 import { CustomSession } from "~/utils/types"
 
 export function NavUserComponent(props: {session: CustomSession}) {
