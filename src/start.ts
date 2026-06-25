@@ -13,7 +13,7 @@ const secureHeadersMiddleware = createMiddleware().server(async ({ next }) => {
         "default-src 'self'",
         "img-src 'self' https://r2.cossie.dev blob: ",
         "media-src 'self' https://r2.cossie.dev blob: ",
-        "connect-src 'self' https://r2.cossie.dev",
+        "connect-src 'self' https://clipz.c04b0b5f451d987b5b3194601eec018a.r2.cloudflarestorage.com https://r2.cossie.dev",
         "object-src 'none'",
         `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' unsafe-eval`,
         `style-src 'self' https://fonts.googleapis.com 'unsafe-inline'`,
