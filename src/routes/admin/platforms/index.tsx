@@ -6,10 +6,7 @@ import { GridWrapper } from '~/components/AdminTable/GridWrapper'
 import { platformsQueryOpts } from '~/features/platforms/utils/platformQueryOpts'
 
 export const Route = createFileRoute('/admin/platforms/')({
-    component: RouteComponent,
-    loader: (async ({ context }) => {
-        await context.queryClient.ensureQueryData(platformsQueryOpts())
-    })    
+    component: RouteComponent,  
 })
 
 function RouteComponent() {

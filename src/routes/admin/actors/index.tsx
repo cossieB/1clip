@@ -7,9 +7,6 @@ import { ICellRendererParams } from 'ag-grid-community';
 
 export const Route = createFileRoute('/admin/actors/')({
     component: RouteComponent,
-    loader: (async ({ context }) => {
-        await context.queryClient.ensureQueryData(actorsQueryOpts())
-    })
 })
 
 function RouteComponent() {

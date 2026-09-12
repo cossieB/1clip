@@ -6,10 +6,7 @@ import { GridWrapper } from '~/components/AdminTable/GridWrapper'
 import { developersQueryOpts } from '~/features/developers/utils/developerQueryOpts'
 
 export const Route = createFileRoute('/admin/developers/')({
-    component: RouteComponent,
-    loader: (async ({ context }) => {
-        await context.queryClient.ensureQueryData(developersQueryOpts(1000))
-    })    
+    component: RouteComponent, 
 })
 
 function RouteComponent() {

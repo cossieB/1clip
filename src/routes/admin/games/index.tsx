@@ -3,13 +3,9 @@ import { ICellRendererParams } from 'ag-grid-community'
 import { Suspense } from 'solid-js'
 import { GridWrapper } from '~/components/AdminTable/GridWrapper'
 import { useGamesQuery } from '~/features/games/hooks/useGameQuery'
-import { gamesWithExtrasQueryOpts } from '~/features/games/utils/gameQueryOpts'
 
 export const Route = createFileRoute('/admin/games/')({
-    component: RouteComponent,
-    loader: (async ({ context }) => {
-        await context.queryClient.ensureInfiniteQueryData(gamesWithExtrasQueryOpts({limit: 5000}))
-    })    
+    component: RouteComponent,  
 })
 
 function RouteComponent() {

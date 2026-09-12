@@ -6,10 +6,7 @@ import { GridWrapper } from '~/components/AdminTable/GridWrapper'
 import { publishersQueryOpts } from '~/features/publishers/utils/publisherQueryOpts'
 
 export const Route = createFileRoute('/admin/publishers/')({
-  component: RouteComponent,
-    loader: (async ({ context }) => {
-        await context.queryClient.ensureQueryData(publishersQueryOpts())
-    })  
+  component: RouteComponent, 
 })
 
 function RouteComponent() {
