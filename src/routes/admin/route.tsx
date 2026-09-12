@@ -1,6 +1,6 @@
-import { createFileRoute, Outlet, redirect } from '@tanstack/solid-router'
+import { ClientOnly, createFileRoute, Outlet, redirect } from '@tanstack/solid-router'
 import { lazy } from 'solid-js'
-const AdminLayout = lazy(() => import('~/components/AdminLayout/AdminLayout'))
+import AdminLayout from '~/components/AdminLayout/AdminLayout'
 
 export const Route = createFileRoute('/admin')({
   headers: () => ({
@@ -15,7 +15,9 @@ export const Route = createFileRoute('/admin')({
 function RouteComponent() {
   return (
     <AdminLayout>
-      <Outlet />
+      <ClientOnly>
+        <Outlet />
+      </ClientOnly>
     </AdminLayout>
   )
 }

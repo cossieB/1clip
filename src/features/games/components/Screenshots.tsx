@@ -8,13 +8,13 @@ type Props = {
 }
 
 export function Screenshots(props: Props) {
-    const screenshots = props.media.filter(m => m.contentType.startsWith("image"))
+    const screenshots = () => props.media.filter(m => m.contentType.startsWith("image"))
     return (
-        <Show when={screenshots.length > 0}>
+        <Show when={screenshots().length > 0}>
             <h2>Screenshots</h2>
             <Carousel
                 media={
-                    screenshots
+                    screenshots()
                         .map(m => ({
                             contentType: m.contentType,
                             url: STORAGE_DOMAIN + m.key

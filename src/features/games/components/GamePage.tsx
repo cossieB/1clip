@@ -1,6 +1,6 @@
 import { getSimilarGames, type getGameFn } from "~/features/games/gamesApi"
 import styles from "./GamePage.module.css"
-import { createSignal, For, Show } from "solid-js"
+import { createMemo, createSignal, For, Show } from "solid-js"
 import { ClientOnly, Link } from "@tanstack/solid-router"
 import { LogoLink } from "~/components/LogoLink/LogoLink"
 import { PhotoCardGrid } from "~/components/CardLink/PhotoCardLink"
@@ -129,12 +129,12 @@ function SimilarGames(props: { gameId: number }) {
 }
 
 function ReleaseDate(props: { date: string }) {
-    const date = props.date.split(/[\-\/]/)
+    const date = createMemo(() => props.date.split(/[\-\/]/))
     return (
-        <div class={`${styles.date} cutout`}>
-            <span> {date[2]} </span>
-            <span> {new Date(2000, parseInt(date[1]) - 1, 1).toLocaleString('default', { month: 'long' })} </span>
-            <span> {date[0]} </span>
-        </div>
+        <time datetime={props.date} class={`${styles.date} cutout`}>
+            <span> {date()[2]} </span>
+            <span> {new Date(2000, parseInt(date()[1]) - 1, 1).toLocaleString('default', { month: 'long' })} </span>
+            <span> {date()[0]} </span>
+        </time>
     )
 }

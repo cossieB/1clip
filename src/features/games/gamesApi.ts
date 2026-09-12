@@ -24,7 +24,7 @@ export const getGameFn = createServerFn()
     })
     .handler(async ({ data }) => {
         const game = await gamesRepository.findById(data)
-        if (!game) throw notFound()
+        if (!game) throw notFound();
         return game
     })
 

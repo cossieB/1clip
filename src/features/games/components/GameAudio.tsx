@@ -66,6 +66,7 @@ export function GameAudio(props: Props) {
                     />
                 </div>
                 <button
+                    aria-label={isPlaying() ? "Pause Button" : "Play Button"}
                     onclick={() => {
                         if (isPlaying())
                             audioRef?.pause()

@@ -1,4 +1,4 @@
-import { createSignal, For, Show } from "solid-js"
+import { createEffect, createSignal, For, on, Show } from "solid-js"
 import { MoveLeftIcon, MoveRightIcon } from "lucide-solid"
 import { getTouchHandlers } from "~/lib/getTouchHandlers"
 import { RenderMedia } from "../RenderMedia"
@@ -13,6 +13,7 @@ type Props = {
 export function Carousel(props: Props) {
 
     const [idx, setIdx] = createSignal(0)
+    createEffect(on(() => props.media, () => setIdx(0)))
     function next() {
         setIdx(prev => (prev + 1) % props.media.length)
     }

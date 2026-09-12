@@ -1,6 +1,6 @@
 import { Form } from "~/components/Forms/Form";
 import { UploadBox } from "~/components/UploadBox/UploadBox";
-import { For, Index, Show } from "solid-js";
+import { For, Show } from "solid-js";
 import { ContentEditable } from "~/components/Forms/ContentEditable";
 import { mediaSrc } from "~/utils/mediaSrc";
 import { AsyncSelect } from "~/components/Forms/AsyncSelect";

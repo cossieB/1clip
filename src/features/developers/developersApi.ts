@@ -10,7 +10,7 @@ export const getDevelopersFn = createServerFn()
     .middleware([staticDataMiddleware])
     .validator(LimitOffsetSchema)
     .handler(async ({data}) => {        
-        const devs = await developerRepository.findAll(data)
+        const devs = await developerRepository.findAll(data);
         return devs
     })
 
