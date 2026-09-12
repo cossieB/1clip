@@ -16,7 +16,11 @@ export const GameCreateSchema = z.object({
     genres: z.string().array()
 })
 
-export const GameEditSchema = GameCreateSchema.partial().extend({ gameId: z.number() })
+export const GameEditSchema = GameCreateSchema.partial().extend({ 
+    gameId: z.number() ,
+    cover: z.string().nullish(),
+    banner: z.string().nullish()
+})
 
 export const GetGamesSchema = z.object({
     developerId: z.number(),

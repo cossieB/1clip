@@ -13,6 +13,7 @@ import { Game, MediaField, useGameForm } from "../hooks/useGameForm";
 import styles from "./GameForm.module.css"
 import { IframeFactory } from "~/components/embeds/IframeFactory";
 import { produce } from "solid-js/store";
+import { UploadBoxWithPreview } from "~/components/UploadBox/UploadBoxWithPreview";
 
 export function GameForm(props: { game?: Game }) {
     const {
@@ -32,8 +33,6 @@ export function GameForm(props: { game?: Game }) {
             isPending={isUploading() || createGameMutation.isPending || editGameMutation.isPending}
             disabled={
                 !game.title ||
-                !game.cover ||
-                !game.banner ||
                 !game.developerId ||
                 !game.publisherId ||
                 !game.releaseDate ||
@@ -46,77 +45,60 @@ export function GameForm(props: { game?: Game }) {
                 setter={title => setGame({ title })}
                 value={game.title ?? ""}
             />
-            <div class={styles.images}>
-                <UploadBox
-                    label="Avatar"
-                    onSuccess={async files => {
-                        const file = files.at(0)
-                        if (!file) return
-                        setGame({ cover: file.objectUrl })
-                        setFiles(prev => [
-                            ...prev.filter(x => x.field != MediaField.Cover),
-                            { ...file, field: MediaField.Cover }
-                        ])
-                    }}
-                    maxSize={1}
-                    limit={1}
-                    accept={{
-                        image: true,
-                        audio: false,
-                        video: false
-                    }}
-                />
-                <UploadBox
-                    label="Banner"
-                    onSuccess={async files => {
-                        const file = files.at(0)
-                        if (!file) return
-                        setGame({ banner: file.objectUrl })
-                        setFiles(prev => [
-                            ...prev.filter(x => x.field != MediaField.Banner),
-                            { ...file, field: MediaField.Banner }
-                        ])
-                    }}
-                    maxSize={4}
-                    limit={1}
-                    accept={{
-                        image: true,
-                        audio: false,
-                        video: false
-                    }}
-                />
-                <div class={styles.preview}>
-                    <div><img src={mediaSrc(game.cover)} /></div>
-                    <div><img src={mediaSrc(game.banner)} /></div>
-                </div>
-            </div>
-            <div class={styles.screenshotbox}>
+            <Show when={props.game}>
+                <div class={styles.images}>
+                    <UploadBoxWithPreview
+                        label="Cover"
+                        onDrop={async file => {
+                            setGame({ cover: file.objectUrl })
+                            setFiles(prev => [
+                                ...prev.filter(x => x.field != MediaField.Cover),
+                                { ...file, field: MediaField.Cover }
+                            ])
+                        }}
+                        image={game.cover ?? "q.png"}
+                    />
+                    <UploadBoxWithPreview
+                        label="Banner"
+                        onDrop={async file => {
 
-                <UploadBox
-                    label="Media"
-                    onSuccess={async files => {
-                        setGame('media', prev => [
-                            ...prev,
-                            ...files.map(x => ({
-                                key: x.objectUrl,
-                                contentType: x.file.type,
-                                metadata: {}
-                            }))
-                        ])
-                        setFiles(prev => [
-                            ...prev,
-                            ...files.map(f => ({ ...f, field: MediaField.Media }))
-                        ])
-                    }}
-                    accept={{
-                        image: true,
-                        video: true,
-                        audio: true
-                    }}
-                    limit={Infinity}
-                    maxSize={4}
-                />
-            </div>
+                            setGame({ banner: file.objectUrl })
+                            setFiles(prev => [
+                                ...prev.filter(x => x.field != MediaField.Banner),
+                                { ...file, field: MediaField.Banner }
+                            ])
+                        }}
+                        image={game.banner ?? "q.png"}
+                    />
+                </div>
+                <div class={styles.screenshotbox}>
+
+                    <UploadBox
+                        label="Media"
+                        onSuccess={async files => {
+                            setGame('media', prev => [
+                                ...prev,
+                                ...files.map(x => ({
+                                    key: x.objectUrl,
+                                    contentType: x.file.type,
+                                    metadata: {}
+                                }))
+                            ])
+                            setFiles(prev => [
+                                ...prev,
+                                ...files.map(f => ({ ...f, field: MediaField.Media }))
+                            ])
+                        }}
+                        accept={{
+                            image: true,
+                            video: true,
+                            audio: true
+                        }}
+                        limit={Infinity}
+                        maxSize={4}
+                    />
+                </div>
+            </Show>
             <div class={styles.screenshots}>
                 <For each={game.media}>
                     {(m, i) =>
@@ -136,7 +118,7 @@ export function GameForm(props: { game?: Game }) {
                                     }))
                             }}
                         />
-                        }
+                    }
                 </For>
             </div>
             <div style={{ "margin-top": "1.5rem" }}>

@@ -9,8 +9,8 @@ import { platformCreateSchema, platformEditSchema } from "./utils/zod"
 export const getPlatformsFn = createServerFn()
     .middleware([staticDataMiddleware])
     .validator(LimitOffsetSchema)
-    .handler(async ({data}) => {        
-        const platforms = await platformRepository.findAll(data)
+    .handler(async ({data}) => {
+        const platforms = await platformRepository.findAll(data);
         return platforms
     })
 

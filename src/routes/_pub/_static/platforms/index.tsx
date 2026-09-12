@@ -36,7 +36,7 @@ function RouteComponent() {
                             href='platform'
                             item={{
                                 id: platform.platformId,
-                                logo: STORAGE_DOMAIN + platform.logo,
+                                logo: STORAGE_DOMAIN + (platform.logo ?? "q.png"),
                                 name: platform.name
                             }}
                         />

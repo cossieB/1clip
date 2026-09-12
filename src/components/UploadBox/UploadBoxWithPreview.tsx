@@ -8,6 +8,7 @@ type Props = {
         objectUrl: string;
         file: File;
     }) => void
+    label: string
 }
 
 export function UploadBoxWithPreview(props: Props) {
@@ -19,7 +20,7 @@ export function UploadBoxWithPreview(props: Props) {
                     video: false,
                     audio: false
                 }}
-                label="Logo"
+                label={props.label}
                 limit={1}
                 maxSize={5}
                 onSuccess={data => {

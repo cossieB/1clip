@@ -29,7 +29,7 @@ function RouteComponent() {
             <Suspense>
                 <CompanyPage
                     id={devResult.data!.actorId}
-                    logo={STORAGE_DOMAIN + devResult.data!.photo}
+                    logo={STORAGE_DOMAIN + (devResult.data!.photo ?? "q.png")}
                     name={devResult.data!.name}
                     summary={devResult.data!.bio}
                     type='actor'

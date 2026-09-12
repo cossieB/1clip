@@ -28,7 +28,16 @@ export function uploadFromServer(file: File, ...pathSegments: string[]) {
     return upload.done()
 }
 
-export async function generateSignedUrl(filename: string, contentType: string, contentLength: number, pathSegments: string[], metadata?: Record<string, string>) {
+type Options = {
+    filename: string;
+    contentType: string;
+    contentLength: number;
+    pathSegments: string[];
+    metadata?: Record<string, string>;
+};
+
+export async function generateSignedUrl(options: Options) {
+    const {filename, pathSegments, contentLength, contentType, metadata} = options
     const ext = filename.slice(filename.lastIndexOf("."))
     const key = join(...pathSegments, crypto.randomUUID() + ext)
     const signedUrl = await getSignedUrl(

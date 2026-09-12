@@ -1,4 +1,4 @@
-import { For, Suspense } from "solid-js"
+import { createEffect, For, Suspense } from "solid-js"
 import { QueryOptions, useQuery } from "@tanstack/solid-query"
 
 type Props<T, V extends string | number> = {
@@ -11,6 +11,7 @@ type Props<T, V extends string | number> = {
 
 export function AsyncChecklist<T, V extends string | number>(props: Props<T, V>) {
     const result = useQuery(() => props.queryOptions);
+
     return (
         <Suspense>
             <For each={result.data}>

@@ -36,7 +36,7 @@ function RouteComponent() {
                             href='publisher'
                             item={{
                                 id: pub.publisherId,
-                                logo: STORAGE_DOMAIN + pub.logo,
+                                logo: STORAGE_DOMAIN + (pub.logo ?? "q.png"),
                                 name: pub.name
                             }}
                         />

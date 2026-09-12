@@ -9,6 +9,7 @@ import { useToastContext } from "~/hooks/useToastContext";
 import { developerQueryOpts, developersQueryOpts } from "../utils/developerQueryOpts";
 import { UploadBoxWithPreview } from "~/components/UploadBox/UploadBoxWithPreview";
 import { getDeveloperFn, createDeveloperFn, editDeveloperFn } from "../developersApi";
+import { Show } from "solid-js";
 
 type Developer = Awaited<ReturnType<typeof getDeveloperFn>>
 
@@ -67,7 +68,6 @@ export function DevForm(props: { developer?: Developer }) {
                     !developer.name ||
                     !developer.country ||
                     !developer.location ||
-                    !developer.logo ||
                     !developer.summary
                 }
                 onSubmit={handleSubmit}
@@ -77,13 +77,16 @@ export function DevForm(props: { developer?: Developer }) {
                     setter={name => setDeveloper({ name })}
                     value={developer.name}
                 />
-                <UploadBoxWithPreview
-                    image={developer.logo}
-                    onDrop={data => {
-                        setDeveloper({ logo: data.objectUrl })
-                        setFiles(() => [{ ...data, field: "logo" }])
-                    }}
-                />
+                <Show when={props.developer}>
+                    <UploadBoxWithPreview
+                        image={developer.logo ?? "/q.png"}
+                        label="Logo"
+                        onDrop={data => {
+                            setDeveloper({ logo: data.objectUrl })
+                            setFiles(() => [{ ...data, field: "logo" }])
+                        }}
+                    />
+                </Show>
                 <Form.FormSelect
                     list={countryList}
                     selected={developer.country}

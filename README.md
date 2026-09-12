@@ -21,4 +21,5 @@ Show off your best gaming moments, epic screenshots, hilarious clips, jaw-droppi
 
 ### Techniques
 Intersection Observer and Tanstack Query to implement infinite scrolling, combined with keyset database pagination to provide a seamless blazing fast user experience.
-Redis Streams and server-sent event to deliver realtime notifications to the user.
+Redis Pub/Sub and server-sent events to deliver realtime notifications to the user.
+Client-side uploads using presigned URLS

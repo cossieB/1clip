@@ -26,7 +26,6 @@ export const getPublisherFn = createServerFn()
         return dev
     })
 
-
 export const createPublisherFn = createServerFn({method: "POST"}) 
     .middleware([adminOnlyMiddleware])
     .validator(publisherCreateSchema)

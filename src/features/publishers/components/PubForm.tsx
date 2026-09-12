@@ -9,6 +9,7 @@ import { countryList } from "~/utils/countryList";
 import { publisherQueryOpts, publishersQueryOpts } from "../utils/publisherQueryOpts";
 import { UploadBoxWithPreview } from "~/components/UploadBox/UploadBoxWithPreview";
 import { getPublisherFn, createPublisherFn, editPublisherFn } from "../publishersApi";
+import { Show } from "solid-js";
 
 type Publisher = Awaited<ReturnType<typeof getPublisherFn>>
 
@@ -70,7 +71,6 @@ export function PubForm(props: { publisher?: Publisher }) {
                     !publisher.name ||
                     !publisher.country ||
                     !publisher.headquarters ||
-                    !publisher.logo ||
                     !publisher.summary
                 }
                 onSubmit={handleSubmit}
@@ -80,17 +80,20 @@ export function PubForm(props: { publisher?: Publisher }) {
                     setter={name => setPublisher({ name })}
                     value={publisher.name}
                 />
-                <UploadBoxWithPreview
-                    image={publisher.logo}
-                    onDrop={data => {
-                        setPublisher({ logo: data.objectUrl })
-                        setFiles(() => [{ ...data, field: "logo" }])
-                    }}
-                />
+                <Show when={props.publisher}>
+                    <UploadBoxWithPreview
+                        image={publisher.logo ?? "/q.png"}
+                        label="Logo"
+                        onDrop={data => {
+                            setPublisher({ logo: data.objectUrl })
+                            setFiles(() => [{ ...data, field: "logo" }])
+                        }}
+                    />
+                </Show>
                 <Form.FormSelect
                     list={countryList}
                     selected={publisher.country}
-                    setSelected={country => setPublisher({country})}
+                    setSelected={country => setPublisher({ country })}
                 />
                 <Form.Input<typeof publisher>
                     field="headquarters"

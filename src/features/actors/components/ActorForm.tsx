@@ -8,7 +8,7 @@ import { actorQueryOpts, actorsQueryOpts } from "../utils/actorQueryOpts"
 import { Form } from "~/components/Forms/Form"
 import { ContentEditable } from "~/components/Forms/ContentEditable"
 import { UploadBoxWithPreview } from "~/components/UploadBox/UploadBoxWithPreview"
-import { For } from "solid-js"
+import { For, Show } from "solid-js"
 import { AsyncSelect } from "~/components/Forms/AsyncSelect"
 import { gamesQueryOpts } from "~/features/games/utils/gameQueryOpts"
 import { StandaloneInput } from "~/components/Forms/FormInput"
@@ -82,13 +82,16 @@ export function ActorForm(props: { actor?: Omit<Actor, 'characters'> & { charact
                     setter={name => setActor({ name })}
                     value={actor.name}
                 />
-                <UploadBoxWithPreview
-                    image={actor.photo ?? "/q.png"}
-                    onDrop={data => {
-                        setActor({ photo: data.objectUrl })
-                        setFiles(() => [{ ...data, field: "photo" }])
-                    }}
-                />
+                <Show when={props.actor}>
+                    <UploadBoxWithPreview
+                        image={actor.photo ?? "/q.png"}
+                        label="Photo"
+                        onDrop={data => {
+                            setActor({ photo: data.objectUrl })
+                            setFiles(() => [{ ...data, field: "photo" }])
+                        }}
+                    />
+                </Show>
                 <ContentEditable
                     html={actor.bio}
                     setter={bio => setActor({ bio })}

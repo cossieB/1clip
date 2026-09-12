@@ -8,6 +8,7 @@ import { Form } from "~/components/Forms/Form"
 import { ContentEditable } from "~/components/Forms/ContentEditable"
 import { UploadBoxWithPreview } from "~/components/UploadBox/UploadBoxWithPreview"
 import { getPlatformFn, createPlatformFn, editPlatformFn } from "../platformsApi"
+import { Show } from "solid-js"
 
 type Platform = Awaited<ReturnType<typeof getPlatformFn>>
 
@@ -66,7 +67,6 @@ export function PlatformForm(props: { platform?: Platform }) {
                 isPending={isUploading() || createPlatformMutation.isPending || editPlatformMutation.isPending}
                 disabled={
                     !platform.name ||
-                    !platform.logo ||
                     !platform.releaseDate
                 }
                 onSubmit={handleSubmit}
@@ -76,13 +76,16 @@ export function PlatformForm(props: { platform?: Platform }) {
                     setter={name => setPlatform({ name })}
                     value={platform.name}
                 />
-                <UploadBoxWithPreview
-                    image={platform.logo}
-                    onDrop={data => {
-                        setPlatform({ logo: data.objectUrl })
-                        setFiles(() => [{ ...data, field: "logo" }])
-                    }}
-                />
+                <Show when={props.platform}>
+                    <UploadBoxWithPreview
+                        image={platform.logo ?? "/q.png"}
+                        label="Logo"
+                        onDrop={data => {
+                            setPlatform({ logo: data.objectUrl })
+                            setFiles(() => [{ ...data, field: "logo" }])
+                        }}
+                    />
+                </Show>
                 <ContentEditable
                     html={platform.summary}
                     setter={summary => setPlatform({ summary })}
@@ -90,7 +93,7 @@ export function PlatformForm(props: { platform?: Platform }) {
                 />
                 <Form.Input
                     field={"releaseDate"}
-                    setter={releaseDate => setPlatform({releaseDate})}
+                    setter={releaseDate => setPlatform({ releaseDate })}
                     value={platform.releaseDate}
                     type="date"
                 />

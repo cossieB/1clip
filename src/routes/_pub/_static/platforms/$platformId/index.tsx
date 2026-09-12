@@ -31,7 +31,7 @@ function RouteComponent() {
             <Suspense>
                 <CompanyPage
                     id={platformResult.data!.platformId}
-                    logo={STORAGE_DOMAIN + platformResult.data!.logo}
+                    logo={STORAGE_DOMAIN + (platformResult.data?.logo ?? "q.png")}
                     name={platformResult.data!.name}
                     summary={platformResult.data!.summary}
                     type="platform"

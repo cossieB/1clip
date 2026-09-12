@@ -30,7 +30,7 @@ function RouteComponent() {
             <Suspense>
                 <CompanyPage
                     id={devResult.data!.publisherId}
-                    logo={STORAGE_DOMAIN + devResult.data!.logo}
+                    logo={STORAGE_DOMAIN + (devResult.data?.logo ?? "q.png")}
                     name={devResult.data!.name}
                     summary={devResult.data!.summary}
                     type='publisher'

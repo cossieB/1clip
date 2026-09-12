@@ -23,8 +23,8 @@ export function useGameForm(props: { game?: Game }) {
     const [game, setGame] = createStore({
         gameId: props.game?.gameId,
         title: props.game?.title ?? "",
-        cover: props.game?.cover ?? "",
-        banner: props.game?.banner ?? "",
+        cover: props.game?.cover,
+        banner: props.game?.banner,
         developerId: props.game?.developerId ?? -1,
         publisherId: props.game?.publisherId ?? -1,
         summary: props.game?.summary ?? "",
