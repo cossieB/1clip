@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/solid-start";
 import z from "zod";
 import { authedMiddleware } from "~/middleware/authorization";
-import * as notificationsRepository from "~/repositories/notificationsRepository"
+import * as notificationsRepository from "./notificationsRepository"
 
 export const getNotifications = createServerFn()
     .middleware([authedMiddleware])

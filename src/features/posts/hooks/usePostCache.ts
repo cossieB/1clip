@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useQueryClient } from "@tanstack/solid-query";
 import { createEffect } from "solid-js";
-import { PostFilters } from "~/repositories/postRepository";
+import { PostFilters } from "~/features/posts/postRepository";
 import { postsQueryOpts } from "../utils/postQueryOpts";
 
 export function usePostQuery(opts?: PostFilters) {

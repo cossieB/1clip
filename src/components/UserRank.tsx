@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/solid-query";
 import { Suspense } from "solid-js";
-import { getUserReputation } from "~/serverFn/users";
+import { getUserReputation } from "~/features/users/usersApi";
 import { STORAGE_DOMAIN } from "~/utils/env";
 
 export function UserRank(props: {userId: string, enabled?: boolean}) {

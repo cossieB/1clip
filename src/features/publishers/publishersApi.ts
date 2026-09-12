@@ -2,9 +2,9 @@ import { notFound } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start";
 import { adminOnlyMiddleware } from "~/middleware/authorization";
 import { staticDataMiddleware } from "~/middleware/static";
-import * as publisherRepository from "~/repositories/publisherRepository"
-import { LimitOffsetSchema } from "~/zod/common";
-import { publisherCreateSchema, publisherEditSchema } from "~/zod/publishers";
+import * as publisherRepository from "./publisherRepository"
+import { LimitOffsetSchema } from "~/utils/zod";
+import { publisherCreateSchema, publisherEditSchema } from "./utils/zod";
 
 export const getPublishersFn = createServerFn()
     .middleware([staticDataMiddleware])

@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/solid-query'
 import { createFileRoute, useLocation } from '@tanstack/solid-router'
 import { For, Suspense } from 'solid-js';
 import { PostBlock } from '~/features/posts/components/PostBlock';
-import { searchPostsFn } from '~/serverFn/posts';
+import { searchPostsFn } from '~/features/posts/postsApi';
 
 export const Route = createFileRoute('/_pub/search/posts')({
     component: RouteComponent,

@@ -1,14 +1,11 @@
 import { PostBlock } from "./PostBlock";
-import { type getPostsFn } from "~/serverFn/posts";
+import { type getPostsFn } from "~/features/posts/postsApi";
 import { createSignal } from "solid-js";
 import { useServerFn } from "@tanstack/solid-start";
 import { useMutation, useQueryClient } from "@tanstack/solid-query";
-import { addCommentFn } from "~/serverFn/comments";
-
-import { CommentList } from "~/features/comments/components/CommentList";
 import { CommentInput } from "~/features/comments/components/CommentInput";
 import { commentListQueryOpts } from "~/features/comments/utils/commentListQueryOpts";
-import { useLocation } from "@tanstack/solid-router";
+import { addCommentFn } from "~/features/comments/commentsApi";
 
 type Props = {
     post: Awaited<ReturnType<typeof getPostsFn>>[number]
@@ -17,7 +14,6 @@ type Props = {
 export function PostId(props: Props) {
     const commentOnPost = useServerFn(addCommentFn);
     const queryClient = useQueryClient()
-    const location = useLocation()
 
     const [comment, setComment] = createSignal("")
     const mutation = useMutation(() => ({

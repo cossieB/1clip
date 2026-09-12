@@ -3,11 +3,11 @@ import { useServerFn } from "@tanstack/solid-start"
 import { createStore } from "solid-js/store"
 import { useToastContext } from "~/hooks/useToastContext"
 import { useUpload } from "~/hooks/useUpload"
-import { createPlatformFn, editPlatformFn, getPlatformFn } from "~/serverFn/platforms"
 import { platformQueryOpts, platformsQueryOpts } from "../utils/platformQueryOpts"
 import { Form } from "~/components/Forms/Form"
 import { ContentEditable } from "~/components/Forms/ContentEditable"
 import { UploadBoxWithPreview } from "~/components/UploadBox/UploadBoxWithPreview"
+import { getPlatformFn, createPlatformFn, editPlatformFn } from "../platformsApi"
 
 type Platform = Awaited<ReturnType<typeof getPlatformFn>>
 

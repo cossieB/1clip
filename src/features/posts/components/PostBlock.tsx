@@ -1,4 +1,4 @@
-import { getPostFn } from '~/serverFn/posts'
+import { getPostFn } from '~/features/posts/postsApi'
 import { For, Show } from 'solid-js'
 import { EllipsisVerticalIcon, EyeIcon, MessageCircleIcon, ThumbsDownIcon, ThumbsUpIcon } from 'lucide-solid'
 import { getRelativeTime } from '~/lib/getRelativeTime'

@@ -3,14 +3,12 @@ import { useServerFn } from "@tanstack/solid-start";
 import { createStore } from "solid-js/store";
 import { ContentEditable } from "~/components/Forms/ContentEditable";
 import { Form } from "~/components/Forms/Form";
-import { UploadBox } from "~/components/UploadBox/UploadBox";
 import { useToastContext } from "~/hooks/useToastContext";
 import { useUpload } from "~/hooks/useUpload";
-import { createPublisherFn, editPublisherFn, getPublisherFn } from "~/serverFn/publishers";
 import { countryList } from "~/utils/countryList";
-import { mediaSrc } from "~/utils/mediaSrc";
 import { publisherQueryOpts, publishersQueryOpts } from "../utils/publisherQueryOpts";
 import { UploadBoxWithPreview } from "~/components/UploadBox/UploadBoxWithPreview";
+import { getPublisherFn, createPublisherFn, editPublisherFn } from "../publishersApi";
 
 type Publisher = Awaited<ReturnType<typeof getPublisherFn>>
 

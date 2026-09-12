@@ -1,6 +1,6 @@
 import { infiniteQueryOptions, queryOptions } from "@tanstack/solid-query";
-import {type GameQueryFilters } from "~/repositories/gamesRepository";
-import { getGameFn, getGamesFn, getGamesWithoutExtras } from "~/serverFn/games";
+import { getGameFn, getGamesFn, getGamesWithoutExtras } from "~/features/games/gamesApi";
+import { type GameQueryFilters } from "../gamesRepository/types";
 
 export function gamesWithExtrasQueryOpts(filters?: GameQueryFilters) {
     return infiniteQueryOptions({

@@ -2,8 +2,8 @@ import { notFound } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start";
 import z from "zod";
 import { verifiedOnlyMiddleware } from "~/middleware/authorization";
-import * as postRepository from "~/repositories/postRepository"
-import { getCurrentUser } from "./auth";
+import * as postRepository from "~/features/posts/postRepository"
+import { getCurrentUser } from "../../serverFn/auth";
 import { AppError } from "~/utils/AppError.server";
 import { variables } from "~/utils/variables";
 import { rateLimiter } from "~/utils/rateLimiter.server";
@@ -12,7 +12,7 @@ import { getRequestIP } from "@tanstack/solid-start/server";
 import { redis } from "~/utils/redis.server";
 import { parseVideoUrl } from "~/components/embeds/IframeFactory";
 import { notificationsService } from "~/integrations/notificationService";
-import { addNotification } from "~/repositories/notificationsRepository";
+import { addNotification } from "~/features/notifications/notificationsRepository";
 
 export const createPostFn = createServerFn({ method: "POST" })
     .middleware([verifiedOnlyMiddleware])

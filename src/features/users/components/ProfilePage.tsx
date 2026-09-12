@@ -1,4 +1,4 @@
-import { getLoggedInUser } from "~/serverFn/users";
+import { getLoggedInUser } from "~/features/users/usersApi";
 import styles from "./ProfilePage.module.css"
 import { Form } from "~/components/Forms/Form";
 import { UploadBox } from "~/components/UploadBox/UploadBox";

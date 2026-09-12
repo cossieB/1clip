@@ -2,7 +2,7 @@ import { CalendarPlus2Icon, CakeIcon, MapPinIcon, PlusIcon, MinusIcon } from "lu
 import { For, Show } from "solid-js";
 import { HeroHeader } from "~/components/Hero/HeroHeader";
 import { formatDate } from "~/lib/formatDate";
-import { type getUserByUsernameFn } from "~/serverFn/users";
+import { type getUserByUsernameFn } from "~/features/users/usersApi";
 import { SITE_URL, STORAGE_DOMAIN } from "~/utils/env";
 import { ClientOnly, Link } from "@tanstack/solid-router";
 import { validateUrl } from "~/lib/validateUrl";

@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/solid-query"
 import { useNavigate } from "@tanstack/solid-router"
 import { useServerFn } from "@tanstack/solid-start"
 import { useToastContext } from "~/hooks/useToastContext"
-import { deletePostFn, getPostFn } from "~/serverFn/posts"
+import { deletePostFn, getPostFn } from "~/features/posts/postsApi"
 import { postsQueryOpts } from "../utils/postQueryOpts"
 
 export function useDeletePost(post: Awaited<ReturnType<typeof getPostFn>>) {

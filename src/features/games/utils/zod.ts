@@ -4,8 +4,6 @@ export const GameCreateSchema = z.object({
     title: z.string(),
     developerId: z.number(),
     publisherId: z.number(),
-    banner: z.string(),
-    cover: z.string(),
     summary: z.string().optional(),
     releaseDate: z.iso.date(),
     trailer: z.string().nullish(),

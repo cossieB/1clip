@@ -1,8 +1,8 @@
-import { useQueryClient, useMutation, QueryClient } from "@tanstack/solid-query"
+import { useQueryClient, useMutation } from "@tanstack/solid-query"
 import { useServerFn } from "@tanstack/solid-start"
 import { createStore } from "solid-js/store"
-import { addCommentFn, getCommentsByPostIdFn } from "~/serverFn/comments"
 import { commentListQueryOpts } from "../utils/commentListQueryOpts"
+import { getCommentsByPostIdFn, addCommentFn } from "../commentsApi"
 
 export function useReplyToComment(comment: Awaited<ReturnType<typeof getCommentsByPostIdFn>>[number], postId: number) {
     const queryClient = useQueryClient()

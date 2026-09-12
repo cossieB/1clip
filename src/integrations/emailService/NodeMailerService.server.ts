@@ -12,7 +12,7 @@ export class NodemailService implements EmailService {
     sendMail = async (opts: EmailOptions ) => {
         return this.transporter.sendMail({
             ...opts,
-            name: "1Clip"
+            
         })
     }
 }

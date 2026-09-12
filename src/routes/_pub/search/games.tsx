@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/solid-query';
 import { createFileRoute, useLocation } from '@tanstack/solid-router'
 import { Suspense } from 'solid-js';
 import { PhotoCardGrid } from '~/components/CardLink/PhotoCardLink';
-import { searchGamesFn } from '~/serverFn/games';
+import { searchGamesFn } from '~/features/games/gamesApi';
 import { STORAGE_DOMAIN } from '~/utils/env';
 
 export const Route = createFileRoute('/_pub/search/games')({

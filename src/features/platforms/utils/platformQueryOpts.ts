@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/solid-query";
-import { getPlatformFn, getPlatformsFn } from "~/serverFn/platforms";
+import { getPlatformFn, getPlatformsFn } from "../platformsApi";
 
 export function platformQueryOpts(platformId: number) {
     return queryOptions({

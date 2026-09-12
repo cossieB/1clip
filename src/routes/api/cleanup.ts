@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/solid-router'
-import { truncateUserNotifications } from '~/repositories/notificationsRepository'
+import { truncateUserNotifications } from '~/features/notifications/notificationsRepository';
 
 export const Route = createFileRoute('/api/cleanup')({
     server: {

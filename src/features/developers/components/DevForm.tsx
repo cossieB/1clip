@@ -1,6 +1,5 @@
 import { createStore } from "solid-js/store";
 import { Form } from "~/components/Forms/Form";
-import { createDeveloperFn, editDeveloperFn, type getDeveloperFn } from "~/serverFn/developers";
 import { useUpload } from "~/hooks/useUpload";
 import { countryList } from "~/utils/countryList";
 import { ContentEditable } from "~/components/Forms/ContentEditable";
@@ -9,6 +8,7 @@ import { useMutation, useQueryClient } from "@tanstack/solid-query";
 import { useToastContext } from "~/hooks/useToastContext";
 import { developerQueryOpts, developersQueryOpts } from "../utils/developerQueryOpts";
 import { UploadBoxWithPreview } from "~/components/UploadBox/UploadBoxWithPreview";
+import { getDeveloperFn, createDeveloperFn, editDeveloperFn } from "../developersApi";
 
 type Developer = Awaited<ReturnType<typeof getDeveloperFn>>
 

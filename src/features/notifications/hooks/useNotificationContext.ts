@@ -2,8 +2,8 @@ import { useQuery } from "@tanstack/solid-query";
 import { authClient } from "~/auth/authClient";
 import { notificationQueryOpts } from "../utils/notificationQueryOpts";
 import { useServerFn } from "@tanstack/solid-start";
-import { markNotificationAsRead } from "~/serverFn/notifications";
 import { useMutation, useQueryClient } from "@tanstack/solid-query";
+import { markNotificationAsRead } from "../notifications";
 
 export function useNotifications() {
     const session = authClient.useSession()

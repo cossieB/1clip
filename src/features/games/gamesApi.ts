@@ -3,9 +3,9 @@ import { createServerFn } from "@tanstack/solid-start"
 import z from "zod";
 import { adminOnlyMiddleware } from "~/middleware/authorization";
 import { staticDataMiddleware } from "~/middleware/static";
-import * as gamesRepository from "~/repositories/gamesRepository";
+import * as gamesRepository from "./gamesRepository";
 import { cacheAside } from "~/utils/cacheAside.server";
-import { GameCreateSchema, GameEditSchema, GetGamesSchema } from "~/zod/games";
+import { GameCreateSchema, GameEditSchema, GetGamesSchema } from "./utils/zod";
 
 export const getGamesFn = createServerFn()
     .middleware([staticDataMiddleware])
@@ -27,8 +27,6 @@ export const getGameFn = createServerFn()
         if (!game) throw notFound()
         return game
     })
-
-
 
 export const createGameFn = createServerFn({ method: "POST" })
     .middleware([adminOnlyMiddleware])

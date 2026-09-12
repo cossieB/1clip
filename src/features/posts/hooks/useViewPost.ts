@@ -1,5 +1,5 @@
 import { onCleanup, onMount } from "solid-js";
-import { viewPostFn } from "~/serverFn/posts";
+import { viewPostFn } from "~/features/posts/postsApi";
 
 export function useViewPost() {
     const viewedPosts = new Set<number>()

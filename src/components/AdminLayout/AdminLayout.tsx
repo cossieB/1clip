@@ -3,7 +3,7 @@ import styles from "./AdminLayout.module.css"
 import { Link } from "@tanstack/solid-router";
 import { ToastContainer } from "../Toast/Toast";
 
-export function AdminLayout(props: { children: JSXElement }) {
+export default function AdminLayout(props: { children: JSXElement }) {
     return (
         <div class={styles.container}>
             <AdminNav />

@@ -1,14 +1,14 @@
 import { createServerFn } from "@tanstack/solid-start";
 import z from "zod";
 import { verifiedOnlyMiddleware } from "~/middleware/authorization";
-import * as commentsRepository from "~/repositories/commentRepository"
-import { getCurrentUser } from "./auth";
+import * as commentsRepository from "./commentRepository"
 import { AppError } from "~/utils/AppError.server";
 import { rateLimiter } from "~/utils/rateLimiter.server";
 import { HttpStatusCode } from "~/utils/statusCodes";
 import { notificationsService } from "~/integrations/notificationService";
 import { redirect } from "@tanstack/solid-router";
-import { addNotification } from "~/repositories/notificationsRepository";
+import { getCurrentUser } from "~/serverFn/auth";
+import { addNotification } from "~/features/notifications/notificationsRepository";
 
 export const addCommentFn = createServerFn({ method: "POST" })
     .middleware([verifiedOnlyMiddleware])

@@ -1,8 +1,8 @@
 import { notFound } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start";
 import z from "zod";
-import * as userRepository from "~/repositories/userRepository"
-import { forceLogin, getCurrentUser as getCurrentUser } from "./auth";
+import * as userRepository from "~/features/users/userRepository"
+import { forceLogin, getCurrentUser as getCurrentUser } from "../../serverFn/auth";
 import { verifiedOnlyMiddleware } from "~/middleware/authorization";
 import { AppError } from "~/utils/AppError.server";
 import * as uploadService from "~/integrations/uploadService/cloudflareUploadService.server"
@@ -10,7 +10,7 @@ import { HttpStatusCode } from "~/utils/statusCodes";
 import { notificationsService } from "~/integrations/notificationService";
 import { cacheAside } from "~/utils/cacheAside.server";
 import { getRank } from "~/utils/getRank";
-import { addNotification } from "~/repositories/notificationsRepository";
+import { addNotification } from "~/features/notifications/notificationsRepository";
 
 export const getLoggedInUser = createServerFn()
     .handler(async () => {

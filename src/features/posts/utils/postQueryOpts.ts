@@ -1,6 +1,6 @@
 import { infiniteQueryOptions, queryOptions } from "@tanstack/solid-query";
-import { PostFilters } from "~/repositories/postRepository";
-import { getPostFn, getPostsFn } from "~/serverFn/posts";
+import { PostFilters } from "~/features/posts/postRepository";
+import { getPostFn, getPostsFn } from "~/features/posts/postsApi";
 
 export function postsQueryOpts(filters: PostFilters = {}) {
     return infiniteQueryOptions({

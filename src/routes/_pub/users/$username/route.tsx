@@ -4,7 +4,7 @@ import { createEffect, Suspense } from 'solid-js'
 import { NavTabs } from '~/components/NavTabs/NavTabs'
 import { UserPage } from '~/features/users/components/UserPage'
 import { userQueryOpts } from '~/features/users/utils/userQueryOpts'
-import { getUserByUsernameFn } from '~/serverFn/users'
+import { getUserByUsernameFn } from '~/features/users/usersApi'
 
 export const Route = createFileRoute('/_pub/users/$username')({
     component: RouteComponent,

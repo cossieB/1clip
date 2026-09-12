@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/solid-query";
-import { getUserByIdFn } from "~/serverFn/users";
+import { getUserByIdFn } from "~/features/users/usersApi";
 
 export function userQueryOpts(userId: string) {
     return queryOptions({

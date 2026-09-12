@@ -1,5 +1,4 @@
 import { getRelativeTime } from "~/lib/getRelativeTime";
-import { getCommentsByPostIdFn } from "~/serverFn/comments";
 import { MessageCircleIcon, ThumbsUpIcon, ThumbsDownIcon, EllipsisVerticalIcon } from "lucide-solid";
 import { CommentInput } from "./CommentInput";
 import { Show } from "solid-js";
@@ -13,6 +12,7 @@ import { useDeleteComment } from "../hooks/useDeleteComment";
 import { authClient } from "~/auth/authClient";
 import { ConfirmDialog } from "~/components/Popover/Confirm";
 import { PostAuthor } from "~/features/posts/components/PostAuthor";
+import { getCommentsByPostIdFn } from "../commentsApi";
 
 type Props = {
     comment: Awaited<ReturnType<typeof getCommentsByPostIdFn>>[number];

@@ -1,8 +1,7 @@
-import { and, eq, inArray, InferInsertModel, InferSelectModel } from "drizzle-orm";
+import { and, eq, inArray, InferInsertModel } from "drizzle-orm";
 import { db } from "~/drizzle/db";
 import { notifications } from "~/drizzle/schema";
 import { sql, gt } from "drizzle-orm";
-import { Notification } from "~/drizzle/models";
 
 export async function addNotification(notification: InferInsertModel<typeof notifications>) {
     const [insert] = await db.insert(notifications).values(notification).returning();

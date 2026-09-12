@@ -3,9 +3,9 @@ import { createServerFn } from "@tanstack/solid-start";
 import z from "zod";
 import { adminOnlyMiddleware } from "~/middleware/authorization";
 import { staticDataMiddleware } from "~/middleware/static";
-import * as actorRepository from "~/repositories/actorRepository"
-import { actorCreateSchema, actorEditSchema } from "~/zod/actors";
-import { LimitOffsetSchema } from "~/zod/common";
+import * as actorRepository from "./actorRepository"
+import { actorCreateSchema, actorEditSchema } from "./utils/zod";
+import { LimitOffsetSchema } from "~/utils/zod";
 
 export const getActorFn = createServerFn()
     .middleware([staticDataMiddleware])

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/solid-query";
 import { useServerFn } from "@tanstack/solid-start";
-import { followUserFn, getUserByUsernameFn } from "~/serverFn/users";
+import { followUserFn, getUserByUsernameFn } from "~/features/users/usersApi";
 
 type User = Awaited<ReturnType<typeof getUserByUsernameFn>>
 

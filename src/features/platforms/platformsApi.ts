@@ -2,9 +2,9 @@ import { notFound } from "@tanstack/solid-router"
 import { createServerFn } from "@tanstack/solid-start"
 import { adminOnlyMiddleware } from "~/middleware/authorization"
 import { staticDataMiddleware } from "~/middleware/static"
-import * as platformRepository from "~/repositories/platformRepository"
-import { LimitOffsetSchema } from "~/zod/common"
-import { platformCreateSchema, platformEditSchema } from "~/zod/platforms"
+import * as platformRepository from "./platformRepository"
+import { LimitOffsetSchema } from "~/utils/zod"
+import { platformCreateSchema, platformEditSchema } from "./utils/zod"
 
 export const getPlatformsFn = createServerFn()
     .middleware([staticDataMiddleware])

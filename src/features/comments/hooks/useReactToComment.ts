@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/solid-start";
 import { modifyCommentCache } from "../utils/modifyCommentCache";
 import { authClient } from "~/auth/authClient";
 import { useToastContext } from "~/hooks/useToastContext";
-import { getCommentsByPostIdFn, reactToCommentFn } from "~/serverFn/comments";
+import { getCommentsByPostIdFn, reactToCommentFn } from "../commentsApi";
 
 export function useReactToComment(comment: Awaited<ReturnType<typeof getCommentsByPostIdFn>>[number], postId: number) {
     const queryClient = useQueryClient()

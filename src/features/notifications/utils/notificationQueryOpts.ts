@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/solid-query";
-import { getNotifications } from "~/serverFn/notifications";
+import { getNotifications } from "../notifications";
 
 export function notificationQueryOpts() {
     return queryOptions({

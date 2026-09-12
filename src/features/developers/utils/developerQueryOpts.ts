@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/solid-query";
-import { getDeveloperFn, getDevelopersFn } from "~/serverFn/developers";
+import { getDeveloperFn, getDevelopersFn } from "../developersApi";
 
 export function developerQueryOpts(developerId: number) {
     return queryOptions({

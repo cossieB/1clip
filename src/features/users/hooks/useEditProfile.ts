@@ -4,7 +4,7 @@ import { createStore } from "solid-js/store";
 import { useAbortController } from "~/hooks/useAbortController";
 import { useToastContext } from "~/hooks/useToastContext";
 import { useUpload } from "~/hooks/useUpload";
-import { getLoggedInUser, updateCurrentUser } from "~/serverFn/users";
+import { getLoggedInUser, updateCurrentUser } from "~/features/users/usersApi";
 
 export function useEditProfile(props: { user: Awaited<ReturnType<typeof getLoggedInUser>> }) {
     const updateUser = useServerFn(updateCurrentUser);

@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/solid-query";
-import { getActorFn, getActorsFn, getActorsWithCharacters } from "~/serverFn/actors";
+import { getActorFn, getActorsFn, getActorsWithCharacters } from "~/features/actors/actorsApi";
 
 export function actorQueryOpts(actorId: number) {
     return queryOptions({

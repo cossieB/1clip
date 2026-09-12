@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/solid-query";
 import { useServerFn } from "@tanstack/solid-start";
-import { getPostFn, reactToPostFn } from "~/serverFn/posts";
+import { getPostFn, reactToPostFn } from "~/features/posts/postsApi";
 import { modifyPostCache } from "../utils/modifyCache";
 import { useToastContext } from "~/hooks/useToastContext";
 import { authClient } from "~/auth/authClient";

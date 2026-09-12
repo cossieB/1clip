@@ -1,4 +1,4 @@
-import { getSimilarGames, type getGameFn } from "~/serverFn/games"
+import { getSimilarGames, type getGameFn } from "~/features/games/gamesApi"
 import styles from "./GamePage.module.css"
 import { createEffect, createSignal, For, Show, Suspense } from "solid-js"
 import { ClientOnly, Link } from "@tanstack/solid-router"

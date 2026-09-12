@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/solid-query'
 import { createFileRoute, redirect } from '@tanstack/solid-router'
 import { Suspense } from 'solid-js'
+import { getCommentByIdFn } from '~/features/comments/commentsApi'
 import { CommentBlock } from '~/features/comments/components/CommentBlock'
-import { getCommentByIdFn } from '~/serverFn/comments'
 
 export const Route = createFileRoute('/_pub/posts/$postId/$commentId')({
     component: RouteComponent,

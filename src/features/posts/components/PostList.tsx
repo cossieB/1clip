@@ -1,7 +1,7 @@
 import { createEffect, For, onCleanup, onMount } from "solid-js";
 import { PostBlock } from "./PostBlock";
 import styles from "./Post.module.css"
-import { type PostFilters } from "~/repositories/postRepository";
+import { type PostFilters } from "~/features/posts/postRepository";
 import { usePostQuery } from "../hooks/usePostCache";
 import { useViewPost } from "../hooks/useViewPost";
 

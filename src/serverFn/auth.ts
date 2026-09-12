@@ -2,7 +2,7 @@ import { redirect } from "@tanstack/solid-router"
 import { createServerFn } from "@tanstack/solid-start"
 import { getRequestHeaders } from "@tanstack/solid-start/server"
 import { auth } from "~/auth/server"
-import * as userRepository from "~/repositories/userRepository"
+import * as userRepository from "~/features/users/userRepository"
 
 export const checkSessionFn = createServerFn().handler(async () => {
     const headers = getRequestHeaders()

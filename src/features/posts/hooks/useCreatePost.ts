@@ -6,7 +6,7 @@ import { useGamesQuery } from "~/features/games/hooks/useGameQuery"
 import { useAbortController } from "~/hooks/useAbortController"
 import { useToastContext } from "~/hooks/useToastContext"
 import { useUpload } from "~/hooks/useUpload"
-import { createPostFn } from "~/serverFn/posts"
+import { createPostFn } from "~/features/posts/postsApi"
 import { postsQueryOpts } from "../utils/postQueryOpts"
 
 export function useCreatePost() {
