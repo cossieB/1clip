@@ -10,7 +10,7 @@ export const Route = createFileRoute('/admin/actors/')({
 })
 
 function RouteComponent() {
-    const result = useQuery(() => actorsQueryOpts())
+    const result = useQuery(() => actorsQueryOpts(500))
 
     return (
         <Suspense >

@@ -37,24 +37,31 @@ export function ActorForm(props: { actor?: Omit<Actor, 'characters'> & { charact
         characters: [] as Optional<Char, 'appearanceId'>[],
     })
 
-    const { isUploading, setFiles, upload } = useUpload(["people"])
+    const { isUploading, setFiles, upload, files } = useUpload()
 
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault()
-        const files = await upload()
-        const f = files.at(0)
-        if (f) setActor({ photo: f.key })
+
         if ('actorId' in actor) {
-            return editActorMutation.mutate({ data: actor }, {
-                onSuccess(data, variables, onMutateResult, context) {
-                    addToast({ text: "Successfully edited actor, " + actor.actorId, type: "info" })
-                    queryClient.setQueryData(actorQueryOpts(actor.actorId).queryKey, actor)
-                    queryClient.invalidateQueries(actorsQueryOpts())
-                },
-                onError(error, variables, onMutateResult, context) {
-                    addToast({ text: "Failed", type: "error" })
-                },
-            })
+            try {
+                const f = files().at(0);
+                const file = f ? {size: f.file.size, contentType: f.file.type, filename: f.file.name} : undefined
+                const r2details = await editActorMutation.mutateAsync({ data: {...actor, file} }); 
+                if (r2details) {
+                    await upload([r2details.signedUrl])
+                    setActor({photo: r2details.key})
+                }
+                addToast({ text: "Successfully edited actor, " + actor.actorId, type: "info" })
+                queryClient.setQueryData(actorQueryOpts(actor.actorId).queryKey, actor)
+                queryClient.invalidateQueries(actorsQueryOpts())
+            }
+            catch (error) {
+                addToast({ text: "Failed", type: "error" });
+                console.error(error)
+            }
+            finally {
+                return;
+            }
         }
         createActorMutation.mutate({ data: actor }, {
             onSuccess(data, variables, onMutateResult, context) {

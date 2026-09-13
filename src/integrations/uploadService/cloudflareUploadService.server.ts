@@ -48,7 +48,7 @@ export async function generateSignedUrl(options: Options) {
         expiresIn: 5 * 60,
         signableHeaders: new Set(["content-type", 'x-amz-meta-postid', 'x-amz-meta-userid']),
     });
-    return { signedUrl, metadata }
+    return { signedUrl, key }
 }
 
 export function deleteObject(key: string) {

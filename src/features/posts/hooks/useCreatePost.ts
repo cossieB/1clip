@@ -49,7 +49,7 @@ export function useCreatePost() {
             })
             void queryClient.invalidateQueries(postsQueryOpts())            
             if (response.post.pending) {
-                await upload(response.urls, abortController)
+                await upload(response.urls.map(x => x.signedUrl), abortController)
                 const p = await markPostUploadComplete({data: response.post.postId});
                 queryClient.setQueryData(postQueryOpts(p.postId).queryKey, p)
             } 

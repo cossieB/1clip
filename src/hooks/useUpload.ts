@@ -14,20 +14,19 @@ export function useUpload() {
         }[]
     })
 
-    async function upload(array: {signedUrl: string, metadata?: Record<string, string>}[], abortController?: AbortController) {
+    async function upload(signedUrls: string[], abortController?: AbortController) {
 
         try {
             if (state.files.length === 0) return;
             setState({ isUploading: true })
 
-            if (array.length != state.files.length)
+            if (signedUrls.length != state.files.length)
                 throw addToast({ text: "Something went wrong. Please try again later", type: "error" })
 
             const promises = state.files.map((f, i) => uploadToSignedUrl(
-                array[i].signedUrl,
+                signedUrls[i],
                 f.file, {
                 signal: abortController?.signal,
-                metadata: array[i].metadata
             }))
             await Promise.all(promises)
         }

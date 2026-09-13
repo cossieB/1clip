@@ -6,6 +6,8 @@ import { staticDataMiddleware } from "~/middleware/static";
 import * as actorRepository from "./actorRepository"
 import { actorCreateSchema, actorEditSchema } from "./utils/zod";
 import { LimitOffsetSchema } from "~/utils/zod";
+import { generateUniqueFilename } from "~/utils/mediaSrc";
+import { generateSignedUrl } from "~/integrations/uploadService/cloudflareUploadService.server";
 
 export const getActorFn = createServerFn()
     .middleware([staticDataMiddleware])
@@ -22,32 +24,38 @@ export const getActorFn = createServerFn()
 export const getActorsFn = createServerFn()
     .middleware([staticDataMiddleware])
     .validator(LimitOffsetSchema)
-    .handler(async ({data}) => {
+    .handler(async ({ data }) => {
         const actors = await actorRepository.findAll(data)
         return actors
     })
 
-export const createActorFn = createServerFn({method: "POST"})  
+export const createActorFn = createServerFn({ method: "POST" })
     .middleware([adminOnlyMiddleware])
     .validator(actorCreateSchema)
-    .handler(async ({data}) => {
-        const {characters, ...rest} = data
+    .handler(async ({ data }) => {
+        const { characters, ...rest } = data
         const actor = await actorRepository.createActor(rest, characters)
         return actor
     })
 
-export const editActorFn = createServerFn({method: "POST"})    
+export const editActorFn = createServerFn({ method: "POST" })
     .middleware([adminOnlyMiddleware])
     .validator(actorEditSchema)
-    .handler(async ({data}) => {
-        const {actorId, characters, ...rest} = data
-        await actorRepository.editActor(actorId, rest, characters)
+    .handler(async ({ data }) => {
+        const { actorId, characters, file, ...rest } = data
+        const d = file ? await generateSignedUrl({
+            contentLength: file.size,
+            contentType: file.contentType,
+            key: `people/${generateUniqueFilename(file.filename)}`
+        }) : undefined
+        await actorRepository.editActor(actorId, { ...rest, photo: d?.key }, characters)
+        return d
     })
 
 export const getActorsWithCharacters = createServerFn()
     .validator(z.number())
-    .handler(async ({data}) => {
+    .handler(async ({ data }) => {
         const actor = await actorRepository.findActorWithGames(data)
-        if (!actor) throw notFound()                 
+        if (!actor) throw notFound()
         return actor
     })    

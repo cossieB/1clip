@@ -13,5 +13,9 @@ export const actorCreateSchema = z.object({
 
 export const actorEditSchema = actorCreateSchema.partial().extend({
     actorId: z.number(),
-    photo: z.string().nullish(),
+    file: z.object({
+        size: z.number().lte(8 * 1024 * 1024),
+        contentType: z.string().refine(str => /^(image|video|audio)/.test(str)),
+        filename: z.string(),
+    }).optional()
 })
