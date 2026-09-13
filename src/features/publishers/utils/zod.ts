@@ -1,4 +1,5 @@
 import z from "zod"
+import { AdminImageSchema } from "~/utils/zod"
 
 export const publisherCreateSchema = z.object({
     name: z.string(),
@@ -9,5 +10,5 @@ export const publisherCreateSchema = z.object({
 
 export const publisherEditSchema = publisherCreateSchema.partial().extend({
     publisherId: z.number(),
-    logo: z.string().nullish(),
+    file: AdminImageSchema
 })    

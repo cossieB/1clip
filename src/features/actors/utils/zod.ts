@@ -1,4 +1,5 @@
 import z from "zod"
+import { AdminImageSchema } from "~/utils/zod"
 
 export const actorCreateSchema = z.object({
     name: z.string(),
@@ -13,9 +14,5 @@ export const actorCreateSchema = z.object({
 
 export const actorEditSchema = actorCreateSchema.partial().extend({
     actorId: z.number(),
-    file: z.object({
-        size: z.number().lte(8 * 1024 * 1024),
-        contentType: z.string().refine(str => /^(image|video|audio)/.test(str)),
-        filename: z.string(),
-    }).optional()
+    file: AdminImageSchema
 })

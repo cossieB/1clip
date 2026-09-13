@@ -5,6 +5,8 @@ import { staticDataMiddleware } from "~/middleware/static"
 import * as platformRepository from "./platformRepository"
 import { LimitOffsetSchema } from "~/utils/zod"
 import { platformCreateSchema, platformEditSchema } from "./utils/zod"
+import { generateSignedUrl } from "~/integrations/uploadService/cloudflareUploadService.server"
+import { generateUniqueFilename } from "~/utils/mediaSrc"
 
 export const getPlatformsFn = createServerFn()
     .middleware([staticDataMiddleware])
@@ -38,6 +40,12 @@ export const editPlatformFn = createServerFn({method: "POST"})
     .middleware([adminOnlyMiddleware])
     .validator(platformEditSchema)
     .handler(async ({data}) => {
-        const {platformId, ...rest} = data
-        await platformRepository.editPlatform(platformId, rest)
+        const { platformId, file, ...rest } = data;
+        const d = file ? await generateSignedUrl({
+            contentLength: file.size,
+            contentType: file.contentType,
+            key: `logos/${generateUniqueFilename(file.filename)}`
+        }) : undefined
+        await platformRepository.editPlatform(platformId, {...rest, logo: d?.key});
+        return d
     })

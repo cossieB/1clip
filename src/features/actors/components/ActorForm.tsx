@@ -16,12 +16,13 @@ import { FormSelect } from "~/components/Forms/Select"
 import styles from "./ActorForm.module.css"
 import { CirclePlusIcon, Trash2Icon } from "lucide-solid"
 import { Optional } from "~/lib/utilityTypes"
+import { useNavigate } from "@tanstack/solid-router"
 
 type Actor = Awaited<ReturnType<typeof getActorsWithCharacters>>
 type Char = Actor['characters'][number]
 
 export function ActorForm(props: { actor?: Omit<Actor, 'characters'> & { characters: Optional<Char, 'appearanceId'>[] } }) {
-
+    const navigate = useNavigate()
     const { addToast } = useToastContext()
     const queryClient = useQueryClient()
     const createActorMutation = useMutation(() => ({
@@ -68,6 +69,7 @@ export function ActorForm(props: { actor?: Omit<Actor, 'characters'> & { charact
                 addToast({ text: "Successfully created actor, " + data.actorId, type: "info" })
                 queryClient.setQueryData(actorQueryOpts(data.actorId).queryKey, data)
                 queryClient.invalidateQueries(actorsQueryOpts())
+                navigate({to: "/admin/actors/$actorId", params: {actorId: data.actorId}})
             },
             onError(error, variables, onMutateResult, context) {
                 addToast({ text: error.message, type: "error" })

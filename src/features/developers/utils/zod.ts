@@ -1,4 +1,5 @@
 import z from "zod"
+import { AdminImageSchema } from "~/utils/zod"
 
 export const developerCreateSchema = z.object({
     name: z.string(),
@@ -9,5 +10,5 @@ export const developerCreateSchema = z.object({
 
 export const developerEditSchema = developerCreateSchema.partial().extend({
     developerId: z.number(),
-    logo: z.string().nullish(),
+    file: AdminImageSchema
 })

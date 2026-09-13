@@ -5,11 +5,13 @@ import { staticDataMiddleware } from "~/middleware/static";
 import * as developerRepository from "./developerRepository"
 import { LimitOffsetSchema } from "~/utils/zod";
 import { developerCreateSchema, developerEditSchema } from "./utils/zod";
+import { generateSignedUrl } from "~/integrations/uploadService/cloudflareUploadService.server";
+import { generateUniqueFilename } from "~/utils/mediaSrc";
 
 export const getDevelopersFn = createServerFn()
     .middleware([staticDataMiddleware])
     .validator(LimitOffsetSchema)
-    .handler(async ({data}) => {        
+    .handler(async ({ data }) => {
         const devs = await developerRepository.findAll(data);
         return devs
     })
@@ -20,24 +22,30 @@ export const getDeveloperFn = createServerFn()
         if (Number.isNaN(developerId) || developerId < 1) throw notFound()
         return developerId
     })
-    .handler(async ({ data }) => {        
+    .handler(async ({ data }) => {
         const dev = await developerRepository.findById(data)
         if (!dev) throw notFound()
         return dev
     })
 
-export const createDeveloperFn = createServerFn({method: "POST"}) 
+export const createDeveloperFn = createServerFn({ method: "POST" })
     .middleware([adminOnlyMiddleware])
     .validator(developerCreateSchema)
-    .handler(async ({data}) => {
+    .handler(async ({ data }) => {
         const dev = await developerRepository.createDeveloper(data)
         return dev
     })
 
-export const editDeveloperFn = createServerFn({method: "POST"})   
+export const editDeveloperFn = createServerFn({ method: "POST" })
     .middleware([adminOnlyMiddleware])
     .validator(developerEditSchema)
-    .handler(async ({data}) => {
-        const {developerId, ...rest} = data
-        await developerRepository.editDeveloper(developerId, rest)
+    .handler(async ({ data }) => {
+        const { developerId, file, ...rest } = data;
+        const d = file ? await generateSignedUrl({
+            contentLength: file.size,
+            contentType: file.contentType,
+            key: `logos/${generateUniqueFilename(file.filename)}`
+        }) : undefined
+        await developerRepository.editDeveloper(developerId, {...rest, logo: d?.key});
+        return d
     })

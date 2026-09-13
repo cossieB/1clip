@@ -5,6 +5,8 @@ import { staticDataMiddleware } from "~/middleware/static";
 import * as publisherRepository from "./publisherRepository"
 import { LimitOffsetSchema } from "~/utils/zod";
 import { publisherCreateSchema, publisherEditSchema } from "./utils/zod";
+import { generateSignedUrl } from "~/integrations/uploadService/cloudflareUploadService.server";
+import { generateUniqueFilename } from "~/utils/mediaSrc";
 
 export const getPublishersFn = createServerFn()
     .middleware([staticDataMiddleware])
@@ -38,6 +40,12 @@ export const editPublisherFn = createServerFn({method: "POST"})
     .middleware([adminOnlyMiddleware])
     .validator(publisherEditSchema)
     .handler(async ({data}) => {
-        const {publisherId, ...rest} = data
-        await publisherRepository.editPublisher(publisherId, rest)
+        const { publisherId, file, ...rest } = data;
+        const d = file ? await generateSignedUrl({
+            contentLength: file.size,
+            contentType: file.contentType,
+            key: `logos/${generateUniqueFilename(file.filename)}`
+        }) : undefined
+        await publisherRepository.editPublisher(publisherId, {...rest, logo: d?.key});
+        return d
     })

@@ -10,10 +10,12 @@ import { publisherQueryOpts, publishersQueryOpts } from "../utils/publisherQuery
 import { UploadBoxWithPreview } from "~/components/UploadBox/UploadBoxWithPreview";
 import { getPublisherFn, createPublisherFn, editPublisherFn } from "../publishersApi";
 import { Show } from "solid-js";
+import { useNavigate } from "@tanstack/solid-router";
 
 type Publisher = Awaited<ReturnType<typeof getPublisherFn>>
 
 export function PubForm(props: { publisher?: Publisher }) {
+    const navigate = useNavigate()
     const { addToast } = useToastContext()
     const queryClient = useQueryClient()
 
@@ -33,29 +35,38 @@ export function PubForm(props: { publisher?: Publisher }) {
         summary: ""
     })
 
-    const { isUploading, setFiles, upload } = useUpload(["logos"])
+    const { isUploading, setFiles, upload, files } = useUpload()
 
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault()
-        const files = await upload()
-        const f = files.at(0)
-        if (f) setPublisher({ logo: f.key })
+
         if ('publisherId' in publisher) {
-            return editPubMutation.mutate({ data: publisher }, {
-                onSuccess(data, variables, onMutateResult, context) {
-                    addToast({ text: "Successfully edited publisher, " + publisher.publisherId, type: "info" })
-                    queryClient.setQueryData(publisherQueryOpts(publisher.publisherId).queryKey, publisher)
-                    queryClient.invalidateQueries(publishersQueryOpts())
-                },
-                onError(error, variables, onMutateResult, context) {
-                    addToast({ text: "Failed", type: "error" })
-                },
-            })
+            try {
+                const f = files().at(0);
+                const file = f ? { size: f.file.size, contentType: f.file.type, filename: f.file.name } : undefined
+                const r2details = await editPubMutation.mutateAsync({ data: { ...publisher, file } });
+                if (r2details) {
+                    await upload([r2details.signedUrl])
+                    setPublisher({ logo: r2details.key })
+                }
+                addToast({ text: "Successfully edited actor, " + publisher.publisherId, type: "info" })
+                queryClient.setQueryData(publisherQueryOpts(publisher.publisherId).queryKey, publisher)
+                queryClient.invalidateQueries(publishersQueryOpts())
+            }
+            catch (error) {
+                addToast({ text: "Failed", type: "error" });
+                console.error(error)
+            }
+            finally {
+                return;
+            }
         }
         createPubMutation.mutate({ data: publisher }, {
             onSuccess(data, variables, onMutateResult, context) {
-                addToast({ text: "Successfully created publisher, " + data.publisherId, type: "info" })
+                addToast({ text: "Successfully created actor, " + data.publisherId, type: "info" })
                 queryClient.setQueryData(publisherQueryOpts(data.publisherId).queryKey, data)
+                queryClient.invalidateQueries(publishersQueryOpts())
+                navigate({ to: "/admin/actors/$actorId", params: { actorId: data.publisherId } })
             },
             onError(error, variables, onMutateResult, context) {
                 addToast({ text: error.message, type: "error" })

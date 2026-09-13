@@ -9,10 +9,12 @@ import { ContentEditable } from "~/components/Forms/ContentEditable"
 import { UploadBoxWithPreview } from "~/components/UploadBox/UploadBoxWithPreview"
 import { getPlatformFn, createPlatformFn, editPlatformFn } from "../platformsApi"
 import { Show } from "solid-js"
+import { useNavigate } from "@tanstack/solid-router"
 
 type Platform = Awaited<ReturnType<typeof getPlatformFn>>
 
 export function PlatformForm(props: { platform?: Platform }) {
+    const navigate = useNavigate()
     const { addToast } = useToastContext()
     const queryClient = useQueryClient()
 
@@ -31,32 +33,41 @@ export function PlatformForm(props: { platform?: Platform }) {
         summary: ""
     })
 
-    const { isUploading, setFiles, upload } = useUpload(["logos"])
+    const { isUploading, setFiles, upload, files } = useUpload()
 
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault()
-        const files = await upload()
-        const f = files.at(0)
-        if (f) setPlatform({ logo: f.key })
+
         if ('platformId' in platform) {
-            return editPlatformMutation.mutate({ data: platform }, {
-                onSuccess(data, variables, onMutateResult, context) {
-                    addToast({ text: "Successfully edited platform, " + platform.platformId, type: "info" })
-                    queryClient.setQueryData(platformQueryOpts(platform.platformId).queryKey, platform)
-                    queryClient.invalidateQueries(platformsQueryOpts())
-                },
-                onError(error, variables, onMutateResult, context) {
-                    addToast({ text: error.message, type: "error" })
-                },
-            })
+            try {
+                const f = files().at(0);
+                const file = f ? { size: f.file.size, contentType: f.file.type, filename: f.file.name } : undefined
+                const r2details = await editPlatformMutation.mutateAsync({ data: { ...platform, file } });
+                if (r2details) {
+                    await upload([r2details.signedUrl])
+                    setPlatform({ logo: r2details.key })
+                }
+                addToast({ text: "Successfully edited actor, " + platform.platformId, type: "info" })
+                queryClient.setQueryData(platformQueryOpts(platform.platformId).queryKey, platform)
+                queryClient.invalidateQueries(platformsQueryOpts())
+            }
+            catch (error) {
+                addToast({ text: "Failed", type: "error" });
+                console.error(error)
+            }
+            finally {
+                return;
+            }
         }
         createPlatformMutation.mutate({ data: platform }, {
             onSuccess(data, variables, onMutateResult, context) {
-                addToast({ text: "Successfully created platform, " + data.platformId, type: "info" })
+                addToast({ text: "Successfully created actor, " + data.platformId, type: "info" })
                 queryClient.setQueryData(platformQueryOpts(data.platformId).queryKey, data)
+                queryClient.invalidateQueries(platformsQueryOpts())
+                navigate({ to: "/admin/actors/$actorId", params: { actorId: data.platformId } })
             },
             onError(error, variables, onMutateResult, context) {
-                addToast({ text: "Failed", type: "error" })
+                addToast({ text: error.message, type: "error" })
             },
         })
     }
