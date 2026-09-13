@@ -13,6 +13,8 @@ import { redis } from "~/utils/redis.server";
 import { parseVideoUrl } from "~/components/embeds/IframeFactory";
 import { notificationsService } from "~/integrations/notificationService";
 import { addNotification } from "~/features/notifications/notificationsRepository";
+import { generateSignedUrl, objectHead } from "~/integrations/uploadService/cloudflareUploadService.server";
+import { generateUniqueFilename } from "~/utils/mediaSrc";
 
 export const createPostFn = createServerFn({ method: "POST" })
     .middleware([verifiedOnlyMiddleware])
@@ -20,8 +22,10 @@ export const createPostFn = createServerFn({ method: "POST" })
         title: z.string().min(3).max(30),
         text: z.string().max(variables.POST_LIMIT),
         media: z.array(z.object({
-            key: z.string(),
-            contentType: z.string()
+            size: z.number().lte(8 * 1024 * 1024),
+            contentType: z.string().refine(str => /^(image|video|audio)/.test(str)),
+            filename: z.string(),
+            metadata: z.record(z.string(), z.string()).optional()
         })),
         tags: z.string().toLowerCase().array(),
         gameId: z.number().optional(),
@@ -32,14 +36,53 @@ export const createPostFn = createServerFn({ method: "POST" })
 
         if ((data.text.length + data.media.length === 0) && !data.link)
             throw new AppError("Empty post", HttpStatusCode.BAD_REQUEST)
-        
+
+        if (data.link && !parseVideoUrl(new URL(data.link)))
+            throw new AppError("Unsupported link", HttpStatusCode.BAD_REQUEST)
+
         if (data.media.length > 0)
             delete data.link
-        
-        if (data.link && !parseVideoUrl(new URL(data.link))) 
-            throw new AppError("Unsupported link", HttpStatusCode.BAD_REQUEST)
-        const post = await postRepository.createPost({ ...data, userId: user.id, })
-        return { ...post, user }
+
+        const media = data.media.map(x => {
+            const filename = generateUniqueFilename(x.filename)
+            return {
+                contentType: x.contentType,
+                key: `media/${user.id}/${filename}`,
+                contentLength: x.size,
+                metadata: x.metadata
+            }
+        })
+
+        const post = await postRepository.createPost({
+            ...data,
+            userId: user.id,
+            media,
+            pending: data.media.length > 0
+        })
+        const urls = await Promise.all(media.map(obj => generateSignedUrl({
+            ...obj,
+            metadata: {
+                postid: post.postId.toString(),
+                userid: user.id
+            }
+        }))); 
+        return { post, urls }
+    })
+
+export const markPostUploadComplete = createServerFn({method: "POST"})
+    .middleware([verifiedOnlyMiddleware])
+    .validator(z.number())
+    .handler(async ({ data }) => {
+        const post = await postRepository.findById(data)
+        if (!post) throw notFound();
+        const results = await Promise.all(post.media.map(media => objectHead(media.key)));
+        const allGood = results.every(r => r);
+        if (allGood)
+            await postRepository.updatePost(data, {
+                pending: false
+            })
+        // TODO: add retries with bullmq
+        return post
     })
 
 export const getPostFn = createServerFn()
@@ -82,7 +125,7 @@ export const reactToPostFn = createServerFn({ method: "POST" })
         await rateLimiter("post:react", user.id, 10, 60)
         const res = await postRepository.reactToPost(data.postId, user.id, data.reaction)
 
-        if (user.id != data.authorId && res.rows.at(0)?.reaction === "like" ) {
+        if (user.id != data.authorId && res.rows.at(0)?.reaction === "like") {
             await addNotification({
                 recipientId: data.authorId,
                 actionUrl: "/posts/" + data.postId,

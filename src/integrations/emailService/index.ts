@@ -1,8 +1,6 @@
-import { createServerFn } from "@tanstack/solid-start"
 import { ConsoleService } from "./ConsoleService"
 import { EmailService } from "./emailService.interface"
 import { NodemailService } from "./NodeMailerService.server"
-import assert from "node:assert"
 import '@tanstack/solid-start/server-only'
 
 export const emailService = (function (): EmailService {
@@ -11,9 +9,3 @@ export const emailService = (function (): EmailService {
     else
         return new ConsoleService()
 })()
-
-export const getLatestVerificationLink = createServerFn()
-    .handler(() => {
-        assert(emailService instanceof ConsoleService)
-        return emailService.getLatestVerificationLink()
-    })

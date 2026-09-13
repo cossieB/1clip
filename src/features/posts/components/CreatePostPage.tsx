@@ -57,7 +57,7 @@ export function CreatePostPage() {
                     <Switch>
                         <Match when={input.mode == "upload"}>
                             <UploadBox
-                                label='Images'
+                                label=''
                                 maxSize={8}
                                 onSuccess={async (array) => {
                                     setFiles(() => array.map(x => ({ field: "media", ...x })))

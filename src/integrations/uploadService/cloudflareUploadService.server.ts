@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, DeleteObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { join } from "node:path/posix";
@@ -29,29 +29,26 @@ export function uploadFromServer(file: File, ...pathSegments: string[]) {
 }
 
 type Options = {
-    filename: string;
+    key: string
     contentType: string;
     contentLength: number;
-    pathSegments: string[];
     metadata?: Record<string, string>;
 };
 
 export async function generateSignedUrl(options: Options) {
-    const {filename, pathSegments, contentLength, contentType, metadata} = options
-    const ext = filename.slice(filename.lastIndexOf("."))
-    const key = join(...pathSegments, crypto.randomUUID() + ext)
+    const { contentLength, contentType, metadata, key } = options
     const signedUrl = await getSignedUrl(
         S3,
         new PutObjectCommand({
             Bucket: "clipz",
             Key: key,
             ContentType: contentType,
-            ContentLength: contentLength,
-            Metadata: metadata,            
+            Metadata: metadata,
         }), {
         expiresIn: 5 * 60,
-    })
-    return {signedUrl, key}
+        signableHeaders: new Set(["content-type", 'x-amz-meta-postid', 'x-amz-meta-userid']),
+    });
+    return { signedUrl, metadata }
 }
 
 export function deleteObject(key: string) {
@@ -60,4 +57,16 @@ export function deleteObject(key: string) {
         Bucket: "clipz",
         Key: key,
     }))
+}
+
+export async function objectHead(key: string) {
+    try {
+        await S3.send(new HeadObjectCommand({
+            Bucket: "clipz",
+            Key: key
+        }))
+        return true
+    } catch (error) {
+        return false
+    }
 }

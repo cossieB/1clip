@@ -1,15 +1,8 @@
-import { useServerFn } from "@tanstack/solid-start";
 import { createStore, unwrap } from "solid-js/store";
-import { getSignedUrls } from "~/integrations/uploadService";
 import { uploadToSignedUrl } from "~/utils/uploadToSignedUrl";
 import { useToastContext } from "./useToastContext";
-import { mergeObjectArrays, zip } from "~/lib/zip";
 
-export function useUpload(
-    pathSegments: string[],
-    abortController?: AbortController
-) {
-    const getUrls = useServerFn(getSignedUrls)
+export function useUpload() {
     const { addToast } = useToastContext()
     const [state, setState] = createStore({
         isUploading: false,
@@ -21,41 +14,29 @@ export function useUpload(
         }[]
     })
 
-    async function upload() {
-        
+    async function upload(array: {signedUrl: string, metadata?: Record<string, string>}[], abortController?: AbortController) {
+
         try {
-            if (state.files.length === 0) return [];
-            setState({isUploading: true})
-            const urls = await getUrls({
-                data: {
-                    paths: pathSegments,
-                    files: state.files.map(f => ({
-                        contentLength: f.file.size,
-                        contentType: f.file.type,
-                        filename: f.file.name,
-                        metadata: f.metadata
-                    }))
-                }
-            })
-            if (urls.length != state.files.length)
+            if (state.files.length === 0) return;
+            setState({ isUploading: true })
+
+            if (array.length != state.files.length)
                 throw addToast({ text: "Something went wrong. Please try again later", type: "error" })
 
             const promises = state.files.map((f, i) => uploadToSignedUrl(
-                urls[i].signedUrl,
-                f.file,
-                {
-                    signal: abortController?.signal,
-                }
-            ))
+                array[i].signedUrl,
+                f.file, {
+                signal: abortController?.signal,
+                metadata: array[i].metadata
+            }))
             await Promise.all(promises)
-            return mergeObjectArrays(state.files, urls)
         }
         catch (error) {
             console.error(error)
             throw error
         }
         finally {
-            setState({isUploading: false})
+            setState({ isUploading: false })
         }
     }
 

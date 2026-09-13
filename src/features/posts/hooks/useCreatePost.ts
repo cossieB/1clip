@@ -4,20 +4,18 @@ import { useServerFn } from "@tanstack/solid-start"
 import { createStore } from "solid-js/store"
 import { useGamesQuery } from "~/features/games/hooks/useGameQuery"
 import { useAbortController } from "~/hooks/useAbortController"
-import { useToastContext } from "~/hooks/useToastContext"
 import { useUpload } from "~/hooks/useUpload"
-import { createPostFn } from "~/features/posts/postsApi"
-import { postsQueryOpts } from "../utils/postQueryOpts"
+import { createPostFn, markPostUploadComplete } from "~/features/posts/postsApi"
+import { postQueryOpts, postsQueryOpts } from "../utils/postQueryOpts"
 
 export function useCreatePost() {
-    const { addToast } = useToastContext()
     const queryClient = useQueryClient()
     const navigate = useNavigate()
     const result = useGamesQuery()
     
     const abortController = useAbortController();
     
-    const { isUploading, setFiles, upload, files } = useUpload(["media"], abortController)
+    const { isUploading, setFiles, upload, files } = useUpload()
     const createAction = useServerFn(createPostFn)
 
     const mutation = useMutation(() => ({
@@ -37,30 +35,28 @@ export function useCreatePost() {
         const { game, ...rest } = input
         e.preventDefault();
         try {
-            const uploadResult = await upload()
-            mutation.mutate({
+            const response = await mutation.mutateAsync({
                 data: {
                     ...rest,
                     gameId: input.game?.gameId,
-                    media: uploadResult.map(f => ({
+                    media: files().map(f => ({
                         contentType: f.file.type,
-                        key: f.key
+                        filename: f.file.name,
+                        size: f.file.size,
                     })),
                 },
                 signal: abortController.signal
-            }, {
-                onError(error, variables, onMutateResult, context) {
-                    console.error(error)
-                    addToast({ text: error.message, type: "error" })
-                },
-                onSuccess(response, variables) {
-                    queryClient.invalidateQueries(postsQueryOpts())
-                    navigate({ to: "/posts/$postId", params: { postId: response.postId } })
-                },
             })
+            void queryClient.invalidateQueries(postsQueryOpts())            
+            if (response.post.pending) {
+                await upload(response.urls, abortController)
+                const p = await markPostUploadComplete({data: response.post.postId});
+                queryClient.setQueryData(postQueryOpts(p.postId).queryKey, p)
+            } 
+            navigate({ to: "/posts/$postId", params: { postId: response.post.postId } })
         }
         catch (error) {
-            addToast({ text: "Something went wrong. Please try again later", type: "error" })
+            console.error(error)            
         }
     }
 

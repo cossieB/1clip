@@ -73,19 +73,12 @@ export const accounts = pgTable(
         refreshTokenExpiresAt: timestamp("refresh_token_expires_at", { withTimezone: true }),
         scope: text("scope"),
         password: text("password"),
-        issuer: text("issuer").notNull(),
         createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
         updatedAt: timestamp("updated_at", { withTimezone: true })
             .$onUpdate(() => /* @__PURE__ */ new Date())
             .notNull(),
     },
-    (table) => [
-        index("accounts_userId_idx").on(table.userId),
-        uniqueIndex("accounts_issuer_accountId_uidx").on(
-            table.issuer,
-            table.accountId,
-        ),
-    ],
+    (table) => [index("accounts_userId_idx").on(table.userId)]
 );
 
 export const verifications = pgTable(

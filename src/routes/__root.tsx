@@ -89,12 +89,10 @@ export const Route = createRootRouteWithContext<{
 
 function RootComponent() {
     return (
-        <ToastProvider>
-            
+        <ToastProvider>            
             <RootDocument>
                 <Outlet />
-            </RootDocument>
-            
+            </RootDocument>            
         </ToastProvider>
     )
 }

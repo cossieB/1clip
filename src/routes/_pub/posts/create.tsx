@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from '@tanstack/solid-router'
+import { ClientOnly, createFileRoute, redirect } from '@tanstack/solid-router'
 import { gamesQueryOpts } from '~/features/games/utils/gameQueryOpts';
 import { CreatePostPage } from '~/features/posts/components/CreatePostPage';
 
@@ -8,14 +8,16 @@ export const Route = createFileRoute('/_pub/posts/create')({
         if (!user) throw redirect({ to: "/auth/signin", replace: true, search: { redirect: "/create" }, })
     },
 
-    loader: async ({ context }) => {
-        await context.queryClient.ensureQueryData(gamesQueryOpts())
-    },
     head: () => ({
         meta: [{ title: "Create Post :: 1Clip" }],
     }),
 })
 
 function RouteComponent() {
-    return <CreatePostPage />
+    return (
+        // workaround to stop Error reading appStream: Error: SSR stream tail exceeded maximum buffer
+        <ClientOnly>
+            <CreatePostPage />
+        </ClientOnly>
+    )
 }

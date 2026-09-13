@@ -1,14 +1,20 @@
 import { and, count, desc, eq, getColumns, gt, inArray, lt, SQL, sql } from "drizzle-orm";
 import { db } from "~/drizzle/db";
+import { Post } from "~/drizzle/models";
 import { comments, followerFollowee, games, media, postReactions, posts, postTags, users } from "~/drizzle/schema";
 
 type PostInsert = {
     title: string;
     userId: string;
     gameId?: number;
-    media: { key: string, contentType: string }[];
+    media: { 
+        key: string, 
+        contentType: string, 
+        metadata?: Record<string, string> 
+    }[];
     text: string;
-    tags: string[]
+    tags: string[],
+    pending: boolean
 };
 
 
@@ -20,7 +26,12 @@ export function createPost(obj: PostInsert) {
         if (obj.tags.length > 0)
             await tx.insert(postTags).values(obj.tags.map(tagName => ({ postId: post.postId, tagName })))
         if (obj.media.length > 0)
-            await tx.insert(media).values(obj.media.map(m => ({ postId: post.postId, ...m })))
+            await tx.insert(media).values(obj.media.map(m => ({
+                postId: post.postId,
+                key: m.key,
+                contentType: m.contentType,
+                metadata: m.metadata
+            })))
         return post
     })
 }
@@ -38,10 +49,13 @@ export type PostFilters = {
     cursor?: number
     followerId?: string
     gameId?: number
+    includePending?: boolean
 }
 
 export async function findAll(obj: PostFilters = {}, userId?: string) {
     const filters: SQL[] = []
+    if (!obj.includePending)
+        filters.push(eq(posts.pending, false))
     if (obj.username)
         filters.push(eq(
             posts.userId,
@@ -97,7 +111,7 @@ export async function findAll(obj: PostFilters = {}, userId?: string) {
         filters.push(inArray(
             posts.userId,
             db
-                .select({userId: followerFollowee.followeeId})
+                .select({ userId: followerFollowee.followeeId })
                 .from(followerFollowee)
                 .where(eq(followerFollowee.followerId, obj.followerId))
         ))
@@ -143,7 +157,11 @@ export function searchPosts(query: string) {
         .from(posts)
         .where(sql`${posts.searchVector} @@ websearch_to_tsquery('english', ${query})`)
 
-    return detailedPosts({filters: [inArray(posts.postId, sub)], limit: 20})
+    return detailedPosts({ filters: [inArray(posts.postId, sub)], limit: 20 })
+}
+
+export function updatePost(postId: number, post: Partial<Post>) {
+    return db.update(posts).set(post).where(eq(posts.postId, postId))
 }
 
 type Args = {

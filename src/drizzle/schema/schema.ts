@@ -105,6 +105,7 @@ export const posts = pgTable('posts', {
     editedOn: timestamp("edited_on", { withTimezone: true }).notNull().$onUpdateFn(() => new Date()),
     views: integer("views").notNull().default(0),
     link: text("link"),
+    pending: boolean().notNull().default(false),
     searchVector: customType({ dataType: () => 'tsvector' })('search_vector').generatedAlwaysAs(sql`(setweight(to_tsvector('english'::regconfig, (COALESCE(title, ''::character varying))::text), 'A'::"char") || setweight(to_tsvector('english'::regconfig, (COALESCE(text, ''::character varying))::text), 'B'::"char"))`),
 }, table => [
     index().using("gin", table.searchVector),
