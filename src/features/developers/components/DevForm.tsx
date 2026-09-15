@@ -36,10 +36,10 @@ export function DevForm(props: { developer?: Developer }) {
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault()
 
+        const f = files().at(0);
+        const file = f ? { size: f.file.size, contentType: f.file.type, filename: f.file.name } : undefined
         if ('developerId' in developer) {
             try {
-                const f = files().at(0);
-                const file = f ? { size: f.file.size, contentType: f.file.type, filename: f.file.name } : undefined
                 const r2details = await editDevMutation.mutateAsync({ data: { ...developer, file } });
                 if (r2details) {
                     await upload([r2details.signedUrl])
@@ -53,21 +53,20 @@ export function DevForm(props: { developer?: Developer }) {
                 addToast({ text: "Failed", type: "error" });
                 console.error(error)
             }
-            finally {
-                return;
-            }
+            return;
         }
-        createDevMutation.mutate({ data: developer }, {
-            onSuccess(data, variables, onMutateResult, context) {
-                addToast({ text: "Successfully created actor, " + data.developerId, type: "info" })
-                queryClient.setQueryData(developerQueryOpts(data.developerId).queryKey, data)
-                queryClient.invalidateQueries(developersQueryOpts())
-                navigate({ to: "/admin/actors/$actorId", params: { actorId: data.developerId } })
-            },
-            onError(error, variables, onMutateResult, context) {
-                addToast({ text: error.message, type: "error" })
-            },
-        })
+        if (!file) throw addToast({ text: "Logo Required", type: "warning" })
+        try {
+            const response = await createDevMutation.mutateAsync({ data: { ...developer, file } });
+            await upload([response.upload.signedUrl])
+            setDeveloper({ logo: response.upload.key })
+            queryClient.setQueryData(developerQueryOpts(response.developer.developerId).queryKey, response.developer)
+            queryClient.invalidateQueries(developersQueryOpts())
+            navigate({ to: "/admin/developers/$developerId/edit", params: { developerId: response.developer.developerId } })
+        }
+        catch (error: any) {
+            addToast({ text: error.message, type: "error" })
+        }
     }
 
     return (
@@ -78,7 +77,8 @@ export function DevForm(props: { developer?: Developer }) {
                     !developer.name ||
                     !developer.country ||
                     !developer.location ||
-                    !developer.summary
+                    !developer.summary ||
+                    !developer.logo
                 }
                 onSubmit={handleSubmit}
             >
@@ -87,16 +87,14 @@ export function DevForm(props: { developer?: Developer }) {
                     setter={name => setDeveloper({ name })}
                     value={developer.name}
                 />
-                <Show when={props.developer}>
-                    <UploadBoxWithPreview
-                        image={developer.logo ?? "/q.png"}
-                        label="Logo"
-                        onDrop={data => {
-                            setDeveloper({ logo: data.objectUrl })
-                            setFiles(() => [{ ...data, field: "logo" }])
-                        }}
-                    />
-                </Show>
+                <UploadBoxWithPreview
+                    image={developer.logo ?? "/q.png"}
+                    label="Logo"
+                    onDrop={data => {
+                        setDeveloper({ logo: data.objectUrl })
+                        setFiles(() => [{ ...data, field: "logo" }])
+                    }}
+                />
                 <Form.FormSelect
                     list={countryList}
                     selected={developer.country}

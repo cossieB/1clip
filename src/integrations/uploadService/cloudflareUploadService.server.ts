@@ -4,6 +4,8 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { join } from "node:path/posix";
 import { generateUniqueFilename } from "~/utils/mediaSrc";
 
+const BUCKET = "clipz"
+
 const S3 = new S3Client({
     region: "auto", // Required by SDK but not used by R2
     // Provide your Cloudflare account ID
@@ -20,7 +22,7 @@ export function uploadFromServer(file: File, ...pathSegments: string[]) {
     const upload = new Upload({
         client: S3,
         params: {
-            Bucket: "clipz",
+            Bucket: BUCKET,
             Key: key,
             Body: file,
             ContentType: file.type
@@ -41,7 +43,7 @@ export async function generateSignedUrl(options: Options) {
     const signedUrl = await getSignedUrl(
         S3,
         new PutObjectCommand({
-            Bucket: "clipz",
+            Bucket: BUCKET,
             Key: key,
             ContentType: contentType,
             Metadata: metadata,
@@ -55,24 +57,32 @@ export async function generateSignedUrl(options: Options) {
 export function deleteObject(key: string) {
     if (["users/default_banner.jpg", "users/default_avatar.png"].includes(key)) return
     return S3.send(new DeleteObjectCommand({
-        Bucket: "clipz",
+        Bucket: BUCKET,
         Key: key,
     }))
 }
 
-export async function objectHead(key: string) {
+export async function fileExistsInR2(key: string) {
     try {
-        await S3.send(new HeadObjectCommand({
-            Bucket: "clipz",
-            Key: key
-        }))
-        return true
-    } catch (error) {
-        return false
+        await S3.send(
+            new HeadObjectCommand({
+                Bucket: BUCKET,
+                Key: key,
+            })
+        );
+        return true;
+    } 
+    catch (error: any) {
+
+        if (error.name === "NotFound" || error.$metadata?.httpStatusCode === 404) {
+            return false;
+        }
+        throw error;
     }
 }
 
-export async function createFileDetails(file: { size: number; contentType: string; filename: string; } | undefined, prefix: [string, ...string[]]) {
+
+export async function createFileDetails(file: { size: number; contentType: string; filename: string; } | undefined, ...prefix: [string, ...string[]]) {
     return file ? await generateSignedUrl({
         contentLength: file.size,
         contentType: file.contentType,

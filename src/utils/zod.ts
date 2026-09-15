@@ -9,4 +9,4 @@ export const AdminImageSchema = z.object({
         size: z.number().lte(8 * 1024 * 1024),
         contentType: z.string().startsWith("image"),
         filename: z.string(),
-    }).optional()
+    })

@@ -32,8 +32,14 @@ export const createDeveloperFn = createServerFn({ method: "POST" })
     .middleware([adminOnlyMiddleware])
     .validator(developerCreateSchema)
     .handler(async ({ data }) => {
-        const dev = await developerRepository.createDeveloper(data)
-        return dev
+        const { file, ...rest } = data;
+        const developer = await developerRepository.createDeveloper({...rest, logo: `logos/${generateUniqueFilename(file.filename)}`})
+        const upload = await generateSignedUrl({
+            contentLength: file.size,
+            contentType: file.contentType,
+            key: developer.logo
+        })
+        return {upload, developer}
     })
 
 export const editDeveloperFn = createServerFn({ method: "POST" })

@@ -9,10 +9,10 @@ export const actorCreateSchema = z.object({
         gameId: z.number(),
         character: z.string(),
         roleType: z.enum(['player character', 'major character', 'minor character'])
-    }))
+    })),
+    file: AdminImageSchema.optional()
 })
 
 export const actorEditSchema = actorCreateSchema.partial().extend({
     actorId: z.number(),
-    file: AdminImageSchema
 })

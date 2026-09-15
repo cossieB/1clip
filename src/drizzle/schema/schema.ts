@@ -5,7 +5,7 @@ import { users } from "./auth";
 export const developers = pgTable("developers", {
     developerId: integer("developer_id").primaryKey().generatedAlwaysAsIdentity(),
     name: varchar("name").notNull(),
-    logo: text("logo"),
+    logo: text("logo").notNull().notNull(),
     location: varchar("location"),
     summary: text("summary").notNull().default(""),
     country: varchar("country"),
@@ -16,7 +16,7 @@ export const developers = pgTable("developers", {
 export const publishers = pgTable("publishers", {
     publisherId: integer("publisher_id").primaryKey().generatedAlwaysAsIdentity(),
     name: varchar("name").notNull(),
-    logo: text("logo"),
+    logo: text("logo").notNull(),
     headquarters: varchar("headquarters"),
     summary: text("summary").notNull().default(""),
     country: varchar("country"),
@@ -31,8 +31,8 @@ export const games = pgTable("games", {
     developerId: integer("developer_id").notNull().references(() => developers.developerId),
     publisherId: integer("publisher_id").notNull().references(() => publishers.publisherId),
     releaseDate: date("release_date").notNull(),
-    cover: text("cover"),
-    banner: text("banner"),
+    cover: text("cover").notNull(),
+    banner: text("banner").notNull(),
     trailer: text("trailer"),
     dateAdded: timestamp("date_added", { withTimezone: true }).notNull().defaultNow(),
     dateModified: timestamp("date_modified", { withTimezone: true }).notNull().$onUpdateFn(() => new Date()),
@@ -46,7 +46,7 @@ export const games = pgTable("games", {
 export const platforms = pgTable("platforms", {
     platformId: integer("platform_id").primaryKey().generatedAlwaysAsIdentity(),
     name: varchar("name").notNull(),
-    logo: text("logo"),
+    logo: text("logo").notNull(),
     releaseDate: date("release_date").notNull(),
     summary: text("summary").notNull().default(""),
     dateAdded: timestamp("date_added", { withTimezone: true }).notNull().defaultNow(),

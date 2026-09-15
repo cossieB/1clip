@@ -43,14 +43,14 @@ export function ActorForm(props: { actor?: Omit<Actor, 'characters'> & { charact
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault()
 
+        const f = files().at(0);
+        const file = f ? { size: f.file.size, contentType: f.file.type, filename: f.file.name } : undefined
         if ('actorId' in actor) {
             try {
-                const f = files().at(0);
-                const file = f ? {size: f.file.size, contentType: f.file.type, filename: f.file.name} : undefined
-                const r2details = await editActorMutation.mutateAsync({ data: {...actor, file} }); 
+                const r2details = await editActorMutation.mutateAsync({ data: { ...actor, file } });
                 if (r2details) {
                     await upload([r2details.signedUrl])
-                    setActor({photo: r2details.key})
+                    setActor({ photo: r2details.key })
                 }
                 addToast({ text: "Successfully edited actor, " + actor.actorId, type: "info" })
                 queryClient.setQueryData(actorQueryOpts(actor.actorId).queryKey, actor)
@@ -60,21 +60,22 @@ export function ActorForm(props: { actor?: Omit<Actor, 'characters'> & { charact
                 addToast({ text: "Failed", type: "error" });
                 console.error(error)
             }
-            finally {
-                return;
-            }
+            return;
         }
-        createActorMutation.mutate({ data: actor }, {
-            onSuccess(data, variables, onMutateResult, context) {
-                addToast({ text: "Successfully created actor, " + data.actorId, type: "info" })
-                queryClient.setQueryData(actorQueryOpts(data.actorId).queryKey, data)
-                queryClient.invalidateQueries(actorsQueryOpts())
-                navigate({to: "/admin/actors/$actorId", params: {actorId: data.actorId}})
-            },
-            onError(error, variables, onMutateResult, context) {
-                addToast({ text: error.message, type: "error" })
-            },
-        })
+        if (!file) throw addToast({ text: "Logo Required", type: "warning" })
+        try {
+            const response = await createActorMutation.mutateAsync({ data: { ...actor, file } });
+            if (response.upload) {
+                await upload([response.upload.signedUrl])
+                setActor({ photo: response.upload.key })
+            }
+            queryClient.setQueryData(actorQueryOpts(response.actor.actorId).queryKey, response.actor)
+            queryClient.invalidateQueries(actorsQueryOpts())
+            navigate({ to: "/admin/actors/$actorId/edit", params: { actorId: response.actor.actorId } })
+        }
+        catch (error: any) {
+            addToast({ text: error.message, type: "error" })
+        }
     }
 
     return (
@@ -91,16 +92,14 @@ export function ActorForm(props: { actor?: Omit<Actor, 'characters'> & { charact
                     setter={name => setActor({ name })}
                     value={actor.name}
                 />
-                <Show when={props.actor}>
-                    <UploadBoxWithPreview
-                        image={actor.photo ?? "/q.png"}
-                        label="Photo"
-                        onDrop={data => {
-                            setActor({ photo: data.objectUrl })
-                            setFiles(() => [{ ...data, field: "photo" }])
-                        }}
-                    />
-                </Show>
+                <UploadBoxWithPreview
+                    image={actor.photo ?? "/q.png"}
+                    label="Photo"
+                    onDrop={data => {
+                        setActor({ photo: data.objectUrl })
+                        setFiles(() => [{ ...data, field: "photo" }])
+                    }}
+                />
                 <ContentEditable
                     html={actor.bio}
                     setter={bio => setActor({ bio })}

@@ -5,10 +5,10 @@ export const publisherCreateSchema = z.object({
     name: z.string(),
     summary: z.string().default(""),
     headquarters: z.string().nullish(),
-    country: z.string().nullish()
+    country: z.string().nullish(),
+    file: AdminImageSchema
 })
 
 export const publisherEditSchema = publisherCreateSchema.partial().extend({
     publisherId: z.number(),
-    file: AdminImageSchema
 })    

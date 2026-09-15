@@ -32,8 +32,14 @@ export const createPublisherFn = createServerFn({method: "POST"})
     .middleware([adminOnlyMiddleware])
     .validator(publisherCreateSchema)
     .handler(async ({data}) => {
-        const pub = await publisherRepository.createPublisher(data)
-        return pub
+        const { file, ...rest } = data;
+        const publisher = await publisherRepository.createPublisher({...rest, logo: `logos/${generateUniqueFilename(file.filename)}`})
+        const upload = await generateSignedUrl({
+            contentLength: file.size,
+            contentType: file.contentType,
+            key: publisher.logo
+        })
+        return {upload, publisher}
     })
 
 export const editPublisherFn = createServerFn({method: "POST"})   

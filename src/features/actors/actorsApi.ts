@@ -33,9 +33,18 @@ export const createActorFn = createServerFn({ method: "POST" })
     .middleware([adminOnlyMiddleware])
     .validator(actorCreateSchema)
     .handler(async ({ data }) => {
-        const { characters, ...rest } = data
-        const actor = await actorRepository.createActor(rest, characters)
-        return actor
+        const { characters, file, ...rest } = data
+        const upload = file ? await generateSignedUrl({
+            contentLength: file.size,
+            contentType: file.contentType,
+            key: `people/${generateUniqueFilename(file.filename)}`
+        }) : undefined
+        const actor = await actorRepository.createActor({
+            ...rest,
+            photo: upload?.key
+        }, characters)
+        
+        return {actor, upload}
     })
 
 export const editActorFn = createServerFn({ method: "POST" })
@@ -43,13 +52,13 @@ export const editActorFn = createServerFn({ method: "POST" })
     .validator(actorEditSchema)
     .handler(async ({ data }) => {
         const { actorId, characters, file, ...rest } = data
-        const d = file ? await generateSignedUrl({
+        const upload = file ? await generateSignedUrl({
             contentLength: file.size,
             contentType: file.contentType,
             key: `people/${generateUniqueFilename(file.filename)}`
         }) : undefined
-        await actorRepository.editActor(actorId, { ...rest, photo: d?.key }, characters)
-        return d
+        await actorRepository.editActor(actorId, { ...rest, photo: upload?.key }, characters)
+        return upload
     })
 
 export const getActorsWithCharacters = createServerFn()

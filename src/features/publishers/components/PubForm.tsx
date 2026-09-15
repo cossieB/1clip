@@ -40,10 +40,10 @@ export function PubForm(props: { publisher?: Publisher }) {
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault()
 
+        const f = files().at(0);
+        const file = f ? { size: f.file.size, contentType: f.file.type, filename: f.file.name } : undefined
         if ('publisherId' in publisher) {
             try {
-                const f = files().at(0);
-                const file = f ? { size: f.file.size, contentType: f.file.type, filename: f.file.name } : undefined
                 const r2details = await editPubMutation.mutateAsync({ data: { ...publisher, file } });
                 if (r2details) {
                     await upload([r2details.signedUrl])
@@ -57,21 +57,20 @@ export function PubForm(props: { publisher?: Publisher }) {
                 addToast({ text: "Failed", type: "error" });
                 console.error(error)
             }
-            finally {
-                return;
-            }
+            return;
         }
-        createPubMutation.mutate({ data: publisher }, {
-            onSuccess(data, variables, onMutateResult, context) {
-                addToast({ text: "Successfully created actor, " + data.publisherId, type: "info" })
-                queryClient.setQueryData(publisherQueryOpts(data.publisherId).queryKey, data)
-                queryClient.invalidateQueries(publishersQueryOpts())
-                navigate({ to: "/admin/actors/$actorId", params: { actorId: data.publisherId } })
-            },
-            onError(error, variables, onMutateResult, context) {
-                addToast({ text: error.message, type: "error" })
-            },
-        })
+        if (!file) throw addToast({ text: "Logo Required", type: "warning" })
+        try {
+            const response = await createPubMutation.mutateAsync({ data: { ...publisher, file } });
+            await upload([response.upload.signedUrl])
+            setPublisher({ logo: response.upload.key })
+            queryClient.setQueryData(publisherQueryOpts(response.publisher.publisherId).queryKey, response.publisher)
+            queryClient.invalidateQueries(publishersQueryOpts())
+            navigate({ to: "/admin/publishers/$publisherId/edit", params: { publisherId: response.publisher.publisherId } })
+        }
+        catch (error: any) {
+            addToast({ text: error.message, type: "error" })
+        }
     }
 
     return (
@@ -82,7 +81,8 @@ export function PubForm(props: { publisher?: Publisher }) {
                     !publisher.name ||
                     !publisher.country ||
                     !publisher.headquarters ||
-                    !publisher.summary
+                    !publisher.summary ||
+                    !publisher.logo
                 }
                 onSubmit={handleSubmit}
             >
@@ -91,16 +91,14 @@ export function PubForm(props: { publisher?: Publisher }) {
                     setter={name => setPublisher({ name })}
                     value={publisher.name}
                 />
-                <Show when={props.publisher}>
-                    <UploadBoxWithPreview
-                        image={publisher.logo ?? "/q.png"}
-                        label="Logo"
-                        onDrop={data => {
-                            setPublisher({ logo: data.objectUrl })
-                            setFiles(() => [{ ...data, field: "logo" }])
-                        }}
-                    />
-                </Show>
+                <UploadBoxWithPreview
+                    image={publisher.logo ?? "/q.png"}
+                    label="Logo"
+                    onDrop={data => {
+                        setPublisher({ logo: data.objectUrl })
+                        setFiles(() => [{ ...data, field: "logo" }])
+                    }}
+                />
                 <Form.FormSelect
                     list={countryList}
                     selected={publisher.country}
