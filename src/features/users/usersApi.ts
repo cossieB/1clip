@@ -11,6 +11,8 @@ import { notificationsService } from "~/integrations/notificationService";
 import { cacheAside } from "~/utils/cacheAside.server";
 import { getRank } from "~/utils/getRank";
 import { addNotification } from "~/features/notifications/notificationsRepository";
+import { AdminImageSchema } from "~/utils/zod";
+import { UserImageSchema } from "./utils/zod";
 
 export const getLoggedInUser = createServerFn()
     .handler(async () => {
@@ -27,7 +29,7 @@ export const getUserByUsernameFn = createServerFn()
     .validator((username: string) => username)
     .handler(async ({ data }) => {
         const u = await getCurrentUser()
-        
+
         const user = await userRepository.findByUsername(data, u?.id);
         if (!user) throw notFound();
         return user
@@ -53,22 +55,37 @@ export const updateCurrentUser = createServerFn({ method: "POST" })
     .validator(z.object({
         displayName: z.string().min(3).max(15).optional(),
         bio: z.string().max(255).optional(),
-        image: z.string().optional(),
-        banner: z.string().optional(),
+        imageFile: UserImageSchema,
+        bannerFile: UserImageSchema,
         dob: z.iso.date().nullish(),
         location: z.string().max(100).nullish(),
         links: z.string().array().transform(arr => arr.slice(0, 5)).optional()
     }))
     .handler(async ({ data, context: { user } }) => {
 
-        if (Object.keys(data).length === 0) throw new AppError("Nothing to update", HttpStatusCode.BAD_REQUEST)
+        const {imageFile, bannerFile, ...rest} = data;
 
-            const old = (await userRepository.updateUser(user.id, data))[0]
-            if (data.banner != old.oldBanner)
-                uploadService.deleteObject(old.oldBanner)
-            if (data.image != old.oldAvatar)
-                uploadService.deleteObject(old.oldAvatar)
-            return new Response(null, { status: 200 })
+        const [av, ba] = await Promise.all([
+            uploadService.createFileDetails(imageFile, ["users", user.id]),
+            uploadService.createFileDetails(bannerFile, ["users", user.id])
+        ])
+        const u = {
+            ...rest,
+            image: av?.key,
+            banner: ba?.key
+        }
+        if (Object.keys(u).length === 0) throw new AppError("Nothing to update", HttpStatusCode.BAD_REQUEST);
+
+        const old = (await userRepository.updateUser(user.id, u))[0]
+        if (u.banner != old.oldBanner)
+            uploadService.deleteObject(old.oldBanner)
+        if (u.image != old.oldAvatar)
+            uploadService.deleteObject(old.oldAvatar)
+        
+        return {
+            avatar: av,
+            banner: ba
+        }
     })
 
 export const followUserFn = createServerFn({ method: "POST" })
@@ -94,15 +111,15 @@ export const followUserFn = createServerFn({ method: "POST" })
 
 export const getUserReputation = createServerFn()
     .validator(z.uuidv7())
-    .handler(async ({data}) => {
+    .handler(async ({ data }) => {
         const res = (await cacheAside(
-            `xp:${data}`, 
+            `xp:${data}`,
             () => userRepository.calculateXP(data),
             86400
         )).at(0)
-        if (!res) throw new Response(null, {status: 404})
+        if (!res) throw new Response(null, { status: 404 })
         return {
             xp: res.reputation,
             rank: getRank(res.reputation)
-        } 
+        }
     })    
