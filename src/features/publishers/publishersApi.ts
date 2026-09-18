@@ -32,26 +32,13 @@ export const createPublisherFn = createServerFn({method: "POST"})
     .middleware([adminOnlyMiddleware])
     .validator(publisherCreateSchema)
     .handler(async ({data}) => {
-        const { file, ...rest } = data;
-        const publisher = await publisherRepository.createPublisher({...rest, logo: `logos/${generateUniqueFilename(file.filename)}`})
-        const upload = await generateSignedUrl({
-            contentLength: file.size,
-            contentType: file.contentType,
-            key: publisher.logo
-        })
-        return {upload, publisher}
+        return await publisherRepository.createPublisher(data)
     })
 
 export const editPublisherFn = createServerFn({method: "POST"})   
     .middleware([adminOnlyMiddleware])
     .validator(publisherEditSchema)
     .handler(async ({data}) => {
-        const { publisherId, file, ...rest } = data;
-        const d = file ? await generateSignedUrl({
-            contentLength: file.size,
-            contentType: file.contentType,
-            key: `logos/${generateUniqueFilename(file.filename)}`
-        }) : undefined
-        await publisherRepository.editPublisher(publisherId, {...rest, logo: d?.key});
-        return d
+        const { publisherId,  ...rest } = data;
+        await publisherRepository.editPublisher(publisherId, rest);
     })

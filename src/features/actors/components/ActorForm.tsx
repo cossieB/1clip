@@ -17,11 +17,13 @@ import styles from "./ActorForm.module.css"
 import { CirclePlusIcon, Trash2Icon } from "lucide-solid"
 import { Optional } from "~/lib/utilityTypes"
 import { useNavigate } from "@tanstack/solid-router"
+import { getPeopleSignedUrls } from "~/serverFn/getSignedUrl"
 
 type Actor = Awaited<ReturnType<typeof getActorsWithCharacters>>
 type Char = Actor['characters'][number]
 
 export function ActorForm(props: { actor?: Omit<Actor, 'characters'> & { characters: Optional<Char, 'appearanceId'>[] } }) {
+    const abortController = new AbortController
     const navigate = useNavigate()
     const { addToast } = useToastContext()
     const queryClient = useQueryClient()
@@ -38,44 +40,37 @@ export function ActorForm(props: { actor?: Omit<Actor, 'characters'> & { charact
         characters: [] as Optional<Char, 'appearanceId'>[],
     })
 
-    const { isUploading, setFiles, upload, files } = useUpload()
+    const { isUploading, setFiles, upload, getSignedUrls } = useUpload(abortController)
 
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault()
-
-        const f = files().at(0);
-        const file = f ? { size: f.file.size, contentType: f.file.type, filename: f.file.name } : undefined
+        const urls = await getSignedUrls(getPeopleSignedUrls)
+        const files = await upload(urls)
+        const f = files.at(0)
+        if (f) setActor({ photo: f.key })
         if ('actorId' in actor) {
-            try {
-                const r2details = await editActorMutation.mutateAsync({ data: { ...actor, file } });
-                if (r2details) {
-                    await upload([r2details.signedUrl])
-                    setActor({ photo: r2details.key })
-                }
-                addToast({ text: "Successfully edited actor, " + actor.actorId, type: "info" })
-                queryClient.setQueryData(actorQueryOpts(actor.actorId).queryKey, actor)
-                queryClient.invalidateQueries(actorsQueryOpts())
-            }
-            catch (error) {
-                addToast({ text: "Failed", type: "error" });
-                console.error(error)
-            }
-            return;
+            return editActorMutation.mutate({ data: actor }, {
+                onSuccess(data, variables, onMutateResult, context) {
+                    addToast({ text: "Successfully edited actor, " + actor.actorId, type: "info" })
+                    queryClient.setQueryData(actorQueryOpts(actor.actorId).queryKey, actor)
+                    queryClient.invalidateQueries(actorsQueryOpts())
+                },
+                onError(error, variables, onMutateResult, context) {
+                    addToast({ text: "Failed", type: "error" })
+                },
+            })
         }
-        if (!file) throw addToast({ text: "Logo Required", type: "warning" })
-        try {
-            const response = await createActorMutation.mutateAsync({ data: { ...actor, file } });
-            if (response.upload) {
-                await upload([response.upload.signedUrl])
-                setActor({ photo: response.upload.key })
-            }
-            queryClient.setQueryData(actorQueryOpts(response.actor.actorId).queryKey, response.actor)
-            queryClient.invalidateQueries(actorsQueryOpts())
-            navigate({ to: "/admin/actors/$actorId/edit", params: { actorId: response.actor.actorId } })
-        }
-        catch (error: any) {
-            addToast({ text: error.message, type: "error" })
-        }
+        createActorMutation.mutate({ data: actor }, {
+            onSuccess(data, variables, onMutateResult, context) {
+                addToast({ text: "Successfully created actor, " + data.actorId, type: "info" })
+                queryClient.setQueryData(actorQueryOpts(data.actorId).queryKey, data)
+                queryClient.invalidateQueries(actorsQueryOpts());
+                navigate({ to: "/admin/actors/$actorId/edit", params: { actorId: data.actorId } })
+            },
+            onError(error, variables, onMutateResult, context) {
+                addToast({ text: error.message, type: "error" })
+            },
+        })
     }
 
     return (

@@ -15,7 +15,7 @@ export function useCreatePost() {
     
     const abortController = useAbortController();
     
-    const { isUploading, setFiles, upload, files } = useUpload()
+    const { isUploading, setFiles, upload, files } = useUpload(abortController)
     const createAction = useServerFn(createPostFn)
 
     const mutation = useMutation(() => ({
@@ -49,7 +49,7 @@ export function useCreatePost() {
             })
             void queryClient.invalidateQueries(postsQueryOpts())            
             if (response.post.pending) {
-                await upload(response.urls.map(x => x.signedUrl), abortController)
+                await upload(response.urls)
                 const p = await markPostUploadComplete({data: response.post.postId});
                 queryClient.setQueryData(postQueryOpts(p.postId).queryKey, p)
             } 

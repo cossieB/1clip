@@ -10,10 +10,12 @@ import { UploadBoxWithPreview } from "~/components/UploadBox/UploadBoxWithPrevie
 import { getPlatformFn, createPlatformFn, editPlatformFn } from "../platformsApi"
 import { Show } from "solid-js"
 import { useNavigate } from "@tanstack/solid-router"
+import { getLogoSignedUrls } from "~/serverFn/getSignedUrl"
 
 type Platform = Awaited<ReturnType<typeof getPlatformFn>>
 
 export function PlatformForm(props: { platform?: Platform }) {
+    const abortController = new AbortController
     const navigate = useNavigate()
     const { addToast } = useToastContext()
     const queryClient = useQueryClient()
@@ -33,42 +35,37 @@ export function PlatformForm(props: { platform?: Platform }) {
         summary: ""
     })
 
-    const { isUploading, setFiles, upload, files } = useUpload()
+    const { isUploading, setFiles, upload, getSignedUrls } = useUpload(abortController)
 
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault()
-
-        const f = files().at(0);
-        const file = f ? { size: f.file.size, contentType: f.file.type, filename: f.file.name } : undefined
+        const urls = await getSignedUrls(getLogoSignedUrls)
+        const files = await upload(urls)
+        const f = files.at(0)
+        if (f) setPlatform({ logo: f.key })
         if ('platformId' in platform) {
-            try {
-                const r2details = await editPlatformMutation.mutateAsync({ data: { ...platform, file } });
-                if (r2details) {
-                    await upload([r2details.signedUrl])
-                    setPlatform({ logo: r2details.key })
-                }
-                addToast({ text: "Successfully edited actor, " + platform.platformId, type: "info" })
-                queryClient.setQueryData(platformQueryOpts(platform.platformId).queryKey, platform)
-                queryClient.invalidateQueries(platformsQueryOpts())
-            }
-            catch (error) {
-                addToast({ text: "Failed", type: "error" });
-                console.error(error)
-            }
-            return;
+            return editPlatformMutation.mutate({ data: platform }, {
+                onSuccess(data, variables, onMutateResult, context) {
+                    addToast({ text: "Successfully edited platform, " + platform.platformId, type: "info" })
+                    queryClient.setQueryData(platformQueryOpts(platform.platformId).queryKey, platform)
+                    queryClient.invalidateQueries(platformsQueryOpts())
+                },
+                onError(error, variables, onMutateResult, context) {
+                    addToast({ text: "Failed", type: "error" })
+                },
+            })
         }
-        if (!file) throw addToast({ text: "Logo Required", type: "warning" })
-        try {
-            const response = await createPlatformMutation.mutateAsync({ data: { ...platform, file } });
-            await upload([response.upload.signedUrl])
-            setPlatform({ logo: response.upload.key })
-            queryClient.setQueryData(platformQueryOpts(response.platform.platformId).queryKey, response.platform)
-            queryClient.invalidateQueries(platformsQueryOpts())
-            navigate({ to: "/admin/platforms/$platformId/edit", params: { platformId: response.platform.platformId } })
-        }
-        catch (error: any) {
-            addToast({ text: error.message, type: "error" })
-        }
+        createPlatformMutation.mutate({ data: platform }, {
+            onSuccess(data, variables, onMutateResult, context) {
+                addToast({ text: "Successfully created platform, " + data.platformId, type: "info" })
+                queryClient.setQueryData(platformQueryOpts(data.platformId).queryKey, data)
+                queryClient.invalidateQueries(platformsQueryOpts());
+                navigate({to: "/admin/platforms/$platformId/edit", params: {platformId: data.platformId}})
+            },
+            onError(error, variables, onMutateResult, context) {
+                addToast({ text: error.message, type: "error" })
+            },
+        })
     }
 
     return (

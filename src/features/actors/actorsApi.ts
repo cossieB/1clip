@@ -6,8 +6,6 @@ import { staticDataMiddleware } from "~/middleware/static";
 import * as actorRepository from "./actorRepository"
 import { actorCreateSchema, actorEditSchema } from "./utils/zod";
 import { LimitOffsetSchema } from "~/utils/zod";
-import { generateUniqueFilename } from "~/utils/mediaSrc";
-import { generateSignedUrl } from "~/integrations/uploadService/cloudflareUploadService.server";
 
 export const getActorFn = createServerFn()
     .middleware([staticDataMiddleware])
@@ -33,32 +31,16 @@ export const createActorFn = createServerFn({ method: "POST" })
     .middleware([adminOnlyMiddleware])
     .validator(actorCreateSchema)
     .handler(async ({ data }) => {
-        const { characters, file, ...rest } = data
-        const upload = file ? await generateSignedUrl({
-            contentLength: file.size,
-            contentType: file.contentType,
-            key: `people/${generateUniqueFilename(file.filename)}`
-        }) : undefined
-        const actor = await actorRepository.createActor({
-            ...rest,
-            photo: upload?.key
-        }, characters)
-        
-        return {actor, upload}
+        const { characters, ...actor } = data
+        return await actorRepository.createActor(actor, characters)
     })
 
 export const editActorFn = createServerFn({ method: "POST" })
     .middleware([adminOnlyMiddleware])
     .validator(actorEditSchema)
     .handler(async ({ data }) => {
-        const { actorId, characters, file, ...rest } = data
-        const upload = file ? await generateSignedUrl({
-            contentLength: file.size,
-            contentType: file.contentType,
-            key: `people/${generateUniqueFilename(file.filename)}`
-        }) : undefined
-        await actorRepository.editActor(actorId, { ...rest, photo: upload?.key }, characters)
-        return upload
+        const { actorId, characters, ...actor } = data        
+        await actorRepository.editActor(actorId, actor, characters)
     })
 
 export const getActorsWithCharacters = createServerFn()

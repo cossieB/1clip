@@ -32,26 +32,13 @@ export const createPlatformFn = createServerFn({method: "POST"})
     .middleware([adminOnlyMiddleware])
     .validator(platformCreateSchema)
     .handler(async ({data}) => {
-        const { file, ...rest } = data;
-        const platform = await platformRepository.createPlatform({...rest, logo: `logos/${generateUniqueFilename(file.filename)}`})
-        const upload = await generateSignedUrl({
-            contentLength: file.size,
-            contentType: file.contentType,
-            key: platform.logo
-        })
-        return {upload, platform}
+        return await platformRepository.createPlatform(data)        
     })
 
 export const editPlatformFn = createServerFn({method: "POST"})    
     .middleware([adminOnlyMiddleware])
     .validator(platformEditSchema)
     .handler(async ({data}) => {
-        const { platformId, file, ...rest } = data;
-        const d = file ? await generateSignedUrl({
-            contentLength: file.size,
-            contentType: file.contentType,
-            key: `logos/${generateUniqueFilename(file.filename)}`
-        }) : undefined
-        await platformRepository.editPlatform(platformId, {...rest, logo: d?.key});
-        return d
+        const { platformId, ...rest } = data;        
+        await platformRepository.editPlatform(platformId, rest);
     })

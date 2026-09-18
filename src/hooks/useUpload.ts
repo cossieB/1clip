@@ -1,8 +1,11 @@
-import { createStore, unwrap } from "solid-js/store";
+import { Fetcher } from "@tanstack/solid-start";
+import { createStore } from "solid-js/store";
 import { uploadToSignedUrl } from "~/utils/uploadToSignedUrl";
 import { useToastContext } from "./useToastContext";
+import { mergeObjectArrays } from "~/lib/zip";
+import { FileUploadSchema, SignedUrlResponse } from "~/integrations/uploadService/utils";
 
-export function useUpload() {
+export function useUpload(abortController?: AbortController) {
     const { addToast } = useToastContext()
     const [state, setState] = createStore({
         isUploading: false,
@@ -14,21 +17,36 @@ export function useUpload() {
         }[]
     })
 
-    async function upload(signedUrls: string[], abortController?: AbortController) {
+    async function getSignedUrls(getUrls: Fetcher<any, typeof FileUploadSchema, Promise<SignedUrlResponse>>, prefix?: string) {
+        if (state.files.length == 0) return []
+        return await getUrls({
+            data: {
+                prefix,
+                files: state.files.map(f => ({
+                    contentLength: f.file.size,
+                    contentType: f.file.type,
+                    filename: f.file.name,
+                    metadata: f.metadata
+                }))
+            },
+            signal: abortController?.signal
+        })
+    }
 
+    async function upload(urls: SignedUrlResponse) {
         try {
-            if (state.files.length === 0) return;
+            if (state.files.length === 0) return [];
             setState({ isUploading: true })
-
-            if (signedUrls.length != state.files.length)
+            if (urls.length != state.files.length)
                 throw addToast({ text: "Something went wrong. Please try again later", type: "error" })
 
             const promises = state.files.map((f, i) => uploadToSignedUrl(
-                signedUrls[i],
+                urls[i].signedUrl,
                 f.file, {
                 signal: abortController?.signal,
             }))
             await Promise.all(promises)
+            return mergeObjectArrays(state.files, urls)
         }
         catch (error) {
             console.error(error)
@@ -47,6 +65,7 @@ export function useUpload() {
         upload,
         setFiles,
         isUploading: () => state.isUploading,
-        files: () => state.files
+        files: () => state.files,
+        getSignedUrls
     }
 }

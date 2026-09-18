@@ -1,6 +1,6 @@
 import { getSimilarGames, type getGameFn } from "~/features/games/gamesApi"
 import styles from "./GamePage.module.css"
-import { createMemo, createSignal, For, Show } from "solid-js"
+import { createEffect, createSignal, For, Show, Suspense } from "solid-js"
 import { ClientOnly, Link } from "@tanstack/solid-router"
 import { LogoLink } from "~/components/LogoLink/LogoLink"
 import { PhotoCardGrid } from "~/components/CardLink/PhotoCardLink"
@@ -22,8 +22,8 @@ export function GamePage(props: Props) {
     return (
         <div class={styles.game}>
             <HeroHeader
-                banner={STORAGE_DOMAIN + (props.game.banner ?? "users/default_banner.jpg")}
-                image={STORAGE_DOMAIN + (props.game.cover ?? "q.png")}
+                banner={STORAGE_DOMAIN + props.game.banner}
+                image={STORAGE_DOMAIN + props.game.cover}
                 label={props.game.title}
                 viewTransitionName={"gameId" + props.game.gameId}
             />
@@ -129,12 +129,12 @@ function SimilarGames(props: { gameId: number }) {
 }
 
 function ReleaseDate(props: { date: string }) {
-    const date = createMemo(() => props.date.split(/[\-\/]/))
+    const date = props.date.split(/[\-\/]/)
     return (
-        <time datetime={props.date} class={`${styles.date} cutout`}>
-            <span> {date()[2]} </span>
-            <span> {new Date(2000, parseInt(date()[1]) - 1, 1).toLocaleString('default', { month: 'long' })} </span>
-            <span> {date()[0]} </span>
-        </time>
+        <div class={`${styles.date} cutout`}>
+            <span> {date[2]} </span>
+            <span> {new Date(2000, parseInt(date[1]) - 1, 1).toLocaleString('default', { month: 'long' })} </span>
+            <span> {date[0]} </span>
+        </div>
     )
 }

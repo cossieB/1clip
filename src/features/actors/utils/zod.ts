@@ -1,5 +1,4 @@
 import z from "zod"
-import { AdminImageSchema } from "~/utils/zod"
 
 export const actorCreateSchema = z.object({
     name: z.string(),
@@ -10,7 +9,7 @@ export const actorCreateSchema = z.object({
         character: z.string(),
         roleType: z.enum(['player character', 'major character', 'minor character'])
     })),
-    file: AdminImageSchema.optional()
+    photo: z.string().nullish()
 })
 
 export const actorEditSchema = actorCreateSchema.partial().extend({

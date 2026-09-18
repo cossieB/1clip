@@ -5,7 +5,6 @@ import { verifiedOnlyMiddleware } from "~/middleware/authorization";
 import * as postRepository from "~/features/posts/postRepository"
 import { getCurrentUser } from "../../serverFn/auth";
 import { AppError } from "~/utils/AppError.server";
-import { variables } from "~/utils/variables";
 import { rateLimiter } from "~/utils/rateLimiter.server";
 import { HttpStatusCode } from "~/utils/statusCodes";
 import { getRequestIP } from "@tanstack/solid-start/server";
@@ -13,24 +12,15 @@ import { redis } from "~/utils/redis.server";
 import { parseVideoUrl } from "~/components/embeds/IframeFactory";
 import { notificationsService } from "~/integrations/notificationService";
 import { addNotification } from "~/features/notifications/notificationsRepository";
-import { generateSignedUrl, objectHead } from "~/integrations/uploadService/cloudflareUploadService.server";
 import { generateUniqueFilename } from "~/utils/mediaSrc";
+import { fileExistsInR2, generateSignedUrl } from "~/integrations/uploadService/cloudflareUploadService.server";
+import { GetPostSchema, PostCreateSchema } from "./utils/zod";
+import { FileUploadSchema } from "~/integrations/uploadService/utils";
+
 
 export const createPostFn = createServerFn({ method: "POST" })
     .middleware([verifiedOnlyMiddleware])
-    .validator(z.object({
-        title: z.string().min(3).max(30),
-        text: z.string().max(variables.POST_LIMIT),
-        media: z.array(z.object({
-            size: z.number().lte(8 * 1024 * 1024),
-            contentType: z.string().refine(str => /^(image|video|audio)/.test(str)),
-            filename: z.string(),
-            metadata: z.record(z.string(), z.string()).optional()
-        })),
-        tags: z.string().toLowerCase().array(),
-        gameId: z.number().optional(),
-        link: z.url().optional().catch(undefined)
-    }))
+    .validator(PostCreateSchema)
     .handler(async ({ data, context: { user } }) => {
         await rateLimiter("post:create", user.id, 5, 60);
 
@@ -65,17 +55,17 @@ export const createPostFn = createServerFn({ method: "POST" })
                 postid: post.postId.toString(),
                 userid: user.id
             }
-        }))); 
+        })));
         return { post, urls }
     })
 
-export const markPostUploadComplete = createServerFn({method: "POST"})
+export const markPostUploadComplete = createServerFn({ method: "POST" })
     .middleware([verifiedOnlyMiddleware])
     .validator(z.number())
     .handler(async ({ data }) => {
         const post = await postRepository.findById(data)
         if (!post) throw notFound();
-        const results = await Promise.all(post.media.map(media => objectHead(media.key)));
+        const results = await Promise.all(post.media.map(media => fileExistsInR2(media.key)));
         const allGood = results.every(r => r);
         if (allGood)
             await postRepository.updatePost(data, {
@@ -97,18 +87,9 @@ export const getPostFn = createServerFn()
         return post
     })
 
+
 export const getPostsFn = createServerFn()
-    .validator(z.object({
-        username: z.string(),
-        authorId: z.string(),
-        likerUsername: z.string(),
-        dislikerUsername: z.string(),
-        tag: z.string(),
-        limit: z.number(),
-        cursor: z.number(),
-        followerId: z.uuidv7(),
-        gameId: z.number()
-    }).partial().optional())
+    .validator(GetPostSchema)
     .handler(async ({ data }) => {
         const user = await getCurrentUser();
         return postRepository.findAll(data, user?.id)

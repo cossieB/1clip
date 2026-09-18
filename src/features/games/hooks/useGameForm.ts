@@ -4,10 +4,11 @@ import { useServerFn } from "@tanstack/solid-start"
 import { createStore } from "solid-js/store"
 import { useToastContext } from "~/hooks/useToastContext"
 import { useUpload } from "~/hooks/useUpload"
-import { createGameFn, getGameFn, updateGameFn } from "~/features/games/gamesApi"
-import { gameQueryOpts, gamesQueryOpts, gamesWithExtrasQueryOpts } from "../utils/gameQueryOpts"
+import * as gamesApi from "~/features/games/gamesApi"
+import { gamesQueryOpts, gamesWithExtrasQueryOpts } from "../utils/gameQueryOpts"
+import { getGamesSignedUrls } from "~/serverFn/getSignedUrl"
 
-export type Game = Awaited<ReturnType<typeof getGameFn>>
+export type Game = Awaited<ReturnType<typeof gamesApi.getGameFn>>
 
 export enum MediaField {
     Cover = "cover",
@@ -19,12 +20,12 @@ export function useGameForm(props: { game?: Game }) {
     const { addToast } = useToastContext();
     const queryClient = useQueryClient()
     const navigate = useNavigate()
-
+    const abortController = new AbortController
     const [game, setGame] = createStore({
         gameId: props.game?.gameId,
         title: props.game?.title ?? "",
-        cover: props.game?.cover,
-        banner: props.game?.banner,
+        cover: props.game?.cover ?? "",
+        banner: props.game?.banner ?? "",
         developerId: props.game?.developerId ?? -1,
         publisherId: props.game?.publisherId ?? -1,
         summary: props.game?.summary ?? "",
@@ -35,74 +36,75 @@ export function useGameForm(props: { game?: Game }) {
         genres: props.game?.genres ?? [],
         actors: props.game?.actors ?? []
     })
-    const paths = game.gameId ? ["games", game.gameId.toString()] : ["games"]
-    const { setFiles, isUploading, upload, files } = useUpload(paths)
+    const { setFiles, isUploading, upload, files, getSignedUrls } = useUpload(abortController)
 
     const editGameMutation = useMutation(() => ({
-        mutationFn: useServerFn(updateGameFn)
+        mutationFn: useServerFn(gamesApi.updateGameFn)
     }))
-
     const createGameMutation = useMutation(() => ({
-        mutationFn: useServerFn(createGameFn)
+        mutationFn: useServerFn(gamesApi.createGameFn)
     }))
 
+    const uploadWrapper = async (id: number) => {
+        const urls = await getSignedUrls(getGamesSignedUrls, `games/${id}`)
+        const uploadResult = await upload(urls);
+        const newCover = uploadResult.find(x => x.field === MediaField.Cover)?.key
+        const newBanner = uploadResult.find(x => x.field === MediaField.Banner)?.key
+        const media = uploadResult
+            .filter(x => x.field === MediaField.Media)
+            .map(x => ({
+                contentType: x.file.type,
+                key: x.key,
+                metadata: x.metadata
+            }))
+            .concat(game.media.filter(x => !x.key.startsWith("blob:")))
+        return { newCover, newBanner, media }
+    }
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault();
-
         try {
-            const uploadResult = await upload();
-            const newCover = uploadResult.find(x => x.field == MediaField.Cover)?.key
-            const newBanner = uploadResult.find(x => x.field == MediaField.Banner)?.key
-
-            setGame({
-                ...newCover && { cover: newCover },
-                ...newBanner && { banner: newBanner },
-                media: [
-                    ...game.media.filter(m => !m.key.startsWith("blob")),
-                    ...uploadResult
-                        .filter(x => x.field === MediaField.Media)
-                        .map(x => ({ key: x.key, contentType: x.file.type, metadata: x.metadata! }))]
-            })
             const { gameId, ...rest } = game
             if (gameId) {
-                return editGameMutation.mutate({
+                const { media, newCover, newBanner } = await uploadWrapper(gameId)
+
+                await editGameMutation.mutateAsync({
                     data: {
                         ...rest,
+                        cover: newCover,
+                        banner: newBanner,
                         gameId,
-                        platforms: rest.platforms.map(platform => platform.platformId)
+                        media,
+                        platforms: rest.platforms.map(platform => platform.platformId),
                     }
-                }, {
-                    onSuccess(data, variables, onMutateResult, context) {
-                        addToast({ text: "Successfully edited game, ", type: "info" })
-                        queryClient.invalidateQueries(gamesWithExtrasQueryOpts())
-                        queryClient.invalidateQueries(gameQueryOpts(gameId))
-                        queryClient.invalidateQueries(gamesQueryOpts())
-                    },
-                    onError(error, variables, onMutateResult, context) {
-                        addToast({ text: error.message, type: "error" })
-                    },
                 })
+                return
             }
-            return createGameMutation.mutate({
+            const newId = await createGameMutation.mutateAsync({
                 data: {
                     ...rest,
+                    cover: "q.png",
+                    banner: "users/default_banner.jpg",
                     platforms: rest.platforms.map(platform => platform.platformId)
                 }
-            }, {
-                onSuccess(data, variables, onMutateResult, context) {
-                    addToast({ text: "Successfully created game, " + data, type: "info" })
-                    queryClient.invalidateQueries(gamesWithExtrasQueryOpts())
-                    queryClient.invalidateQueries(gameQueryOpts(data))
-                    queryClient.invalidateQueries(gamesQueryOpts())
-                    navigate({ to: "/admin/games/$gameId/edit", params: { gameId: data } })
-                },
-                onError(error, variables, onMutateResult, context) {
-                    addToast({ text: error.message, type: "error" })
-                },
             })
+
+            const { media, newCover, newBanner } = await uploadWrapper(newId)
+
+            await editGameMutation.mutateAsync({
+                data: {
+                    gameId: newId,
+                    cover: newCover,
+                    banner: newBanner,
+                    media: media
+                }
+            })
+
+            queryClient.invalidateQueries(gamesWithExtrasQueryOpts())
+            queryClient.invalidateQueries(gamesQueryOpts())
+            navigate({ to: "/admin/games/$gameId/edit", params: { gameId: newId } })
         }
         catch (error) {
-
+            addToast({ text: String(error), type: "error" })
         }
     }
     return {

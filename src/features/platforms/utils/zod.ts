@@ -1,11 +1,10 @@
 import z from "zod"
-import { AdminImageSchema } from "~/utils/zod"
 
 export const platformCreateSchema = z.object({
     name: z.string(),
     releaseDate: z.string(),
     summary: z.string().optional(),
-    file: AdminImageSchema,
+    logo: z.string()
 })
 
 export const platformEditSchema = platformCreateSchema.partial().extend({

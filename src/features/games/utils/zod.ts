@@ -4,6 +4,8 @@ export const GameCreateSchema = z.object({
     title: z.string(),
     developerId: z.number(),
     publisherId: z.number(),
+    banner: z.string(),
+    cover: z.string(),
     summary: z.string().optional(),
     releaseDate: z.iso.date(),
     trailer: z.string().nullish(),
@@ -16,11 +18,7 @@ export const GameCreateSchema = z.object({
     genres: z.string().array()
 })
 
-export const GameEditSchema = GameCreateSchema.partial().extend({ 
-    gameId: z.number() ,
-    cover: z.string().nullish(),
-    banner: z.string().nullish()
-})
+export const GameEditSchema = GameCreateSchema.partial().extend({ gameId: z.number() })
 
 export const GetGamesSchema = z.object({
     developerId: z.number(),
@@ -34,3 +32,13 @@ export const GetGamesSchema = z.object({
         limit: z.number().default(50)
     })
     .optional()
+
+export const GameFileSchema = z.object({
+    prefix: z.string().optional(),
+    files: z.array(z.object({
+        filename: z.string(),
+        contentType: z.string().startsWith("image/"),
+        contentLength: z.number().max(8 * 1024 * 1024),
+        metadata: z.record(z.string(), z.string()).optional()
+    }))
+})    

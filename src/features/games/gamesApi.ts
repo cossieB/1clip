@@ -5,7 +5,10 @@ import { adminOnlyMiddleware } from "~/middleware/authorization";
 import { staticDataMiddleware } from "~/middleware/static";
 import * as gamesRepository from "./gamesRepository";
 import { cacheAside } from "~/utils/cacheAside.server";
-import { GameCreateSchema, GameEditSchema, GetGamesSchema } from "./utils/zod";
+import { GameFileSchema, GameCreateSchema, GameEditSchema, GetGamesSchema } from "./utils/zod";
+import { generateSignedUrl } from "~/integrations/uploadService/cloudflareUploadService.server";
+import { generateUniqueFilename } from "~/utils/mediaSrc";
+import assert from "node:assert";
 
 export const getGamesFn = createServerFn()
     .middleware([staticDataMiddleware])
@@ -32,8 +35,8 @@ export const createGameFn = createServerFn({ method: "POST" })
     .middleware([adminOnlyMiddleware])
     .validator(GameCreateSchema)
     .handler(async ({ data }) => {
-        const { media, platforms, genres, ...game } = data
-        return await gamesRepository.createGame(game, { platforms, media, genres })
+        const { platforms, genres, ...game } = data;
+        return await gamesRepository.createGame(game, { platforms, media: [], genres })
     })
 
 export const updateGameFn = createServerFn({ method: "POST" })
@@ -60,3 +63,4 @@ export const getSimilarGames = createServerFn()
     .handler(async ({ data }) => {
         return await cacheAside(`similar:${data}`, () => gamesRepository.similarGames(data), 604800);
     })
+

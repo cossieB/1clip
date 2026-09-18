@@ -1,5 +1,6 @@
 import { createStore } from "solid-js/store";
 import { Form } from "~/components/Forms/Form";
+import * as api from "../developersApi"
 import { useUpload } from "~/hooks/useUpload";
 import { countryList } from "~/utils/countryList";
 import { ContentEditable } from "~/components/Forms/ContentEditable";
@@ -8,21 +9,21 @@ import { useMutation, useQueryClient } from "@tanstack/solid-query";
 import { useToastContext } from "~/hooks/useToastContext";
 import { developerQueryOpts, developersQueryOpts } from "../utils/developerQueryOpts";
 import { UploadBoxWithPreview } from "~/components/UploadBox/UploadBoxWithPreview";
-import { getDeveloperFn, createDeveloperFn, editDeveloperFn } from "../developersApi";
-import { Show } from "solid-js";
+import { getLogoSignedUrls } from "~/serverFn/getSignedUrl";
 import { useNavigate } from "@tanstack/solid-router";
 
-type Developer = Awaited<ReturnType<typeof getDeveloperFn>>
+type Developer = Awaited<ReturnType<typeof api.getDeveloperFn>>
 
 export function DevForm(props: { developer?: Developer }) {
+    const abortController = new AbortController
     const navigate = useNavigate()
     const { addToast } = useToastContext()
     const queryClient = useQueryClient()
     const createDevMutation = useMutation(() => ({
-        mutationFn: useServerFn(createDeveloperFn)
+        mutationFn: useServerFn(api.createDeveloperFn)
     }))
     const editDevMutation = useMutation(() => ({
-        mutationFn: useServerFn(editDeveloperFn)
+        mutationFn: useServerFn(api.editDeveloperFn)
     }))
     const [developer, setDeveloper] = createStore(props.developer ?? {
         name: "",
@@ -31,42 +32,37 @@ export function DevForm(props: { developer?: Developer }) {
         logo: "",
         summary: ""
     })
-    const { isUploading, setFiles, upload, files } = useUpload()
+    const { isUploading, setFiles, upload, getSignedUrls } = useUpload(abortController)
 
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault()
-
-        const f = files().at(0);
-        const file = f ? { size: f.file.size, contentType: f.file.type, filename: f.file.name } : undefined
+        const urls = await getSignedUrls(getLogoSignedUrls)
+        const files = await upload(urls)
+        const f = files.at(0)
+        if (f) setDeveloper({ logo: f.key })
         if ('developerId' in developer) {
-            try {
-                const r2details = await editDevMutation.mutateAsync({ data: { ...developer, file } });
-                if (r2details) {
-                    await upload([r2details.signedUrl])
-                    setDeveloper({ logo: r2details.key })
-                }
-                addToast({ text: "Successfully edited actor, " + developer.developerId, type: "info" })
-                queryClient.setQueryData(developerQueryOpts(developer.developerId).queryKey, developer)
-                queryClient.invalidateQueries(developersQueryOpts())
-            }
-            catch (error) {
-                addToast({ text: "Failed", type: "error" });
-                console.error(error)
-            }
-            return;
+            return editDevMutation.mutate({ data: developer }, {
+                onSuccess(data, variables, onMutateResult, context) {
+                    addToast({ text: "Successfully edited developer, " + developer.developerId, type: "info" })
+                    queryClient.setQueryData(developerQueryOpts(developer.developerId).queryKey, developer)
+                    queryClient.invalidateQueries(developersQueryOpts())
+                },
+                onError(error, variables, onMutateResult, context) {
+                    addToast({ text: "Failed", type: "error" })
+                },
+            })
         }
-        if (!file) throw addToast({ text: "Logo Required", type: "warning" })
-        try {
-            const response = await createDevMutation.mutateAsync({ data: { ...developer, file } });
-            await upload([response.upload.signedUrl])
-            setDeveloper({ logo: response.upload.key })
-            queryClient.setQueryData(developerQueryOpts(response.developer.developerId).queryKey, response.developer)
-            queryClient.invalidateQueries(developersQueryOpts())
-            navigate({ to: "/admin/developers/$developerId/edit", params: { developerId: response.developer.developerId } })
-        }
-        catch (error: any) {
-            addToast({ text: error.message, type: "error" })
-        }
+        createDevMutation.mutate({ data: developer }, {
+            onSuccess(data, variables, onMutateResult, context) {
+                addToast({ text: "Successfully created developer, " + data.developerId, type: "info" })
+                queryClient.setQueryData(developerQueryOpts(data.developerId).queryKey, data)
+                queryClient.invalidateQueries(developersQueryOpts());
+                navigate({ to: "/admin/developers/$developerId/edit", params: { developerId: data.developerId } })
+            },
+            onError(error, variables, onMutateResult, context) {
+                addToast({ text: error.message, type: "error" })
+            },
+        })
     }
 
     return (
@@ -77,8 +73,8 @@ export function DevForm(props: { developer?: Developer }) {
                     !developer.name ||
                     !developer.country ||
                     !developer.location ||
-                    !developer.summary ||
-                    !developer.logo
+                    !developer.logo ||
+                    !developer.summary
                 }
                 onSubmit={handleSubmit}
             >
@@ -88,8 +84,8 @@ export function DevForm(props: { developer?: Developer }) {
                     value={developer.name}
                 />
                 <UploadBoxWithPreview
-                    image={developer.logo ?? "/q.png"}
                     label="Logo"
+                    image={developer.logo}
                     onDrop={data => {
                         setDeveloper({ logo: data.objectUrl })
                         setFiles(() => [{ ...data, field: "logo" }])

@@ -4,7 +4,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { join } from "node:path/posix";
 import { generateUniqueFilename } from "~/utils/mediaSrc";
 
-const BUCKET = "clipz"
+const BUCKET = "test"
 
 const S3 = new S3Client({
     region: "auto", // Required by SDK but not used by R2
@@ -46,6 +46,7 @@ export async function generateSignedUrl(options: Options) {
             Bucket: BUCKET,
             Key: key,
             ContentType: contentType,
+            ContentLength: contentLength,
             Metadata: metadata,
         }), {
         expiresIn: 5 * 60,
@@ -79,13 +80,4 @@ export async function fileExistsInR2(key: string) {
         }
         throw error;
     }
-}
-
-
-export async function createFileDetails(file: { size: number; contentType: string; filename: string; } | undefined, ...prefix: [string, ...string[]]) {
-    return file ? await generateSignedUrl({
-        contentLength: file.size,
-        contentType: file.contentType,
-        key: join(...prefix, generateUniqueFilename(file.filename))
-    }) : undefined
 }
