@@ -36,7 +36,7 @@ export function useGameForm(props: { game?: Game }) {
         genres: props.game?.genres ?? [],
         actors: props.game?.actors ?? []
     })
-    const { setFiles, isUploading, upload, files, getSignedUrls } = useUpload(abortController)
+    const { setFiles, isUploading, files, convertAndUpload } = useUpload(abortController)
 
     const editGameMutation = useMutation(() => ({
         mutationFn: useServerFn(gamesApi.updateGameFn)
@@ -46,8 +46,7 @@ export function useGameForm(props: { game?: Game }) {
     }))
 
     const uploadWrapper = async (id: number) => {
-        const urls = await getSignedUrls(getGamesSignedUrls, `games/${id}`)
-        const uploadResult = await upload(urls);
+        const uploadResult = await convertAndUpload(getGamesSignedUrls, `games/${id}`)
         const newCover = uploadResult.find(x => x.field === MediaField.Cover)?.key
         const newBanner = uploadResult.find(x => x.field === MediaField.Banner)?.key
         const media = uploadResult

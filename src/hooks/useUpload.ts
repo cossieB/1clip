@@ -4,6 +4,7 @@ import { uploadToSignedUrl } from "~/utils/uploadToSignedUrl";
 import { useToastContext } from "./useToastContext";
 import { mergeObjectArrays } from "~/lib/zip";
 import { FileUploadSchema, SignedUrlResponse } from "~/integrations/storageService/zod";
+import { convertToWebP } from "~/utils/convertToWebp.client";
 
 export function useUpload(abortController?: AbortController) {
     const { addToast } = useToastContext()
@@ -13,19 +14,27 @@ export function useUpload(abortController?: AbortController) {
             file: File,
             field: string,
             objectUrl: string,
-            metadata?: Record<string, string>
+            metadata?: Record<string, string>,
+            convertedFile?: File
         }[]
     })
-
+    async function convertFiles() {
+        await Promise.all(state.files.map(async (f, i) => {
+            if (!f.file.type.startsWith("image/")) return;
+            const convertedFile = await convertToWebP(f.file);
+            setState('files', i, 'convertedFile', convertedFile)
+        }))
+    }
     async function getSignedUrls(getUrls: Fetcher<any, typeof FileUploadSchema, Promise<SignedUrlResponse>>, prefix?: string) {
-        if (state.files.length == 0) return []
+        if (state.files.length == 0) return [];
+        
         return await getUrls({
             data: {
                 prefix,
                 files: state.files.map(f => ({
-                    contentLength: f.file.size,
-                    contentType: f.file.type,
-                    filename: f.file.name,
+                    contentLength: (f.convertedFile ?? f.file).size,
+                    contentType: (f.convertedFile ?? f.file).type,
+                    filename: (f.convertedFile ?? f.file).name,
                     metadata: f.metadata
                 }))
             },
@@ -42,7 +51,7 @@ export function useUpload(abortController?: AbortController) {
 
             const promises = state.files.map((f, i) => uploadToSignedUrl(
                 urls[i].signedUrl,
-                f.file, {
+                f.convertedFile ?? f.file, {
                 signal: abortController?.signal,
             }))
             await Promise.all(promises)
@@ -61,11 +70,19 @@ export function useUpload(abortController?: AbortController) {
         setState("files", prev => cb(prev))
     }
 
+    async function convertAndUpload(getUrls: Fetcher<any, typeof FileUploadSchema, Promise<SignedUrlResponse>>, prefix?: string) {
+        await convertFiles()
+        const urls = await getSignedUrls(getUrls, prefix);
+        return upload(urls)
+    }
+
     return {
         upload,
         setFiles,
         isUploading: () => state.isUploading,
         files: () => state.files,
-        getSignedUrls
+        getSignedUrls,
+        convertFiles,
+        convertAndUpload
     }
 }

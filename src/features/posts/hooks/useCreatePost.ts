@@ -7,6 +7,7 @@ import { useAbortController } from "~/hooks/useAbortController"
 import { useUpload } from "~/hooks/useUpload"
 import { createPostFn, markPostUploadComplete } from "~/features/posts/postsApi"
 import { postQueryOpts, postsQueryOpts } from "../utils/postQueryOpts"
+import { convertToWebP } from "~/utils/convertToWebp.client"
 
 export function useCreatePost() {
     const queryClient = useQueryClient()
@@ -15,7 +16,7 @@ export function useCreatePost() {
     
     const abortController = useAbortController();
     
-    const { isUploading, setFiles, upload, files } = useUpload(abortController)
+    const { isUploading, setFiles, upload, files, convertFiles } = useUpload(abortController)
     const createAction = useServerFn(createPostFn)
 
     const mutation = useMutation(() => ({
@@ -35,14 +36,15 @@ export function useCreatePost() {
         const { game, ...rest } = input
         e.preventDefault();
         try {
+            await convertFiles()
             const response = await mutation.mutateAsync({
                 data: {
                     ...rest,
                     gameId: input.game?.gameId,
                     media: files().map(f => ({
-                        contentType: f.file.type,
-                        filename: f.file.name,
-                        size: f.file.size,
+                        contentType: (f.convertedFile ?? f.file).type,
+                        filename: (f.convertedFile ?? f.file).name,
+                        size: (f.convertedFile ?? f.file).size,
                     })),
                 },
                 signal: abortController.signal

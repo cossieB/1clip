@@ -7,6 +7,7 @@ import * as actorRepository from "./actorRepository"
 import { actorCreateSchema, actorEditSchema } from "./utils/zod";
 import { LimitOffsetSchema } from "~/utils/zod";
 import { orphanedFileService } from "~/services/orphanedFileService";
+import { storageService } from "~/integrations/storageService/index.server";
 
 export const getActorFn = createServerFn()
     .middleware([staticDataMiddleware])
@@ -43,8 +44,11 @@ export const editActorFn = createServerFn({ method: "POST" })
     .validator(actorEditSchema)
     .handler(async ({ data }) => {
         const { actorId, characters, ...actor } = data        
-        await actorRepository.editActor(actorId, actor, characters)
-        if (data.photo) orphanedFileService.removePendingUpload(data.photo)
+        const [old] = await actorRepository.editActor(actorId, actor, characters)
+        if (data.photo) {
+            orphanedFileService.removePendingUpload(data.photo)
+            old.oldPhoto && storageService.moveToDeletedBucket(old.oldPhoto)
+        }
     })
 
 export const getActorsWithCharacters = createServerFn()

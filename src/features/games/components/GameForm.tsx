@@ -58,7 +58,7 @@ export function GameForm(props: { game?: Game }) {
                             { ...file, field: MediaField.Cover }
                         ])
                     }}
-                    maxSize={1}
+                    maxSize={4}
                     limit={1}
                     accept={{
                         image: true,

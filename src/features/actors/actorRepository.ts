@@ -10,7 +10,7 @@ export function findById(actorId: number) {
     })
 }
 
-export async function findAll(filters?: {limit?: number, offset?: number}) {
+export async function findAll(filters?: { limit?: number, offset?: number }) {
     return db.query.actors.findMany(filters)
 }
 
@@ -31,10 +31,14 @@ export function createActor(actor: InferInsertModel<typeof actors>, characters: 
 }
 
 export async function editActor(actorId: number, actor: Partial<InferSelectModel<typeof actors>>, characters?: Char[]) {
-    if (!characters) return db.update(actors).set(actor).where(eq(actors.actorId, actorId))
+    if (!characters) return db.update(actors).set(actor).where(eq(actors.actorId, actorId)).returning({
+        oldPhoto: sql<string | null>`OLD.photo`
+    })
 
-    await db.transaction(async tx => {
-        await tx.update(actors).set(actor).where(eq(actors.actorId, actorId))
+    return db.transaction(async tx => {
+        const a = await tx.update(actors).set(actor).where(eq(actors.actorId, actorId)).returning({
+            oldPhoto: sql<string | null>`OLD.photo`
+        })
         if (characters.length == 0)
             await tx.delete(gameActors).where(eq(gameActors.actorId, actorId))
 
@@ -49,6 +53,7 @@ export async function editActor(actorId: number, actor: Partial<InferSelectModel
                 character: char.character
             }))).onConflictDoNothing()
         }
+        return a
     })
 };
 

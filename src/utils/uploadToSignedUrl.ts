@@ -1,6 +1,6 @@
 
 export async function uploadToSignedUrl(url: string, file: File, obj?: { signal?: AbortSignal, metadata?: Record<string, string> }) {
-
+    
     try {
         const res = await fetch(url, {
             method: "PUT",

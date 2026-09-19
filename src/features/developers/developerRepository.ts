@@ -1,4 +1,4 @@
-import { eq, InferInsertModel, InferSelectModel } from "drizzle-orm";
+import { eq, InferInsertModel, InferSelectModel, sql } from "drizzle-orm";
 import { db } from "~/drizzle/db";
 import { developers } from "~/drizzle/schema";
 
@@ -25,7 +25,9 @@ export async function findById(developerId: number) {
 }
 
 export async function editDeveloper(developerId: number, data: Partial<InferSelectModel<typeof developers>>) {
-    return db.update(developers).set(data).where(eq(developers.developerId, developerId))
+    return db.update(developers).set(data).where(eq(developers.developerId, developerId)).returning({
+        oldLogo: sql<string>`OLD.logo`
+    })
 }
 
 export async function createDeveloper(data: InferInsertModel<typeof developers>) {

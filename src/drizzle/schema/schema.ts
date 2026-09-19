@@ -5,7 +5,7 @@ import { users } from "./auth";
 export const developers = pgTable("developers", {
     developerId: integer("developer_id").primaryKey().generatedAlwaysAsIdentity(),
     name: varchar("name").notNull(),
-    logo: text("logo").notNull().notNull(),
+    logo: text("logo").notNull(),
     location: varchar("location"),
     summary: text("summary").notNull().default(""),
     country: varchar("country"),

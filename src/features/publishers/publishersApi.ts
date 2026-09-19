@@ -6,6 +6,7 @@ import * as publisherRepository from "./publisherRepository"
 import { LimitOffsetSchema } from "~/utils/zod";
 import { publisherCreateSchema, publisherEditSchema } from "./utils/zod";
 import { orphanedFileService } from "~/services/orphanedFileService";
+import { storageService } from "~/integrations/storageService/index.server";
 
 export const getPublishersFn = createServerFn()
     .middleware([staticDataMiddleware])
@@ -41,6 +42,9 @@ export const editPublisherFn = createServerFn({method: "POST"})
     .validator(publisherEditSchema)
     .handler(async ({data}) => {
         const { publisherId,  ...rest } = data;
-        await publisherRepository.editPublisher(publisherId, rest);
-        if (data.logo) orphanedFileService.removePendingUpload(data.logo)
+        const [old] = await publisherRepository.editPublisher(publisherId, rest);
+        if (data.logo) {
+            orphanedFileService.removePendingUpload(data.logo);
+            storageService.moveToDeletedBucket(old.oldLogo)
+        }
     })

@@ -7,6 +7,8 @@ import * as gamesRepository from "./gamesRepository";
 import { cacheAside } from "~/utils/cacheAside.server";
 import { GameCreateSchema, GameEditSchema, GetGamesSchema } from "./utils/zod";
 import { orphanedFileService } from "~/services/orphanedFileService";
+import { AppError } from "~/utils/AppError.server";
+import { storageService } from "~/integrations/storageService/index.server";
 
 export const getGamesFn = createServerFn()
     .middleware([staticDataMiddleware])
@@ -34,10 +36,7 @@ export const createGameFn = createServerFn({ method: "POST" })
     .validator(GameCreateSchema)
     .handler(async ({ data }) => {
         const { platforms, genres, ...game } = data;
-        const g = await gamesRepository.createGame(game, { platforms, media: [], genres })
-        orphanedFileService.removePendingUpload(data.cover)
-        orphanedFileService.removePendingUpload(data.banner)
-        return g
+        return await gamesRepository.createGame(game, { platforms, media: [], genres })        
     })
 
 export const updateGameFn = createServerFn({ method: "POST" })
@@ -45,9 +44,15 @@ export const updateGameFn = createServerFn({ method: "POST" })
     .validator(GameEditSchema)
     .handler(async ({ data }) => {
         const { gameId, media, platforms, genres, ...game } = data
-        await gamesRepository.updateGame(gameId, game, { platforms, media, genres })
-        if (data.cover) orphanedFileService.removePendingUpload(data.cover)
-        if (data.banner) orphanedFileService.removePendingUpload(data.banner)
+        const [old] = await gamesRepository.updateGame(gameId, game, { platforms, media, genres })
+        if (data.cover) {
+            orphanedFileService.removePendingUpload(data.cover)
+            storageService.moveToDeletedBucket(old.oldCover)
+        }
+        if (data.banner) {
+            orphanedFileService.removePendingUpload(data.banner)
+            storageService.moveToDeletedBucket(old.oldBanner)
+        }
     })
 
 export const getGamesWithoutExtras = createServerFn()

@@ -40,12 +40,11 @@ export function ActorForm(props: { actor?: Omit<Actor, 'characters'> & { charact
         characters: [] as Optional<Char, 'appearanceId'>[],
     })
 
-    const { isUploading, setFiles, upload, getSignedUrls } = useUpload(abortController)
+    const { isUploading, setFiles, upload, getSignedUrls, convertAndUpload } = useUpload(abortController)
 
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault()
-        const urls = await getSignedUrls(getPeopleSignedUrls)
-        const files = await upload(urls)
+        const files = await convertAndUpload(getPeopleSignedUrls)
         const f = files.at(0)
         if (f) setActor({ photo: f.key })
         if ('actorId' in actor) {

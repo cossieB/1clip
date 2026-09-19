@@ -35,12 +35,11 @@ export function PubForm(props: { publisher?: Publisher }) {
         summary: ""
     })
 
-    const { isUploading, setFiles, upload, getSignedUrls } = useUpload()
+    const { isUploading, setFiles, convertAndUpload } = useUpload()
 
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault()
-        const urls = await getSignedUrls(getLogoSignedUrls)
-        const files = await upload(urls)
+        const files = await convertAndUpload(getLogoSignedUrls)
         const f = files.at(0)
         if (f) setPublisher({ logo: f.key })
         if ('publisherId' in publisher) {

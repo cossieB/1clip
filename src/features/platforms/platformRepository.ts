@@ -1,4 +1,4 @@
-import { eq, InferInsertModel, InferSelectModel } from "drizzle-orm";
+import { eq, InferInsertModel, InferSelectModel, sql } from "drizzle-orm";
 import { db } from "~/drizzle/db";
 import { platforms } from "~/drizzle/schema";
 
@@ -29,5 +29,7 @@ export async function createPlatform(platform: InferInsertModel<typeof platforms
 }
 
 export function editPlatform(platformId: number, data: Partial<InferSelectModel<typeof platforms>>) {
-    return db.update(platforms).set(data).where(eq(platforms.platformId, platformId))
+    return db.update(platforms).set(data).where(eq(platforms.platformId, platformId)).returning({
+        oldLogo: sql<string>`OLD.logo`
+    })
 }

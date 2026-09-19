@@ -6,6 +6,7 @@ import * as developerRepository from "./developerRepository"
 import { LimitOffsetSchema } from "~/utils/zod";
 import { developerCreateSchema, developerEditSchema } from "./utils/zod";
 import { orphanedFileService } from "~/services/orphanedFileService";
+import { storageService } from "~/integrations/storageService/index.server";
 
 export const getDevelopersFn = createServerFn()
     .middleware([staticDataMiddleware])
@@ -41,7 +42,10 @@ export const editDeveloperFn = createServerFn({ method: "POST" })
     .validator(developerEditSchema)
     .handler(async ({ data }) => {
         const { developerId, ...rest } = data;
-        await developerRepository.editDeveloper(developerId, rest);      
-        if (data.logo) orphanedFileService.removePendingUpload(data.logo)  
+        const [old] = await developerRepository.editDeveloper(developerId, rest);      
+        if (data.logo) {
+            orphanedFileService.removePendingUpload(data.logo)
+            storageService.moveToDeletedBucket(old.oldLogo)
+        }
     })
 

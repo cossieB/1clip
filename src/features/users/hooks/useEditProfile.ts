@@ -10,7 +10,7 @@ import { getUsersSignedUrls } from "~/integrations/storageService/serverFn";
 export function useEditProfile(props: { user: Awaited<ReturnType<typeof getLoggedInUser>> }) {
     const updateUser = useServerFn(updateCurrentUser);
     const abortController = useAbortController()
-    const { setFiles, upload, isUploading, getSignedUrls } = useUpload(abortController)
+    const { setFiles, upload, isUploading, getSignedUrls, convertAndUpload } = useUpload(abortController)
 
     const { addToast } = useToastContext()
     const queryClient = useQueryClient()
@@ -33,8 +33,7 @@ export function useEditProfile(props: { user: Awaited<ReturnType<typeof getLogge
         e.preventDefault();
 
         try {
-            const urls = await getSignedUrls(getUsersSignedUrls)
-            const uploadResult = await upload(urls);
+            const uploadResult = await convertAndUpload(getUsersSignedUrls);
             const newAvatar = uploadResult.find(x => x.field === "avatar")
             const newBanner = uploadResult.find(x => x.field === "banner")
             setUser({

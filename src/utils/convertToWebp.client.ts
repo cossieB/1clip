@@ -4,9 +4,9 @@ interface ConvertOptions {
     maxHeight?: number;
 }
 
-function convertToWebP(
+export function convertToWebP(
     file: File,
-    quality: number = 0.8,
+    quality: number = 0.9,
     maxWidth?: number,
     maxHeight?: number
 ): Promise<File> {

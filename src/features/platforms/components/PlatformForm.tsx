@@ -34,12 +34,11 @@ export function PlatformForm(props: { platform?: Platform }) {
         summary: ""
     })
 
-    const { isUploading, setFiles, upload, getSignedUrls } = useUpload(abortController)
+    const { isUploading, setFiles, convertAndUpload } = useUpload(abortController)
 
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault()
-        const urls = await getSignedUrls(getLogoSignedUrls)
-        const files = await upload(urls)
+        const files = await convertAndUpload(getLogoSignedUrls)
         const f = files.at(0)
         if (f) setPlatform({ logo: f.key })
         if ('platformId' in platform) {

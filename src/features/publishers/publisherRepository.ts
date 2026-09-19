@@ -1,4 +1,4 @@
-import { eq, InferInsertModel, InferSelectModel } from "drizzle-orm";
+import { eq, InferInsertModel, InferSelectModel, sql } from "drizzle-orm";
 import { db } from "~/drizzle/db";
 import { publishers } from "~/drizzle/schema";
 
@@ -27,7 +27,9 @@ export async function findById(publisherId: number) {
 }
 
 export async function editPublisher(publisherId: number, data: Partial<InferSelectModel<typeof publishers>>) {
-    return db.update(publishers).set(data).where(eq(publishers.publisherId, publisherId))
+    return db.update(publishers).set(data).where(eq(publishers.publisherId, publisherId)).returning({
+        oldLogo: sql<string>`OLD.logo`
+    })
 }
 
 export async function createPublisher(data: InferInsertModel<typeof publishers>) {

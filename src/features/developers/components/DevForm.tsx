@@ -32,12 +32,11 @@ export function DevForm(props: { developer?: Developer }) {
         logo: "",
         summary: ""
     })
-    const { isUploading, setFiles, upload, getSignedUrls } = useUpload(abortController)
+    const { isUploading, setFiles, convertAndUpload } = useUpload(abortController)
 
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault()
-        const urls = await getSignedUrls(getLogoSignedUrls)
-        const files = await upload(urls)
+        const files = await convertAndUpload(getLogoSignedUrls)
         const f = files.at(0)
         if (f) setDeveloper({ logo: f.key })
         if ('developerId' in developer) {

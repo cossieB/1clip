@@ -6,6 +6,7 @@ import * as platformRepository from "./platformRepository"
 import { LimitOffsetSchema } from "~/utils/zod"
 import { platformCreateSchema, platformEditSchema } from "./utils/zod"
 import { orphanedFileService } from "~/services/orphanedFileService"
+import { storageService } from "~/integrations/storageService/index.server"
 
 export const getPlatformsFn = createServerFn()
     .middleware([staticDataMiddleware])
@@ -41,6 +42,9 @@ export const editPlatformFn = createServerFn({method: "POST"})
     .validator(platformEditSchema)
     .handler(async ({data}) => {
         const { platformId, ...rest } = data;        
-        await platformRepository.editPlatform(platformId, rest);
-        if (data.logo) orphanedFileService.removePendingUpload(data.logo)
+        const [old] = await platformRepository.editPlatform(platformId, rest);
+        if (data.logo) {
+            orphanedFileService.removePendingUpload(data.logo);
+            storageService.moveToDeletedBucket(old.oldLogo)
+        }
     })

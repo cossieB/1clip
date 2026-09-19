@@ -9,7 +9,7 @@ export function useLogout() {
     return async function logout() {
         try {
             await authClient.signOut();
-            navigate({ to: "/" })
+            navigate({ to: "/", reloadDocument: true })
         }
         catch (error) {
             console.error(error)
