@@ -17,7 +17,7 @@ import styles from "./ActorForm.module.css"
 import { CirclePlusIcon, Trash2Icon } from "lucide-solid"
 import { Optional } from "~/lib/utilityTypes"
 import { useNavigate } from "@tanstack/solid-router"
-import { getPeopleSignedUrls } from "~/serverFn/getSignedUrl"
+import { getPeopleSignedUrls } from "~/integrations/storageService/serverFn"
 
 type Actor = Awaited<ReturnType<typeof getActorsWithCharacters>>
 type Char = Actor['characters'][number]

@@ -5,8 +5,7 @@ import { staticDataMiddleware } from "~/middleware/static";
 import * as publisherRepository from "./publisherRepository"
 import { LimitOffsetSchema } from "~/utils/zod";
 import { publisherCreateSchema, publisherEditSchema } from "./utils/zod";
-import { generateSignedUrl } from "~/integrations/uploadService/cloudflareUploadService.server";
-import { generateUniqueFilename } from "~/utils/mediaSrc";
+import { orphanedFileService } from "~/services/orphanedFileService";
 
 export const getPublishersFn = createServerFn()
     .middleware([staticDataMiddleware])
@@ -32,7 +31,9 @@ export const createPublisherFn = createServerFn({method: "POST"})
     .middleware([adminOnlyMiddleware])
     .validator(publisherCreateSchema)
     .handler(async ({data}) => {
-        return await publisherRepository.createPublisher(data)
+        const p = await publisherRepository.createPublisher(data);
+        orphanedFileService.removePendingUpload(data.logo)
+        return p
     })
 
 export const editPublisherFn = createServerFn({method: "POST"})   
@@ -41,4 +42,5 @@ export const editPublisherFn = createServerFn({method: "POST"})
     .handler(async ({data}) => {
         const { publisherId,  ...rest } = data;
         await publisherRepository.editPublisher(publisherId, rest);
+        if (data.logo) orphanedFileService.removePendingUpload(data.logo)
     })

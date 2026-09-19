@@ -8,9 +8,8 @@ import { Form } from "~/components/Forms/Form"
 import { ContentEditable } from "~/components/Forms/ContentEditable"
 import { UploadBoxWithPreview } from "~/components/UploadBox/UploadBoxWithPreview"
 import { getPlatformFn, createPlatformFn, editPlatformFn } from "../platformsApi"
-import { Show } from "solid-js"
 import { useNavigate } from "@tanstack/solid-router"
-import { getLogoSignedUrls } from "~/serverFn/getSignedUrl"
+import { getLogoSignedUrls } from "~/integrations/storageService/serverFn"
 
 type Platform = Awaited<ReturnType<typeof getPlatformFn>>
 

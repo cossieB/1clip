@@ -5,8 +5,7 @@ import { staticDataMiddleware } from "~/middleware/static"
 import * as platformRepository from "./platformRepository"
 import { LimitOffsetSchema } from "~/utils/zod"
 import { platformCreateSchema, platformEditSchema } from "./utils/zod"
-import { generateSignedUrl } from "~/integrations/uploadService/cloudflareUploadService.server"
-import { generateUniqueFilename } from "~/utils/mediaSrc"
+import { orphanedFileService } from "~/services/orphanedFileService"
 
 export const getPlatformsFn = createServerFn()
     .middleware([staticDataMiddleware])
@@ -32,7 +31,9 @@ export const createPlatformFn = createServerFn({method: "POST"})
     .middleware([adminOnlyMiddleware])
     .validator(platformCreateSchema)
     .handler(async ({data}) => {
-        return await platformRepository.createPlatform(data)        
+        const p = await platformRepository.createPlatform(data)        
+        orphanedFileService.removePendingUpload(data.logo)
+        return p
     })
 
 export const editPlatformFn = createServerFn({method: "POST"})    
@@ -41,4 +42,5 @@ export const editPlatformFn = createServerFn({method: "POST"})
     .handler(async ({data}) => {
         const { platformId, ...rest } = data;        
         await platformRepository.editPlatform(platformId, rest);
+        if (data.logo) orphanedFileService.removePendingUpload(data.logo)
     })

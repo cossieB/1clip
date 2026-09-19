@@ -5,10 +5,8 @@ import { adminOnlyMiddleware } from "~/middleware/authorization";
 import { staticDataMiddleware } from "~/middleware/static";
 import * as gamesRepository from "./gamesRepository";
 import { cacheAside } from "~/utils/cacheAside.server";
-import { GameFileSchema, GameCreateSchema, GameEditSchema, GetGamesSchema } from "./utils/zod";
-import { generateSignedUrl } from "~/integrations/uploadService/cloudflareUploadService.server";
-import { generateUniqueFilename } from "~/utils/mediaSrc";
-import assert from "node:assert";
+import { GameCreateSchema, GameEditSchema, GetGamesSchema } from "./utils/zod";
+import { orphanedFileService } from "~/services/orphanedFileService";
 
 export const getGamesFn = createServerFn()
     .middleware([staticDataMiddleware])
@@ -36,7 +34,10 @@ export const createGameFn = createServerFn({ method: "POST" })
     .validator(GameCreateSchema)
     .handler(async ({ data }) => {
         const { platforms, genres, ...game } = data;
-        return await gamesRepository.createGame(game, { platforms, media: [], genres })
+        const g = await gamesRepository.createGame(game, { platforms, media: [], genres })
+        orphanedFileService.removePendingUpload(data.cover)
+        orphanedFileService.removePendingUpload(data.banner)
+        return g
     })
 
 export const updateGameFn = createServerFn({ method: "POST" })
@@ -45,6 +46,8 @@ export const updateGameFn = createServerFn({ method: "POST" })
     .handler(async ({ data }) => {
         const { gameId, media, platforms, genres, ...game } = data
         await gamesRepository.updateGame(gameId, game, { platforms, media, genres })
+        if (data.cover) orphanedFileService.removePendingUpload(data.cover)
+        if (data.banner) orphanedFileService.removePendingUpload(data.banner)
     })
 
 export const getGamesWithoutExtras = createServerFn()

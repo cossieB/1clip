@@ -5,13 +5,13 @@ import * as userRepository from "~/features/users/userRepository"
 import { forceLogin, getCurrentUser as getCurrentUser } from "../../serverFn/auth";
 import { verifiedOnlyMiddleware } from "~/middleware/authorization";
 import { AppError } from "~/utils/AppError.server";
-import * as uploadService from "~/integrations/uploadService/cloudflareUploadService.server"
 import { HttpStatusCode } from "~/utils/statusCodes";
 import { notificationsService } from "~/integrations/notificationService";
 import { cacheAside } from "~/utils/cacheAside.server";
 import { getRank } from "~/utils/getRank";
 import { addNotification } from "~/features/notifications/notificationsRepository";
-import { getCookie } from "@tanstack/solid-start/server";
+import { storageService } from "~/integrations/storageService/index.server";
+import { orphanedFileService } from "~/services/orphanedFileService";
 
 export const getLoggedInUser = createServerFn()
     .handler(async () => {
@@ -65,10 +65,16 @@ export const updateCurrentUser = createServerFn({ method: "POST" })
         if (Object.keys(data).length === 0) throw new AppError("Nothing to update", HttpStatusCode.BAD_REQUEST)
             
             const old = (await userRepository.updateUser(user.id, data))[0]
-            if (data.banner != old.oldBanner)
-                uploadService.deleteObject(old.oldBanner)
-            if (data.image != old.oldAvatar)
-                uploadService.deleteObject(old.oldAvatar)            
+            if (data.banner != old.oldBanner) {
+                storageService.deleteObject(old.oldBanner);
+                orphanedFileService.removePendingUpload(data.banner!)
+            }
+                
+            if (data.image != old.oldAvatar) {
+                storageService.deleteObject(old.oldAvatar)        
+                orphanedFileService.removePendingUpload(data.image!)
+            }
+                    
             return new Response(null, { 
                 status: 200
             })

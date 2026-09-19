@@ -5,6 +5,7 @@ import { staticDataMiddleware } from "~/middleware/static";
 import * as developerRepository from "./developerRepository"
 import { LimitOffsetSchema } from "~/utils/zod";
 import { developerCreateSchema, developerEditSchema } from "./utils/zod";
+import { orphanedFileService } from "~/services/orphanedFileService";
 
 export const getDevelopersFn = createServerFn()
     .middleware([staticDataMiddleware])
@@ -30,8 +31,9 @@ export const createDeveloperFn = createServerFn({ method: "POST" })
     .middleware([adminOnlyMiddleware])
     .validator(developerCreateSchema)
     .handler(async ({ data }) => {
-        return await developerRepository.createDeveloper(data)
-        
+        const d = await developerRepository.createDeveloper(data)
+        orphanedFileService.removePendingUpload(data.logo)
+        return d;
     })
 
 export const editDeveloperFn = createServerFn({ method: "POST" })
@@ -39,6 +41,7 @@ export const editDeveloperFn = createServerFn({ method: "POST" })
     .validator(developerEditSchema)
     .handler(async ({ data }) => {
         const { developerId, ...rest } = data;
-        await developerRepository.editDeveloper(developerId, rest);        
+        await developerRepository.editDeveloper(developerId, rest);      
+        if (data.logo) orphanedFileService.removePendingUpload(data.logo)  
     })
 

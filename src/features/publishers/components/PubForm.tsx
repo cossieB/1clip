@@ -10,7 +10,7 @@ import { publisherQueryOpts, publishersQueryOpts } from "../utils/publisherQuery
 import { UploadBoxWithPreview } from "~/components/UploadBox/UploadBoxWithPreview";
 import { getPublisherFn, createPublisherFn, editPublisherFn } from "../publishersApi";
 import { useNavigate } from "@tanstack/solid-router";
-import { getLogoSignedUrls } from "~/serverFn/getSignedUrl";
+import { getLogoSignedUrls } from "~/integrations/storageService/serverFn";
 
 type Publisher = Awaited<ReturnType<typeof getPublisherFn>>
 

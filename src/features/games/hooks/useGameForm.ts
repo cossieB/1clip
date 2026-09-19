@@ -6,7 +6,7 @@ import { useToastContext } from "~/hooks/useToastContext"
 import { useUpload } from "~/hooks/useUpload"
 import * as gamesApi from "~/features/games/gamesApi"
 import { gamesQueryOpts, gamesWithExtrasQueryOpts } from "../utils/gameQueryOpts"
-import { getGamesSignedUrls } from "~/serverFn/getSignedUrl"
+import { getGamesSignedUrls } from "~/integrations/storageService/serverFn"
 
 export type Game = Awaited<ReturnType<typeof gamesApi.getGameFn>>
 

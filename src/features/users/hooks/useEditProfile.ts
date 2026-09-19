@@ -5,7 +5,7 @@ import { useAbortController } from "~/hooks/useAbortController";
 import { useToastContext } from "~/hooks/useToastContext";
 import { useUpload } from "~/hooks/useUpload";
 import { getLoggedInUser, updateCurrentUser } from "~/features/users/usersApi";
-import { getUsersSignedUrls } from "~/serverFn/getSignedUrl";
+import { getUsersSignedUrls } from "~/integrations/storageService/serverFn";
 
 export function useEditProfile(props: { user: Awaited<ReturnType<typeof getLoggedInUser>> }) {
     const updateUser = useServerFn(updateCurrentUser);

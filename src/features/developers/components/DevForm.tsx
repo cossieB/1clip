@@ -9,8 +9,8 @@ import { useMutation, useQueryClient } from "@tanstack/solid-query";
 import { useToastContext } from "~/hooks/useToastContext";
 import { developerQueryOpts, developersQueryOpts } from "../utils/developerQueryOpts";
 import { UploadBoxWithPreview } from "~/components/UploadBox/UploadBoxWithPreview";
-import { getLogoSignedUrls } from "~/serverFn/getSignedUrl";
 import { useNavigate } from "@tanstack/solid-router";
+import { getLogoSignedUrls } from "~/integrations/storageService/serverFn";
 
 type Developer = Awaited<ReturnType<typeof api.getDeveloperFn>>
 

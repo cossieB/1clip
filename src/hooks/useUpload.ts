@@ -3,7 +3,7 @@ import { createStore } from "solid-js/store";
 import { uploadToSignedUrl } from "~/utils/uploadToSignedUrl";
 import { useToastContext } from "./useToastContext";
 import { mergeObjectArrays } from "~/lib/zip";
-import { FileUploadSchema, SignedUrlResponse } from "~/integrations/uploadService/utils";
+import { FileUploadSchema, SignedUrlResponse } from "~/integrations/storageService/zod";
 
 export function useUpload(abortController?: AbortController) {
     const { addToast } = useToastContext()

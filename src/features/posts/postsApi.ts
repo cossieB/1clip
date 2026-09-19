@@ -13,10 +13,9 @@ import { parseVideoUrl } from "~/components/embeds/IframeFactory";
 import { notificationsService } from "~/integrations/notificationService";
 import { addNotification } from "~/features/notifications/notificationsRepository";
 import { generateUniqueFilename } from "~/utils/mediaSrc";
-import { fileExistsInR2, generateSignedUrl } from "~/integrations/uploadService/cloudflareUploadService.server";
+import { storageService } from "~/integrations/storageService/index.server";
 import { GetPostSchema, PostCreateSchema } from "./utils/zod";
-import { FileUploadSchema } from "~/integrations/uploadService/utils";
-
+import { orphanedFileService } from "~/services/orphanedFileService";
 
 export const createPostFn = createServerFn({ method: "POST" })
     .middleware([verifiedOnlyMiddleware])
@@ -49,13 +48,14 @@ export const createPostFn = createServerFn({ method: "POST" })
             media,
             pending: data.media.length > 0
         })
-        const urls = await Promise.all(media.map(obj => generateSignedUrl({
+        const urls = await Promise.all(media.map(obj => storageService.generateSignedUrl({
             ...obj,
             metadata: {
                 postid: post.postId.toString(),
                 userid: user.id
             }
         })));
+        await orphanedFileService.storePendingUploads(urls, user.id)
         return { post, urls }
     })
 
@@ -65,12 +65,14 @@ export const markPostUploadComplete = createServerFn({ method: "POST" })
     .handler(async ({ data }) => {
         const post = await postRepository.findById(data)
         if (!post) throw notFound();
-        const results = await Promise.all(post.media.map(media => fileExistsInR2(media.key)));
+        const results = await Promise.all(post.media.map(media => storageService.fileExists(media.key)));
         const allGood = results.every(r => r);
-        if (allGood)
+        if (allGood) {
             await postRepository.updatePost(data, {
                 pending: false
             })
+            // post.media.forEach(m => orphanedFileService.removePendingUpload(m.key))
+        }
         // TODO: add retries with bullmq
         return post
     })
