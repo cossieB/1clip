@@ -4,7 +4,7 @@ import { uploadToSignedUrl } from "~/utils/uploadToSignedUrl";
 import { useToastContext } from "./useToastContext";
 import { mergeObjectArrays } from "~/lib/zip";
 import { FileUploadSchema, SignedUrlResponse } from "~/integrations/storageService/zod";
-import { convertToWebP } from "~/utils/convertToWebp.client";
+import { convertToWebP } from "~/utils/convertToWebp";
 
 export function useUpload(abortController?: AbortController) {
     const { addToast } = useToastContext()

@@ -1,10 +1,13 @@
+import { createClientOnlyFn } from "@tanstack/solid-start";
+
 interface ConvertOptions {
     quality?: number;
     maxWidth?: number;
     maxHeight?: number;
 }
 
-export function convertToWebP(
+
+export const convertToWebP = createClientOnlyFn(function (
     file: File,
     quality: number = 0.9,
     maxWidth?: number,
@@ -64,4 +67,4 @@ export function convertToWebP(
             reject(err);
         };
     });
-}
+})

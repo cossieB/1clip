@@ -7,7 +7,7 @@ import { useAbortController } from "~/hooks/useAbortController"
 import { useUpload } from "~/hooks/useUpload"
 import { createPostFn, markPostUploadComplete } from "~/features/posts/postsApi"
 import { postQueryOpts, postsQueryOpts } from "../utils/postQueryOpts"
-import { convertToWebP } from "~/utils/convertToWebp.client"
+import { convertToWebP } from "~/utils/convertToWebp"
 
 export function useCreatePost() {
     const queryClient = useQueryClient()
