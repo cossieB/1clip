@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/solid-query'
 import { createFileRoute } from '@tanstack/solid-router'
 import { Suspense } from 'solid-js'
 import { PostList } from '~/features/posts/components/PostList'

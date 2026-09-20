@@ -12,7 +12,11 @@ type Options = {
 
 export class R2StorageService {
     private readonly client: S3Client;
-
+    private readonly protectedKeys = [
+            "users/default_banner.jpg",
+            "users/default_avatar.png",
+            "q.png",        
+        ];
     constructor(private readonly bucket: string) {
 
         this.client = new S3Client({
@@ -76,12 +80,7 @@ export class R2StorageService {
     }
 
     deleteObject = (key: string) => {
-        const protectedKeys = [
-            "users/default_banner.jpg",
-            "users/default_avatar.png",
-        ];
-
-        if (protectedKeys.includes(key)) {
+        if (this.protectedKeys.includes(key)) {
             return;
         }
 
@@ -111,6 +110,9 @@ export class R2StorageService {
         }
     }
     moveToDeletedBucket = async (key: string) => {
+        if (this.protectedKeys.includes(key)) {
+            return;
+        }        
         const destinationBucket = `${this.bucket}-deleted`;
 
         const copyCommand = new CopyObjectCommand({

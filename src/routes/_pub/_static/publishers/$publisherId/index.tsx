@@ -12,7 +12,7 @@ export const Route = createFileRoute('/_pub/_static/publishers/$publisherId/')({
     component: RouteComponent,
     loader: async ({ context, params}) => {
         if (Number.isNaN(params.publisherId)) throw notFound()
-        context.queryClient.ensureInfiniteQueryData(gamesWithExtrasQueryOpts({publisherId: params.publisherId}))
+        await context.queryClient.ensureInfiniteQueryData(gamesWithExtrasQueryOpts({publisherId: params.publisherId}))
         return await context.queryClient.ensureQueryData(publisherQueryOpts(params.publisherId))
     },
     head: ({ loaderData }) => ({

@@ -13,7 +13,7 @@ export const Route = createFileRoute('/_pub/_static/platforms/$platformId/')({
 
     loader: async ({ context, params }) => {
         if (Number.isNaN(params.platformId)) throw notFound()
-        context.queryClient.ensureInfiniteQueryData(gamesWithExtrasQueryOpts({platformId: params.platformId}))
+        await context.queryClient.ensureInfiniteQueryData(gamesWithExtrasQueryOpts({platformId: params.platformId}))
         return await context.queryClient.ensureQueryData(platformQueryOpts(params.platformId))
     },
     head: ({ loaderData }) => ({

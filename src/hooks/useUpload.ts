@@ -9,7 +9,7 @@ import { convertToWebP } from "~/utils/convertToWebp";
 export function useUpload(abortController?: AbortController) {
     const { addToast } = useToastContext()
     const [state, setState] = createStore({
-        isUploading: false,
+        isBusy: false,
         files: [] as {
             file: File,
             field: string,
@@ -19,33 +19,48 @@ export function useUpload(abortController?: AbortController) {
         }[]
     })
     async function convertFiles() {
-        await Promise.all(state.files.map(async (f, i) => {
-            if (!f.file.type.startsWith("image/")) return;
-            const convertedFile = await convertToWebP(f.file);
-            setState('files', i, 'convertedFile', convertedFile)
-        }))
+        setState({ isBusy: true })
+        try {
+            await Promise.allSettled(state.files.map(async (f, i) => {
+                if (!f.file.type.startsWith("image/")) return;
+                const convertedFile = await convertToWebP(f.file);
+                setState('files', i, 'convertedFile', convertedFile)
+            }))
+        }
+        catch (error) {
+            console.error(error)
+        }
+        finally {
+            setState({ isBusy: false })
+        }
     }
     async function getSignedUrls(getUrls: Fetcher<any, typeof FileUploadSchema, Promise<SignedUrlResponse>>, prefix?: string) {
         if (state.files.length == 0) return [];
-        
-        return await getUrls({
-            data: {
-                prefix,
-                files: state.files.map(f => ({
-                    contentLength: (f.convertedFile ?? f.file).size,
-                    contentType: (f.convertedFile ?? f.file).type,
-                    filename: (f.convertedFile ?? f.file).name,
-                    metadata: f.metadata
-                }))
-            },
-            signal: abortController?.signal
-        })
+        setState({ isBusy: true })
+        try {
+            return await getUrls({
+                data: {
+                    prefix,
+                    files: state.files.map(f => ({
+                        contentLength: (f.convertedFile ?? f.file).size,
+                        contentType: (f.convertedFile ?? f.file).type,
+                        filename: (f.convertedFile ?? f.file).name,
+                        metadata: f.metadata
+                    }))
+                },
+                signal: abortController?.signal
+            })
+        }
+        catch (error) {
+            console.error(error)
+            throw new Error("Could not create your post. Upload failed")
+        }
     }
 
     async function upload(urls: SignedUrlResponse) {
         try {
             if (state.files.length === 0) return [];
-            setState({ isUploading: true })
+            setState({ isBusy: true })
             if (urls.length != state.files.length)
                 throw addToast({ text: "Something went wrong. Please try again later", type: "error" })
 
@@ -59,10 +74,10 @@ export function useUpload(abortController?: AbortController) {
         }
         catch (error) {
             console.error(error)
-            throw error
+            throw new Error("Could not create your post. Upload failed")
         }
         finally {
-            setState({ isUploading: false })
+            setState({ isBusy: false })
         }
     }
 
@@ -79,7 +94,7 @@ export function useUpload(abortController?: AbortController) {
     return {
         upload,
         setFiles,
-        isUploading: () => state.isUploading,
+        isUploading: () => state.isBusy,
         files: () => state.files,
         getSignedUrls,
         convertFiles,

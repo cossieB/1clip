@@ -122,19 +122,18 @@ function SimilarGames(props: { gameId: number }) {
                 getPic={game => STORAGE_DOMAIN + game.cover}
                 getParam={game => ({ gameId: game.gameId })}
                 to="/games/$gameId"
-
             />
         </div>
     )
 }
 
 function ReleaseDate(props: { date: string }) {
-    const date = props.date.split(/[\-\/]/)
+    const date = () => props.date.split(/[\-\/]/)
     return (
         <div class={`${styles.date} cutout`}>
-            <span> {date[2]} </span>
-            <span> {new Date(2000, parseInt(date[1]) - 1, 1).toLocaleString('default', { month: 'long' })} </span>
-            <span> {date[0]} </span>
+            <span> {date()[2]} </span>
+            <span> {new Date(2000, parseInt(date()[1]) - 1, 1).toLocaleString('default', { month: 'long' })} </span>
+            <span> {date()[0]} </span>
         </div>
     )
 }

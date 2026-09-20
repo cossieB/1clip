@@ -75,11 +75,13 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'docker compose up -d && npx wait-on tcp:2345 && npx drizzle-kit push && npm run dev',
+    command: 'docker compose up -d && npx wait-on tcp:2345 && npx drizzle-kit push && npm run build && npm run start',
     url: 'http://localhost:1337',
     reuseExistingServer: !process.env.CI,
+    timeout: 180_000,
     env: {
       NODE_ENV: "test",
+      PORT: "1337",
       DATABASE_URL: "postgres://user:password@localhost:2345/tests",
       REDIS_URL: "redis://localhost:6378",
       BETTER_AUTH_SECRET: "01234567890123456789012345678901",

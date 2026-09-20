@@ -94,6 +94,9 @@ export const auth = betterAuth({
         database: {
             generateId: "uuid"
         },
+        ipAddress: {
+            ipAddressHeaders: ["cf-connecting-ip", "x-forwarded-for"]
+        }
     },
     databaseHooks: {
         user: {

@@ -7,7 +7,7 @@ import { getCurrentUser } from "../../serverFn/auth";
 import { AppError } from "~/utils/AppError.server";
 import { rateLimiter } from "~/utils/rateLimiter.server";
 import { HttpStatusCode } from "~/utils/statusCodes";
-import { getRequestIP } from "@tanstack/solid-start/server";
+import { getRequestHeader, getRequestIP } from "@tanstack/solid-start/server";
 import { redis } from "~/utils/redis.server";
 import { parseVideoUrl } from "~/components/embeds/IframeFactory";
 import { notificationsService } from "~/integrations/notificationService";
@@ -71,7 +71,7 @@ export const markPostUploadComplete = createServerFn({ method: "POST" })
             await postRepository.updatePost(data, {
                 pending: false
             })
-            // post.media.forEach(m => orphanedFileService.removePendingUpload(m.key))
+            post.media.forEach(m => orphanedFileService.removePendingUpload(m.key))
         }
         // TODO: add retries with bullmq
         return post
@@ -138,7 +138,7 @@ export const viewPostFn = createServerFn({ method: "POST" })
     .validator(z.array(z.number()))
     .handler(async ({ data }) => {
         if (data.length == 0) return
-        const ip = getRequestIP();
+        const ip = getRequestHeader("cf-connecting-ip") || getRequestHeader("X-Forwarded-For")
         const user = await getCurrentUser()
         if (!ip) return
         // Only count a view if user hasn't viewed the post within the past day

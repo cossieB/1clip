@@ -7,7 +7,6 @@ import { useAbortController } from "~/hooks/useAbortController"
 import { useUpload } from "~/hooks/useUpload"
 import { createPostFn, markPostUploadComplete } from "~/features/posts/postsApi"
 import { postQueryOpts, postsQueryOpts } from "../utils/postQueryOpts"
-import { convertToWebP } from "~/utils/convertToWebp"
 
 export function useCreatePost() {
     const queryClient = useQueryClient()
@@ -35,7 +34,7 @@ export function useCreatePost() {
     async function handleSubmit(e: SubmitEvent) {
         const { game, ...rest } = input
         e.preventDefault();
-        try {
+        try {            
             await convertFiles()
             const response = await mutation.mutateAsync({
                 data: {

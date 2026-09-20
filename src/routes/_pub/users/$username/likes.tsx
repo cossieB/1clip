@@ -6,7 +6,7 @@ import { postsQueryOpts } from '~/features/posts/utils/postQueryOpts'
 export const Route = createFileRoute('/_pub/users/$username/likes')({
     component: RouteComponent,
     loader: async ({context, params: {username}}) => {
-        context.queryClient.ensureInfiniteQueryData(postsQueryOpts({likerUsername: username}))
+        await context.queryClient.ensureInfiniteQueryData(postsQueryOpts({likerUsername: username}))
     }
 })
 

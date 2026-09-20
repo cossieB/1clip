@@ -114,7 +114,7 @@ export function GameForm(props: { game?: Game }) {
                         audio: true
                     }}
                     limit={Infinity}
-                    maxSize={4}
+                    maxSize={8}
                 />
             </div>
             <div class={styles.screenshots}>
