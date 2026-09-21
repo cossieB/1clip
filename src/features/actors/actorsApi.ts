@@ -43,11 +43,11 @@ export const editActorFn = createServerFn({ method: "POST" })
     .middleware([adminOnlyMiddleware])
     .validator(actorEditSchema)
     .handler(async ({ data }) => {
-        const { actorId, characters, ...actor } = data        
-        const [old] = await actorRepository.editActor(actorId, actor, characters)
+        const { actorId, characters, ...actor } = data
+        const [old] = await actorRepository.editActor(actorId, actor, characters);
         if (data.photo) {
-            orphanedFileService.removePendingUpload(data.photo)
-            old.oldPhoto && storageService.moveToDeletedBucket(old.oldPhoto)
+            orphanedFileService.removePendingUpload(data.photo);
+            (old.oldPhoto && data.photo !== old.oldPhoto) && storageService.moveToDeletedBucket(old.oldPhoto)
         }
     })
 

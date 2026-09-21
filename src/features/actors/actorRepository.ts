@@ -50,8 +50,15 @@ export async function editActor(actorId: number, actor: Partial<InferSelectModel
             await tx.insert(gameActors).values(characters.map(char => ({
                 actorId,
                 gameId: char.gameId,
-                character: char.character
-            }))).onConflictDoNothing()
+                character: char.character,
+                roleType: char.roleType
+            }))).onConflictDoUpdate({
+                target: [gameActors.gameId, gameActors.actorId],
+                set: {
+                    character: sql`EXCLUDED.${gameActors.character.name}`,
+                    roleType: sql`EXCLUDED.${gameActors.roleType.name}`
+                }
+            })
         }
         return a
     })

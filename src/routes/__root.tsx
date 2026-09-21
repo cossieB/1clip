@@ -19,6 +19,7 @@ import { ToastProvider } from '~/components/Toast/ToastProvider'
 import z from 'zod'
 import { useToastContext } from '~/hooks/useToastContext'
 import { getCurrentUser } from '~/serverFn/auth'
+import { trackVisit } from '~/utils/trackVisits'
 
 export const Route = createRootRouteWithContext<{
     queryClient: QueryClient
@@ -81,18 +82,20 @@ export const Route = createRootRouteWithContext<{
             autoFade: z.boolean().optional().default(true).catch(true)
         })).optional().catch(undefined)
     }),
-    beforeLoad: async ({context}) => {
-        const user = await getCurrentUser()
-        return {user}
-    },    
+    beforeLoad: async ({ context }) => {
+        trackVisit().catch(() => { })
+
+        const user = await getCurrentUser();
+        return { user }
+    },
 })
 
 function RootComponent() {
     return (
-        <ToastProvider>            
+        <ToastProvider>
             <RootDocument>
                 <Outlet />
-            </RootDocument>            
+            </RootDocument>
         </ToastProvider>
     )
 }

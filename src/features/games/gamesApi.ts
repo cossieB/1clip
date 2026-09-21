@@ -36,7 +36,7 @@ export const createGameFn = createServerFn({ method: "POST" })
     .validator(GameCreateSchema)
     .handler(async ({ data }) => {
         const { platforms, genres, ...game } = data;
-        return await gamesRepository.createGame(game, { platforms, media: [], genres })        
+        return await gamesRepository.createGame(game, { platforms, media: [], genres })
     })
 
 export const updateGameFn = createServerFn({ method: "POST" })
@@ -46,13 +46,14 @@ export const updateGameFn = createServerFn({ method: "POST" })
         const { gameId, media, platforms, genres, ...game } = data
         const [old] = await gamesRepository.updateGame(gameId, game, { platforms, media, genres })
         if (data.cover) {
-            orphanedFileService.removePendingUpload(data.cover)
-            storageService.moveToDeletedBucket(old.oldCover)
+            orphanedFileService.removePendingUpload(data.cover);
+            (data.cover != old.oldCover) && storageService.moveToDeletedBucket(old.oldCover)
         }
         if (data.banner) {
-            orphanedFileService.removePendingUpload(data.banner)
-            storageService.moveToDeletedBucket(old.oldBanner)
+            orphanedFileService.removePendingUpload(data.banner);
+            (data.banner != old.oldBanner) && storageService.moveToDeletedBucket(old.oldBanner)
         }
+
     })
 
 export const getGamesWithoutExtras = createServerFn()

@@ -44,8 +44,8 @@ export const editDeveloperFn = createServerFn({ method: "POST" })
         const { developerId, ...rest } = data;
         const [old] = await developerRepository.editDeveloper(developerId, rest);      
         if (data.logo) {
-            orphanedFileService.removePendingUpload(data.logo)
-            storageService.moveToDeletedBucket(old.oldLogo)
+            orphanedFileService.removePendingUpload(data.logo);
+            (data.logo != old.oldLogo) && storageService.moveToDeletedBucket(old.oldLogo)
         }
     })
 

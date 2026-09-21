@@ -1,12 +1,13 @@
 import { createStart, createMiddleware, createCsrfMiddleware } from "@tanstack/solid-start";
 import { getResponseHeaders, setResponseHeader, setResponseHeaders } from "@tanstack/solid-start/server";
 import { randomBytes } from "node:crypto";
+import { redis } from "./utils/redis.server";
 
 const csrfMiddleware = createCsrfMiddleware({
     filter: (ctx) => ctx.handlerType === 'serverFn',
 })
 
-const secureHeadersMiddleware = createMiddleware().server(async ({ next }) => {
+const secureHeadersMiddleware = createMiddleware().server(async ({ next, request }) => {
     const nonce = randomBytes(16).toString("base64");
     const csp = [
         "frame-ancestors 'none'",
@@ -32,7 +33,6 @@ const secureHeadersMiddleware = createMiddleware().server(async ({ next }) => {
         'Strict-Transport-Security': 'max-age=31536000;',
         'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
     }
-    
     setResponseHeaders(new Headers(headers))
     return next()
 })
