@@ -11,12 +11,12 @@ const secureHeadersMiddleware = createMiddleware().server(async ({ next, request
     const nonce = randomBytes(16).toString("base64");
     const csp = [
         "frame-ancestors 'none'",
-        "default-src 'self'",
+        // "default-src 'self'",
         "img-src 'self' https://r2.cossie.dev blob: ",
         "media-src 'self' https://r2.cossie.dev blob: ",
         "connect-src 'self' https://clipz.c04b0b5f451d987b5b3194601eec018a.r2.cloudflarestorage.com https://r2.cossie.dev",
         "object-src 'none'",
-        `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-eval'`,
+        // `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-eval'`,
         `style-src 'self' https://fonts.googleapis.com 'unsafe-inline'`,
         `frame-src 'self' https://www.youtube.com https://*.twitch.tv https://youtube-nocookie.com`, 
         "font-src 'self' https://fonts.gstatic.com",
@@ -26,7 +26,7 @@ const secureHeadersMiddleware = createMiddleware().server(async ({ next, request
     ]
 
     const headers = {
-        // "Content-Security-Policy": csp.join("; ") + ";",
+        "Content-Security-Policy": csp.join("; ") + ";",
         'X-Frame-Options': 'DENY',
         'X-Content-Type-Options': 'nosniff',
         'Referrer-Policy': 'strict-origin-when-cross-origin',
@@ -34,7 +34,11 @@ const secureHeadersMiddleware = createMiddleware().server(async ({ next, request
         'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
     }
     setResponseHeaders(new Headers(headers))
-    return next()
+    const result = await next();
+    for (const [key, val] of Object.entries(headers)) 
+        result.response.headers.set(key, val)
+
+    return result
 })
 
 export const startInstance = createStart(() => {

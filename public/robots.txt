@@ -1,0 +1,25 @@
+User-agent: *
+Allow: /
+
+User-agent: OAI-SearchBot
+User-agent: Claude-SearchBot
+User-agent: PerplexityBot
+Allow: /
+
+# Block AI scrapers, LLM training crawlers, and AI agents
+User-agent: GPTBot
+User-agent: ChatGPT-User
+User-agent: OAI-SearchBot
+User-agent: ClaudeBot
+User-agent: Claude-Web
+User-agent: Google-Extended
+User-agent: CCBot
+User-agent: Bytespider
+User-agent: PerplexityBot
+User-agent: Diffbot
+User-agent: cohere-ai
+User-agent: Omgilibot
+User-agent: FacebookBot
+Disallow: /
+
+Sitemap: https://1clip.cossie.dev/sitemap.xml

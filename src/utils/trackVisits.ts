@@ -5,7 +5,7 @@ import { getRequest } from "@tanstack/solid-start/server"
 const TTL_SECONDS = 60 * 60 * 24 * 90
 const COOLDOWN_SECONDS = 60 * 30
 
-export const trackVisit = createServerFn().handler(async () => {console.log("HERE")
+export const trackVisit = createServerFn().handler(async () => {
     const request = getRequest()
     const h = request.headers
     const ip = h.get('cf-connecting-ip') ?? 'unknown'
