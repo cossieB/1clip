@@ -1,3 +1,7 @@
+.container {
+    position: relative;
+}
+
 .imgs {
     display: grid;
     grid-template-columns: 1fr 1fr;

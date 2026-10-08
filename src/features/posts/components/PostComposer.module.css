@@ -1,0 +1,62 @@
+.container {
+    position: relative;
+    width: 100%;
+    height: 10rem;
+    margin: 0 auto;
+    --highlightClr: var(--neon-green);
+    scrollbar-width: none;
+
+    * {
+        scrollbar-width: none;
+    }
+}
+
+/* Base styles shared across both elements to guarantee pixel-perfect text alignment */
+.backdrop,
+.textarea {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 1rem;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    margin: 0;
+    box-sizing: border-box;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.backdrop {
+    overflow: hidden;
+    color: #d0d2d4;
+    /* Transparent border matches textarea's default border width */
+    border: 1px solid transparent;
+    z-index: 0;
+}
+
+.textarea {
+    resize: none;
+    background-color: transparent;
+    color: transparent;
+    caret-color: white;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    outline: none;
+    overflow-y: auto;
+    z-index: 10;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.textarea:focus {
+    border-color: var(--highlightClr);
+    box-shadow: 0 0 0 1px var(--highlightClr);
+}
+
+/* Highlight style passed dynamically into innerHTML */
+.highlight {
+    color: var(--highlightClr);
+}

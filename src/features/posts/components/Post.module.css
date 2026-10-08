@@ -26,6 +26,11 @@
     button {
         padding: 0.5rem;
     }
+
+    a:not(.a) {
+        color: var(--neon-green);
+        position: relative;
+    }
 }
 
 .user {

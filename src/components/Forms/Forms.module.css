@@ -1,5 +1,6 @@
 .form {
-    padding-top: 0.5rem;
+    padding-top: 2rem;
+    gap: 1.25rem;
     width: min(90%, 800px);
     background-color: #00000050;
     border-radius: .5rem;
@@ -52,7 +53,6 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    margin: 0.75rem 0;
     width: min(90%, 600px);
 
     label {

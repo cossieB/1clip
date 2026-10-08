@@ -1,5 +1,5 @@
 import { getPostFn } from '~/features/posts/postsApi'
-import { For, Show } from 'solid-js'
+import { For, JSX, Show } from 'solid-js'
 import { EllipsisVerticalIcon, EyeIcon, MessageCircleIcon, ThumbsDownIcon, ThumbsUpIcon } from 'lucide-solid'
 import { getRelativeTime } from '~/lib/getRelativeTime'
 import { formatDate } from '~/lib/formatDate'
@@ -14,6 +14,7 @@ import { IframeFactory } from '~/components/embeds/IframeFactory'
 import { PostAuthor } from './PostAuthor'
 import styles from "./Post.module.css"
 import { ConfirmDialog } from '~/components/Popover/Confirm'
+import { PostContent } from './PostContent'
 
 type Props = {
     post: Awaited<ReturnType<typeof getPostFn>>
@@ -26,7 +27,7 @@ export function PostBlock(props: Props) {
 
     return (
         <div data-type="post" data-postId={props.post.postId} class={styles.postContainer}>
-            <PostAuthor 
+            <PostAuthor
                 entityId={props.post.postId}
                 user={props.post.user}
                 class={styles.user}
@@ -37,7 +38,7 @@ export function PostBlock(props: Props) {
                     <span title={formatDate(props.post.createdAt)}>
                         {getRelativeTime(props.post.createdAt)}
                     </span>
-                    <button  popoverTarget={'post-popover-' + props.post.postId}>
+                    <button popoverTarget={'post-popover-' + props.post.postId}>
                         <EllipsisVerticalIcon />
                     </button>
                 </div>
@@ -56,7 +57,7 @@ export function PostBlock(props: Props) {
                         <IframeFactory link={props.post.link!} />
                     </div>
                 </Show>
-                <div class={styles.main} innerHTML={props.post.text} />
+                <PostContent content={props.post.text} />
                 <Show when={props.post.tags.length > 0}>
                     <div class={styles.tags} >
                         <For each={props.post.tags}>
