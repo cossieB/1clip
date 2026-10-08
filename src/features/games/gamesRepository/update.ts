@@ -1,6 +1,6 @@
 import { and, eq, InferSelectModel, notInArray, sql } from "drizzle-orm";
 import { db } from "~/drizzle/db";
-import { gamePlatforms, gameGenres, media, games } from "~/drizzle/schema/schema";
+import { gamePlatforms, gameGenres, media, games, genres } from "~/drizzle/schema/schema";
 import { type GameInsert } from "./types";
 
 export async function updateGame(gameId: number, game: Partial<InferSelectModel<typeof games>>, other: Partial<GameInsert>) {
@@ -36,6 +36,10 @@ export async function updateGame(gameId: number, game: Partial<InferSelectModel<
             if (other.genres.length == 0)
                 await tx.delete(gameGenres).where(eq(gameGenres.gameId, gameId))
             else {
+                await tx.insert(genres)
+                    .values(other.genres.map(name => ({
+                        name
+                    })))
                 await tx.delete(gameGenres)
                     .where(
                         and(

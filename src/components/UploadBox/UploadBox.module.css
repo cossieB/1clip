@@ -5,6 +5,9 @@
     justify-content: center;
     position: relative;
     border: dotted 1px gray;
+    transition: 
+        border-color 200ms ease,
+        background-color 200ms ease;
 
     label {
         position: absolute;
@@ -18,7 +21,18 @@
 
     &.dragover {
         z-index: 5;
-        background-color: #3d3a3a;
+        background-color: color-mix(in oklab, var(--neon-green) 50%, black 50%);
+        border-color: var(--neon-green);
+    }
+
+    input {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        opacity: 0;
+    }
+    &:hover {
+        color: var(--neon-green);
     }
 }
 

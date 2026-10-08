@@ -23,7 +23,7 @@ export function UploadBox(props: P) {
     const objectUrls: string[] = []
 
     const accepts = Object.entries(props.accept).reduce((acc, curr) => {
-        const [type, bool] = curr 
+        const [type, bool] = curr
         if (bool) return [...acc, type + "/*"]
         return acc
     }, [] as string[])
@@ -72,9 +72,7 @@ export function UploadBox(props: P) {
             }}
         >
             <label>{props.label}</label>
-            <button style={{ "all": "unset" }} type="button" onclick={() => inputRef.click()} >
-                <UploadIcon />
-            </button>
+            <UploadIcon />
             <span>MAX: {props.maxSize} MB</span>
             <span>
                 {Object.entries(props.accept).reduce((acc, [key, bool]) => {
@@ -87,7 +85,6 @@ export function UploadBox(props: P) {
             <input
                 ref={inputRef}
                 type="file"
-                hidden
                 accept={accepts.join(",")}
                 multiple={props.limit > 1}
                 onchange={e => {
