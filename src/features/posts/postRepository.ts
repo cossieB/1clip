@@ -182,15 +182,6 @@ function detailedPosts(obj: Args = { filters: [], limit: 1 }, userId?: string) {
             .groupBy(media.postId)
     )
 
-    const tagsQuery = db.$with("tq").as(
-        db.select({
-            postId: postTags.postId,
-            tags: sql`ARRAY_AGG(tag_name)`.as("tags")
-        })
-            .from(postTags)
-            .groupBy(postTags.postId)
-    )
-
     const reactionQuery = db.$with("rq").as(
         db.select({
             postId: postReactions.postId,
@@ -219,10 +210,9 @@ function detailedPosts(obj: Args = { filters: [], limit: 1 }, userId?: string) {
             .where(eq(postReactions.userId, userId!))
     )
     const { searchVector, ...columns } = getColumns(posts)
-    const query = db.with(mediaQuery, tagsQuery, reactionQuery, commentsQuery, userReactionQuery).select({
+    const query = db.with(mediaQuery, reactionQuery, commentsQuery, userReactionQuery).select({
         ...columns,
         media: sql<{ key: string, contentType: string }[]>`COALESCE(${mediaQuery.media}, '[]'::JSONB)`,
-        tags: sql<string[]>`COALESCE(${tagsQuery.tags}, '{}')`,
         user: {
             id: users.id,
             displayName: users.displayName,
@@ -251,7 +241,6 @@ function detailedPosts(obj: Args = { filters: [], limit: 1 }, userId?: string) {
         .from(posts)
         .innerJoin(users, eq(posts.userId, users.id))
         .leftJoin(mediaQuery, eq(posts.postId, mediaQuery.postId))
-        .leftJoin(tagsQuery, eq(posts.postId, tagsQuery.postId))
         .leftJoin(reactionQuery, eq(posts.postId, reactionQuery.postId))
         .leftJoin(commentsQuery, eq(posts.postId, commentsQuery.postId))
         .leftJoin(games, eq(posts.gameId, games.gameId))

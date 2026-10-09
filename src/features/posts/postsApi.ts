@@ -9,7 +9,6 @@ import { rateLimiter } from "~/utils/rateLimiter.server";
 import { HttpStatusCode } from "~/utils/statusCodes";
 import { getRequestHeader } from "@tanstack/solid-start/server";
 import { redis } from "~/utils/redis.server";
-import { notificationsService } from "~/integrations/notificationService";
 import { generateUniqueFilename } from "~/utils/mediaSrc";
 import { storageService } from "~/integrations/storageService/index.server";
 import { GetPostSchema, PostCreateSchema } from "./utils/zod";
@@ -54,7 +53,9 @@ export const createPostFn = createServerFn({ method: "POST" })
         })));
         await orphanedFileService.storePendingUploads(urls, user.id)
         if (mentions.length > 0)
-            addNotification(mentions.map(username => ({ username: username.toLowerCase() })), {
+            addNotification(
+            mentions.map(username => ({ username: username.toLowerCase() })).filter(u => u.username != user.username), 
+            {
                 actionUrl: `/posts/${post.postId}`,
                 createdAt: post.createdAt,
                 type: "MENTION",

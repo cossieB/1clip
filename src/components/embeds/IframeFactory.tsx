@@ -1,7 +1,6 @@
 import { createEffect, Match, Setter, Switch } from "solid-js"
 import { validateUrl } from "~/lib/validateUrl"
-import { YouTubeIframe } from "./YoutubeIframe"
-import { TwitchIframe } from "./TwitchIframe"
+import { TwitchIframe, YouTubeIframe } from "./iframes"
 
 type Props = {
     link: string
@@ -17,7 +16,7 @@ export function IframeFactory(props: Props) {
 
     createEffect(() => {
         if (!res()) props.setError?.(true)
-    })    
+    })
 
     return (
         <Switch>
@@ -30,7 +29,9 @@ export function IframeFactory(props: Props) {
             <Match when={res()?.[0] === "twitch"}>
                 <TwitchIframe slug={res()![1]} />
             </Match>
-
+            {/* <Match when={res()?.[0] === "tiktok"}>
+                <TikTokIframe slug={res()![1]} />
+            </Match> */}
             {/* Default case */}
             <Match when={true}>
                 <div style={{ color: "red" }}>
@@ -61,7 +62,7 @@ export function parseVideoUrl(url: URL) {
     }
 
     // Handle www.twitch.tv/{user}/clip/{slug}
-    if (url.hostname.includes('twitch.tv')) {
+    if (url.hostname === 'twitch.tv' || url.hostname.endsWith('.twitch.tv')) {
         const clipIndex = pathSegments.indexOf('clip');
         if (clipIndex !== -1 && pathSegments[clipIndex + 1]) {
             return ["twitch", pathSegments[clipIndex + 1]] as const;
@@ -93,5 +94,20 @@ export function parseVideoUrl(url: URL) {
 
         return null
     }
+    // if (url.hostname === 'tiktok.com' || url.hostname.endsWith('.tiktok.com')) {
+    //     // www.tiktok.com/@user/video/{ID}
+    //     const videoIndex = pathSegments.indexOf('video');
+    //     if (videoIndex !== -1 && /^\d+$/.test(pathSegments[videoIndex + 1] ?? "")) {
+    //         return ["tiktok", pathSegments[videoIndex + 1]] as const;
+    //     }
+
+    //     // www.tiktok.com/embed/{ID} or www.tiktok.com/embed/v2/{ID}
+    //     if (pathSegments[0] === 'embed') {
+    //         const id = pathSegments[pathSegments.length - 1];
+    //         if (/^\d+$/.test(id)) return ["tiktok", id] as const;
+    //     }
+
+    //     return null
+    // }
     return null
 }

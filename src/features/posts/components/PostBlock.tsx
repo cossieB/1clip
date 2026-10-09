@@ -15,6 +15,7 @@ import { PostAuthor } from './PostAuthor'
 import styles from "./Post.module.css"
 import { ConfirmDialog } from '~/components/Popover/Confirm'
 import { PostContent } from './PostContent'
+import { extractFirstVideo, extractTokens } from '../utils/parsePost'
 
 type Props = {
     post: Awaited<ReturnType<typeof getPostFn>>
@@ -24,6 +25,7 @@ export function PostBlock(props: Props) {
     const session = authClient.useSession()
     const { fn, isPending } = useReactToPost(props.post)
     const { deleteMutation } = useDeletePost(props.post)
+    const link = () => extractFirstVideo(props.post.text)
 
     return (
         <div data-type="post" data-postId={props.post.postId} class={styles.postContainer}>
@@ -52,23 +54,12 @@ export function PostBlock(props: Props) {
                         showPrevBtn
                     />
                 </Show>
-                <Show when={props.post.link}>
+                <Show when={link()}>
                     <div class={styles.iframe}>
-                        <IframeFactory link={props.post.link!} />
+                        <IframeFactory link={link()!.url} />
                     </div>
                 </Show>
                 <PostContent content={props.post.text} />
-                <Show when={props.post.tags.length > 0}>
-                    <div class={styles.tags} >
-                        <For each={props.post.tags}>
-                            {tag =>
-                                <div class="cutout">
-                                    {tag}
-                                    <Link to='/posts/tags/$tag' params={{ tag }} />
-                                </div>}
-                        </For>
-                    </div>
-                </Show>
                 <Show when={props.post.gameId}>
                     <div class={styles.game}>
                         <img src={STORAGE_DOMAIN + props.post.game?.cover} alt="" />
