@@ -8,7 +8,7 @@ import { HttpStatusCode } from "~/utils/statusCodes";
 import { notificationsService } from "~/integrations/notificationService";
 import { redirect } from "@tanstack/solid-router";
 import { getCurrentUser } from "~/serverFn/auth";
-import { addNotification } from "~/features/notifications/notificationsRepository";
+import { addNotification } from "../notifications/addNotification";
 
 export const addCommentFn = createServerFn({ method: "POST" })
     .middleware([verifiedOnlyMiddleware])
@@ -32,8 +32,7 @@ export const addCommentFn = createServerFn({ method: "POST" })
         let link = `/posts/${data.originalPost}/${result.commentId}`
         
         if (notifyee && user.id !== notifyee) {
-            await addNotification({
-                recipientId: notifyee,
+            await addNotification([{userId: notifyee,}],{                
                 actionUrl: link,
                 sourceUserId: user.id,
                 type: "REPLY",
@@ -42,7 +41,6 @@ export const addCommentFn = createServerFn({ method: "POST" })
                 entityType: data.replyTo ? "comment" : "post",
                 entityId: data.replyTo ?? data.originalPost                
             })
-            notificationsService.publish(notifyee)
         }
 
         return result

@@ -143,10 +143,11 @@ export function calculateXP(userId: string) {
     return db
         .with(cte)
         .select({
-            userId: cte.userId,
-            reputation: sql<number>`SUM(${cte.score})::INT`
+            userId: users.id,
+            reputation: sql<number>`COALESCE(SUM(${cte.score}), 0)::INT`
         })
-        .from(cte)
-        .groupBy(cte.userId)
-        .where(eq(cte.userId, userId))
+        .from(users)
+        .leftJoin(cte, eq(cte.userId, users.id))
+        .where(eq(users.id, userId))
+        .groupBy(users.id)
 }

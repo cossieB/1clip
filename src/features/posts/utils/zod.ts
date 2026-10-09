@@ -10,9 +10,7 @@ export const PostCreateSchema = z.object({
         filename: z.string(),
         metadata: z.record(z.string(), z.string()).optional()
     })),
-    tags: z.string().toLowerCase().array(),
     gameId: z.number().optional(),
-    link: z.url().optional().catch(undefined)
 });
 
 export const GetPostSchema = z.object({

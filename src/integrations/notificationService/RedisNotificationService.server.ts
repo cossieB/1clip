@@ -1,5 +1,4 @@
 import { redis } from "~/utils/redis.server";
-import type { RedisClientType } from "redis";
 
 export class RedisNotificationService {
 

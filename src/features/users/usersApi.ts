@@ -9,9 +9,9 @@ import { HttpStatusCode } from "~/utils/statusCodes";
 import { notificationsService } from "~/integrations/notificationService";
 import { cacheAside } from "~/utils/cacheAside.server";
 import { getRank } from "~/utils/getRank";
-import { addNotification } from "~/features/notifications/notificationsRepository";
 import { storageService } from "~/integrations/storageService/index.server";
 import { orphanedFileService } from "~/services/orphanedFileService";
+import { addNotification } from "../notifications/addNotification";
 
 export const getLoggedInUser = createServerFn()
     .handler(async () => {
@@ -88,15 +88,13 @@ export const followUserFn = createServerFn({ method: "POST" })
         const res = await userRepository.followUser(user.id, data)
         const success = res.rowCount === 1
         if (success) {
-            await addNotification({
-                recipientId: data,
+            await addNotification([{userId: data}], {
                 actionUrl: "/users/" + user.username,
                 type: "FOLLOW",
                 title: `You have a new follower!`,
                 message: `${user.displayUsername} has followed you.`,
                 sourceUserId: user.id,
             })
-            notificationsService.publish(data)
         }
         return success
     })

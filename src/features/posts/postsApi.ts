@@ -7,15 +7,15 @@ import { getCurrentUser } from "../../serverFn/auth";
 import { AppError } from "~/utils/AppError.server";
 import { rateLimiter } from "~/utils/rateLimiter.server";
 import { HttpStatusCode } from "~/utils/statusCodes";
-import { getRequestHeader, getRequestIP } from "@tanstack/solid-start/server";
+import { getRequestHeader } from "@tanstack/solid-start/server";
 import { redis } from "~/utils/redis.server";
-import { parseVideoUrl } from "~/components/embeds/IframeFactory";
 import { notificationsService } from "~/integrations/notificationService";
-import { addNotification } from "~/features/notifications/notificationsRepository";
 import { generateUniqueFilename } from "~/utils/mediaSrc";
 import { storageService } from "~/integrations/storageService/index.server";
 import { GetPostSchema, PostCreateSchema } from "./utils/zod";
 import { orphanedFileService } from "~/services/orphanedFileService";
+import { extractTokens } from "./utils/parsePost";
+import { addNotification } from "../notifications/addNotification";
 
 export const createPostFn = createServerFn({ method: "POST" })
     .middleware([verifiedOnlyMiddleware])
@@ -23,14 +23,10 @@ export const createPostFn = createServerFn({ method: "POST" })
     .handler(async ({ data, context: { user } }) => {
         await rateLimiter("post:create", user.id, 5, 60);
 
-        if ((data.text.length + data.media.length === 0) && !data.link)
+        if (data.text.length + data.media.length === 0)
             throw new AppError("Empty post", HttpStatusCode.BAD_REQUEST)
 
-        if (data.link && !parseVideoUrl(new URL(data.link)))
-            throw new AppError("Unsupported link", HttpStatusCode.BAD_REQUEST)
-
-        if (data.media.length > 0)
-            delete data.link
+        const { hashtags, mentions } = extractTokens(data.text)
 
         const media = data.media.map(x => {
             const filename = generateUniqueFilename(x.filename)
@@ -46,7 +42,8 @@ export const createPostFn = createServerFn({ method: "POST" })
             ...data,
             userId: user.id,
             media,
-            pending: data.media.length > 0
+            pending: data.media.length > 0,
+            tags: hashtags.map(tag => tag.toLowerCase())
         })
         const urls = await Promise.all(media.map(obj => storageService.generateSignedUrl({
             ...obj,
@@ -56,6 +53,17 @@ export const createPostFn = createServerFn({ method: "POST" })
             }
         })));
         await orphanedFileService.storePendingUploads(urls, user.id)
+        if (mentions.length > 0)
+            addNotification(mentions.map(username => ({ username: username.toLowerCase() })), {
+                actionUrl: `/posts/${post.postId}`,
+                createdAt: post.createdAt,
+                type: "MENTION",
+                sourceUserId: user.id,
+                title: `${user.username} mentioned you`,
+                message: post.text.slice(0, 20),
+                entityId: post.postId,
+                entityType: "post"
+            })
         return { post, urls }
     })
 
@@ -109,8 +117,7 @@ export const reactToPostFn = createServerFn({ method: "POST" })
         const res = await postRepository.reactToPost(data.postId, user.id, data.reaction)
 
         if (user.id != data.authorId && res.rows.at(0)?.reaction === "like") {
-            await addNotification({
-                recipientId: data.authorId,
+            await addNotification([{ userId: data.authorId }], {
                 actionUrl: "/posts/" + data.postId,
                 type: "LIKE",
                 title: "You got a like",
@@ -119,7 +126,6 @@ export const reactToPostFn = createServerFn({ method: "POST" })
                 entityId: data.postId,
                 sourceUserId: user.id
             })
-            void notificationsService.publish(data.authorId)
         }
     })
 

@@ -3,9 +3,9 @@ import { db } from "~/drizzle/db";
 import { notifications } from "~/drizzle/schema";
 import { sql, gt } from "drizzle-orm";
 
-export async function addNotification(notification: InferInsertModel<typeof notifications>) {
-    const [insert] = await db.insert(notifications).values(notification).returning();
-    return insert
+export async function createNotification(notification: InferInsertModel<typeof notifications> | InferInsertModel<typeof notifications>[]) {
+    // @ts-expect-error
+    return await db.insert(notifications).values(notification).returning();
 }
 
 export function getNotifications(filter: { userId: string }) {

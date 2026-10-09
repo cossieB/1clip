@@ -40,7 +40,7 @@ export function CreatePostPage() {
                     maxLength={30}
                 />
                 <UploadBox
-                    label=''
+                    label='Media'
                     maxSize={8}
                     onSuccess={async (array) => {
                         setFiles((prev) => [...prev, ...array.map(x => ({ field: "media", ...x }))].slice(0, 4))
