@@ -6,10 +6,7 @@ import styles from "./SearchGames.module.css"
 import { getGamesWithoutExtras } from "~/features/games/gamesApi"
 import { debounce } from "~/lib/debounce"
  
-type GetGamesReturnType = {
-    title: string,
-    gameId: number
-}[]
+type GetGamesReturnType = Awaited<ReturnType<typeof getGamesWithoutExtras>>
  
 type Game = GetGamesReturnType[number]
  
@@ -39,7 +36,7 @@ export function SearchGames(props: SearchGamesProps) {
         queryFn: () => getGamesWithoutExtras({ data: searchQuery(), signal: abortController.signal })
     }))
  
-    const games = (): GetGamesReturnType => searchResults.data ?? []
+    const games = () => searchResults.data ?? []
     const activeGame = () => games()[activeIndex()]
  
     const showPanel = () => isOpen() && inputValue().trim() !== ""
@@ -106,8 +103,8 @@ export function SearchGames(props: SearchGamesProps) {
     }
  
     return (
-        <div class={styles.root}>
-            <div class={styles.field}>
+        <div class={styles.root} >
+            <div class={styles.field} style={{"anchor-name": "--sg-root"}}>
                 <input
                     class={styles.input}
                     type="search"
@@ -124,6 +121,7 @@ export function SearchGames(props: SearchGamesProps) {
                     onKeyDown={handleKeyDown}
                     onFocus={() => setIsOpen(true)}
                     onBlur={() => setIsOpen(false)}
+                    
                 />
             </div>
  

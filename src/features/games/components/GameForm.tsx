@@ -13,6 +13,7 @@ import { Game, MediaField, useGameForm } from "../hooks/useGameForm";
 import styles from "./GameForm.module.css"
 import { IframeFactory } from "~/components/embeds/IframeFactory";
 import { produce } from "solid-js/store";
+import { TagSelector } from "./TagSelector";
 
 export function GameForm(props: { game?: Game }) {
     const {
@@ -191,10 +192,9 @@ export function GameForm(props: { game?: Game }) {
             <Show when={game.trailer}>
                 <IframeFactory link={game.trailer!} />
             </Show>
-            <Form.TagsInput
-                setTags={tags => setGame('genres', tags)}
-                tags={() => game.genres}
-                label="Genres"
+            <TagSelector
+                genres={game.genres}
+                onUpdate={genres => setGame({genres})}
             />
         </Form>
     )

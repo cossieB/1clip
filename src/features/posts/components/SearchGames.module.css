@@ -6,10 +6,8 @@
   --sg-hover: #eef0f5;
   --sg-focus: #3b5bdb;
   --sg-shadow: 0 8px 24px rgb(20 22 30 / 0.12);
- 
   position: relative;
-  width: 100%;
-  max-width: 28rem;
+  width: 100%;  
   color: var(--sg-text);
 }
  
@@ -47,8 +45,12 @@
  
 .panel {
   position: absolute;
+  position-anchor: --sg-root;
+  margin-inline: auto;
   inset-inline: 0;
-  top: calc(100% + 0.25rem);
+  bottom: calc(100% + 0.25rem);
+  bottom: calc(anchor(top) + 0.25rem);
+  position-try-fallbacks: flip-block;
   z-index: 10;
   box-sizing: border-box;
   max-height: 16rem;

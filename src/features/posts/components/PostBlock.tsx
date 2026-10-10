@@ -25,7 +25,7 @@ export function PostBlock(props: Props) {
     const session = authClient.useSession()
     const { fn, isPending } = useReactToPost(props.post)
     const { deleteMutation } = useDeletePost(props.post)
-    const link = () => extractFirstVideo(props.post.text)
+    const externalVideo = () => extractFirstVideo(props.post.text)
 
     return (
         <div data-type="post" data-postId={props.post.postId} class={styles.postContainer}>
@@ -54,9 +54,9 @@ export function PostBlock(props: Props) {
                         showPrevBtn
                     />
                 </Show>
-                <Show when={link()}>
+                <Show when={externalVideo() && props.post.media.length === 0}>
                     <div class={styles.iframe}>
-                        <IframeFactory link={link()!.url} />
+                        <IframeFactory link={externalVideo()!.url} />
                     </div>
                 </Show>
                 <PostContent content={props.post.text} />

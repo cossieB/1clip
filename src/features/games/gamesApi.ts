@@ -10,6 +10,7 @@ import { orphanedFileService } from "~/services/orphanedFileService";
 import { AppError } from "~/utils/AppError.server";
 import { storageService } from "~/integrations/storageService/index.server";
 import { sleep } from "~/lib/sleep";
+import { db } from "~/drizzle/db";
 
 export const getGamesFn = createServerFn()
     .middleware([staticDataMiddleware])
@@ -61,7 +62,6 @@ export const getGamesWithoutExtras = createServerFn()
     .middleware([staticDataMiddleware])
     .validator(z.string().optional())
     .handler(async ({data}) => {
-        console.log("HERE")
         return gamesRepository.findAll(data)
     })
 
@@ -78,3 +78,12 @@ export const getSimilarGames = createServerFn()
         return await cacheAside(`similar:${data}`, () => gamesRepository.similarGames(data), 604800);
     })
 
+export const getAllGenres = createServerFn()
+    .handler(async () => {
+        const res = await db.query.genres.findMany({
+            orderBy: {
+                name: "asc"
+            }
+        });
+        return res
+    })

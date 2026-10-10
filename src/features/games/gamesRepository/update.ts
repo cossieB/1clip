@@ -40,6 +40,7 @@ export async function updateGame(gameId: number, game: Partial<InferSelectModel<
                     .values(other.genres.map(name => ({
                         name
                     })))
+                    .onConflictDoNothing()
                 await tx.delete(gameGenres)
                     .where(
                         and(
