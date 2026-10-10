@@ -28,8 +28,12 @@
     }
 
     a:not(.a) {
-        color: var(--neon-green);
+        color: var(--neon-blue);
         position: relative;
+
+        &[href^="http"] {
+            font-size: 0.75rem;
+        }
     }
 }
 

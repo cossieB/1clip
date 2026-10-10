@@ -153,9 +153,9 @@ function NewCharacter(props: P) {
                 setSelected={game => setState({ gameId: game.gameId, title: game.title })}
             />
             <StandaloneInput
-                field=""
-                setter={character => setState({ character })}
+                onChange={e => setState({ character: e.currentTarget.value.trim() })}
                 value={state.character}
+                label="Character"
             />
             <FormSelect
                 list={['player character', 'major character', 'minor character']}

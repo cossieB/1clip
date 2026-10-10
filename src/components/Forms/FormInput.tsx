@@ -48,14 +48,17 @@ export function FormInput<T>(props: Props<T>) {
     )
 }
 
-export function StandaloneInput(props: Props) {
+type P2 = {
+    label: string
+} & ComponentProps<"input">
+
+export function StandaloneInput(props: P2) {
+    const [_, inputProps] = splitProps(props, ['label'])
     return (
         <div role="group" class={styles.formControl} style={props.style}>
             <input
-                onchange={e => props.setter(e.currentTarget.value)}
-                value={props.value}
+                {...inputProps}
                 placeholder=" "
-                type={props.type}
             />
             <label > {props.label} </label>
         </div>

@@ -9,6 +9,7 @@ import { GameCreateSchema, GameEditSchema, GetGamesSchema } from "./utils/zod";
 import { orphanedFileService } from "~/services/orphanedFileService";
 import { AppError } from "~/utils/AppError.server";
 import { storageService } from "~/integrations/storageService/index.server";
+import { sleep } from "~/lib/sleep";
 
 export const getGamesFn = createServerFn()
     .middleware([staticDataMiddleware])
@@ -58,7 +59,11 @@ export const updateGameFn = createServerFn({ method: "POST" })
 
 export const getGamesWithoutExtras = createServerFn()
     .middleware([staticDataMiddleware])
-    .handler(async () => gamesRepository.findAll())
+    .validator(z.string().optional())
+    .handler(async ({data}) => {
+        console.log("HERE")
+        return gamesRepository.findAll(data)
+    })
 
 export const searchGamesFn = createServerFn()
     .validator(z.string())

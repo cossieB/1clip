@@ -15,7 +15,7 @@ function RouteComponent() {
 
     return (
         <Suspense>
-            <PostList filters={{tag: params().tag}} />
+            <PostList filters={{tag: params().tag.toLowerCase()}} />
         </Suspense>
     )
 }

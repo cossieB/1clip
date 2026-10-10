@@ -33,7 +33,7 @@ export function extractFirstVideo(text: string) {
             if (video) return { url: trimUrl(url), platform: video[0], id: video[1] }
         }
         catch {
-
+            
         }
     }
     return null

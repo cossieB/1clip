@@ -27,8 +27,6 @@ export function useCreatePost() {
         text: "",
         game: null as { gameId: number, title: string } | null,
         mode: "text" as "text" | "upload" | "Youtube / Twitch",
-        link: "",
-        tags: [] as string[],
     })
     
     async function handleSubmit(e: SubmitEvent) {

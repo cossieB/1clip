@@ -39,3 +39,20 @@
 .modeselect {
     margin-bottom: 0.5rem;
 }
+
+.suggestions {
+    position: absolute;
+    position-anchor: --search-input;
+    top: anchor(bottom);
+    max-height: 20rem;
+    overflow: auto;
+    background-color: black;
+    z-index: 55;
+    cursor: pointer;
+    >div {
+        padding: 0.25rem 0.5rem;
+        &:hover {
+            background-color: var(--bg-clr);
+        }
+    }
+}

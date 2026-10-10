@@ -2,9 +2,10 @@
 import { defineConfig } from 'vite'
 import { tanstackStart } from '@tanstack/solid-start/plugin/vite'
 import viteSolid from 'vite-plugin-solid'
-import {nitro} from "nitro/vite"
+import { nitro } from "nitro/vite"
 import dotenv from 'dotenv';
 import path from 'node:path';
+import { configDefaults } from 'vitest/config';
 
 const environment = process.env.NODE_ENV || 'development';
 
@@ -12,7 +13,7 @@ dotenv.config({
   path: path.resolve(process.cwd(), `.env.${environment}`)
 });
 
-export default defineConfig(({command}) => ({
+export default defineConfig(({ command }) => ({
 
   server: {
     port: 1337,
@@ -38,4 +39,12 @@ export default defineConfig(({command}) => ({
   resolve: {
     tsconfigPaths: true
   },
+  test: {
+    include: ['src/**/*.test.{ts,tsx}'],
+
+    exclude: [
+      ...configDefaults.exclude,
+      "e2e/**"
+    ],
+  }
 }))

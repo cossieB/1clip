@@ -1,6 +1,6 @@
 import { db } from "~/drizzle/db";
 
-export async function findAll() {
+export async function findAll(titleSearch?: string) {
     return db.query.games.findMany({
         columns: {
             title: true,
@@ -8,6 +8,11 @@ export async function findAll() {
         },
         orderBy: {
             title: 'asc'
+        },
+        where: {
+            title: {
+                ilike: `%${titleSearch}%`
+            }
         }
     })
 }

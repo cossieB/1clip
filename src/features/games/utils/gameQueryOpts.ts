@@ -18,9 +18,9 @@ export function gameQueryOpts(gameId: number) {
     })
 }
 
-export function gamesQueryOpts() {
+export function gamesQueryOpts(title?: string) {
     return queryOptions({
-        queryKey: ["allGames"],
-        queryFn: () => getGamesWithoutExtras()
+        queryKey: ["gamesMinimal"],
+        queryFn: () => getGamesWithoutExtras({data: title})
     })
 }

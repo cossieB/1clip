@@ -24,12 +24,14 @@
         background-color: color-mix(in oklab, var(--neon-green) 50%, black 50%);
         border-color: var(--neon-green);
     }
-
+    &:has(input[type="file"]:focus) {
+        outline: 1px solid var(--neon-green);
+    }
     input {
         position: absolute;
         inset: 0;
         z-index: 1;
-        opacity: 0;
+        opacity: 0;        
     }
     &:hover {
         color: var(--neon-green);

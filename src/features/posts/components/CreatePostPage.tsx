@@ -1,12 +1,16 @@
-import { createSignal, For, Show } from "solid-js"
+import { createEffect, createSignal, For, Show, Suspense } from "solid-js"
 import styles from "./CreatePostPage.module.css"
 import { Form } from "~/components/Forms/Form"
 import { useCreatePost } from "../hooks/useCreatePost"
-import { AsyncSelect } from "~/components/Forms/AsyncSelect"
-import { gamesQueryOpts } from "~/features/games/utils/gameQueryOpts"
 import { PostComposer } from "./PostComposer"
 import { UploadBox } from "~/components/UploadBox/UploadBox"
 import { ImagePreview } from "~/features/games/components/ImagePreview"
+import { StandaloneInput } from "~/components/Forms/FormInput"
+import { useQuery } from "@tanstack/solid-query"
+import { getGamesWithoutExtras } from "~/features/games/gamesApi"
+import { useAbortController } from "~/hooks/useAbortController"
+import { debounce } from "~/lib/debounce"
+import { SearchGames } from "./SearchGames"
 
 export function CreatePostPage() {
     const { handleSubmit,
@@ -17,15 +21,22 @@ export function CreatePostPage() {
         setFiles,
         files
     } = useCreatePost()
+    const abortController = useAbortController()
+    let searchRef!: HTMLInputElement
+    const [searchQuery, _setSearchQuery] = createSignal("")
+    const setSearchQuery = debounce(_setSearchQuery, 500)
 
+    const searchResults = useQuery(() => ({
+        queryKey: ["s", searchQuery()],
+        enabled: !!searchQuery(),
+        queryFn: () => getGamesWithoutExtras({ data: searchQuery(), signal: abortController.signal })
+    }))
     return (
-        <div
-            class={`flexCenter ${styles.container}`}
-        >
+        <div class={`flexCenter ${styles.container}`}>
             <Form
                 disabled={
                     input.title.length < 3 ||
-                    input.text.length + input.link.length + files().length == 0
+                    files().length + input.text.length === 0
                 }
                 isPending={mutation.isPending || isUploading()}
                 onSubmit={handleSubmit}
@@ -62,7 +73,8 @@ export function CreatePostPage() {
                                 class={styles.preview}
                                 url={file.objectUrl}
                                 onDelete={() => {
-                                    setFiles(prev => prev.filter((_, j) => j != i()))
+                                    setFiles(prev => prev.filter((_, j) => j != i()));
+                                    URL.revokeObjectURL(files()[i()].objectUrl)
                                 }}
                                 metadata={{}}
                             />}
@@ -74,14 +86,11 @@ export function CreatePostPage() {
                     text={input.text}
                     setText={str => setInput({ text: str })}
                 />
-                <AsyncSelect
-                    field=""
-                    //@ts-expect-error
-                    queryOptions={gamesQueryOpts()}
-                    getLabel={game => game.title}
-                    getValue={game => game.gameId}
-                    selected={input.game?.gameId ?? null}
-                    setSelected={game => setInput({ game })}
+                <Show when={input.game}>
+                    {input.game?.title}
+                </Show>
+                <SearchGames
+                    onSelect={game => setInput({game})}
                 />
             </Form>
         </div>
