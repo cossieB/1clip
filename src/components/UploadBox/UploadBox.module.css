@@ -24,7 +24,7 @@
         background-color: color-mix(in oklab, var(--neon-green) 50%, black 50%);
         border-color: var(--neon-green);
     }
-    &:has(input[type="file"]:focus) {
+    &:focus-within {
         outline: 1px solid var(--neon-green);
     }
     input {

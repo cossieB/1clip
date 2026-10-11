@@ -1,16 +1,15 @@
-import { createEffect, createSignal, For, Show, Suspense } from "solid-js"
+import { createSignal, For, Show } from "solid-js"
 import styles from "./CreatePostPage.module.css"
 import { Form } from "~/components/Forms/Form"
 import { useCreatePost } from "../hooks/useCreatePost"
 import { PostComposer } from "./PostComposer"
 import { UploadBox } from "~/components/UploadBox/UploadBox"
 import { ImagePreview } from "~/features/games/components/ImagePreview"
-import { StandaloneInput } from "~/components/Forms/FormInput"
 import { useQuery } from "@tanstack/solid-query"
-import { getAllGenres, getGamesWithoutExtras } from "~/features/games/gamesApi"
+import { getGamesWithoutExtras } from "~/features/games/gamesApi"
 import { useAbortController } from "~/hooks/useAbortController"
 import { debounce } from "~/lib/debounce"
-import { SearchGames } from "./SearchGames"
+import { SearchAutocomplete } from "~/components/SearchAutocomplete/SearchAutocomplete"
 
 export function CreatePostPage() {
     const { handleSubmit,
@@ -86,11 +85,13 @@ export function CreatePostPage() {
                     text={input.text}
                     setText={str => setInput({ text: str })}
                 />
-                <Show when={input.game}>
-                    {input.game?.title}
-                </Show>
-                <SearchGames
+                <SearchAutocomplete
+                    search={input => getGamesWithoutExtras({data: input})}
+                    getLabel={game => game.title}
                     onSelect={game => setInput({game})}
+                    label="Game"
+                    queryKey="gameSearch"
+                    noun="game"                    
                 />
             </Form>
         </div>

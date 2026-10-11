@@ -156,10 +156,6 @@
     &:disabled {
         cursor: not-allowed;
     }
-
-    &:focus-visible {
-        all: unset;
-    }
 }
 
 .dropdown {

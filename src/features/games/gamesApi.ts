@@ -66,7 +66,7 @@ export const getGamesWithoutExtras = createServerFn()
     })
 
 export const searchGamesFn = createServerFn()
-    .validator(z.string())
+    .validator(z.string().nonempty())
     .handler(async ({ data }) => {
         return gamesRepository.searchGames(data)
     })

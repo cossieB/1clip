@@ -7,6 +7,8 @@ import { LimitOffsetSchema } from "~/utils/zod";
 import { developerCreateSchema, developerEditSchema } from "./utils/zod";
 import { orphanedFileService } from "~/services/orphanedFileService";
 import { storageService } from "~/integrations/storageService/index.server";
+import z from "zod";
+import { db } from "~/drizzle/db";
 
 export const getDevelopersFn = createServerFn()
     .middleware([staticDataMiddleware])
@@ -49,3 +51,19 @@ export const editDeveloperFn = createServerFn({ method: "POST" })
         }
     })
 
+export const searchDevsFn = createServerFn()
+    .validator(z.string().nonempty())
+    .handler(async ({data}) => db.query.developers.findMany({
+        columns: {
+            name: true,
+            developerId: true
+        },
+        where: {
+            name: {
+                ilike: `%${data}%`
+            }
+        },
+        orderBy: {
+            name: "asc"
+        }
+    }))

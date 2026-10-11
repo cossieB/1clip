@@ -1,80 +1,90 @@
-import { createEffect, createSignal, createUniqueId, For, Match, on, Show, Switch } from "solid-js"
+import { createEffect, createSignal, createUniqueId, For, Match, on, Show, Switch, type JSX } from "solid-js"
 import { useQuery } from "@tanstack/solid-query"
-// Adjust these two imports to wherever they live in your project
 import { useAbortController } from "~/hooks/useAbortController"
-import styles from "./SearchGames.module.css"
-import { getGamesWithoutExtras } from "~/features/games/gamesApi"
+import styles from "./SearchAutocomplete.module.css"
 import { debounce } from "~/lib/debounce"
- 
-type GetGamesReturnType = Awaited<ReturnType<typeof getGamesWithoutExtras>>
- 
-type Game = GetGamesReturnType[number]
- 
-type SearchGamesProps = {
-    onSelect?: (game: Game) => void
+
+export type SearchAutocompleteProps<T> = {
+    /** Accessible name for the input, also used as the placeholder unless `placeholder` is set */
+    label: string
+    /** Namespace for the query cache. Must be unique per kind of search, e.g. "games" */
+    queryKey: string
+    /** Fetch the results for a query. Called once the user stops typing */
+    search: (query: string, signal: AbortSignal) => Promise<T[]>
+    /** Text shown in the input once an item is picked (and used as the default row content) */
+    getLabel: (item: T) => string
+    onSelect?: (item: T) => void
+    /** Custom row content; defaults to `getLabel(item)` */
+    renderItem?: (item: T) => JSX.Element
+    placeholder?: string
+    /** Plural noun for status messages: "No {noun} match …". Defaults to "results" */
+    noun?: string
+    /** Read once on mount, changing it later has no effect. Defaults to 300 */
+    debounceMs?: number
 }
- 
-export function SearchGames(props: SearchGamesProps) {
+
+export function SearchAutocomplete<T>(props: SearchAutocompleteProps<T>) {
     const listboxId = createUniqueId()
-    const optionId = (game: Game) => `${listboxId}-${game.gameId}`
- 
+    const optionId = (index: number) => `${listboxId}-${index}`
+
     const [inputValue, setInputValue] = createSignal("")
     const [searchQuery, setSearchQuery] = createSignal("")
     const [isTyping, setIsTyping] = createSignal(false)
     const [isOpen, setIsOpen] = createSignal(false)
     const [activeIndex, setActiveIndex] = createSignal(-1)
- 
+
     const abortController = useAbortController()
     const updateSearchQuery = debounce((value: string) => {
         setSearchQuery(value)
         setIsTyping(false)
-    }, 300, abortController.signal)
- 
+    }, props.debounceMs ?? 300, abortController.signal)
+
     const searchResults = useQuery(() => ({
-        queryKey: ["s", searchQuery()],
+        queryKey: [props.queryKey, searchQuery()],
         enabled: !!searchQuery(),
-        queryFn: () => getGamesWithoutExtras({ data: searchQuery(), signal: abortController.signal })
+        queryFn: () => props.search(searchQuery(), abortController.signal)
     }))
- 
-    const games = () => searchResults.data ?? []
-    const activeGame = () => games()[activeIndex()]
- 
+
+    const items = () => searchResults.data ?? []
+    const activeItem = () => items()[activeIndex()]
+    const noun = () => props.noun ?? "results"
+
     const showPanel = () => isOpen() && inputValue().trim() !== ""
-    // Debounce pending, or request in flight
     const status = () => {
+        // Debounce pending, or request in flight
         if (isTyping() || searchResults.isFetching) return "loading"
         if (searchResults.isError) return "error"
-        if (games().length === 0) return "empty"
+        if (items().length === 0) return "empty"
         return "results"
     }
     const showList = () => showPanel() && status() === "results"
- 
+
     // Reset the highlighted option whenever new results arrive
     createEffect(on(() => searchResults.data, () => setActiveIndex(-1)))
- 
+
     // Keep the highlighted option visible when navigating with the keyboard
     createEffect(() => {
-        const game = activeGame()
-        if (game) document.getElementById(optionId(game))?.scrollIntoView({ block: "nearest" })
+        const index = activeIndex()
+        if (index >= 0) document.getElementById(optionId(index))?.scrollIntoView({ block: "nearest" })
     })
- 
+
     const handleInput = (value: string) => {
         setInputValue(value)
         setIsOpen(true)
         setIsTyping(true)
         updateSearchQuery(value.trim())
     }
- 
-    const select = (game: Game) => {
-        setInputValue(game.title)
+
+    const select = (item: T) => {
+        setInputValue(props.getLabel(item))
         setIsOpen(false)
         setActiveIndex(-1)
-        props.onSelect?.(game)
+        props.onSelect?.(item)
     }
- 
+
     const handleKeyDown = (event: KeyboardEvent) => {
-        const count = games().length
- 
+        const count = items().length
+
         switch (event.key) {
             case "ArrowDown":
                 event.preventDefault()
@@ -87,10 +97,10 @@ export function SearchGames(props: SearchGamesProps) {
                 if (count) setActiveIndex((i) => (i <= 0 ? count - 1 : i - 1))
                 break
             case "Enter": {
-                const game = activeGame()
-                if (showList() && game) {
+                const item = activeItem()
+                if (showList() && item !== undefined) {
                     event.preventDefault()
-                    select(game)
+                    select(item)
                 }
                 break
             }
@@ -101,48 +111,51 @@ export function SearchGames(props: SearchGamesProps) {
                 break
         }
     }
- 
+
     return (
-        <div class={styles.root} >
-            <div class={styles.field} style={{"anchor-name": "--sg-root"}}>
+        <div class={styles.root}>
+            <div class={styles.field}>
+                <svg class={styles.icon} viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true">
+                    <circle cx="8.5" cy="8.5" r="5.5" />
+                    <path d="M12.75 12.75 17 17" />
+                </svg>
                 <input
                     class={styles.input}
                     type="search"
-                    placeholder="Search games"
+                    placeholder={props.placeholder ?? props.label}
                     autocomplete="off"
                     role="combobox"
-                    aria-label="Search games"
+                    aria-label={props.label}
                     aria-autocomplete="list"
                     aria-expanded={showList()}
                     aria-controls={showList() ? listboxId : undefined}
-                    aria-activedescendant={showList() && activeGame() ? optionId(activeGame()!) : undefined}
+                    aria-activedescendant={showList() && activeIndex() >= 0 ? optionId(activeIndex()) : undefined}
                     value={inputValue()}
                     onInput={(e) => handleInput(e.currentTarget.value)}
                     onKeyDown={handleKeyDown}
                     onFocus={() => setIsOpen(true)}
                     onBlur={() => setIsOpen(false)}
-                    
                 />
             </div>
- 
+
             <Show when={showPanel()}>
                 <div class={styles.panel}>
                     <Switch>
                         <Match when={status() === "results"}>
-                            <ul class={styles.list} id={listboxId} role="listbox" aria-label="Game suggestions">
-                                <For each={games()}>
-                                    {(game, index) => (
+                            <ul class={styles.list} id={listboxId} role="listbox" aria-label={`${props.label} suggestions`}>
+                                <For each={items()}>
+                                    {(item, index) => (
                                         <li
                                             class={styles.option}
-                                            id={optionId(game)}
+                                            id={optionId(index())}
                                             role="option"
                                             aria-selected={index() === activeIndex()}
                                             // Keep focus on the input so blur doesn't close the list before the click lands
                                             onMouseDown={(e) => e.preventDefault()}
-                                            onClick={() => select(game)}
+                                            onClick={() => select(item)}
                                             onMouseMove={() => setActiveIndex(index())}
                                         >
-                                            {game.title}
+                                            {props.renderItem ? props.renderItem(item) : props.getLabel(item)}
                                         </li>
                                     )}
                                 </For>
@@ -156,12 +169,12 @@ export function SearchGames(props: SearchGamesProps) {
                         </Match>
                         <Match when={status() === "error"}>
                             <p class={`${styles.message} ${styles.messageError}`} role="status">
-                                Couldn't load games. Try again.
+                                Couldn't load {noun()}. Try again.
                             </p>
                         </Match>
                         <Match when={status() === "empty"}>
                             <p class={styles.message} role="status">
-                                No games match “{searchQuery()}”
+                                No {noun()} match “{searchQuery()}”
                             </p>
                         </Match>
                     </Switch>

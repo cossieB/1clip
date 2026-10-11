@@ -7,6 +7,8 @@ import { LimitOffsetSchema } from "~/utils/zod";
 import { publisherCreateSchema, publisherEditSchema } from "./utils/zod";
 import { orphanedFileService } from "~/services/orphanedFileService";
 import { storageService } from "~/integrations/storageService/index.server";
+import z from "zod";
+import { db } from "~/drizzle/db";
 
 export const getPublishersFn = createServerFn()
     .middleware([staticDataMiddleware])
@@ -48,3 +50,20 @@ export const editPublisherFn = createServerFn({ method: "POST" })
             (data.logo != old.oldLogo) && storageService.moveToDeletedBucket(old.oldLogo)
         }
     })
+
+export const searchPubsFn = createServerFn()
+    .validator(z.string().nonempty())
+    .handler(async ({data}) => db.query.publishers.findMany({
+        columns: {
+            name: true,
+            publisherId: true
+        },
+        where: {
+            name: {
+                ilike: `%${data}%`
+            }
+        },
+        orderBy: {
+            name: "asc"
+        }
+    }))    

@@ -14,6 +14,9 @@ import styles from "./GameForm.module.css"
 import { IframeFactory } from "~/components/embeds/IframeFactory";
 import { produce } from "solid-js/store";
 import { TagSelector } from "./TagSelector";
+import { SearchAutocomplete } from "~/components/SearchAutocomplete/SearchAutocomplete";
+import { searchDevsFn } from "~/features/developers/developersApi";
+import { searchPubsFn } from "~/features/publishers/publishersApi";
 
 export function GameForm(props: { game?: Game }) {
     const {
@@ -137,10 +140,10 @@ export function GameForm(props: { game?: Game }) {
                                     }))
                             }}
                         />
-                        }
+                    }
                 </For>
             </div>
-            <div style={{ "margin-top": "1.5rem" }}>
+            <div >
                 <ContentEditable
                     html={game.summary}
                     setter={summary => setGame({ summary })}
@@ -153,25 +156,23 @@ export function GameForm(props: { game?: Game }) {
                 value={game.releaseDate}
                 type="date"
             />
-            <div style={{ "z-index": 50 }}>
-                <AsyncSelect
-                    field="Developer"
-                    // @ts-expect-error
-                    queryOptions={developersQueryOpts(500)}
-                    getLabel={item => item.name}
-                    getValue={item => item.developerId}
-                    selected={game.developerId ?? null}
-                    setSelected={dev => setGame({ developerId: dev.developerId })}
-                />
-            </div>
-            <AsyncSelect
-                field="Publisher"
-                // @ts-expect-error
-                queryOptions={publishersQueryOpts(500)}
+            <SearchAutocomplete
+                queryKey="searchDevs"
+                label="Developer"
+                search={input => searchDevsFn({ data: input })}
+                getLabel={dev => dev.name}
+                noun="developer"
+                onSelect={dev => setGame({ developerId: dev.developerId })}
+                debounceMs={500}
+            />
+            <SearchAutocomplete
+                label="Publisher"
+                queryKey="searchPubs"
+                search={input => searchPubsFn({ data: input })}
                 getLabel={item => item.name}
-                getValue={item => item.publisherId}
-                selected={game.publisherId ?? null}
-                setSelected={pub => setGame({ publisherId: pub.publisherId })}
+                onSelect={pub => setGame({ publisherId: pub.publisherId })}
+                noun="publisher"
+                debounceMs={500}
             />
             <div class={styles.platforms}>
                 <AsyncChecklist
@@ -194,7 +195,7 @@ export function GameForm(props: { game?: Game }) {
             </Show>
             <TagSelector
                 genres={game.genres}
-                onUpdate={genres => setGame({genres})}
+                onUpdate={genres => setGame({ genres })}
             />
         </Form>
     )

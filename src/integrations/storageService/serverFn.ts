@@ -5,21 +5,21 @@ import { rateLimiter } from "~/utils/rateLimiter.server"
 import { ImageUploadSchema, FileUploadSchema } from "./zod"
 import {generateAndStoreSignedUrls} from "./utils"
 
-export const getLogoSignedUrls = createServerFn()
+export const getLogoSignedUrls = createServerFn({method: "POST"})
     .middleware([adminOnlyMiddleware])
     .validator(ImageUploadSchema)
     .handler(async ({ data, context: { user } }) => {
         return generateAndStoreSignedUrls(data, user.id, "logos")
     })
 
-export const getPeopleSignedUrls = createServerFn()
+export const getPeopleSignedUrls = createServerFn({method: "POST"})
     .middleware([adminOnlyMiddleware])
     .validator(ImageUploadSchema)
     .handler(async ({ data, context: { user } }) => {
         return generateAndStoreSignedUrls(data, user.id, "people")
     })
 
-export const getUsersSignedUrls = createServerFn()
+export const getUsersSignedUrls = createServerFn({method: "POST"})
     .middleware([verifiedOnlyMiddleware])
     .validator(ImageUploadSchema)
     .handler(async ({ data, context: { user } }) => {
@@ -27,7 +27,7 @@ export const getUsersSignedUrls = createServerFn()
         return generateAndStoreSignedUrls(data, user.id, "users")
     })
 
-export const getGamesSignedUrls = createServerFn()
+export const getGamesSignedUrls = createServerFn({method: "POST"})
     .middleware([adminOnlyMiddleware])
     .validator(FileUploadSchema)
     .handler(async ({ data, context: { user } }) => {
