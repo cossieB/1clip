@@ -4,6 +4,7 @@ import { PlusIcon } from "lucide-solid"
 
 type P = {
     arr: string[]
+    /**Callback to run when user types comma, semi-colon or clicks the plus button. Throw an error in the caller when val fails validation */
     onAdd: (val: string) => void
     label: string
     disabled: boolean
@@ -19,10 +20,17 @@ export function InputWithPlusBtn(props: P) {
     }) {
         e.preventDefault()
         if (/[,;]$/.test(e.currentTarget.value)) {
+            e.preventDefault()
             const val = e.currentTarget.value.slice(0, -1).trim();
-            e.currentTarget.value = ""
-            props.onAdd(val)
-            setInput("")
+            try {
+                props.onAdd(val)
+                e.currentTarget.value = ""
+                setInput("")
+            } 
+            catch (error) {
+                setInput(val);
+                e.currentTarget.value = val
+            }
         }
         else {
             setInput(e.currentTarget.value);
@@ -46,10 +54,6 @@ export function InputWithPlusBtn(props: P) {
                 type="text"
                 placeholder={props.label}
                 disabled={props.disabled}
-                onChange={() => {
-                    props.onAdd(input().trim());
-                    setInput("")
-                }}
             />
             <button
                 class={styles.addBtn}

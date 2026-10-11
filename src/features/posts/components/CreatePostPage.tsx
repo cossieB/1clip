@@ -84,6 +84,7 @@ export function CreatePostPage() {
                 <PostComposer
                     text={input.text}
                     setText={str => setInput({ text: str })}
+                    placeholder="Text goes here"
                 />
                 <SearchAutocomplete
                     search={input => getGamesWithoutExtras({data: input})}

@@ -181,6 +181,7 @@ export function SecurityPage() {
                 id="del-account-warn"
                 challengeAnswer={input.challengeAnswer}
                 setChallengeAnswer={val => setInput({challengeAnswer: val})}
+                closedby='closerequest'
             />
         </div>
     )

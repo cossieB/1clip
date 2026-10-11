@@ -97,7 +97,10 @@ export function Profile(props: { user: Awaited<ReturnType<typeof getLoggedInUser
                     label="Add link"
                     onAdd={val => {
                         const link = validateUrl(val)
-                        if (!link) return addToast({ text: "Invalid link. Copy and paste your link here including the \"https\"", type: "info" })
+                        if (!link) {
+                            addToast({ text: "Invalid link. Copy and paste your link here including the \"https\"", type: "error" });
+                            throw new Error()
+                        } 
                         if (user.links.includes(val)) return
                         setUser('links', prev => [...prev, val])
                     }}

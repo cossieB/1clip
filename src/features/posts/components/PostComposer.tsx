@@ -1,4 +1,3 @@
-import { createSignal, Setter } from "solid-js";
 import styles from "./PostComposer.module.css";
 import { TOKEN_REGEX } from "./PostContent";
 import { variables } from "~/utils/variables";
@@ -6,6 +5,7 @@ import { variables } from "~/utils/variables";
 type Props = {
     text: string
     setText: (str: string) => void
+    placeholder: string
 }
 
 export function PostComposer(props: Props) {
@@ -51,7 +51,10 @@ export function PostComposer(props: Props) {
     };
 
     return (
-        <div class={styles.container}>
+        <div 
+            class={styles.container}
+            style={{"--chars": (props.text.length * 100 / variables.POST_LIMIT) + "%"}}
+            >
             <div
                 ref={backdropRef}
                 class={styles.backdrop}
@@ -64,10 +67,11 @@ export function PostComposer(props: Props) {
                 value={props.text}
                 onInput={handleInput}
                 onScroll={handleScroll}
-                placeholder="Post content"
+                placeholder={props.placeholder}
                 spellcheck={false}
                 maxLength={variables.POST_LIMIT}
             />
+            <div  class={styles.counter} />
         </div>
     );
 }

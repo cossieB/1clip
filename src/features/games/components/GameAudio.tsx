@@ -36,6 +36,10 @@ export function GameAudio(props: Props) {
 
     return (
         <Show when={song()}>
+            <div
+                ref={div}
+                class={styles.player}
+            >
             <audio
                 ref={audioRef}
                 src={STORAGE_DOMAIN + song()!.key}
@@ -47,10 +51,6 @@ export function GameAudio(props: Props) {
                 autoplay
                 loop
             ></audio>
-            <div
-                ref={div}
-                class={styles.player}
-            >
                 <div>
                     <span class={styles.song}> {song()!.metadata.title} </span>
                     <span class={styles.artist}> {song()!.metadata.artist} </span>

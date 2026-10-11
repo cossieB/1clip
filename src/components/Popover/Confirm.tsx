@@ -22,7 +22,9 @@ type Props = ComponentProps<"dialog"> & {
 
 export function ConfirmDialog(props: Props) {
     let dialogElem!: HTMLDialogElement
+    let inputRef!: HTMLInputElement
     const [local, attributes] = splitProps(props, ["headline", "onConfirm", "type", "label", "challengeAnswer", "setChallengeAnswer", "additionalText"])
+    
     return (
         <dialog
             {...attributes}
@@ -30,6 +32,7 @@ export function ConfirmDialog(props: Props) {
             ref={dialogElem}
             class={styles.dialog}
             use:clickOutside={() => dialogElem?.close()}
+            onClose={() => inputRef.value = ""}
         >
             <span class={styles.headline} >{props.headline}</span>
             <Show when={props.additionalText}>
@@ -37,12 +40,11 @@ export function ConfirmDialog(props: Props) {
             </Show>
             <Show when={props.setChallengeAnswer}>
                 <StandaloneInput
-                    field="challengeAnswer"
-                    setter={props.setChallengeAnswer!}
-                    value={props.challengeAnswer!}
-                    label={props.label}
+                    label={props.label ?? ""}
+                    onInput={e => props.setChallengeAnswer!(e.currentTarget.value)}
                     type={props.type}
                     autofocus
+                    ref={inputRef}
                 />
             </Show>
             <div class={styles.btns}>

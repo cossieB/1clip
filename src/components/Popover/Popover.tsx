@@ -1,6 +1,5 @@
-import { ComponentProps, createEffect, createSignal, Show, type JSXElement } from "solid-js";
+import { type JSXElement } from "solid-js";
 import styles from "./Popover.module.css"
-import { StandaloneInput } from "../Forms/FormInput";
 
 type NewType = {
     children: JSXElement;

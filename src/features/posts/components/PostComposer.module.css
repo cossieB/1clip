@@ -5,7 +5,7 @@
     margin: 0 auto;
     --highlightClr: var(--neon-blue);
     scrollbar-width: none;
-
+    --chars: 0%;
     * {
         scrollbar-width: none;
     }
@@ -36,6 +36,7 @@
     /* Transparent border matches textarea's default border width */
     border: 1px solid transparent;
     z-index: 0;
+    background-color: #00000050
 }
 
 .textarea {
@@ -59,4 +60,12 @@
 /* Highlight style passed dynamically into innerHTML */
 .highlight {
     color: var(--highlightClr);
+}
+
+.counter {
+    position: absolute;
+    bottom: -0.5rem;
+    height: 1px;
+    background-color: var(--neon-green);
+    width: var(--chars);
 }
