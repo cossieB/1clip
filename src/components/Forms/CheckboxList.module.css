@@ -1,0 +1,107 @@
+/*
+  Theming: override any --cl-* variable from a parent, e.g.
+  .form { --cl-accent: #d6336c; }
+*/
+.root {
+    --cl-surface: #171a23;
+    --cl-text: #eceef5;
+    --cl-muted: #9aa1b3;
+    --cl-border: #2f3443;
+    --cl-accent: #8f93ff;
+    --cl-accent-soft: #272a4a;
+    --cl-error: #f97066;
+    --cl-radius: 0.625rem;
+
+    width: min(90%, 600px);
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    color: var(--cl-text);
+    font: inherit;
+}
+
+.legend {
+    margin-bottom: 0.5rem;
+    padding: 0;
+    font-weight: 600;
+}
+
+/* ---------- Options ---------- */
+
+.list {
+    display: flex;
+    flex-wrap: wrap;
+    grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+        display: flex;
+        flex-grow: 1;
+        flex-shrink: 0;
+    }
+}
+
+.option {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--cl-border);
+    border-radius: var(--cl-radius);
+    background: var(--cl-surface);
+    cursor: pointer;
+    width: 100%;
+}
+
+.option:hover {
+    border-color: var(--cl-accent);
+}
+
+.option:has(.input:checked) {
+    border-color: var(--cl-accent);
+    background: var(--cl-accent-soft);
+}
+
+.option:has(.input:focus-visible) {
+    outline: 2px solid var(--cl-accent);
+    outline-offset: 1px;
+}
+
+.input {
+    flex: none;
+    width: 1.1rem;
+    height: 1.1rem;
+    margin: 0;
+    accent-color: var(--cl-accent);
+    cursor: inherit;
+}
+
+.text {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.root:disabled .option {
+    border-color: var(--cl-border);
+    background: var(--cl-surface);
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ---------- Loading / empty / error ---------- */
+
+.message {
+    margin: 0;
+    color: var(--cl-muted);
+}
+
+.messageError {
+    color: var(--cl-error);
+}
+

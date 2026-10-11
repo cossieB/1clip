@@ -79,6 +79,8 @@ export default defineConfig({
     url: 'http://localhost:1337',
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
+    stderr: "pipe",
+    stdout: "pipe",
     env: {
       NODE_ENV: "test",
       PORT: "1337",

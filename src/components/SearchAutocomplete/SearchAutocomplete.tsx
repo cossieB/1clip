@@ -1,5 +1,6 @@
 import { createEffect, createSignal, createUniqueId, For, Match, on, Show, Switch, type JSX } from "solid-js"
 import { useQuery } from "@tanstack/solid-query"
+// Adjust this import to wherever it lives in your project
 import { useAbortController } from "~/hooks/useAbortController"
 import styles from "./SearchAutocomplete.module.css"
 import { debounce } from "~/lib/debounce"
@@ -14,6 +15,10 @@ export type SearchAutocompleteProps<T> = {
     /** Text shown in the input once an item is picked (and used as the default row content) */
     getLabel: (item: T) => string
     onSelect?: (item: T) => void
+    /** Hide results the caller doesn't want offered (e.g. already added). Tracked reactively */
+    exclude?: (item: T) => boolean
+    /** Empty the input after a pick instead of filling it with the item's label */
+    clearOnSelect?: boolean
     /** Custom row content; defaults to `getLabel(item)` */
     renderItem?: (item: T) => JSX.Element
     placeholder?: string
@@ -45,7 +50,7 @@ export function SearchAutocomplete<T>(props: SearchAutocompleteProps<T>) {
         queryFn: () => props.search(searchQuery(), abortController.signal)
     }))
 
-    const items = () => searchResults.data ?? []
+    const items = (): T[] => (searchResults.data ?? []).filter((item) => !props.exclude?.(item))
     const activeItem = () => items()[activeIndex()]
     const noun = () => props.noun ?? "results"
 
@@ -76,7 +81,7 @@ export function SearchAutocomplete<T>(props: SearchAutocompleteProps<T>) {
     }
 
     const select = (item: T) => {
-        setInputValue(props.getLabel(item))
+        setInputValue(props.clearOnSelect ? "" : props.getLabel(item))
         setIsOpen(false)
         setActiveIndex(-1)
         props.onSelect?.(item)

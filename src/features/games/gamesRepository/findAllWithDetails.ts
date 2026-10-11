@@ -1,6 +1,6 @@
 import { eq, inArray, lt, SQL } from "drizzle-orm"
 import { type GameQueryFilters } from "./types"
-import { gameActors, gameGenres, gamePlatforms, games } from "~/drizzle/schema"
+import { appearances, gameGenres, gamePlatforms, games } from "~/drizzle/schema"
 import { db } from "~/drizzle/db"
 import { detailedGames } from "./detail"
 
@@ -14,9 +14,9 @@ export async function findGamesWithDetails(obj: GameQueryFilters = {}) {
         filters.push(inArray(
             games.gameId,
             db
-                .select({ gameId: gameActors.gameId })
-                .from(gameActors)
-                .where(eq(gameActors.actorId, obj.actorId))
+                .select({ gameId: appearances.gameId })
+                .from(appearances)
+                .where(eq(appearances.actorId, obj.actorId))
         ))
     if (obj.platformId)
         filters.push(inArray(

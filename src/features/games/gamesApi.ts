@@ -7,9 +7,7 @@ import * as gamesRepository from "./gamesRepository";
 import { cacheAside } from "~/utils/cacheAside.server";
 import { GameCreateSchema, GameEditSchema, GetGamesSchema } from "./utils/zod";
 import { orphanedFileService } from "~/services/orphanedFileService";
-import { AppError } from "~/utils/AppError.server";
 import { storageService } from "~/integrations/storageService/index.server";
-import { sleep } from "~/lib/sleep";
 import { db } from "~/drizzle/db";
 
 export const getGamesFn = createServerFn()
@@ -28,32 +26,43 @@ export const getGameFn = createServerFn()
         return gameId
     })
     .handler(async ({ data }) => {
-        const game = await gamesRepository.findById(data)
-        if (!game) throw notFound();
-        return game
+        try {
+            const game = await gamesRepository.findById(data)
+            if (!game) throw notFound();
+            return game
+            
+        } catch (error) {
+            console.error(error)
+            throw error
+        }
     })
 
 export const createGameFn = createServerFn({ method: "POST" })
     .middleware([adminOnlyMiddleware])
     .validator(GameCreateSchema)
     .handler(async ({ data }) => {
-        const { platforms, genres, ...game } = data;
-        return await gamesRepository.createGame(game, { platforms, media: [], genres })
+        const { platforms, genres, characters, ...game } = data;
+        return await gamesRepository.createGame(game, { platforms, media: [], genres, characters })
     })
 
 export const updateGameFn = createServerFn({ method: "POST" })
     .middleware([adminOnlyMiddleware])
     .validator(GameEditSchema)
     .handler(async ({ data }) => {
-        const { gameId, media, platforms, genres, ...game } = data
-        const [old] = await gamesRepository.updateGame(gameId, game, { platforms, media, genres })
-        if (data.cover) {
-            orphanedFileService.removePendingUpload(data.cover);
-            (data.cover != old.oldCover) && storageService.moveToDeletedBucket(old.oldCover)
-        }
-        if (data.banner) {
-            orphanedFileService.removePendingUpload(data.banner);
-            (data.banner != old.oldBanner) && storageService.moveToDeletedBucket(old.oldBanner)
+        const { gameId, media, platforms, genres, characters, ...game } = data;
+        try {
+            const [old] = await gamesRepository.updateGame(gameId, game, { platforms, media, genres, characters })
+            if (data.cover) {
+                orphanedFileService.removePendingUpload(data.cover);
+                (data.cover != old.oldCover) && storageService.moveToDeletedBucket(old.oldCover)
+            }
+            if (data.banner) {
+                orphanedFileService.removePendingUpload(data.banner);
+                (data.banner != old.oldBanner) && storageService.moveToDeletedBucket(old.oldBanner)
+            }
+        } catch (error) {
+            console.error(error)
+            throw error
         }
 
     })

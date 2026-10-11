@@ -1,6 +1,6 @@
 import { and, eq, getColumns, InferInsertModel, InferSelectModel, notInArray, sql } from "drizzle-orm";
 import { db } from "~/drizzle/db";
-import { actors, gameActors, games } from "~/drizzle/schema";
+import { actors, appearances, games } from "~/drizzle/schema";
 
 export function findById(actorId: number) {
     return db.query.actors.findFirst({
@@ -25,7 +25,7 @@ export function createActor(actor: InferInsertModel<typeof actors>, characters: 
     return db.transaction(async tx => {
         const [a] = await tx.insert(actors).values(actor).returning()
         if (characters.length > 0)
-            await tx.insert(gameActors).values(characters.map(char => ({ ...char, actorId: a.actorId })))
+            await tx.insert(appearances).values(characters.map(char => ({ ...char, actorId: a.actorId })))
         return a
     })
 }
@@ -40,23 +40,23 @@ export async function editActor(actorId: number, actor: Partial<InferSelectModel
             oldPhoto: sql<string | null>`OLD.photo`
         })
         if (characters.length == 0)
-            await tx.delete(gameActors).where(eq(gameActors.actorId, actorId))
+            await tx.delete(appearances).where(eq(appearances.actorId, actorId))
 
         else {
-            await tx.delete(gameActors).where(and(
-                eq(gameActors.actorId, actorId),
-                notInArray(gameActors.appearanceId, characters.map(ch => ch.appearanceId).filter(Boolean) as number[])
+            await tx.delete(appearances).where(and(
+                eq(appearances.actorId, actorId),
+                notInArray(appearances.appearanceId, characters.map(ch => ch.appearanceId).filter(Boolean) as number[])
             ))
-            await tx.insert(gameActors).values(characters.map(char => ({
+            await tx.insert(appearances).values(characters.map(char => ({
                 actorId,
                 gameId: char.gameId,
                 character: char.character,
                 roleType: char.roleType
             }))).onConflictDoUpdate({
-                target: [gameActors.gameId, gameActors.actorId],
+                target: [appearances.gameId, appearances.actorId],
                 set: {
-                    character: sql`EXCLUDED.${gameActors.character.name}`,
-                    roleType: sql`EXCLUDED.${gameActors.roleType.name}`
+                    character: sql.raw(`EXCLUDED.${appearances.character.name}`),
+                    roleType: sql.raw(`EXCLUDED.${appearances.roleType.name}`)
                 }
             })
         }
@@ -67,18 +67,18 @@ export async function editActor(actorId: number, actor: Partial<InferSelectModel
 export async function findActorWithGames(actorId: number) {
     const gamesQuery = db.$with("gq").as(
         db.select({
-            actorId: gameActors.actorId,
+            actorId: appearances.actorId,
             characters: sql`JSONB_AGG(JSONB_BUILD_OBJECT(
-                'appearanceId', ${gameActors.appearanceId},
+                'appearanceId', ${appearances.appearanceId},
                 'gameId', ${games.gameId},
                 'title', ${games.title},
-                'character', ${gameActors.character},
-                'roleType', ${gameActors.roleType}
+                'character', ${appearances.character},
+                'roleType', ${appearances.roleType}
             ))`.as('chars')
         })
-            .from(gameActors)
-            .innerJoin(games, eq(gameActors.gameId, games.gameId))
-            .groupBy(gameActors.actorId)
+            .from(appearances)
+            .innerJoin(games, eq(appearances.gameId, games.gameId))
+            .groupBy(appearances.actorId)
     )
 
     const actor = await db.with(gamesQuery).select({

@@ -5,8 +5,9 @@ import { createStore } from "solid-js/store"
 import { useToastContext } from "~/hooks/useToastContext"
 import { useUpload } from "~/hooks/useUpload"
 import * as gamesApi from "~/features/games/gamesApi"
-import { gamesQueryOpts, gamesWithExtrasQueryOpts } from "../utils/gameQueryOpts"
+import { gameQueryOpts, gamesQueryOpts, gamesWithExtrasQueryOpts } from "../utils/gameQueryOpts"
 import { getGamesSignedUrls } from "~/integrations/storageService/serverFn"
+import { Platform, RoleType } from "~/drizzle/models"
 
 export type Game = Awaited<ReturnType<typeof gamesApi.getGameFn>>
 
@@ -14,6 +15,16 @@ export enum MediaField {
     Cover = "cover",
     Banner = "banner",
     Media = "media"
+}
+
+type Cast = {
+    appearanceId?: number
+    gameId: number
+    gameTitle: string
+    actorId: number
+    name: string
+    character: string
+    roleType: RoleType
 }
 
 export function useGameForm(props: { game?: Game }) {
@@ -27,15 +38,18 @@ export function useGameForm(props: { game?: Game }) {
         cover: props.game?.cover ?? "",
         banner: props.game?.banner ?? "",
         developerId: props.game?.developerId ?? 0,
+        developerName: props.game?.developer.name ?? "",
         publisherId: props.game?.publisherId ?? 0,
+        publisherName: props.game?.publisher.name ?? "",
         summary: props.game?.summary ?? "",
         media: props.game?.media ?? [],
-        platforms: props.game?.platforms ?? [],
+        platforms: props.game?.platforms ?? [] as Pick<Platform, 'platformId'>[],
         trailer: props.game?.trailer ?? "",
         releaseDate: props.game?.releaseDate ?? "",
         genres: props.game?.genres ?? [],
-        actors: props.game?.actors ?? []
+        actors: props.game?.actors ?? [] as Cast[]
     })
+
     const { setFiles, isUploading, files, convertAndUpload } = useUpload(abortController)
 
     const editGameMutation = useMutation(() => ({
@@ -74,8 +88,13 @@ export function useGameForm(props: { game?: Game }) {
                         gameId,
                         media,
                         platforms: rest.platforms.map(platform => platform.platformId),
+                        characters: game.actors
                     }
                 })
+                queryClient.invalidateQueries(gamesWithExtrasQueryOpts())
+                queryClient.invalidateQueries(gamesQueryOpts())
+                queryClient.invalidateQueries(gameQueryOpts(gameId))
+                addToast({ text: "Success", type: "info" })
                 return
             }
             const newId = await createGameMutation.mutateAsync({
@@ -83,7 +102,8 @@ export function useGameForm(props: { game?: Game }) {
                     ...rest,
                     cover: "q.png",
                     banner: "users/default_banner.jpg",
-                    platforms: rest.platforms.map(platform => platform.platformId)
+                    platforms: rest.platforms.map(platform => platform.platformId),
+                    characters: game.actors
                 }
             })
 

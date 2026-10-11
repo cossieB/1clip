@@ -20,8 +20,8 @@ export const relations = defineRelations(schema, (r) => ({
 			to: r.genres.name.through(r.gameGenres.genre)
 		}),
 		actors: r.many.actors({
-			from: r.games.gameId.through(r.gameActors.gameId),
-			to: r.actors.actorId.through(r.gameActors.actorId)
+			from: r.games.gameId.through(r.appearances.gameId),
+			to: r.actors.actorId.through(r.appearances.actorId)
 		}),
 		media: r.many.media({
 			from: r.games.gameId,
@@ -66,13 +66,13 @@ export const relations = defineRelations(schema, (r) => ({
 		})
 	},
 	actors: {
-		characters: r.many.gameActors({
+		characters: r.many.appearances({
 			from: r.actors.actorId,
-			to: r.gameActors.actorId
+			to: r.appearances.actorId
 		}),
 		games: r.many.games({
-			from: r.actors.actorId.through(r.gameActors.actorId),
-			to: r.games.gameId.through(r.gameActors.gameId)
+			from: r.actors.actorId.through(r.appearances.actorId),
+			to: r.games.gameId.through(r.appearances.gameId)
 		})
 	},
 }))

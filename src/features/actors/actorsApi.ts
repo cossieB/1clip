@@ -8,6 +8,7 @@ import { actorCreateSchema, actorEditSchema } from "./utils/zod";
 import { LimitOffsetSchema } from "~/utils/zod";
 import { orphanedFileService } from "~/services/orphanedFileService";
 import { storageService } from "~/integrations/storageService/index.server";
+import { db } from "~/drizzle/db";
 
 export const getActorFn = createServerFn()
     .middleware([staticDataMiddleware])
@@ -58,3 +59,16 @@ export const getActorsWithCharacters = createServerFn()
         if (!actor) throw notFound()
         return actor
     })    
+
+export const searchActorsFn = createServerFn()
+    .validator(z.string().nonempty())
+    .handler(async ({data}) => db.query.actors.findMany({
+        where: {
+            name: {
+                ilike: `%${data}%`
+            }
+        },
+        orderBy: {
+            name: "asc"
+        }
+    }))

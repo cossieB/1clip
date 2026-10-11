@@ -8,16 +8,10 @@ import { actorQueryOpts, actorsQueryOpts } from "../utils/actorQueryOpts"
 import { Form } from "~/components/Forms/Form"
 import { ContentEditable } from "~/components/Forms/ContentEditable"
 import { UploadBoxWithPreview } from "~/components/UploadBox/UploadBoxWithPreview"
-import { For, Show } from "solid-js"
-import { AsyncSelect } from "~/components/Forms/AsyncSelect"
-import { gamesQueryOpts } from "~/features/games/utils/gameQueryOpts"
-import { StandaloneInput } from "~/components/Forms/FormInput"
-import { FormSelect } from "~/components/Forms/Select"
-import styles from "./ActorForm.module.css"
-import { CirclePlusIcon, Trash2Icon } from "lucide-solid"
 import { Optional } from "~/lib/utilityTypes"
 import { useNavigate } from "@tanstack/solid-router"
 import { getPeopleSignedUrls } from "~/integrations/storageService/serverFn"
+import { CharacterEditor } from "~/components/CharacterEditor/CharacterEditor"
 
 type Actor = Awaited<ReturnType<typeof getActorsWithCharacters>>
 type Char = Actor['characters'][number]
@@ -40,7 +34,7 @@ export function ActorForm(props: { actor?: Omit<Actor, 'characters'> & { charact
         characters: [] as Optional<Char, 'appearanceId'>[],
     })
 
-    const { isUploading, setFiles, upload, getSignedUrls, convertAndUpload } = useUpload(abortController)
+    const { isUploading, setFiles, convertAndUpload } = useUpload(abortController)
 
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault()
@@ -77,7 +71,8 @@ export function ActorForm(props: { actor?: Omit<Actor, 'characters'> & { charact
             <Form
                 isPending={isUploading() || createActorMutation.isPending || editActorMutation.isPending}
                 disabled={
-                    !actor.name
+                    !actor.name ||
+                    actor.characters.some(ch => !ch.character)
                 }
                 onSubmit={handleSubmit}
             >
@@ -99,87 +94,25 @@ export function ActorForm(props: { actor?: Omit<Actor, 'characters'> & { charact
                     setter={bio => setActor({ bio })}
                     label="Bio"
                 />
-                <NewCharacter
-                    handleAdd={char => setActor('characters', prev => [...prev, char])}
+                <CharacterEditor
+                    actor={props.actor ?? {actorId: 0, name: actor.name}}
+                    appearances={props.actor?.characters.map(char => ({
+                        ...char,
+                        actorId: props.actor!.actorId,
+                        actorName: props.actor!.name,
+                        gameTitle: char.title
+                    }))}
+                    onChange={appearances => {
+                        setActor({
+                            characters: appearances.map(ap => ({
+                                ...ap,
+                                title:  ap.gameTitle
+                            }))
+                        })
+                    }}
+
                 />
-                <ul class={styles.charlist}>
-                    <For each={actor.characters}>
-                        {char =>
-                            <li  >
-                                <div> {char.title} </div>
-                                <div> {char.character} </div>
-                                <div> {char.roleType} </div>
-                                <button
-                                    class={styles.button}
-                                    type="button"
-                                    onclick={() => setActor('characters', prev => prev.filter(x => x.gameId != char.gameId))}
-                                >
-                                    <Trash2Icon />
-                                </button>
-                            </li>
-                        }
-                    </For>
-                </ul>
             </Form>
-        </div>
-    )
-}
-
-type P = {
-    handleAdd: (char: {
-        gameId: number,
-        title: string,
-        character: string,
-        roleType: Char['roleType']
-    }) => void
-}
-
-function NewCharacter(props: P) {
-    const [state, setState] = createStore({
-        gameId: -1,
-        character: "",
-        title: "",
-        roleType: "major character" as Char['roleType']
-    })
-    return (
-        <div class={styles.new}>
-            <AsyncSelect
-                //@ts-expect-error
-                queryOptions={gamesQueryOpts()}
-                field=""
-                getLabel={game => game.title}
-                getValue={game => game.gameId}
-                selected={state.gameId}
-                setSelected={game => setState({ gameId: game.gameId, title: game.title })}
-            />
-            <StandaloneInput
-                onChange={e => setState({ character: e.currentTarget.value.trim() })}
-                value={state.character}
-                label="Character"
-            />
-            <FormSelect
-                list={['player character', 'major character', 'minor character']}
-                selected={state.roleType}
-                setSelected={role => setState({ roleType: role as Char['roleType'] })}
-            />
-            <button
-                type="button"
-                disabled={
-                    state.gameId == -1 ||
-                    !state.character
-                }
-                onClick={() => {
-                    props.handleAdd({ ...state });
-                    setState({
-                        gameId: -1,
-                        character: "",
-                        title: "",
-                        roleType: "major character" as Char['roleType']
-                    })
-                }}
-            >
-                <CirclePlusIcon />
-            </button>
         </div>
     )
 }

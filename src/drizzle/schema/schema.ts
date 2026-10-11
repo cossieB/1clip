@@ -71,7 +71,7 @@ export const genres = pgTable("genres", {
 
 export const roleType = pgEnum('role_type', ["player character", "major character", "minor character"])
 
-export const gameActors = pgTable("game_actors", {
+export const appearances = pgTable("appearances", {
     appearanceId: integer("appearance_id").primaryKey().generatedAlwaysAsIdentity(),
     gameId: integer("game_id").notNull().references(() => games.gameId, { onDelete: "cascade" }),
     actorId: integer("actor_id").notNull().references(() => actors.actorId, { onDelete: "cascade" }),

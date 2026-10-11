@@ -1,6 +1,6 @@
 import { InferInsertModel } from "drizzle-orm"
 import { GameInsert } from "./types"
-import { gameGenres, gamePlatforms, games, genres, media } from "~/drizzle/schema"
+import { appearances, gameGenres, gamePlatforms, games, genres, media } from "~/drizzle/schema"
 import { db } from "~/drizzle/db"
 
 export async function createGame(game: InferInsertModel<typeof games>, other: GameInsert) {
@@ -18,6 +18,13 @@ export async function createGame(game: InferInsertModel<typeof games>, other: Ga
         if (other.platforms.length > 0)
             await tx.insert(gamePlatforms).values(other.platforms.map(platformId => ({ platformId, gameId: g.gameId })))
 
+        if (other.characters.length > 0)
+            await tx.insert(appearances).values(other.characters.map(app => ({
+                gameId: g.gameId,
+                roleType: app.roleType,
+                character: app.character,
+                actorId: app.actorId
+            })))
         return g.gameId
     })
 }

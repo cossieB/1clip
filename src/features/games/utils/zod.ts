@@ -15,7 +15,13 @@ export const GameCreateSchema = z.object({
         metadata: z.record(z.string(), z.string()).optional()
     })),
     platforms: z.number().array(),
-    genres: z.string().array()
+    genres: z.string().array(),
+    characters: z.array(z.object({
+        appearanceId: z.number().optional(),
+        actorId: z.number(),
+        character: z.string(),
+        roleType: z.enum(['player character', 'major character', 'minor character'])
+    })),
 })
 
 export const GameEditSchema = GameCreateSchema.partial().extend({ gameId: z.number() })

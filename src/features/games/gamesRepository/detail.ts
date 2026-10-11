@@ -1,7 +1,7 @@
 import { and, desc, eq, getColumns, SQL, sql } from "drizzle-orm";
 import { db } from "~/drizzle/db";
-import { gameActors, gamePlatforms, gameGenres, actors, platforms, media, games, publishers, developers, genres } from "~/drizzle/schema/schema";
-import { Actor, Platform } from "~/drizzle/models";
+import { appearances, gamePlatforms, gameGenres, actors, platforms, media, games, publishers, developers, genres } from "~/drizzle/schema/schema";
+import { Actor, Appearances, Platform } from "~/drizzle/models";
 
 type Args = {
     filters: SQL[]
@@ -12,18 +12,20 @@ export function detailedGames(obj: Args = { filters: [] }) {
     const { searchVector, ...gamesColumns } = getColumns(games)
     const actorQuery = db.$with("aq").as(
         db.select({
-            gameId: gameActors.gameId,
+            gameId: appearances.gameId,
             actorArr: sql`JSONB_AGG(JSONB_BUILD_OBJECT(
-            'character', character,
+            'character', ${appearances.character},
+            'roleType', ${appearances.roleType},
+            'appearanceId', ${appearances.appearanceId},
             'actorId', ${actors.actorId},
             'name', ${actors.name},
             'photo', ${actors.photo},
             'bio', ${actors.bio}
-        ) ORDER BY role_type)`.as("a_arr")
+        ) ORDER BY ${appearances.roleType})`.as("a_arr")
         })
-            .from(gameActors)
-            .innerJoin(actors, eq(gameActors.actorId, actors.actorId))
-            .groupBy(gameActors.gameId)
+            .from(appearances)
+            .innerJoin(actors, eq(appearances.actorId, actors.actorId))
+            .groupBy(appearances.gameId)
     )
 
     const platformQuery = db.$with("pq").as(
@@ -72,7 +74,7 @@ export function detailedGames(obj: Args = { filters: [] }) {
             developer: { ...getColumns(developers) },
             genres: sql<string[]>`COALESCE(${genresQuery.tags}, '{}')`,
             platforms: sql<Platform[]>`COALESCE(${platformQuery.platformArr}, '[]'::JSONB)`,
-            actors: sql<(Actor & { character: string })[]>`COALESCE(${actorQuery.actorArr}, '[]'::JSONB)`,
+            actors: sql<(Actor & Appearances)[]>`COALESCE(${actorQuery.actorArr}, '[]'::JSONB)`,
             media: sql<{ key: string, contentType: string, metadata: Record<string, string> }[]>`COALESCE(${mediaQuery.media}, '[]'::JSONB)`
         })
         .from(games)

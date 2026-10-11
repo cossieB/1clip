@@ -3,13 +3,13 @@
   .toolbar { --sa-accent: #d6336c; }
 */
 .root {
-  --sa-surface: #ffffff;
-  --sa-text: #1b1f2a;
-  --sa-muted: #5f6675;
-  --sa-border: #cfd4de;
-  --sa-accent: #3b3fe0;
-  --sa-accent-soft: #e8e9fd;
-  --sa-error: #b42318;
+  --sa-surface: #171a23;
+  --sa-text: #eceef5;
+  --sa-muted: #9aa1b3;
+  --sa-border: #2f3443;
+  --sa-accent: #8f93ff;
+  --sa-accent-soft: #272a4a;
+  --sa-error: #f97066;
   --sa-radius: 0.625rem;
 
   position: relative;
@@ -17,18 +17,6 @@
   max-width: 28rem;
   color: var(--sa-text);
   font: inherit;
-}
-
-@media (prefers-color-scheme: dark) {
-  .root {
-    --sa-surface: #171a23;
-    --sa-text: #eceef5;
-    --sa-muted: #9aa1b3;
-    --sa-border: #2f3443;
-    --sa-accent: #8f93ff;
-    --sa-accent-soft: #272a4a;
-    --sa-error: #f97066;
-  }
 }
 
 /* ---------- Input ---------- */

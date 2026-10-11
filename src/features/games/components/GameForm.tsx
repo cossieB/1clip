@@ -1,14 +1,9 @@
 import { Form } from "~/components/Forms/Form";
 import { UploadBox } from "~/components/UploadBox/UploadBox";
-import { For, Index, Show } from "solid-js";
+import { For, Show } from "solid-js";
 import { ContentEditable } from "~/components/Forms/ContentEditable";
 import { mediaSrc } from "~/utils/mediaSrc";
-import { AsyncSelect } from "~/components/Forms/AsyncSelect";
-import { developersQueryOpts } from "~/features/developers/utils/developerQueryOpts";
-import { publishersQueryOpts } from "~/features/publishers/utils/publisherQueryOpts";
 import { ImagePreview } from "~/features/games/components/ImagePreview";
-import { AsyncChecklist } from "~/components/Forms/AsyncChecklist";
-import { platformsQueryOpts } from "~/features/platforms/utils/platformQueryOpts";
 import { Game, MediaField, useGameForm } from "../hooks/useGameForm";
 import styles from "./GameForm.module.css"
 import { IframeFactory } from "~/components/embeds/IframeFactory";
@@ -17,6 +12,8 @@ import { TagSelector } from "./TagSelector";
 import { SearchAutocomplete } from "~/components/SearchAutocomplete/SearchAutocomplete";
 import { searchDevsFn } from "~/features/developers/developersApi";
 import { searchPubsFn } from "~/features/publishers/publishersApi";
+import { CharacterEditor } from "~/components/CharacterEditor/CharacterEditor";
+import { PlatformSelector } from "./PlatformSelector";
 
 export function GameForm(props: { game?: Game }) {
     const {
@@ -42,7 +39,8 @@ export function GameForm(props: { game?: Game }) {
                 !game.publisherId ||
                 !game.releaseDate ||
                 !game.trailer ||
-                game.platforms.length == 0
+                game.platforms.length == 0 ||
+                game.actors.some(role => !role.character)
             }
         >
             <Form.Input
@@ -95,7 +93,6 @@ export function GameForm(props: { game?: Game }) {
                 </div>
             </div>
             <div class={styles.screenshotbox}>
-
                 <UploadBox
                     label="Media"
                     onSuccess={async files => {
@@ -158,15 +155,15 @@ export function GameForm(props: { game?: Game }) {
             />
             <SearchAutocomplete
                 queryKey="searchDevs"
-                label="Developer"
                 search={input => searchDevsFn({ data: input })}
+                label={`Developer ${game ? `(${game.developerName})` : ""}`}
                 getLabel={dev => dev.name}
                 noun="developer"
                 onSelect={dev => setGame({ developerId: dev.developerId })}
                 debounceMs={500}
             />
             <SearchAutocomplete
-                label="Publisher"
+                label={`Publisher ${game ? `(${game.publisherName})` : ""}`}
                 queryKey="searchPubs"
                 search={input => searchPubsFn({ data: input })}
                 getLabel={item => item.name}
@@ -174,16 +171,12 @@ export function GameForm(props: { game?: Game }) {
                 noun="publisher"
                 debounceMs={500}
             />
-            <div class={styles.platforms}>
-                <AsyncChecklist
-                    // @ts-expect-error
-                    queryOptions={platformsQueryOpts()}
-                    getLabel={platform => platform.name}
-                    getValue={platform => platform.platformId}
-                    selected={game.platforms}
-                    setter={platforms => setGame({ platforms })}
-                />
-            </div>
+            <PlatformSelector
+                onPlatformsChanged={platforms => {
+                    setGame('platforms', platforms.map(platformId => ({platformId})))
+                }}
+                initialPlatformIds={game.platforms.map(platform => platform.platformId)}
+            />
             <Form.Input<typeof game>
                 field="trailer"
                 setter={trailer => setGame({ trailer })}
@@ -196,6 +189,20 @@ export function GameForm(props: { game?: Game }) {
             <TagSelector
                 genres={game.genres}
                 onUpdate={genres => setGame({ genres })}
+            />
+            <CharacterEditor
+                game={props.game ?? {gameId: 0, title: game.title}}
+                appearances={game.actors.map(a => ({
+                    ...a,
+                    actorName: a.name,
+                    gameTitle: game.title                    
+                }))}
+                onChange={appearances => {                    
+                    setGame({actors: appearances.map(ap => ({
+                        ...ap,
+                        name: ap.actorName
+                    }))})
+                }}
             />
         </Form>
     )
