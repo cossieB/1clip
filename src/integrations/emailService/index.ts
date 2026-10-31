@@ -1,11 +1,11 @@
 import { ConsoleService } from "./ConsoleService"
 import { EmailService } from "./emailService.interface"
-import { NodemailService } from "./NodeMailerService.server"
-import '@tanstack/solid-start/server-only'
+import { ResendService } from "./ResendService"
+import 'server-only'
 
 export const emailService = (function (): EmailService {
     if (process.env.NODE_ENV == 'production')
-        return new NodemailService()
+        return new ResendService()
     else
         return new ConsoleService()
 })()

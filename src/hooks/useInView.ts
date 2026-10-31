@@ -8,8 +8,9 @@ export function useInView(ref: Accessor<HTMLDivElement | undefined>) {
         else
             setIsInView(false)
     })
-    createEffect(() => {
-        const elem = ref();
+    createEffect(
+        () => ref(),
+        (elem) => {
         if (elem)
             observer.observe(elem)
     })

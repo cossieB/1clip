@@ -1,24 +1,25 @@
 {
-  "include": ["**/*.ts", "**/*.tsx"],
   "compilerOptions": {
-    "strict": true,
-    "esModuleInterop": true,
+    // General
     "jsx": "preserve",
-    "jsxImportSource": "solid-js",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "isolatedModules": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
+    "jsxImportSource": "@solidjs/web",
     "target": "ESNext",
-    "allowJs": true,
-    "forceConsistentCasingInFileNames": true,
-    "verbatimModuleSyntax": false,
-    "types": ["@testing-library/jest-dom"],
+
+    // Modules
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+
+    // Type Checking & Safety
+    "strict": true,
+    "skipLibCheck": true,
+    "types": ["vite/client"],
+
     "paths": {
       "~/*": ["./src/*"]
     },
-    "noEmit": true,
   }
 }

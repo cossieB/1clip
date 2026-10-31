@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "solid-store",
+  "main": "virtual:solid-ssr-handler",
+  "compatibility_date": "2026-10-26",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./dist/client",
+    "binding": "ASSETS",
+  },
+  "observability": {
+    "enabled": true,
+  },
+  "vars": {
+    "VITE_SITE_URL": "https://1clip.cossie.dev",
+    "VITE_STORAGE_DOMAIN": "https://r2.cossie.dev",
+    "NODE_ENV": "production"
+  }
+}

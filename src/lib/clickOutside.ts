@@ -1,16 +1,10 @@
-import { Accessor, onCleanup } from "solid-js";
+export default function clickOutside(handler: (e: MouseEvent) => void) {
+  return (el: Element) => {
+    const onClick = (e: MouseEvent) => {
+      if (!el.contains(e.target as Node)) handler(e);
+    };
 
-export default function clickOutside(el: Element, accessor: Accessor<() => void>) {
-  const onClick = (e: PointerEvent) => !el.contains(e.target! as Node) && accessor()?.();
-  document.body.addEventListener("click", onClick);
-
-  onCleanup(() => document.body.removeEventListener("click", onClick));
+    document.body.addEventListener("click", onClick);
+    return () => document.body.removeEventListener("click", onClick);
+  };
 }
-
-declare module "solid-js" {
-    namespace JSX {
-      interface DirectiveFunctions {  
-        clickOutside: typeof clickOutside
-      }
-    }
-  }

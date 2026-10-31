@@ -17,7 +17,7 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  
+
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
@@ -32,12 +32,12 @@ export default defineConfig({
     {
       name: 'setup db',
       testMatch: /global\.setup\.ts/,
-      teardown: 'cleanup db',
+      // teardown: 'cleanup db',
     },
-    {
-      name: 'cleanup db',
-      testMatch: /global\.teardown\.ts/,
-    },
+    // {
+    //   name: 'cleanup db',
+    //   testMatch: /global\.teardown\.ts/,
+    // },
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
@@ -75,7 +75,7 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'docker compose up -d && npx wait-on tcp:2345 && npx drizzle-kit push && npm run build && npm run start',
+    command: 'npx drizzle-kit push && npm run build && node --env-file=.env.test .output/server/index.mjs',
     url: 'http://localhost:1337',
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
