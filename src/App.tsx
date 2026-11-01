@@ -1,6 +1,7 @@
 import { Loading } from 'solid-js';
 import { Router } from './router';
 import './styles/index.css';
+import MainLayout from './components/MainLayout/MainLayout';
 
 export default function App() {
   return (
@@ -8,9 +9,9 @@ export default function App() {
       {(props) => (
         <>
           <Loading fallback={<main>Loading…</main>}>
-            <main>
+            <MainLayout>
               {props.children}
-            </main>
+            </MainLayout>
           </Loading>
         </>
       )}

@@ -1,0 +1,85 @@
+.compose {
+    grid-template-columns: auto 1fr;
+    align-items: start;
+
+    .editor {
+        grid-column: 2;
+        display: grid;
+        border-bottom: 1px solid var(--line);
+        transition: border-color .15s;
+
+        &:focus-within {
+            border-color: var(--accent);
+        }
+
+        /* Both layers MUST share identical text metrics */
+        .backdrop,
+        textarea {
+            grid-area: 1 / 1;
+            font: 400 1rem/1.5 var(--font-ui);
+            letter-spacing: normal;
+            padding: .4rem 0;
+            margin: 0;
+            border: 0;
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+            min-height: 3.2rem;
+        }
+
+        .backdrop {
+            color: var(--text);
+            pointer-events: none;
+        }
+
+        textarea {
+            width: 100%;
+            resize: none;
+            overflow: hidden;
+            /* a scrollbar would change wrapping */
+            background: transparent;
+            color: transparent;
+            caret-color: var(--accent);
+            outline: none;
+
+            &::placeholder {
+                color: var(--text-subtle);
+            }
+
+            &::selection {
+                color: transparent;
+                background: color-mix(in oklch, var(--accent) 35%, transparent);
+            }
+        }
+
+        .hash {
+            color: var(--accent-bright);
+        }
+
+        .mention {
+            color: var(--info);
+        }
+
+        .url {
+            color: var(--info);
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+    }
+
+    .row {
+        grid-column: 2;
+        display: flex;
+        gap: .5rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    :global .primary {
+        margin-left: auto;
+    }
+
+    button:not(:global .primary) {
+        padding: .55rem .8rem;
+        font-size: .85rem;
+    }
+}

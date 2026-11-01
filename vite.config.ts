@@ -3,8 +3,14 @@ import { fileRoutes } from 'filesystem-routing/vite';
 import { defineConfig } from 'vitest/config';
 import { cloudflare } from "@cloudflare/vite-plugin";
 import solid from '@solidjs/vite-plugin';
+import path from 'node:path';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      "~": path.resolve(import.meta.dirname, "./src")
+    }
+  },
   // Turnkey streaming SSR: no index.html and no entry files — the plugin
   // generates the entries around src/App.tsx, wrapped in src/Document.tsx.
   // `vite build` emits client assets to dist/client and the request handler
