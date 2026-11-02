@@ -1,0 +1,87 @@
+.dialog {
+    --dur: 0.3s;
+    --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+    /* reset.css zeroes margins, so re-center the modal */
+    margin: auto;
+    width: min(32rem, calc(100% - 2rem));
+    padding: 0;
+    color: var(--text);
+    background: linear-gradient(160deg, var(--surface-2), var(--surface-1));
+    border: 1px solid var(--accent-deep);
+    box-shadow: 0 0 40px -8px var(--accent-glow);
+
+    /* Exit state (also the pre-entry state) */
+    opacity: 0;
+    translate: 0 1.5rem;
+    scale: 0.96;
+    filter: blur(6px);
+
+    transition:
+        opacity var(--dur) var(--ease),
+        translate var(--dur) var(--ease),
+        scale var(--dur) var(--ease),
+        filter var(--dur) var(--ease),
+        overlay var(--dur) allow-discrete,
+        display var(--dur) allow-discrete;
+
+    &[open] {
+        opacity: 1;
+        translate: 0 0;
+        scale: 1;
+        filter: blur(0);
+    }
+
+    &::backdrop {
+        background: oklch(0 0 0 / 0);
+        backdrop-filter: blur(0);
+        transition:
+            background var(--dur) var(--ease),
+            backdrop-filter var(--dur) var(--ease),
+            overlay var(--dur) allow-discrete,
+            display var(--dur) allow-discrete;
+    }
+
+    &[open]::backdrop {
+        background: oklch(0 0 0 / 0.65);
+        backdrop-filter: blur(6px);
+    }
+}
+
+/* Entry: where the transition starts from when the dialog first opens */
+@starting-style {
+    .dialog[open] {
+        opacity: 0;
+        translate: 0 1.5rem;
+        scale: 0.96;
+        filter: blur(6px);
+    }
+
+    .dialog[open]::backdrop {
+        background: oklch(0 0 0 / 0);
+        backdrop-filter: blur(0);
+    }
+}
+
+.dialogPanel {
+    display: grid;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+}
+
+.dialogHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+
+    h2 {
+        margin-bottom: 0;
+    }
+
+    .dialogClose {
+        margin-left: auto;
+        padding: 0.5rem 0.7rem;
+    }
+}
+

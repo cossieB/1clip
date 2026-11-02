@@ -41,6 +41,14 @@ declare module "virtual:file-routes" {
       $$route: FileRouteEagerRef<typeof import("./src/routes/[...404]")>;
     },
     {
+      path: "/api/auth/*auth";
+      page: false;
+      $GET: FileRouteLazyRef<typeof import("./src/routes/api/auth/[...auth]")>;
+      $POST: FileRouteLazyRef<typeof import("./src/routes/api/auth/[...auth]")>;
+      $HEAD: FileRouteLazyRef<typeof import("./src/routes/api/auth/[...auth]")>;
+      $$route?: undefined;
+    },
+    {
       path: "/";
       page: true;
       $component: FileRouteLazyRef<typeof import("./src/routes/index")>;

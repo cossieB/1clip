@@ -1,5 +1,6 @@
-import { createSignal, createMemo, For } from "solid-js"
+import { createSignal, createMemo, For, useContext, Show, Loading } from "solid-js"
 import styles from "./PostComposer.module.css"
+import { AuthContext } from "~/features/auth/components/AuthContext";
 
 export const TOKEN_REGEX = /(?<hash>(?<=^|\s)#\w+\b)|(?<mention>(?<=^|\s)@[A-Za-z]\w{2,14}\b)|(?<url>https?:\/\/\S+)/g
 
@@ -22,33 +23,38 @@ function tokenize(input: string): Segment[] {
 export function PostComposer() {
     const [content, setContent] = createSignal("")
     const segments = createMemo(() => tokenize(content()))
-
+    const session = useContext(AuthContext)
     return (
-        <section class={["card", styles.compose]} aria-label="Create post">
-            <img class={styles.avatar} src="" alt="" />
+        <Loading>
+            <Show when={session().data}>
 
-            <div class={styles.editor}>
-                <div class={styles.backdrop} aria-hidden="true">
-                    <For each={segments()}>
-                        {(s) => (s.type ? <span class={styles[s.type]}>{s.text}</span> : s.text)}
-                    </For>
-                    {/* keeps a trailing newline from collapsing so heights stay in sync */}
-                    {"\u200b"}
-                </div>
-                <textarea
-                    placeholder="What did you just clutch?"
-                    aria-label="Post text"
-                    value={content()}
-                    onInput={(e) => setContent(e.currentTarget.value)}
-                    maxlength={500}
-                />
-            </div>
+                <section class={["card", styles.compose]} aria-label="Create post">
+                    <img class={styles.avatar} src="" alt="" />
 
-            <div class={styles.row}>
-                <button>Upload</button>
-                <button>Looking for group</button>
-                <button class="primary">Post</button>
-            </div>
-        </section>
+                    <div class={styles.editor}>
+                        <div class={styles.backdrop} aria-hidden="true">
+                            <For each={segments()}>
+                                {(s) => (s.type ? <span class={styles[s.type]}>{s.text}</span> : s.text)}
+                            </For>
+                            {/* keeps a trailing newline from collapsing so heights stay in sync */}
+                            {"\u200b"}
+                        </div>
+                        <textarea
+                            placeholder="What did you just clutch?"
+                            aria-label="Post text"
+                            value={content()}
+                            onInput={(e) => setContent(e.currentTarget.value)}
+                            maxlength={500}
+                        />
+                    </div>
+
+                    <div class={styles.row}>
+                        <button>Upload</button>
+                        <button>Looking for group</button>
+                        <button class="primary">Post</button>
+                    </div>
+                </section>
+            </Show>
+        </Loading>
     )
 }

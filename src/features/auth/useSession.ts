@@ -11,7 +11,7 @@ import { authClient } from "./authClient";
  * @param store Store instance.
  * @returns Store value.
  */
-function useStore<
+export function useStore<
 	SomeStore extends Store,
 	Value extends StoreValue<SomeStore>,
 >(store: SomeStore): Accessor<Value> {
@@ -37,5 +37,3 @@ function useStore<
 
 	return () => state().value;
 }
-
-export const useSession = useStore(authClient.useSession)

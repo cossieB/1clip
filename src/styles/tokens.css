@@ -34,12 +34,13 @@
     --ok: oklch(0.82 0.20 155);
     --warn: oklch(0.84 0.15 85);
     --danger: oklch(0.66 0.23 27);
-    --info: oklch(0.80 0.13 215);
+    --info: oklch(0.62 0.18 235);
 
     /* Shape */
     --bevel: 18px;
     --radius: 0;
 
-    --font-header: 'Press Start 2p', system-ui;
+    --font-brand: 'Press Start 2p', system-ui;
+    --font-header: "Orbitron", sans-serif;
     --font-ui: "Chakra Petch", sans-serif;
 }
