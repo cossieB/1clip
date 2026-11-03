@@ -2,7 +2,6 @@
     .field {
         display: grid;
         gap: .35rem;
-        max-width: 22rem;
 
         label {
             font-size: .7rem;

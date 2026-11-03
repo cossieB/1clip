@@ -3,13 +3,13 @@ import * as schema from "./schema/";
 
 export const relations = defineRelations(schema, (r) => ({
 	games: {
-		developer: r.one.developers({
+		developer: r.one.companies({
 			from: r.games.developerId,
-			to: r.developers.developerId
+			to: r.companies.companyId
 		}),
-		publisher: r.one.publishers({
+		publisher: r.one.companies({
 			from: r.games.publisherId,
-			to: r.publishers.publisherId
+			to: r.companies.companyId
 		}),
 		platforms: r.many.platforms({
 			from: r.games.gameId.through(r.gamePlatforms.gameId),

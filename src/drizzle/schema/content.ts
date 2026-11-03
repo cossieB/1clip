@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { timestamp, integer, pgTable, text, varchar, primaryKey, pgEnum, jsonb, check, uuid, foreignKey, date, unique, customType, index, boolean } from "drizzle-orm/pg-core";
 import { users } from "./auth";
-import { games } from "./static";
+import { games } from "./info";
 
 export const posts = pgTable('posts', {
     postId: integer("post_id").primaryKey().generatedAlwaysAsIdentity(),

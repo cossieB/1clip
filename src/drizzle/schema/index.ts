@@ -1,3 +1,3 @@
 export * from "./auth"
-export * from "./static"
+export * from "./info"
 export * from "./content"

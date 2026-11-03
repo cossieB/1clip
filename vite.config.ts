@@ -1,7 +1,6 @@
 import { fileURLToPath } from 'node:url';
 import { fileRoutes } from 'filesystem-routing/vite';
 import { defineConfig } from 'vitest/config';
-import { cloudflare } from "@cloudflare/vite-plugin";
 import solid from '@solidjs/vite-plugin';
 import path from 'node:path';
 
@@ -16,13 +15,13 @@ export default defineConfig({
   // `vite build` emits client assets to dist/client and the request handler
   // to dist/server, plus the Node server (dist/server/node.js) `npm start` runs.
   plugins: [
-    cloudflare({ viteEnvironment: { name: "ssr" } }),
+    // cloudflare({ viteEnvironment: { name: "ssr" } }),
     solid({
       start: {
-        middleware: './src/middleware.ts',
+        middleware: './src/middleware/index.ts',
         // Emit dist/server/node.js: a ready-to-run Node server (static
         // assets + the handler). Other platforms import dist/server/server.js.
-        nodeServer: false,
+        nodeServer: true,
         // Typed env is on by convention: ./env.ts is probed automatically.
         // (Set the top-level `env: false` option to opt out.)
       },

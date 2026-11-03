@@ -1,5 +1,5 @@
-import { Element, Loading, Show, useContext } from "solid-js"
-import { AuthContext } from "./AuthContext"
+import { type Element, Loading, Show } from "solid-js"
+import { session } from "../authApi"
 
 type Props = {
     fallback?: Element
@@ -7,7 +7,6 @@ type Props = {
 }
 
 export function ShowWhenAuthed(props: Props) {
-    const session = useContext(AuthContext)
 
     return (
         <Loading>

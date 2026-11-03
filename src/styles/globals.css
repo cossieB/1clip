@@ -63,7 +63,7 @@ p {
 }
 
 /* ── Buttons (sharp, never bevelled) ── */
-button {
+button, .button {
     font: 700 .95rem/1 "Chakra Petch", sans-serif;
     padding: .8rem 1.2rem;
     border: 1px solid var(--line);
@@ -110,6 +110,12 @@ button {
         &:hover {
             background: color-mix(in oklch, var(--accent) 14%, transparent);
         }
+    }
+    &:disabled {
+        background-color: oklch(from var(--surface-3) l c h / 0.4);
+        pointer-events: none;
+        border-color: var(--line);
+        color: var(--text-muted);
     }
 }
 
@@ -187,7 +193,6 @@ button {
 .field {
     display: grid;
     gap: .35rem;
-    max-width: 22rem;
 
     label {
         font-size: .7rem;
@@ -214,7 +219,7 @@ button {
     }
 }
 
-input {
+input, .input {
     background: var(--surface-1);
     color: var(--text);
     border: 1px solid var(--border-strong);
@@ -238,4 +243,10 @@ textarea {
 
 textarea {
     field-sizing: content;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }

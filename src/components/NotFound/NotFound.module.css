@@ -1,0 +1,13 @@
+.nf {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    >h1 {
+        font-size: clamp(2rem, 5vw, 10rem);
+    }
+    >span {
+        font-size: clamp(1rem, 2vw, 5rem);
+    }
+}

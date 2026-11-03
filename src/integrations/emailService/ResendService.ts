@@ -1,4 +1,4 @@
-import { CreateEmailOptions, Resend } from 'resend';
+import { type CreateEmailOptions, Resend } from 'resend';
 import type { EmailOptions, EmailService } from "./emailService.interface"
 import env from 'virtual:solid-env/server';
 

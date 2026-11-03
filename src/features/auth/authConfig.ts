@@ -1,4 +1,4 @@
-import { APIError, betterAuth } from "better-auth";
+import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { username } from "better-auth/plugins";
 import { db } from "~/drizzle/db";
@@ -21,11 +21,6 @@ export const auth = betterAuth({
                 input: false,
                 required: true,
                 defaultValue: "user"
-            },
-            banner: {
-                type: "string",
-                input: true,
-                required: false,
             }
         },
         changeEmail: {
@@ -99,7 +94,7 @@ export const auth = betterAuth({
             maxUsernameLength: 15,
             usernameValidator(username) {
                 return /^[a-zA-Z]\w{2,14}$/.test(username)
-            },
+            },            
         }),
     ],
     advanced: {
@@ -108,12 +103,11 @@ export const auth = betterAuth({
             generateId: "uuid"
         },
         ipAddress: {
-            ipAddressHeaders: ["cf-connecting-ip", "x-forwarded-for"]
+            ipAddressHeaders: ["cf-connecting-ip", "x-real-ip", "x-forwarded-for"]
         }
     },
 
     rateLimit: {
-        enabled: true,
         customRules: {
             "/send-verification-email": {
                 window: 60,

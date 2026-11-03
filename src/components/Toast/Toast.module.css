@@ -1,0 +1,58 @@
+.toast {
+    padding: 1rem 2rem;
+    --c: var(--surface-1)
+    padding: 1rem 2rem;
+    background-color: color-mix(in oklch, var(--c) 5%, transparent );    
+    color: var(--c);
+    border: none;
+    outline: 1px solid var(--c);
+    opacity: 0;
+    scale: 0.9;
+    top: calc(var(--idx) * 3rem + 1rem);
+    left: 1rem;
+    height: 2.5rem;
+    transition: 
+        opacity 200ms ease,
+        scale 200ms ease,
+        top 200ms ease,
+        overlay 200ms allow-discrete,
+        display 200ms allow-discrete;
+
+    font-family: 'Orbitron';
+    backdrop-filter: blur(10px);
+
+    >div {
+        height: 100%;
+        display: flex;
+        align-items: center;
+    }
+
+    button {
+        padding: 0;
+        background: none;
+        border: none;
+        cursor: pointer;
+        height: fit-content;
+    }
+    
+    &:popover-open {
+        opacity: 1;
+        scale: 1;
+        
+        @starting-style {
+            opacity: 0;
+            scale: 0.9;
+        }
+    }
+    &.error {
+        --c: var(--danger)
+    }
+    &.warning {
+        --c: var(--warn)
+        
+    }
+    &.info {
+        --c: var(--info)
+
+    }
+}

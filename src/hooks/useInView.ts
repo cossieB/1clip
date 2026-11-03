@@ -1,4 +1,4 @@
-import { Accessor, createEffect, createSignal } from "solid-js"
+import { type Accessor, createEffect, createSignal } from "solid-js"
 
 export function useInView(ref: Accessor<HTMLDivElement | undefined>) {
     const [isInView, setIsInView] = createSignal(false)

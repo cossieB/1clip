@@ -1,10 +1,14 @@
 .me {
+    all: unset;
+    cursor: pointer;
     margin-top: auto;
     display: flex;
     align-items: center;
     gap: .75rem;
     padding: .6rem;
     border: 1px solid var(--border);
+    background: none;
+    position: relative;
 
     b {
         display: block;
@@ -23,17 +27,92 @@
         align-content: start;
         min-width: 0
     }
-    @media (width <= 1180px) {
+
+    &[data-s] {
+        &::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: .75rem;
+            height: .75rem;
+            background: var(--ok);
+            border: 2px solid var(--bg);
+        }
+
+        &[data-s="off"]::before {
+            background: var(--danger);
+        }
+
+        &[data-s="on"]::before {
+            background: var(--ok);
+        }
+
+        &[data-s="unavailable"]::before {
+            background-color: var(--warn);
+        }
+    }
+
+    @media (width <=1180px) {
         justify-content: center;
         border: 0;
         padding: 0;
 
         div {
             display: none;
-        }        
+        }
     }
+
     .avatar {
         height: 2.1rem;
         aspect-ratio: 1;
+    }
+}
+
+#userStatus {
+    --bevel: 8px;
+    margin-bottom: 0.5rem;
+    background-color: var(--surface-1);
+    opacity: 0;
+    flex-direction: column;
+    gap: 0.5rem;
+    border: none;
+    padding: 1rem;    
+    position-area: top center;
+    transform: scale(0.95) translateY(-10px);    
+    transition:
+        opacity 200ms ease,
+        transform 200ms ease,
+        overlay 200ms allow-discrete,
+        display 200ms allow-discrete;
+
+    li {
+        width: 100%;
+    }
+
+    button {
+        width: 100%;
+    }
+
+    &:popover-open {
+        display: flex;
+        opacity: 1;
+        transform: scale(1) translateY(0);        
+
+        @starting-style {
+            opacity: 0;
+            transform: scale(0.95) translateY(-10px);
+        }        
+    }
+
+    [role="group"] {
+        display: flex;
+        input {
+            all: unset;
+            padding-right: 0.5rem;
+        }
+        button {
+            padding: 0.5rem;
+        }
     }
 }

@@ -49,6 +49,12 @@ declare module "virtual:file-routes" {
       $$route?: undefined;
     },
     {
+      path: "/auth/signup";
+      page: true;
+      $component: FileRouteLazyRef<typeof import("./src/routes/auth/signup")>;
+      $$route?: undefined;
+    },
+    {
       path: "/";
       page: true;
       $component: FileRouteLazyRef<typeof import("./src/routes/index")>;
@@ -73,6 +79,14 @@ declare module "virtual:file-routes" {
       page: true;
       $component: FileRouteLazyRef<typeof import("./src/routes/[...404]")>;
       $$route: FileRouteEagerRef<typeof import("./src/routes/[...404]")>;
+      children?: undefined;
+    },
+    {
+      path: "/auth/signup";
+      id: "/auth/signup";
+      page: true;
+      $component: FileRouteLazyRef<typeof import("./src/routes/auth/signup")>;
+      $$route?: undefined;
       children?: undefined;
     }
   ];

@@ -1,19 +1,8 @@
 import { sql } from "drizzle-orm";
 import { timestamp, integer, pgTable, text, varchar, primaryKey, pgEnum, jsonb, check, uuid, foreignKey, date, unique, customType, index, boolean } from "drizzle-orm/pg-core";
 
-export const developers = pgTable("developers", {
-    developerId: integer("developer_id").primaryKey().generatedAlwaysAsIdentity(),
-    name: varchar("name").notNull(),
-    logo: text("logo").notNull(),
-    location: varchar("location"),
-    summary: text("summary").notNull().default(""),
-    country: varchar("country"),
-    dateAdded: timestamp("date_added", { withTimezone: true }).notNull().defaultNow(),
-    dateModified: timestamp("date_modified", { withTimezone: true }).notNull().$onUpdateFn(() => new Date()),
-})
-
-export const publishers = pgTable("publishers", {
-    publisherId: integer("publisher_id").primaryKey().generatedAlwaysAsIdentity(),
+export const companies = pgTable("companies", {
+    companyId: integer("company_id").primaryKey().generatedAlwaysAsIdentity(),
     name: varchar("name").notNull(),
     logo: text("logo").notNull(),
     headquarters: varchar("headquarters"),
@@ -27,8 +16,8 @@ export const games = pgTable("games", {
     gameId: integer("game_id").primaryKey().generatedAlwaysAsIdentity(),
     title: varchar("title").notNull(),
     summary: text("summary").notNull().default(""),
-    developerId: integer("developer_id").notNull().references(() => developers.developerId),
-    publisherId: integer("publisher_id").notNull().references(() => publishers.publisherId),
+    developerId: integer("developer_id").notNull().references(() => companies.companyId),
+    publisherId: integer("publisher_id").notNull().references(() => companies.companyId),
     releaseDate: date("release_date").notNull(),
     cover: text("cover").notNull(),
     banner: text("banner").notNull(),

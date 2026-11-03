@@ -2,7 +2,7 @@ import { Loading } from 'solid-js';
 import { Router } from './router';
 import './styles/index.css';
 import MainLayout from './components/MainLayout/MainLayout';
-import { AuthProvider } from './features/auth/components/AuthContext';
+import { ToastProvider } from './components/Toast/ToastProvider';
 
 export default function App() {
   return (
@@ -10,11 +10,11 @@ export default function App() {
       {(props) => (
         <>
           <Loading fallback={<main>Loading…</main>}>
-            <AuthProvider>
+            <ToastProvider>
               <MainLayout>
                 {props.children}
               </MainLayout>
-            </AuthProvider>
+            </ToastProvider>
           </Loading>
         </>
       )}

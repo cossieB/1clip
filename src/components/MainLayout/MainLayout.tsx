@@ -1,4 +1,4 @@
-import { ParentProps } from "solid-js";
+import { type ParentProps } from "solid-js";
 import styles from "./MainLayout.module.css"
 import { PlusIcon, UnlockIcon } from "@lucide/solid"
 import { Nav, Tabbar } from "./Nav";
@@ -8,6 +8,8 @@ import { Trending } from "./Trending";
 import { UserNavItem } from "~/features/auth/components/UserNavItem";
 import { SearchBar } from "./Searchbar";
 import { ShowWhenAuthed } from "~/features/auth/components/ShowWhenAuthed";
+import { Dialog } from "../Popover/Dialog";
+import { paths } from "~/router";
 
 export default function MainLayout(props: ParentProps) {
 
@@ -19,10 +21,14 @@ export default function MainLayout(props: ParentProps) {
                 <Nav />
                 <ShowWhenAuthed
                     fallback={
-                        <button class={["primary", styles.postbtn]}>
+                        <a
+                            class={["button", "primary", styles.postbtn]}
+                            href={paths({dialog: "signin"}, )}  
+                            replace
+                        >
                             <UnlockIcon />
                             <span>Login</span>
-                        </button>
+                        </a>
                     }
                 >
                     <button class={["primary", styles.postbtn]}>
@@ -46,6 +52,7 @@ export default function MainLayout(props: ParentProps) {
                 <Trending />
             </aside>
             <Tabbar />
+            <Dialog />
         </div>
     )
 }

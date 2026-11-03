@@ -1,6 +1,6 @@
-import { createSignal, createMemo, For, useContext, Show, Loading } from "solid-js"
+import { createSignal, createMemo, For, Show, Loading } from "solid-js"
 import styles from "./PostComposer.module.css"
-import { AuthContext } from "~/features/auth/components/AuthContext";
+import { session } from "~/features/auth/authApi";
 
 export const TOKEN_REGEX = /(?<hash>(?<=^|\s)#\w+\b)|(?<mention>(?<=^|\s)@[A-Za-z]\w{2,14}\b)|(?<url>https?:\/\/\S+)/g
 
@@ -23,7 +23,6 @@ function tokenize(input: string): Segment[] {
 export function PostComposer() {
     const [content, setContent] = createSignal("")
     const segments = createMemo(() => tokenize(content()))
-    const session = useContext(AuthContext)
     return (
         <Loading>
             <Show when={session().data}>

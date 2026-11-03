@@ -1,52 +1,65 @@
-import { createEffect, createUniqueId, Show, type ParentProps } from "solid-js";
+import { createEffect, createUniqueId, Match, Show, Switch, type ParentProps } from "solid-js";
 import styles from "./Dialog.module.css"
+import { XIcon } from "@lucide/solid";
+import { useSearchParams } from "@solidjs/router";
+import { paths } from "~/router";
+import { LoginForm } from "~/features/auth/components/LoginForm";
+import SignupForm from "~/routes/auth/signup";
 
-type DialogProps = ParentProps<{
-    open: boolean;
-    onClose: () => void;
-    title?: string;
-}>;
-
-export function Dialog(props: DialogProps) {
+export function Dialog() {
     let dialog!: HTMLDialogElement;
     const titleId = createUniqueId();
+    const [search, setSearch] = useSearchParams(paths)
 
-    // Sync the `open` prop to the native dialog state
-    createEffect(
-        () => props.open,
-        (open) => {
-            if (open && !dialog.open) dialog.showModal();
-            if (!open && dialog.open) dialog.close();
-        },
-    );
+    const title = () => {
+        switch (search.dialog) {
+            case "signin":
+                return "Log In"
+            case "signup":
+                return "Sign Up"
+        }
+    }
 
-    // Click on the backdrop (the dialog element itself) closes it
-    const onClick = (e: MouseEvent) => {
-        if (e.target === dialog) props.onClose();
-    };
+    createEffect(() => search.dialog, d => {
+        if (d)
+            dialog.showModal()
+        else
+            dialog.close()
+    })
 
     return (
         <dialog
             ref={(el) => (dialog = el)}
             class={[styles.dialog, "cutout"]}
-            aria-labelledby={props.title ? titleId : undefined}
-            onClick={onClick}
-            onClose={() => props.onClose()}
+            aria-labelledby={titleId}
+            id="app-dialog"
+            onClose={() => setSearch({dialog: undefined}, {replace: true})}
         >
             <div class={styles.dialogPanel}>
                 <header class={styles.dialogHeader}>
-                    <Show when={props.title}>
-                        <h2 id={titleId}>{props.title}</h2>
+                    <Show when={title()}>
+                        <h2 id={titleId}>{title()}</h2>
                     </Show>
                     <button
                         class={["ghost", styles.dialogClose]}
                         aria-label="Close dialog"
-                        onClick={() => props.onClose()}
+                        commandfor={"app-dialog"}
+                        command="close"
+                        type="button"
                     >
-                        ✕
+                        <XIcon />
                     </button>
                 </header>
-                <div class={styles.dialogBody}>{props.children}</div>
+                <div class={styles.dialogBody}>
+                    <Switch>
+                        <Match when={search.dialog == "signin"}>
+                            <LoginForm />
+                        </Match>
+                        <Match when={search.dialog == "signup"}>
+                            <SignupForm />
+                        </Match>
+                    </Switch>
+                </div>
             </div>
         </dialog>
     );

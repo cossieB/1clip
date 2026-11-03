@@ -1,6 +1,6 @@
 import { inferAdditionalFields, usernameClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/client";
-import { auth } from "./server";
+import { auth } from "./authConfig";
 
 export const authClient = createAuthClient({
     plugins: [

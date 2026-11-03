@@ -1,5 +1,5 @@
 import { ConsoleService } from "./ConsoleService"
-import { EmailService } from "./emailService.interface"
+import { type EmailService } from "./emailService.interface"
 import { ResendService } from "./ResendService"
 import 'server-only'
 
