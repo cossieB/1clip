@@ -1,15 +1,12 @@
 import { action, affects, createMemo, createOptimistic, createStore, refresh, useContext } from "solid-js";
 import { authClient } from "./authClient";
-import { useSearchParams } from "@solidjs/router";
 import { ToastContext } from "~/components/Toast/ToastProvider";
-import { paths } from "~/router";
 import { ensureUnauthed } from "./hooks/useEnsureUnauthed";
 
 export const session = createMemo(() => authClient.getSession(), { ssrSource: "client" })
 
 export function useSignUp() {
     ensureUnauthed();
-    const [_, setSearch] = useSearchParams(paths)
     const { addToast } = useContext(ToastContext)
     const [input, setInput] = createStore({
         email: "",

@@ -17,8 +17,34 @@ export const posts = pgTable('posts', {
     searchVector: customType({ dataType: () => 'tsvector' })('search_vector').generatedAlwaysAs(sql`(setweight(to_tsvector('english'::regconfig, (COALESCE(title, ''::character varying))::text), 'A'::"char") || setweight(to_tsvector('english'::regconfig, (COALESCE(text, ''::character varying))::text), 'B'::"char"))`),
 }, table => [
     index().using("gin", table.searchVector),
-    index().on(table.userId)
+    index().on(table.createdAt)
 ])
+
+export const lfg = pgTable("lfg", {
+    lfgId: integer("lfg_id").primaryKey().generatedAlwaysAsIdentity(),
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+    text: varchar("text", { length: 255 }).notNull().default(""),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    editedOn: timestamp("edited_on", { withTimezone: true }).notNull().$onUpdateFn(() => new Date()),
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
+    gameId: integer("game_id").references(() => games.gameId, { onDelete: "set null" }),
+    /** excluding owner */
+    slots: integer("slots").notNull(),
+    slotsTaken: integer("slots_taken").notNull(),
+}, table => [
+    index().on(table.gameId),
+    index().on(table.createdAt)
+])
+
+export const status = pgEnum("status", ["pending", "accepted", "rejected"])
+
+export const lfgApplications = pgTable("lfg_applications", {
+    applicationId: integer("application_id").primaryKey().generatedAlwaysAsIdentity(),
+    lfgId: integer("lfg_id").notNull().references(() => lfg.lfgId, { onDelete: "cascade" }),
+    candidateId: uuid("candidate_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    status: status("status").notNull().default("pending"),
+    appliedAt: timestamp("applied_at", { withTimezone: true }).notNull().defaultNow()
+})
 
 export const comments = pgTable("comments", {
     commentId: integer("comment_id").primaryKey().generatedAlwaysAsIdentity(),
@@ -37,22 +63,18 @@ export const comments = pgTable("comments", {
     index().on(t.postId)
 ])
 
-export const reactionType = pgEnum("reaction_type", ["like", "dislike"])
-
-export const postReactions = pgTable("post_reactions", {
+export const postLikes = pgTable("post_likes", {
     userId: uuid("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
     postId: integer("post_id").references(() => posts.postId, { onDelete: "cascade" }),
     date: timestamp("date", { withTimezone: true }).notNull().defaultNow(),
-    reaction: reactionType("reaction").notNull()
 }, t => [
     primaryKey({ columns: [t.postId, t.userId] })
 ])
 
-export const commentReactions = pgTable("comment_reactions", {
+export const commentLikes = pgTable("comment_likes", {
     userId: uuid("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
     commentId: integer("comment_id").notNull().references(() => comments.commentId, { onDelete: "cascade" }),
     date: timestamp("date", { withTimezone: true }).notNull().defaultNow(),
-    reaction: reactionType("reaction").notNull()
 }, t => [
     primaryKey({ columns: [t.commentId, t.userId] })
 ])
@@ -65,7 +87,8 @@ export const media = pgTable("media", {
     metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull().default({}),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
 }, table => [
-    index().on(table.postId, table.gameId)
+    index().on(table.postId),
+    index().on(table.gameId)
 ])
 
 export const postTags = pgTable("post_tags", {
@@ -90,24 +113,11 @@ export const notifications = pgTable("notifications", {
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     readAt: timestamp('read_at', { withTimezone: true }),
     actionUrl: text("action_url"),
-    type: varchar("type", {length: 30}).$type<"LIKE" | "REPLY" | "MENTION" | "FOLLOW" | "SYSTEM">(),
+    type: varchar("type", { length: 30 }).$type<"LIKE" | "REPLY" | "MENTION" | "FOLLOW" | "SYSTEM">(),
     title: text(),
     message: text(),
-    entityType: varchar("entity_type", {length: 50}),
+    entityType: varchar("entity_type", { length: 50 }),
     entityId: integer("entity_id")
 }, table => [
     index().on(table.recipientId)
 ])
-
-export const reviews = pgTable("reviews", {
-    reviewId: integer("review_id").primaryKey().generatedAlwaysAsIdentity(),
-    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-    gameId: integer("game_id").notNull().references(() => games.gameId, { onDelete: "cascade" }),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-    editedAt: timestamp('edited_at', { withTimezone: true }),
-    score: integer("score").notNull(),
-    text: text("text").notNull().default("")
-}, (table) => [
-    check("valid_review_score_check", sql`${table.score} >= 1 AND ${table.score} <= 5`),
-    unique().on(table.gameId, table.userId),
-]);

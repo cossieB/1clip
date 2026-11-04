@@ -21,6 +21,11 @@ export const auth = betterAuth({
                 input: false,
                 required: true,
                 defaultValue: "user"
+            },
+            banner: {
+                type: "string",
+                input: true,
+                required: false
             }
         },
         changeEmail: {

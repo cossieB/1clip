@@ -1,3 +1,4 @@
+@layer components {
 .compose {
     grid-template-columns: auto 1fr;
     align-items: start;
@@ -82,4 +83,5 @@
         padding: .55rem .8rem;
         font-size: .85rem;
     }
+}    
 }

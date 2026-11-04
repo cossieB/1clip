@@ -45,9 +45,9 @@ export const relations = defineRelations(schema, (r) => ({
 			from: r.posts.postId,
 			to: r.comments.postId
 		}),
-		reactions: r.many.postReactions({
+		reactions: r.many.postLikes({
 			from: r.posts.postId,
-			to: r.postReactions.postId
+			to: r.postLikes.postId
 		}),
 		
 	},

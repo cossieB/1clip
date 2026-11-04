@@ -2,7 +2,6 @@ import { type ParentProps } from "solid-js";
 import styles from "./MainLayout.module.css"
 import { PlusIcon, UnlockIcon } from "@lucide/solid"
 import { Nav, Tabbar } from "./Nav";
-import { PostComposer } from "~/features/posts/components/PostComposer";
 import { FriendsOnline } from "./FriendsOnline";
 import { Trending } from "./Trending";
 import { UserNavItem } from "~/features/auth/components/UserNavItem";
@@ -10,11 +9,13 @@ import { SearchBar } from "./Searchbar";
 import { ShowWhenAuthed } from "~/features/auth/components/ShowWhenAuthed";
 import { Dialog } from "../Popover/Dialog";
 import { paths } from "~/router";
+import { VerificationReminder } from "./VerificationReminder";
 
 export default function MainLayout(props: ParentProps) {
 
     return (
         <div class={styles.shell}>
+
             {/* <!-- LEFT RAIL --> */}
             <nav class={styles.rail} aria-label="Main">
                 <div class={styles.brand}>1Clip</div>
@@ -23,7 +24,7 @@ export default function MainLayout(props: ParentProps) {
                     fallback={
                         <a
                             class={["button", "primary", styles.postbtn]}
-                            href={paths({dialog: "signin"}, )}  
+                            href={paths({ dialog: "signin" },)}
                             replace
                         >
                             <UnlockIcon />
@@ -42,7 +43,7 @@ export default function MainLayout(props: ParentProps) {
             {/* <!-- CENTER FEED --> */}
             <main>
                 <SearchBar />
-                <PostComposer />
+                <VerificationReminder />
                 {props.children}
             </main>
 

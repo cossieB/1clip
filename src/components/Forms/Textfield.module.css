@@ -1,54 +1,52 @@
-@layer components {
-    .field {
-        display: grid;
-        gap: .35rem;
+.field {
+    display: grid;
+    gap: .35rem;
 
-        label {
-            font-size: .7rem;
-            letter-spacing: .15em;
-            text-transform: uppercase;
-            color: var(--text-subtle);
-            transition: color .15s;
-        }
-
-        &:has(input:focus-visible) label {
-            color: var(--accent);
-        }
-
-        input::placeholder {
-            color: var(--text-subtle);
-        }
-
-        &[data-invalid] {
-            label {
-                color: var(--danger);
-            }
-
-            input {
-                border-color: var(--danger);
-
-                &:focus-visible {
-                    border-color: var(--danger);
-                    box-shadow: 0 6px 18px -8px color-mix(in oklch, var(--danger) 55%, transparent);
-                }
-            }
-        }
-    }
-
-    .note {
-        font-size: .8rem;
+    label {
+        font-size: .7rem;
+        letter-spacing: .15em;
+        text-transform: uppercase;
         color: var(--text-subtle);
-
-        &[role="alert"] {
-            color: var(--danger);
-            animation: note-in .15s ease-out;
-        }
+        transition: color .15s;
     }
 
-    @keyframes note-in {
-        from {
-            opacity: 0;
-            translate: 0 -4px;
+    &:has(input:focus-visible) label {
+        color: var(--accent);
+    }
+
+    input::placeholder {
+        color: var(--text-subtle);
+    }
+
+    &[data-invalid] {
+        label {
+            color: var(--danger) !important;
         }
+
+        input {
+            border-color: var(--danger);
+
+            &:focus-visible {
+                border-color: var(--danger);
+                box-shadow: 0 6px 18px -8px color-mix(in oklch, var(--danger) 55%, transparent);
+            }
+        }
+    }
+}
+
+.note {
+    font-size: .8rem;
+    color: var(--text-subtle);
+
+    &[role="alert"] {
+        color: var(--danger);
+        animation: note-in .15s ease-out;
+    }
+}
+
+@keyframes note-in {
+    from {
+        opacity: 0;
+        translate: 0 -4px;
     }
 }

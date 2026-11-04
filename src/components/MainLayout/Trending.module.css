@@ -1,22 +1,20 @@
-@layer components {
-    .trending {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
+.trending {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 
-        a {
-            font: 600 .68rem var(--font-ui);
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            padding: .2rem .5rem;
-            --c: var(--accent);
-            color: var(--c);
-            border: 1px solid color-mix(in oklch, var(--c) 50%, transparent);
-            background: color-mix(in oklch, var(--c) 12%, transparent);
+    a {
+        font: 600 .68rem var(--font-ui);
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        padding: .2rem .5rem;
+        --c: var(--accent);
+        color: var(--c);
+        border: 1px solid color-mix(in oklch, var(--c) 50%, transparent);
+        background: color-mix(in oklch, var(--c) 12%, transparent);
 
-            &:hover {
-                --c: var(--accent-bright)
-            }
+        &:hover {
+            --c: var(--accent-bright)
         }
     }
 }

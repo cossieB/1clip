@@ -1,35 +1,35 @@
-@layer component {
-    .btn {
-        --percent: 0;
-        background: transparent;
-        position: relative;
+.btn {
+    --percent: 0;
+    background: transparent;
+    position: relative;
+
+    &::after {
+        content: "";
+        background-color: var(--accent-deep);
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        z-index: -1;
+        transition: width 25ms linear;
+        width: calc(var(--percent) * 1%);
+    }
+
+    &[data-type="danger"] {
         &::after {
-            content: "";
-            background-color: var(--accent-deep);
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            z-index: -1;
-            transition: width 25ms linear;
-            width: calc(var(--percent) * 1%);
+            background-color: var(--danger);
         }
-        &[data-type="danger"] {
-            &::after {
-                background-color: var(--danger);
-            }
-        }
+    }
 
-        >span {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            justify-content: center;
+    >span {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        justify-content: center;
 
-            span {
-                font-weight: bold;
-                font-style: italic;
-            }
+        span {
+            font-weight: bold;
+            font-style: italic;
         }
     }
 }

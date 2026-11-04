@@ -1,63 +1,61 @@
-@layer components {
-    .li {
-        display: grid;
-        grid-template-columns: auto 1fr;
-        justify-content: center;
-        gap: 0.25rem;
-        padding: .4rem .3rem;
-        font: 600 .9rem var(--font-ui);
-        position: relative;
+.li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: .4rem .3rem;
+    font: 600 .9rem var(--font-ui);
+    position: relative;
 
-        small {
-            display: block;
-            color: var(--text-subtle);
-            font: 400 .78rem var(--font-ui);
-            place-self: start;
-        }
-
-        span {
-            align-self: end;
-        }
-
-        &[data-s] {
-            &::before {
-                content: "";
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: .75rem;
-                height: .75rem;
-                background: var(--ok);
-                border: 2px solid var(--bg);
-            }
-
-            &[data-s="off"]::before {
-                background: var(--danger);
-            }
-
-            &[data-s="on"]::before {
-                background: var(--ok);
-            }
-
-            &[data-s="unavailable"]::before {
-                background-color: var(--warn);
-            }
-        }
+    small {
+        display: block;
+        color: var(--text-subtle);
+        font: 400 .78rem var(--font-ui);
+        place-self: start;
     }
 
+    span {
+        align-self: end;
+    }
 
-    .avatar {
-        width: 2.6rem;
-        height: 2.6rem;
-        display: block;
-        flex: none;
-        border-radius: 10px 0 10px 0;
-        grid-row: span 2;
-        position: relative;
-
-        &.sm {
-            width: 2.1rem;
-            height: 2.1rem;
+    &[data-s] {
+        &::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: .75rem;
+            height: .75rem;
+            background: var(--ok);
+            border: 2px solid var(--bg);
         }
+
+        &[data-s="off"]::before {
+            background: var(--danger);
+        }
+
+        &[data-s="on"]::before {
+            background: var(--ok);
+        }
+
+        &[data-s="unavailable"]::before {
+            background-color: var(--warn);
+        }
+    }
+}
+
+
+.avatar {
+    width: 2.6rem;
+    height: 2.6rem;
+    display: block;
+    flex: none;
+    border-radius: 10px 0 10px 0;
+    grid-row: span 2;
+    position: relative;
+
+    &.sm {
+        width: 2.1rem;
+        height: 2.1rem;
     }
 }
