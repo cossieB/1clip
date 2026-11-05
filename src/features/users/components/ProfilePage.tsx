@@ -1,29 +1,24 @@
-import { createEffect, isPending, Loading, Show } from "solid-js";
+import { isPending, Loading, Show } from "solid-js";
 import z from "zod";
 import { ItemList } from "~/components/Forms/ItemList";
 import { TextArea } from "~/components/Forms/Textarea";
 import { TextField } from "~/components/Forms/Textfield";
 import { session, useLogout } from "~/features/auth/authApi";
-import { useNavigate } from "@solidjs/router";
-import { paths } from "~/router";
 import { Spinner } from "~/components/Loader/Spinner";
 import { UpdateUserSchema } from "../utils/zod";
 import { useProfile } from "../hooks/useProfile";
 import { HoldClickBtn } from "~/components/HoldClickBtn/HoldClickBtn";
+import { DropZone } from "~/components/Forms/DropZone";
+import styles from "./ProfilePage.module.css"
 
 export default function ProfilePage() {
     const { isSubmitting, updateUserAction, input, setInput } = useProfile()
-    const navigate = useNavigate()
-
-    createEffect(() => session().data, (s) => {
-        if (!s) navigate(paths({ dialog: "signin" }))
-    })
-    createEffect(isSubmitting, s => console.log(s))
 
     const isDisabled = () => !UpdateUserSchema.safeParse(input).success || isSubmitting()
     const logout = useLogout()
     return (
         <Loading fallback={<Spinner />} >
+
             <form
                 class="form card"
                 onSubmit={async e => {
@@ -31,6 +26,18 @@ export default function ProfilePage() {
                     await updateUserAction()
                 }}
             >
+                <div
+                    class={styles.files}
+                >
+                    <DropZone
+                        setFile={f => { }}
+                        image={input.image}
+                    />
+                    <DropZone
+                        setFile={f => { }}
+                        image={input.banner}
+                    />
+                </div>
                 <TextField
                     label="Display Name"
                     value={input.displayName}
@@ -91,8 +98,8 @@ export default function ProfilePage() {
                 label="Log Out"
                 variant="danger"
                 disabled={isPending(session)}
-                style={{width: "100%", "margin-top": "1rem"}}
-                
+                style={{ width: "100%", "margin-top": "1rem" }}
+
             />
         </Loading>
     )

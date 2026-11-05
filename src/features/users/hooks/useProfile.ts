@@ -12,7 +12,9 @@ export function useProfile() {
         bio: "",
         location: "",
         dob: "",
-        links: []
+        links: [],
+        image: "",
+        banner: ""
     })
 
     const updateUserAction = action(async function* () {

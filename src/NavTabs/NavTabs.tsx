@@ -1,7 +1,6 @@
-import { ComponentProps, createEffect, createSignal, For, omit } from "solid-js"
+import { createEffect, createSignal, For } from "solid-js"
 import styles from "./NavTabs.module.css"
 import { useLocation, useMatch } from "@solidjs/router"
-import { JSX } from "@solidjs/web/jsx-runtime"
 
 type Props = {
     tabs: {

@@ -1,0 +1,53 @@
+.file-drop {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.5rem;
+    border: 1.5px dashed var(--surface-2);
+    background: var(--surface-1);
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+    height: 15rem;
+
+    input[type="file"] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    &:hover,
+    &.dragover {
+        border-color: var(--accent);
+        background: color-mix(in oklch, var(--accent) 20%, transparent)
+    }
+
+    &.invalid {
+        border-color: var(--danger-tint);
+        background: var(--danger);
+    }
+
+    .file-title {
+        font-size: 0.88rem;
+        color: var(--text);
+    }
+
+    .file-hint {
+        font-size: 0.76rem;
+        color: var(--text-muted);
+    }
+
+    .file-name {
+        font-family: var(--font-mono);
+        font-size: 0.76rem;
+        color: var(--volt-300);
+    }
+
+    img {
+        height: 100%;
+    }
+}

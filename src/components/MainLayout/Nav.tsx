@@ -12,7 +12,7 @@ export function Nav() {
             <ShowWhenAuthed>
                 <a href="/test"> <MessageSquareMoreIcon /> <span>Messages</span><b class="badge info">3</b></a>
                 <a href="/test"> <BellIcon /> <span>Alerts</span></a>
-                <a href={paths.settings.profile()}> <User2Icon /> <span>Profile</span></a>
+                <a href={paths.profile()}> <User2Icon /> <span>Profile</span></a>
             </ShowWhenAuthed>
         </div>
     )
@@ -42,7 +42,7 @@ export function Tabbar() {
                 </button>
             </ShowWhenAuthed>
             <a href="test"> <HandshakeIcon /> Squads</a>
-            <a href={paths.settings.profile()}> <User2Icon /> Profile</a>
+            <a href={paths.profile()}> <User2Icon /> Profile</a>
         </nav>
     )
 }

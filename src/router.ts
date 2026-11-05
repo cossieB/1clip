@@ -10,6 +10,7 @@ import ProfilePage from './features/users/components/ProfilePage';
 import MainLayout from './components/MainLayout/MainLayout';
 import { getProfile } from './features/users/userApi';
 import { SettingsLayout } from './components/layouts/SettingsLayout';
+import SecurityPage from './features/auth/components/SecurityPage';
 
 // Link preloading is opt-in. intentPreload() is the hover/focus/touch
 // strategy: resting on a link warms its code and runs its preload, which is
@@ -31,16 +32,15 @@ export const Router = createRouter({
                     component: NotFound
                 },
                 {
-                    path: "/settings",
                     component: SettingsLayout,
                     children: [
                         {
-                            path: "profile",
+                            path: "/profile",
                             component: ProfilePage
                         },
                         {
-                            path: "security",
-                            component: () => "Security Page"
+                            path: "/security",
+                            component: SecurityPage
                         }
                     ]
                 }

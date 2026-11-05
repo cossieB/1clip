@@ -35,7 +35,7 @@ export const auth = betterAuth({
                 emailService.sendMail({
                     to: newEmail,
                     subject: "Verify your email address",
-                    text: `Click the link to verify your email: ${url}`,
+                    text: `To: ${newEmail}\nClick the link to verify your email: ${url} \n\n`,
                     id: "email-verification",
                     variables: {
                         confirmation_url: url
@@ -49,7 +49,7 @@ export const auth = betterAuth({
                 emailService.sendMail({
                     to: user.email,
                     subject: "Confirm account deletion",
-                    text: `Click the link to confirm that you want to delete your account: ${url}`,
+                    text: `To: ${user.email}\nClick the link to confirm that you want to delete your account: ${url} \n\n`,
                     id: "account-deletion",
                     variables: {
                         link: url
@@ -64,7 +64,7 @@ export const auth = betterAuth({
             emailService.sendMail({
                 to: data.user.email,
                 subject: "Reset your password",
-                text: `Click the link to reset your password: ${data.url}`,
+                text: `To: ${data.user.email}\nClick the link to reset your password: ${data.url}`,
                 id: "password-reset",
                 variables: {
                     link: data.url
@@ -78,7 +78,7 @@ export const auth = betterAuth({
             emailService.sendMail({
                 to: user.email,
                 subject: "Verify your email address",
-                text: `Click the link to verify your email: ${url}`,
+                text: `To: ${user.email}\nClick the link to verify your email: ${url} \n\n`,
                 id: "email-verification",
                 variables: {
                     link: url
