@@ -2,7 +2,8 @@ import z from "zod"
 import { TextField } from "~/components/Forms/Textfield"
 import { paths } from "~/router"
 import { session, useSignUp } from "../authApi"
-import { isPending } from "solid-js"
+import { isPending, Show } from "solid-js"
+import { Spinner } from "~/components/Loader/Spinner"
 
 const SignupSchema = z.object({
     email: z.email(),
@@ -21,8 +22,8 @@ const SignupSchema = z.object({
     })
 
 export function SignupForm() {
-    
-    const {signup, isSubmitting, input, setInput} = useSignUp()
+
+    const { signup, isSubmitting, input, setInput } = useSignUp()
 
     const disabled = () => !SignupSchema.safeParse(input).success
     return (
@@ -66,7 +67,15 @@ export function SignupForm() {
             >
                 <a href={paths({ dialog: "signin" })} replace>Already have an account?</a>
             </div>
-            <button class="primary" disabled={disabled() || isSubmitting() || isPending(session)} type="submit">Submit</button>
+            <button
+                class="primary"
+                disabled={disabled() || isSubmitting() || isPending(session)}
+                type="submit"
+            >
+                <Show when={isSubmitting()} fallback="Submit">
+                    <Spinner size="small" />
+                </Show>
+            </button>
         </form>
     )
 }

@@ -1,6 +1,10 @@
 .field {
     display: grid;
     gap: .35rem;
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
     label {
         font-size: .7rem;
@@ -89,7 +93,7 @@
 .list {
     display: grid;
     gap: .4rem;
-    margin-top: .25rem;
+    margin-top: .25rem;    
 }
 
 .item {
@@ -101,6 +105,9 @@
     border: 1px solid var(--border);
     border-left: 2px solid var(--accent);
     animation: item-in .15s ease-out;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .text {

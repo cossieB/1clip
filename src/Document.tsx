@@ -1,5 +1,7 @@
 import type { ParentProps } from 'solid-js';
 import { HydrationScript } from '@solidjs/web';
+import { enableRichArguments } from '@solidjs/web/server-functions/rich-args';
+enableRichArguments()
 
 // The document shell (the index.html replacement), picked up by the
 // src/Document.* convention; it must render the full <html> and ships no

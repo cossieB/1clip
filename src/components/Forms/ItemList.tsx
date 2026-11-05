@@ -1,6 +1,7 @@
 import { createSignal, createUniqueId, flush, For, Show } from "solid-js";
 import type { z } from "zod";
 import styles from "./ItemList.module.css";
+import { JSX } from "@solidjs/web/jsx-runtime";
 
 export type ItemListProps = {
     label: string;
@@ -13,7 +14,7 @@ export type ItemListProps = {
     /** Zod schema applied to each item before it is added. Its output is what gets stored. */
     schema?: z.ZodType<string>;
     /** Type of the draft input, for example "url". Defaults to "text". */
-    type?: string;
+    type?: JSX.InputHTMLAttributes<HTMLInputElement>['type']
     placeholder?: string;
     /** Helper text, replaced by errors and the limit message. */
     hint?: string;
