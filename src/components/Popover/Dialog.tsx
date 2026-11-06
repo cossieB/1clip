@@ -5,6 +5,7 @@ import { useSearchParams } from "@solidjs/router";
 import { paths } from "~/router";
 import { LoginForm } from "~/features/auth/components/LoginForm";
 import SignupForm from "~/routes/auth/signup";
+import { RequestPasswordRequestForm, ResetPasswordForm } from "~/features/auth/components/ResetPasswordForm";
 
 export function Dialog() {
     let dialog!: HTMLDialogElement;
@@ -17,6 +18,10 @@ export function Dialog() {
                 return "Log In"
             case "signup":
                 return "Sign Up"
+            case "reset":
+                return "Reset Password"
+            default:
+                setSearch({dialog: undefined}) 
         }
     }
 
@@ -33,7 +38,7 @@ export function Dialog() {
             class={[styles.dialog, "cutout"]}
             aria-labelledby={titleId}
             id="app-dialog"
-            onClose={() => setSearch({dialog: undefined}, {replace: true})}
+            onClose={() => setSearch({dialog: undefined, token: undefined}, {replace: true})}
         >
             <div class={styles.dialogPanel}>
                 <header class={styles.dialogHeader}>
@@ -57,6 +62,12 @@ export function Dialog() {
                         </Match>
                         <Match when={search.dialog == "signup"}>
                             <SignupForm />
+                        </Match>
+                        <Match when={search.dialog == "reset" && !search.token}>
+                            <RequestPasswordRequestForm />
+                        </Match>
+                        <Match when={search.dialog == "reset"}>
+                            <ResetPasswordForm />
                         </Match>
                     </Switch>
                 </div>

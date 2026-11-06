@@ -24,7 +24,8 @@ export const Router = createRouter({
                     path: "/",
                     component: Home,
                     search: z.object({
-                        dialog: z.enum(["signup", "signin"]).optional().catch(undefined)
+                        dialog: z.enum(["signup", "signin", "reset"]).optional().catch(undefined),
+                        token: z.string()
                     }).optional().catch(undefined)
                 },
                 {
