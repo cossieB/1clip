@@ -1,4 +1,8 @@
-@layer components {
+
+.avatar {
+    height: 2.1rem;
+    width: 2.1rem
+}
 .compose {
     grid-template-columns: auto 1fr;
     align-items: start;
@@ -75,13 +79,18 @@
         flex-wrap: wrap;
     }
 
-    :global .primary {
+    .postBtn {
         margin-left: auto;
     }
 
-    button:not(:global .primary) {
+    button:not(.postBtn) {
         padding: .55rem .8rem;
         font-size: .85rem;
     }
 }    
+
+.avatar {
+    height: 2.1rem;
+    width: 2.1rem;
+    object-fit: cover;
 }

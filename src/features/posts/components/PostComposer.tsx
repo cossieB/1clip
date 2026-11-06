@@ -1,6 +1,7 @@
 import { createSignal, createMemo, For, Show, Loading } from "solid-js"
 import styles from "./PostComposer.module.css"
 import { session } from "~/features/auth/authApi";
+import { mediaSrc } from "~/utils/mediaSrc";
 
 export const TOKEN_REGEX = /(?<hash>(?<=^|\s)#\w+\b)|(?<mention>(?<=^|\s)@[A-Za-z]\w{2,14}\b)|(?<url>https?:\/\/\S+)/g
 
@@ -28,7 +29,7 @@ export function PostComposer() {
             <Show when={session().data}>
 
                 <section class={["card", styles.compose]} aria-label="Create post">
-                    <img class={styles.avatar} src="" alt="" />
+                    <img class={styles.avatar} src={mediaSrc(session().data!.user.image!)} alt="" />
 
                     <div class={styles.editor}>
                         <div class={styles.backdrop} aria-hidden="true">
@@ -50,7 +51,7 @@ export function PostComposer() {
                     <div class={styles.row}>
                         <button>Upload</button>
                         <button>Looking for group</button>
-                        <button class="primary">Post</button>
+                        <button class={["primary", styles.postBtn]}>Post</button>
                     </div>
                 </section>
             </Show>

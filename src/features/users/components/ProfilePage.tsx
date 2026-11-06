@@ -8,17 +8,16 @@ import { Spinner } from "~/components/Loader/Spinner";
 import { UpdateUserSchema } from "../utils/zod";
 import { useProfile } from "../hooks/useProfile";
 import { HoldClickBtn } from "~/components/HoldClickBtn/HoldClickBtn";
-import { DropZone } from "~/components/Forms/DropZone";
 import styles from "./ProfilePage.module.css"
+import { ImageUpload } from "~/components/Forms/ImageUpload";
 
 export default function ProfilePage() {
-    const { isSubmitting, updateUserAction, input, setInput } = useProfile()
+    const { isSubmitting, updateUserAction, input, setInput, setFiles } = useProfile()
 
     const isDisabled = () => !UpdateUserSchema.safeParse(input).success || isSubmitting()
     const logout = useLogout()
     return (
         <Loading fallback={<Spinner />} >
-
             <form
                 class="form card"
                 onSubmit={async e => {
@@ -29,13 +28,39 @@ export default function ProfilePage() {
                 <div
                     class={styles.files}
                 >
-                    <DropZone
-                        setFile={f => { }}
+                    <ImageUpload
+                        setFile={file => setFiles(s => {
+                            const existing = s.find(f => f.field === "avatar")
+                            if (existing) {
+                                existing.file = file;
+                                existing.metadata = undefined
+                                existing.convertedFile = undefined
+                                return;
+                            }
+                            s.push({
+                                field: "avatar",
+                                file,
+                            })
+                        })}
                         image={input.image}
+                        maxSize={2 * 1024*1024}
                     />
-                    <DropZone
-                        setFile={f => { }}
+                    <ImageUpload
+                        setFile={file => setFiles(s => {
+                            const existing = s.find(f => f.field === "banner")
+                            if (existing) {
+                                existing.file = file;
+                                existing.metadata = undefined
+                                existing.convertedFile = undefined
+                                return;
+                            }
+                            s.push({
+                                field: "banner",
+                                file,
+                            })
+                        })}
                         image={input.banner}
+                        maxSize={2 * 1024*1024}
                     />
                 </div>
                 <TextField

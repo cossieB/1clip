@@ -6,6 +6,8 @@ import { getCurrentUser } from "../auth/serverFn";
 import { paths } from "~/router";
 import { UpdateUserSchema } from "./utils/zod";
 import { GET } from "@solidjs/web/server-functions/server";
+import { storageService } from "~/integrations/storageService/index.server";
+import { orphanedFileService } from "~/services/orphanedFileService";
 
 export const getUser = query(async (id: string) => {
     'use server'
@@ -16,10 +18,19 @@ export const getUser = query(async (id: string) => {
 
 export async function updateUser(profile: z.input<typeof UpdateUserSchema>) {
     'use server'
-    const u = UpdateUserSchema.parse(profile)
+    const data = UpdateUserSchema.parse(profile)
     const session = await getCurrentUser();
     if (!session) throw redirect(paths({ dialog: "signin" }))
-    await userRepository.updateUser(session.user.id, u)
+    const old = (await userRepository.updateUser(session.user.id, data))[0]
+    if (data.banner != old.oldBanner) {
+        storageService.deleteObject(old.oldBanner);
+        orphanedFileService.removePendingUpload(data.banner!)
+    }
+
+    if (data.image != old.oldAvatar) {
+        storageService.deleteObject(old.oldAvatar)
+        orphanedFileService.removePendingUpload(data.image!)
+    }
 }
 
 export const getProfile = GET(async () => {

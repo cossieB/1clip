@@ -2,6 +2,7 @@ import { S3Client, PutObjectCommand, DeleteObjectCommand, HeadObjectCommand, Cop
 import { Upload } from "@aws-sdk/lib-storage";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { join } from "node:path/posix";
+import env from "virtual:solid-env/server";
 
 type Options = {
     key: string;
@@ -21,10 +22,10 @@ export class R2StorageService {
 
         this.client = new S3Client({
             region: "auto",
-            endpoint: process.env.CLOUDFLARE_ENDPOINT,
+            endpoint: env.CLOUDFLARE_ENDPOINT,
             credentials: {
-                accessKeyId: process.env.ACCESS_KEY_ID!,
-                secretAccessKey: process.env.SECRET_ACCESS_KEY!,
+                accessKeyId: env.ACCESS_KEY_ID,
+                secretAccessKey: env.SECRET_ACCESS_KEY,
             },
         });
     }

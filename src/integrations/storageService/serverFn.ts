@@ -37,7 +37,7 @@ export async function getUsersSignedUrls(img: z.input<typeof ImageUploadSchema>)
     })
     const data = ImageUploadSchema.parse(img)
     await rateLimiter("upload", userSession.user.id, 5, 60)
-    return generateAndStoreSignedUrls(data, userSession.user.id, "users")
+    return generateAndStoreSignedUrls(data, userSession.user.id, `users/${userSession.user.id}`)
 }
 
 export async function getGamesSignedUrls(img: z.input<typeof FileUploadSchema>) {
@@ -47,3 +47,5 @@ export async function getGamesSignedUrls(img: z.input<typeof FileUploadSchema>) 
     assert(data.prefix)
     return generateAndStoreSignedUrls(data, userSession.user.id, data.prefix)
 }
+
+export type SignedUrlFetcher = typeof getLogoSignedUrls

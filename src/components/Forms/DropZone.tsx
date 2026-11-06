@@ -1,94 +1,178 @@
-import { createSignal, onCleanup, Setter, Show } from "solid-js";
+import { createMemo, createSignal, For, onCleanup, Show, type Setter } from "solid-js"
+import { formatBytes, matchesAccept } from "./fileUtils"
 import styles from "./DropZone.module.css"
-import { mediaSrc } from "~/utils/mediaSrc";
 
 type Props = {
-    setFile: Setter<File | null>
-    image?: string | null
+    files: File[]
+    setFiles: Setter<File[]>
+    /** Same syntax as the native input: "image/*,.pdf" */
+    accept?: string
+    /** Defaults to unlimited */
+    maxFiles?: number
+    /** Max size per file, in bytes */
+    maxSize?: number
+    onReject?: (messages: string[]) => void
 }
 
-export function DropZone(props: Props) {
-    let ref!: HTMLLabelElement
-    const [objectUrl, setObjectUrl] = createSignal("")
-    const [errored, setErrored] = createSignal(false)
-    onCleanup(() => URL.revokeObjectURL(objectUrl()));
+type DragState = "idle" | "over" | "invalid"
 
-    const src = () => {
-        if (objectUrl())
-            return objectUrl()
-        if (errored())
-            return undefined
-        if (props.image)
-            return props.image
+const sameFile = (a: File, b: File) =>
+    a.name === b.name && a.size === b.size && a.lastModified === b.lastModified
+
+export function DropZone(props: Props) {
+    const [dragState, setDragState] = createSignal<DragState>("idle")
+    const [errors, setErrors] = createSignal<string[]>([])
+
+    const limit = () => props.maxFiles ?? Infinity
+    const multiple = () => limit() !== 1
+
+    const hint = createMemo(() => {
+        const parts: string[] = []
+        if (props.accept) parts.push(props.accept.split(",").map(t => t.trim()).join(", "))
+        if (props.maxSize != null) parts.push(`max ${formatBytes(props.maxSize)} each`)
+        if (Number.isFinite(limit()) && limit() > 1) parts.push(`up to ${limit()} files`)
+        return parts.join(" · ")
+    })
+
+    const handleFiles = (list: FileList | null | undefined) => {
+        if (!list || !list.length) return
+
+        const rejected: string[] = []
+        const valid: File[] = []
+
+        for (const file of Array.from(list)) {
+            if (!matchesAccept(file, props.accept)) {
+                rejected.push(`${file.name}: file type not allowed`)
+            } else if (props.maxSize != null && file.size > props.maxSize) {
+                rejected.push(
+                    `${file.name}: ${formatBytes(file.size)} exceeds ${formatBytes(props.maxSize)}`
+                )
+            } else {
+                valid.push(file)
+            }
+        }
+
+        if (!multiple()) {
+            // Single mode: replace the current file with the first valid one
+            if (valid.length) props.setFiles([valid[0]])
+            if (valid.length > 1) rejected.push("Only one file is allowed")
+        } else {
+            const current = props.files
+            const fresh = valid.filter(f => !current.some(c => sameFile(c, f)))
+            const room = Math.max(0, limit() - current.length)
+            const accepted = fresh.slice(0, room)
+
+            if (fresh.length > room) {
+                rejected.push(`Only ${limit()} files allowed; ${fresh.length - room} skipped`)
+            }
+            if (accepted.length) props.setFiles(files => [...files, ...accepted])
+        }
+
+        setErrors(rejected)
+        if (rejected.length) props.onReject?.(rejected)
     }
 
-    const handleFiles = (files: FileList | null | undefined) => {
-        if (!files || !files.length) return;
-
-        const fileArray = Array.from(files);
-        const imageFile = fileArray.find(f => f.type.startsWith("image/"));
-
-        if (!imageFile) return;
-
-        URL.revokeObjectURL(objectUrl());
-        setObjectUrl(URL.createObjectURL(imageFile));
-        props.setFile(imageFile);
-    };
+    const removeFile = (file: File) => {
+        setErrors([])
+        props.setFiles(files => files.filter(f => f !== file))
+    }
 
     return (
-        <label
-            ref={ref}
-            class={styles["file-drop"]}
-            onDragOver={e => e.preventDefault()}
-
-            onDrop={async e => {
-                e.preventDefault()
-                ref.classList.remove(styles.invalid, styles.dragover)
-                handleFiles(e.dataTransfer?.files)
-            }}
-        >
-            <input
-                type="file"
-                id="file-input"
-                accept="image/*"
-                onChange={e => {
-                    handleFiles(e.target.files);
-                    e.target.value = "";
-                }}
-                title=""
-                onDragEnter={e => {
-                    e.preventDefault();
-                    const items = Array.from(e.dataTransfer?.items ?? []);
-                    const hasImage = items.some(item => {
-                        const isLocalImage = item.kind === 'file' && item.type.startsWith('image/');
-                        const isExternalImage = item.kind === 'string' && (item.type === 'text/html' || item.type === 'text/uri-list');
-                        return isLocalImage || isExternalImage;
-                    });
-
-                    if (hasImage) {
-                        ref.classList.remove(styles.invalid);
-                        ref.classList.add(styles.dragover);
+        <div class={styles.root}>
+            <label
+                class={[
+                    styles["file-drop"],
+                    {
+                        [styles.dragover]: dragState() === "over",
+                        [styles.invalid]: dragState() === "invalid"
                     }
-                    else {
-                        ref.classList.remove(styles.dragover);
-                        ref.classList.add(styles.invalid);
-                    }
-                }}
-
-                onDragLeave={e => {
+                ]}
+                onDragOver={e => e.preventDefault()}
+                onDrop={e => {
                     e.preventDefault()
-                    ref.classList.remove(styles.dragover, styles.invalid)
+                    setDragState("idle")
+                    handleFiles(e.dataTransfer?.files)
                 }}
-            />
-            <Show when={src()}
-                fallback={<span class={styles["file-title"]}>Drop files here</span>}
             >
-                <img
-                    src={mediaSrc(src()!)}
-                    alt=""
-                    onError={() => setErrored(true)}
+                <input
+                    type="file"
+                    accept={props.accept}
+                    multiple={multiple()}
+                    title=""
+                    onChange={e => {
+                        handleFiles(e.target.files)
+                        e.target.value = ""
+                    }}
+                    onDragEnter={e => {
+                        e.preventDefault()
+                        const items = Array.from(e.dataTransfer?.items ?? []).filter(
+                            item => item.kind === "file"
+                        )
+                        const ok =
+                            items.length > 0 &&
+                            items.every(item => matchesAccept({ name: "", type: item.type }, props.accept))
+                        setDragState(ok ? "over" : "invalid")
+                    }}
+                    onDragLeave={e => {
+                        e.preventDefault()
+                        setDragState("idle")
+                    }}
                 />
+                <span class={styles["file-title"]}>
+                    {multiple() ? "Drop files here" : "Drop a file here"}
+                </span>
+                <Show when={hint()}>
+                    <span class={styles["file-hint"]}>{hint()}</span>
+                </Show>
+            </label>
+
+            <Show when={errors().length}>
+                <ul class={styles.errors} role="alert">
+                    <For each={errors()}>{message => <li>{message}</li>}</For>
+                </ul>
             </Show>
-        </label>
+
+            <Show when={props.files.length}>
+                <ul class={styles.previews}>
+                    <For each={props.files}>
+                        {file => {
+                            const url = file.type.startsWith("image/")
+                                ? URL.createObjectURL(file)
+                                : undefined
+                            onCleanup(() => url && URL.revokeObjectURL(url))
+
+                            return (
+                                <li class={styles.preview}>
+                                    <Show
+                                        when={url}
+                                        fallback={
+                                            <span class={styles.ext}>
+                                                {file.name.split(".").pop()?.slice(0, 4) || "file"}
+                                            </span>
+                                        }
+                                    >
+                                        <img src={url!} alt="" />
+                                    </Show>
+                                    <div class={styles.meta}>
+                                        <span class={styles.name} title={file.name}>
+                                            {file.name}
+                                        </span>
+                                        <span class={styles.size}>{formatBytes(file.size)}</span>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        class={styles.remove}
+                                        aria-label={`Remove ${file.name}`}
+                                        onClick={() => removeFile(file)}
+                                    >
+                                        ✕
+                                    </button>
+                                </li>
+                            )
+                        }}
+                    </For>
+                </ul>
+            </Show>
+        </div>
     )
 }
