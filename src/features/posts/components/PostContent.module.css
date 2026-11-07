@@ -1,0 +1,45 @@
+.root {
+        display: grid;
+        justify-items: start;
+        gap: .25rem;
+    }
+
+    .content {
+        color: var(--text);
+        line-height: 1.6;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        max-width: 75ch;
+    }
+
+    .clamped {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: var(--lines, 6);
+        line-clamp: var(--lines, 6);
+        overflow: hidden;
+    }
+
+    .fade {
+        mask-image: linear-gradient(to bottom, #000 calc(100% - 1.8em), transparent);
+    }
+
+    .link {
+        color: var(--accent-bright);
+        text-decoration: underline;
+        text-decoration-color: transparent;
+        text-underline-offset: 3px;
+        transition: text-decoration-color .15s;
+
+        &:hover {
+            text-decoration-color: currentColor;
+        }
+    }
+
+    .toggle {
+        padding: .35rem .6rem;
+        font-size: .8rem;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: var(--accent);
+    }

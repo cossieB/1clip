@@ -35,6 +35,12 @@ declare module "virtual:file-routes" {
   /** The flat route manifest, in scan order. */
   const routes: readonly [
     {
+      path: "/(home)";
+      page: true;
+      $component: FileRouteLazyRef<typeof import("./src/routes/(home)")>;
+      $$route: FileRouteEagerRef<typeof import("./src/routes/(home)")>;
+    },
+    {
       path: "/*404";
       page: true;
       $component: FileRouteLazyRef<typeof import("./src/routes/[...404]")>;
@@ -53,12 +59,6 @@ declare module "virtual:file-routes" {
       page: true;
       $component: FileRouteLazyRef<typeof import("./src/routes/auth/signup")>;
       $$route?: undefined;
-    },
-    {
-      path: "/";
-      page: true;
-      $component: FileRouteLazyRef<typeof import("./src/routes/index")>;
-      $$route: FileRouteEagerRef<typeof import("./src/routes/index")>;
     }
   ];
   export default routes;
@@ -66,19 +66,19 @@ declare module "virtual:file-routes" {
   /** The page entries, nested by path with grouping segments stripped. */
   export const pageRoutes: readonly [
     {
-      path: "/";
-      id: "/";
-      page: true;
-      $component: FileRouteLazyRef<typeof import("./src/routes/index")>;
-      $$route: FileRouteEagerRef<typeof import("./src/routes/index")>;
-      children?: undefined;
-    },
-    {
       path: "/*404";
       id: "/*404";
       page: true;
       $component: FileRouteLazyRef<typeof import("./src/routes/[...404]")>;
       $$route: FileRouteEagerRef<typeof import("./src/routes/[...404]")>;
+      children?: undefined;
+    },
+    {
+      path: "/";
+      id: "/(home)";
+      page: true;
+      $component: FileRouteLazyRef<typeof import("./src/routes/(home)")>;
+      $$route: FileRouteEagerRef<typeof import("./src/routes/(home)")>;
       children?: undefined;
     },
     {

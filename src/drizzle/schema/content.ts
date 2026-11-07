@@ -65,7 +65,7 @@ export const comments = pgTable("comments", {
 
 export const postLikes = pgTable("post_likes", {
     userId: uuid("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
-    postId: integer("post_id").references(() => posts.postId, { onDelete: "cascade" }),
+    postId: integer("post_id").notNull().references(() => posts.postId, { onDelete: "cascade" }),
     date: timestamp("date", { withTimezone: true }).notNull().defaultNow(),
 }, t => [
     primaryKey({ columns: [t.postId, t.userId] })
@@ -92,8 +92,8 @@ export const media = pgTable("media", {
 ])
 
 export const postTags = pgTable("post_tags", {
-    tagName: varchar("tag_name", { length: 25 }).notNull().primaryKey(),
-    postId: integer("post_id").references(() => posts.postId, { onDelete: "cascade" }),
+    tagName: varchar("tag_name", { length: 25 }).notNull(),
+    postId: integer("post_id").notNull().references(() => posts.postId, { onDelete: "cascade" }),
 }, table => [
     primaryKey({ columns: [table.tagName, table.postId] })
 ])

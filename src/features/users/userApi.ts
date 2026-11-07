@@ -8,6 +8,7 @@ import { UpdateUserSchema } from "./utils/zod";
 import { GET } from "@solidjs/web/server-functions/server";
 import { storageService } from "~/integrations/storageService/index.server";
 import { orphanedFileService } from "~/services/orphanedFileService";
+import { zodSafeParse } from "~/utils/zodSafeParse";
 
 export const getUser = query(async (id: string) => {
     'use server'
@@ -18,7 +19,7 @@ export const getUser = query(async (id: string) => {
 
 export async function updateUser(profile: z.input<typeof UpdateUserSchema>) {
     'use server'
-    const data = UpdateUserSchema.parse(profile)
+    const data = zodSafeParse(UpdateUserSchema, profile)
     const session = await getCurrentUser();
     if (!session) throw redirect(paths({ dialog: "signin" }))
     const old = (await userRepository.updateUser(session.user.id, data))[0]

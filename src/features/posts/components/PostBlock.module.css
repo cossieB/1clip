@@ -1,0 +1,215 @@
+    .post {
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    /* ── Header ── */
+    .header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: .75rem;
+    }
+
+    .author {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        min-width: 0;
+
+        &:hover .username {
+            color: var(--accent-bright);
+        }
+    }
+
+    .avatar {
+        --bevel: 8px;
+        width: 2.5rem;
+        height: 2.5rem;
+        object-fit: cover;
+        border: 1px solid var(--border-strong);
+        background: var(--surface-1);
+        flex-shrink: 0;
+    }
+
+    .names {
+        display: grid;
+        min-width: 0;
+    }
+
+    .username {
+        font-weight: 700;
+        color: var(--text);
+        transition: color .15s;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .meta {
+        font-size: .75rem;
+        color: var(--text-subtle);
+    }
+
+    .game {
+        text-decoration: none;
+        transition: background-color .15s;
+
+        &:hover {
+            background: color-mix(in oklch, var(--c) 24%, transparent);
+        }
+    }
+
+    /* ── Body ── */
+    .title {
+        font-size: 1.15rem;
+        letter-spacing: .04em;
+        line-height: 1.25;
+        color: var(--text);
+        overflow-wrap: anywhere;
+    }
+
+    .linkCard {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        justify-self: start;
+        max-width: 100%;
+        padding: .5rem .8rem;
+        border: 1px solid var(--border-strong);
+        border-left: 3px solid var(--accent);
+        background: var(--surface-1);
+        color: var(--accent-bright);
+        font-size: .85rem;
+        transition: border-color .15s, background-color .15s;
+
+        &:hover {
+            background: var(--surface-2);
+            border-color: var(--accent);
+        }
+    }
+
+    .linkHost {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* ── Media ── */
+    .media {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: .25rem;
+    }
+
+    .single {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .mediaItem {
+        width: 100%;
+        aspect-ratio: 16 / 10;
+        object-fit: cover;
+        border: 1px solid var(--border);
+        background: var(--surface-1);
+    }
+
+    .single .mediaItem {
+        aspect-ratio: auto;
+        max-height: 28rem;
+    }
+
+    video.mediaItem {
+        object-fit: contain;
+        background: #000;
+    }
+
+    .iframe {
+        width: 100%;
+
+        iframe {
+            width: 100%;
+            height: 20rem;
+        }
+    }
+
+    /* ── Tags ── */
+    .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .4rem;
+    }
+
+    .tag {
+        display: inline-block;
+        padding: .15rem .55rem;
+        border: 1px solid color-mix(in oklch, var(--accent) 40%, transparent);
+        color: var(--accent-bright);
+        font-size: .78rem;
+        letter-spacing: .04em;
+        transition: background-color .15s, border-color .15s;
+
+        &:hover {
+            background: color-mix(in oklch, var(--accent) 14%, transparent);
+            border-color: var(--accent);
+        }
+    }
+
+    /* ── Footer ── */
+    .footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding-top: .75rem;
+        border-top: 1px solid var(--line);
+    }
+
+    .actions {
+        display: flex;
+        align-items: center;
+        gap: .25rem;
+    }
+
+    .action {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .45rem .75rem;
+        color: var(--text-muted);
+        font-variant-numeric: tabular-nums;
+        transition: color .15s, background-color .15s;
+        --clr: var(--accent);
+
+        &:first-child {
+            --clr: var(--pink)
+        }
+
+        &:hover {
+            color: var(--text);
+            background: color-mix(in oklch, var(--clr) 14%, transparent);
+        }
+
+        &:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+    }
+
+    .liked {
+        color: var(--clr);
+
+        svg {
+            filter: drop-shadow(0 0 6px oklch(from var(--clr) l c h / 0.45));
+        }
+    }
+
+    .views {
+        font-size: .78rem;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: var(--text-subtle);
+    }
+

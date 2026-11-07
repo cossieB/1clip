@@ -10,6 +10,7 @@ declare module 'virtual:solid-env/client' {
   const env: {
     readonly "VITE_STORAGE_DOMAIN": __Out<__Schema["client"]["VITE_STORAGE_DOMAIN"]>;
     readonly "VITE_SITE_URL": __Out<__Schema["client"]["VITE_SITE_URL"]>;
+    readonly "VITE_POST_LIMIT": __Out<__Schema["client"]["VITE_POST_LIMIT"]>;
   };
   export { env };
   export default env;
@@ -33,6 +34,7 @@ declare module 'virtual:solid-env/server' {
     readonly "R2_DOMAIN": __Out<__Schema["server"]["R2_DOMAIN"]>;
     readonly "VITE_STORAGE_DOMAIN": __Out<__Schema["client"]["VITE_STORAGE_DOMAIN"]>;
     readonly "VITE_SITE_URL": __Out<__Schema["client"]["VITE_SITE_URL"]>;
+    readonly "VITE_POST_LIMIT": __Out<__Schema["client"]["VITE_POST_LIMIT"]>;
   };
   export { env };
   export default env;

@@ -21,16 +21,18 @@ export function Dialog() {
             case "reset":
                 return "Reset Password"
             default:
-                setSearch({dialog: undefined}) 
+                setSearch({ dialog: undefined })
         }
     }
 
-    createEffect(() => search.dialog, d => {
-        if (d)
-            dialog.showModal()
-        else
-            dialog.close()
-    })
+    createEffect(
+        () => search.dialog,
+        d => {
+            if (d)
+                dialog.showModal()
+            else
+                dialog.close()
+        })
 
     return (
         <dialog
@@ -38,7 +40,7 @@ export function Dialog() {
             class={[styles.dialog, "cutout"]}
             aria-labelledby={titleId}
             id="app-dialog"
-            onClose={() => setSearch({dialog: undefined, token: undefined}, {replace: true})}
+            onClose={() => setSearch({ dialog: undefined, token: undefined }, { replace: true })}
         >
             <div class={styles.dialogPanel}>
                 <header class={styles.dialogHeader}>

@@ -51,7 +51,14 @@ export function PostComposer() {
                     <div class={styles.row}>
                         <button>Upload</button>
                         <button>Looking for group</button>
-                        <button class={["primary", styles.postBtn]}>Post</button>
+                        <button
+                            class={["primary", styles.postBtn]}
+                            onClick={() => {
+                                
+                            }}
+                        >
+                            Post
+                        </button>
                     </div>
                 </section>
             </Show>

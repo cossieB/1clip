@@ -32,6 +32,7 @@ export default {
   },
   client: {
     VITE_STORAGE_DOMAIN: z.string(),
-    VITE_SITE_URL: z.string()
+    VITE_SITE_URL: z.string(),
+    VITE_POST_LIMIT: z.int().positive().default(500)
   },
 };

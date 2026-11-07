@@ -1,9 +1,9 @@
-import { and, count, eq, exists, getColumns, sql, SQL, sum } from "drizzle-orm";
-import { unionAll } from "drizzle-orm/pg-core";
+import { and, eq, exists, getColumns, sql, SQL } from "drizzle-orm";
 import { db } from "~/drizzle/db";
 import { User } from "~/drizzle/models";
 import { commentLikes, comments, followerFollowee, postLikes, posts } from "~/drizzle/schema";
 import { users } from "~/drizzle/schema/auth";
+import "server-only"
 
 export async function findById(userId: string, loggedInUserId?: string) {
     const { email, emailVerified, createdAt, updatedAt, ...rest } = getColumns(users)
