@@ -26,7 +26,8 @@ export const GetPostSchema = z.object({
     }),
     followerId: z.uuidv7(),
     gameId: z.number(),
-    includePending: z.boolean().default(false)
+    includePending: z.boolean().default(false),
+    searchString: z.string().optional()
 }).partial().optional();
 
 export type PostFilters = z.input<typeof GetPostSchema>

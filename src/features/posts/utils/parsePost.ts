@@ -1,5 +1,5 @@
+import { TOKEN_REGEX } from "~/components/Forms/Editor"
 import { parseVideoUrl } from "../components/IframeFactory"
-import { TOKEN_REGEX } from "../components/PostContent"
 
 export type PostTokens = {
     hashtags: string[]

@@ -1,13 +1,13 @@
-import { For, Show, action, createOptimistic, createSignal, useContext } from "solid-js"
+import { For, Show } from "solid-js"
 import { PostContent } from "./PostContent"
 import styles from "./PostBlock.module.css"
 import { mediaSrc } from "~/utils/mediaSrc"
 import { toggleLikeFn, type getPostFn } from "../postsApi"
-import { HeartIcon, MessageCircleIcon, TextIcon } from "@lucide/solid"
-import { ToastContext } from "~/components/Toast/ToastProvider"
+import { HeartIcon, MessageCircleIcon } from "@lucide/solid"
 import { RenderMedia } from "~/components/RenderMedia"
 import { extractFirstVideo } from "../utils/parsePost"
 import { IframeFactory } from "./IframeFactory"
+import { useToggleLike } from "~/hooks/useToggleLike"
 
 type Props = {
     post: NonNullable<Awaited<ReturnType<typeof getPostFn>>>
@@ -18,31 +18,12 @@ type Props = {
 const dateFormat = new Intl.DateTimeFormat("en", { dateStyle: "medium", timeZone: "UTC" })
 
 export function PostBlock(props: Props) {
-    const { addToast } = useContext(ToastContext)
-    // confirmed state, resets whenever the post prop is refetched
-    const [likeState, setLikeState] = createSignal(() => ({
-        liked: props.post.likedByCurrentUser,
-        count: props.post.likeCount,
-    }))
-    // what the screen shows: optimistic inside the action, confirmed otherwise
-    const [like, setLike] = createOptimistic(() => likeState())
-
-    const toggle = action(function* () {
-        try {
-            const current = likeState()
-            setLike({
-                liked: !current.liked,
-                count: current.count + (current.liked ? -1 : 1),
-            })
-            const result: Awaited<ReturnType<typeof toggleLikeFn>> = yield toggleLikeFn(props.post.postId)
-            if (result) setLikeState({ liked: result.liked, count: result.likeCount })
-        }
-        catch (error: any) {
-            addToast({
-                text: error.message ?? "Something went wrong. Please try again later.",
-                type: "error"
-            })
-        }
+    const { like, toggle } = useToggleLike({
+        initial: () => ({
+            liked: props.post.likedByCurrentUser,
+            count: props.post.likeCount,
+        }),
+        request: () => toggleLikeFn(props.post.postId),
     })
 
     const created = () => new Date(props.post.createdAt)

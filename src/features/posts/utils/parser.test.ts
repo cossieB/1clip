@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { extractFirstVideo, extractTokens } from "./parsePost";
-import { TOKEN_REGEX } from "../components/PostComposer";
 import { parseVideoUrl } from "../components/IframeFactory";
+import { TOKEN_REGEX } from "~/components/Forms/Editor";
 
 describe('TOKEN_REGEX', () => {
     it('matches hashtags with leading space or start of string', () => {

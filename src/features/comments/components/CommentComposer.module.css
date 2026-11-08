@@ -1,0 +1,29 @@
+.avatar {
+    composes: avatar from "~/features/posts/components/PostComposer.module.css"
+}
+
+.compose {
+    composes: compose from "~/features/posts/components/PostComposer.module.css"
+}
+
+.postBtn {
+    composes: postBtn from "~/features/posts/components/PostComposer.module.css";
+    margin-left: auto;
+}
+
+.row {
+    composes: row from "~/features/posts/components/PostComposer.module.css";
+
+}
+
+.group {
+    display: flex;
+    [aria-role="group"] {
+        padding-right: 1rem;
+        width: 100%;
+        textarea {
+            width: 100%;
+        }
+    }
+
+}

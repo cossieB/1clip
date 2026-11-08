@@ -1,7 +1,7 @@
 import z from "zod";
 
 export const AddCommentSchema = z.object({
-        text: z.string().trim().length(255),
+        text: z.string().trim().max(255),
         originalPost: z.number(),
         replyTo: z.number().optional(),
     })

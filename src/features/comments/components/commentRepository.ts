@@ -16,7 +16,7 @@ export async function addComment(comment: InferInsertModel<typeof comments>) {
             ...getColumns(inserted),
             recipientUserId: sql<string>`
                 COALESCE(
-                    ${comments.commentId},
+                    ${comments.userId},
                     ${posts.userId}
                 )
             `.as("recipient_user_id")
@@ -47,41 +47,20 @@ export async function findPostComments(
     currentUserId?: string,
     { limit, cursor }: CommentPagination = {}
 ) {
-    const replies = alias(comments, "replies");
     const pageSize = Math.min(Math.max(limit ?? COMMENTS_DEFAULT_LIMIT, 1), COMMENTS_MAX_LIMIT);
 
-    return db
-        .select({
+    // 1. Paginated base comments CTE
+    const paginatedComments = db.$with("paginated_comments").as(
+        db.select({
             commentId: comments.commentId,
             postId: comments.postId,
             replyTo: comments.replyTo,
+            userId: comments.userId,
             text: comments.text,
             createdAt: comments.createdAt,
             editedOn: comments.editedOn,
-            author: {
-                id: users.id,
-                username: users.username,
-                image: users.image,
-            },
-            likeCount: sql<number>`(
-                select count(*)::int from ${commentLikes}
-                where ${commentLikes.commentId} = ${comments.commentId}
-            )`.as("like_count"),
-            likedByCurrentUser: (currentUserId
-                ? sql<boolean>`exists (
-                    select 1 from ${commentLikes}
-                    where ${commentLikes.commentId} = ${comments.commentId}
-                    and ${commentLikes.userId} = ${currentUserId}
-                )`
-                : sql<boolean>`false`
-            ).as("liked_by_current_user"),
-            replyCount: sql<number>`(
-                select count(*)::int from ${replies}
-                where ${replies.replyTo} = ${comments.commentId}
-            )`.as("reply_count"),
         })
         .from(comments)
-        .innerJoin(users, eq(users.id, comments.userId))
         .where(and(
             eq(comments.postId, postId),
             replyTo === null ? isNull(comments.replyTo) : eq(comments.replyTo, replyTo),
@@ -93,8 +72,58 @@ export async function findPostComments(
                 : undefined
         ))
         .orderBy(asc(comments.createdAt), asc(comments.commentId))
-        .limit(pageSize);
+        .limit(pageSize)
+    );
+
+    // 2. Pre-aggregated Likes CTE using GROUP BY
+    const likesAgg = db.$with("likes_agg").as(
+        db.select({
+            commentId: commentLikes.commentId,
+            likeCount: sql<number>`count(*)::int`.as("like_count"),
+            likedByCurrentUser: currentUserId 
+                ? sql<boolean>`bool_or(${commentLikes.userId} = ${currentUserId})`.as("liked_by_current_user")
+                : sql<boolean>`false`.as("liked_by_current_user"),
+        })
+        .from(commentLikes)
+        .groupBy(commentLikes.commentId)
+    );
+
+    // 3. Pre-aggregated Replies CTE using GROUP BY
+    const repliesAgg = db.$with("replies_agg").as(
+        db.select({
+            replyTo: comments.replyTo,
+            replyCount: sql<number>`count(*)::int`.as("reply_count"),
+        })
+        .from(comments)
+        .groupBy(comments.replyTo)
+    );
+
+    // 4. Main query combining CTEs via LEFT JOINs
+    return db
+        .with(paginatedComments, likesAgg, repliesAgg)
+        .select({
+            commentId: paginatedComments.commentId,
+            postId: paginatedComments.postId,
+            replyTo: paginatedComments.replyTo,
+            text: paginatedComments.text,
+            createdAt: paginatedComments.createdAt,
+            editedOn: paginatedComments.editedOn,
+            author: {
+                id: users.id,
+                username: users.username,
+                image: users.image,
+            },
+            likeCount: sql<number>`coalesce(${likesAgg.likeCount}, 0)`,
+            likedByCurrentUser: sql<boolean>`coalesce(${likesAgg.likedByCurrentUser}, false)`,
+            replyCount: sql<number>`coalesce(${repliesAgg.replyCount}, 0)`,
+        })
+        .from(paginatedComments)
+        .innerJoin(users, eq(users.id, paginatedComments.userId))
+        .leftJoin(likesAgg, eq(likesAgg.commentId, paginatedComments.commentId))
+        .leftJoin(repliesAgg, eq(repliesAgg.replyTo, paginatedComments.commentId))
+        .orderBy(asc(paginatedComments.createdAt), asc(paginatedComments.commentId));
 }
+
 
 export type CommentWithDetails = Awaited<ReturnType<typeof findPostComments>>[number];
 

@@ -5,7 +5,7 @@ import 'server-only'
 
 export async function rateLimiter(prefix: string, user: string, limit: number, window: number) {
     const key = `${prefix}:${user}`
-    const count = await redis.incr(key)
+    const count = await redis.incr(key);
     void redis.expire(key, window, 'NX')
     if (count > limit)
         throw respond(new Error("You're doing that too much"), {

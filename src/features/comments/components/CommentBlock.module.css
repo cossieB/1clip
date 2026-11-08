@@ -4,6 +4,10 @@
         grid-template-columns: auto minmax(0, 1fr);
         column-gap: .75rem;
         padding-block: .75rem;
+
+        &.pending {
+            opacity: 0.5;
+        }
     }
 
     .avatarLink {

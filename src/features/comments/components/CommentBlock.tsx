@@ -1,47 +1,38 @@
-import { Show, action, createOptimistic, createSignal, createUniqueId, onFlush, type ParentProps } from "solid-js"
+import { Show, action, createOptimistic, createSignal, createUniqueId, onFlush, useContext, type ParentProps } from "solid-js"
 import type { CommentWithDetails } from "./commentRepository"
 import styles from "./CommentBlock.module.css"
 import { mediaSrc } from "~/utils/mediaSrc"
 import { PostContent } from "~/features/posts/components/PostContent"
-import { toggleCommentLikeFn } from "./commentsApi"
+import { addCommentFn, toggleCommentLikeFn } from "./commentsApi"
+import { HeartIcon } from "@lucide/solid"
+import { useToggleLike } from "~/hooks/useToggleLike"
+import { ToastContext } from "~/components/Toast/ToastProvider"
 
-const MAX_LENGTH = 255 
+const MAX_LENGTH = 255
 
 const dateFormat = new Intl.DateTimeFormat("en", { dateStyle: "medium", timeZone: "UTC" })
 
 type Props = ParentProps<{
     comment: CommentWithDetails
-    canInteract?: boolean 
-    /** Receives the trimmed reply text. The box closes once the returned promise resolves. */
-    onReply?: (text: string) => unknown
+    canInteract?: boolean
 }>
 
 export function CommentBlock(props: Props) {
+    const {addToast} = useContext(ToastContext)
     const textareaId = createUniqueId()
     let textarea!: HTMLTextAreaElement
-    let sending = false
+    const [isCommenting, setIsCommenting] = createOptimistic(false)
 
     const [replying, setReplying] = createSignal(false)
     const [showReplies, setShowReplies] = createSignal(false)
     const [draft, setDraft] = createSignal("")
 
-    // ── Likes (same pattern as PostBlock) ──
-    const [likeState, setLikeState] = createSignal(() => ({
-        liked: props.comment.likedByCurrentUser,
-        count: props.comment.likeCount,
-    }))
-    const [like, setLike] = createOptimistic(() => likeState())
-
-    const toggleLike = action(function* () {
-        const current = likeState()
-        setLike({
-            liked: !current.liked,
-            count: current.count + (current.liked ? -1 : 1),
-        })
-        const result: Awaited<ReturnType<typeof toggleCommentLikeFn>> = yield toggleCommentLikeFn(
-            props.comment.commentId,
-        )
-        if (result) setLikeState({ liked: result.liked, count: result.likeCount })
+    const { like, toggle: toggleLike } = useToggleLike({
+        initial: () => ({
+            liked: props.comment.likedByCurrentUser,
+            count: props.comment.likeCount,
+        }),
+        request: () => toggleCommentLikeFn(props.comment.commentId),
     })
 
     // ── Reply box ──
@@ -56,29 +47,32 @@ export function CommentBlock(props: Props) {
         setDraft("")
     }
 
-    const submit = action(function* (text: string) {
-        if (sending) return
-        sending = true
+    const submit = action(function* () {
+        if (isCommenting()) return
+        setIsCommenting(true)
         try {
-            yield props.onReply?.(text)
-            setDraft("")
-            setReplying(false)
-        } finally {
-            sending = false
+            yield addCommentFn({
+                replyTo: props.comment.commentId,
+                text: draft().trim(),
+                originalPost: props.comment.postId
+            })
+            closeReply()
+            addToast({text: "Successfully replied", type: "info"})
+        }
+        catch(error: unknown) {
+            addToast({text: error instanceof Error && error.message
+                    ? error.message
+                    : "Something went wrong. Please try again later.", type: "error"})
         }
     })
-
-    const send = () => {
-        const text = draft().trim()
-        if (text) submit(text)
-    }
 
     const onKeyDown = (e: KeyboardEvent) => {
         if (e.key === "Escape") {
             closeReply()
-        } else if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+        } 
+        else if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
             e.preventDefault()
-            send()
+            submit()
         }
     }
 
@@ -88,7 +82,7 @@ export function CommentBlock(props: Props) {
     const remaining = () => MAX_LENGTH - draft().length
 
     return (
-        <article class={styles.comment}>
+        <article class={[styles.comment, { [styles.pending]: props.comment.commentId < 0 }]}>
             <a href={`/users/${props.comment.author.username}`} class={styles.avatarLink} tabindex="-1" aria-hidden="true">
                 <img
                     class={["cutout", styles.avatar]}
@@ -125,19 +119,11 @@ export function CommentBlock(props: Props) {
                         disabled={!interactive()}
                         onClick={() => toggleLike()}
                     >
-                        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-                            <path
-                                d="M12 21s-7.5-4.6-9.6-9.1C.9 8.6 2.7 5 6.1 5c2 0 3.2 1 3.9 2.1h.0C10.7 6 11.9 5 13.9 5c3.4 0 5.2 3.6 3.7 6.9C19.5 16.4 12 21 12 21z"
-                                fill={like().liked ? "currentColor" : "none"}
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linejoin="round"
-                            />
-                        </svg>
+                        <HeartIcon />
                         <span>{like().count}</span>
                     </button>
 
-                    <Show when={props.onReply}>
+                    <Show when={props.canInteract}>
                         <button
                             type="button"
                             class={["ghost", styles.action, { [styles.active]: replying() }]}
@@ -184,7 +170,7 @@ export function CommentBlock(props: Props) {
                     class={styles.composer}
                     onSubmit={e => {
                         e.preventDefault()
-                        send()
+                        submit()
                     }}
                 >
                     <textarea

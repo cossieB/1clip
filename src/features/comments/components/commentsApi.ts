@@ -48,6 +48,7 @@ export async function getCommentsByPostIdFn(input: z.input<typeof GetCommentsSch
 export async function toggleCommentLikeFn(commentId: number) {
     const data = zodSafeParse(z.number(), commentId)
     const userSession = await ensureVerified()
+    await rateLimiter("comment:react", userSession.user.id, 10, 60)    
     return await commentsRepository.toggleLike(data, userSession.user.id)
 }
 

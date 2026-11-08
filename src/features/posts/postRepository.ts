@@ -1,4 +1,4 @@
-import { and, count, desc, eq, exists, getColumns, gt, inArray, lt, or, SQL, sql } from "drizzle-orm";
+import { and, AnyColumn, count, desc, eq, exists, getColumns, gt, inArray, lt, or, SQL, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { db } from "~/drizzle/db";
 import { Media, Post } from "~/drizzle/models";
@@ -20,7 +20,6 @@ type PostInsert = {
     pending: boolean
 };
 
-
 export function createPost(obj: PostInsert) {
     const { searchVector, ...columns } = getColumns(posts)
     return db.transaction(async tx => {
@@ -39,125 +38,27 @@ export function createPost(obj: PostInsert) {
     })
 }
 
-function postSelection(currentUserId?: string) {
-    return {
-        postId: posts.postId,
-        title: posts.title,
-        text: posts.text,
-        link: posts.link,
-        views: posts.views,
-        createdAt: posts.createdAt,
-        editedOn: posts.editedOn,
-        author: {
-            id: users.id,
-            username: users.username,
-            image: users.image,
-        },
-        game: {
-            id: games.gameId,
-            title: games.title,
-        },
-        likeCount: sql<number>`(
-            select count(*)::int from ${postLikes}
-            where ${postLikes.postId} = ${posts.postId}
-        )`.as("like_count"),
-        commentCount: sql<number>`(
-            select count(*)::int from ${comments}
-            where ${comments.postId} = ${posts.postId}
-        )`.as("comment_count"),
-        likedByCurrentUser: (currentUserId
-            ? sql<boolean>`exists (
-                select 1 from ${postLikes}
-                where ${postLikes.postId} = ${posts.postId}
-                and ${postLikes.userId} = ${currentUserId}
-            )`
-            : sql<boolean>`false`
-        ).as("liked_by_current_user"),
-        media: sql<Media[]>`coalesce((
-            select json_agg(
-                json_build_object(
-                    'key', ${media.key},
-                    'contentType', ${media.contentType},
-                    'metadata', ${media.metadata}
-                ) order by ${media.createdAt}
-            )
-            from ${media}
-            where ${media.postId} = ${posts.postId}
-        ), '[]'::json)`.as("media"),
-        tags: sql<string[]>`coalesce((
-            select json_agg(${postTags.tagName} order by ${postTags.tagName})
-            from ${postTags}
-            where ${postTags.postId} = ${posts.postId}
-        ), '[]'::json)`.as("tags"),
-    };
-}
-
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
 
 export async function findAll(filters: PostFilters = {}, currentUserId?: string) {
-    const liker = alias(users, "liker");
     const limit = Math.min(Math.max(filters.limit ?? DEFAULT_LIMIT, 1), MAX_LIMIT);
-    const conditions: (SQL | undefined)[] = []
-    if (filters.includePending) conditions.push(eq(posts.pending, false))
-    if (filters.username) conditions.push(eq(users.username, filters.username))
-    if (filters.authorId) conditions.push(eq(posts.userId, filters.authorId))
-    if (filters.gameId) conditions.push(eq(posts.gameId, filters.gameId))
-    if (filters.tag)
-        conditions.push(exists(
-            db.select({ one: sql`1` })
-                .from(postTags)
-                .where(and(eq(postTags.postId, posts.postId), eq(postTags.tagName, filters.tag)))
-        ))
-
-    if (filters.likerUsername)
-        conditions.push(exists(
-            db.select({ one: sql`1` })
-                .from(postLikes)
-                .innerJoin(liker, eq(liker.id, postLikes.userId))
-                .where(and(eq(postLikes.postId, posts.postId), eq(liker.username, filters.likerUsername)))
-        ))
-
-    if (filters.followerId)
-        conditions.push(exists(
-            db.select({ one: sql`1` })
-                .from(followerFollowee)
-                .where(and(
-                    eq(followerFollowee.followerId, filters.followerId),
-                    eq(followerFollowee.followeeId, posts.userId)
-                ))
-        ))
-
-    if (filters.cursor)
-        conditions.push(or(
-            lt(posts.createdAt, filters.cursor.createdAt),
-            and(eq(posts.createdAt, filters.cursor.createdAt), lt(posts.postId, filters.cursor.postId))
-        ))
-
-    return db
-        .select(postSelection(currentUserId))
-        .from(posts)
-        .innerJoin(users, eq(users.id, posts.userId))
-        .leftJoin(games, eq(games.gameId, posts.gameId))
-        .where(and(...conditions))
-        .orderBy(desc(posts.createdAt), desc(posts.postId))
-        .limit(limit);
+    const base = basePostsCte(and(...buildFilterConditions(filters)), limit);
+    return selectPostDetails(base, currentUserId);
 }
 
 export type PostWithDetails = Awaited<ReturnType<typeof findAll>>[number];
 
-export async function findById(postId: number, currentUserId?: string, includePending = false): Promise<PostWithDetails | null> {
-    const [post] = await db
-        .select(postSelection(currentUserId))
-        .from(posts)
-        .innerJoin(users, eq(users.id, posts.userId))
-        .leftJoin(games, eq(games.gameId, posts.gameId))
-        .where(and(
-            eq(posts.postId, postId),
-            includePending ? undefined : eq(posts.pending, false)
-        ))
-        .limit(1);
-
+export async function findById(
+    postId: number,
+    currentUserId?: string,
+    includePending = false
+): Promise<PostWithDetails | null> {
+    const where = and(
+        eq(posts.postId, postId),
+        includePending ? undefined : eq(posts.pending, false)
+    );
+    const [post] = await selectPostDetails(basePostsCte(where, 1), currentUserId);
     return post ?? null;
 }
 
@@ -171,15 +72,6 @@ export async function deletePost(postId: number, userId: string) {
 
 export async function viewPosts(postIds: number[]) {
     return db.update(posts).set({ views: sql`${posts.views} + 1` }).where(inArray(posts.postId, postIds))
-}
-
-export function searchPosts(query: string, currentUserId?: string) {
-
-    return db.select(postSelection(currentUserId))
-        .from(posts)
-        .innerJoin(users, eq(users.id, posts.userId))
-        .leftJoin(games, eq(games.gameId, posts.gameId))
-        .where(sql`${posts.searchVector} @@ websearch_to_tsquery('english', ${query})`)
 }
 
 export function updatePost(postId: number, post: Partial<Post>) {
@@ -219,4 +111,208 @@ export async function toggleLike(postId: number, currentUserId: string) {
 
         return { liked, likeCount, authorId: post.authorId };
     });
+}
+
+
+function basePostsCte(where: SQL | undefined, limit: number) {
+    return db.$with("base_posts").as(
+        db.select({
+            postId: posts.postId,
+            userId: posts.userId,
+            gameId: posts.gameId,
+            title: posts.title,
+            text: posts.text,
+            link: posts.link,
+            views: posts.views,
+            createdAt: posts.createdAt,
+            editedOn: posts.editedOn,
+        })
+            .from(posts)
+            .innerJoin(users, eq(users.id, posts.userId))
+            .where(where)
+            .orderBy(desc(posts.createdAt), desc(posts.postId))
+            .limit(limit)
+    );
+}
+
+type BasePosts = ReturnType<typeof basePostsCte>;
+
+/**
+ * Selects the full post shape (author, game, counts, media, tags) on top of a
+ * base CTE. Each aggregate is scoped to the post IDs in the base CTE, so only
+ * the current page is aggregated (the old findAll aggregated whole tables).
+ */
+function selectPostDetails(base: BasePosts, currentUserId?: string) {
+    const pageIds = (col: AnyColumn) => inArray(col, db.select({ id: base.postId }).from(base));
+
+    const likesAgg = db.$with("likes_agg").as(
+        db.select({
+            postId: postLikes.postId,
+            likeCount: sql<number>`count(*)::int`.as("like_count"),
+            likedByCurrentUser: currentUserId
+                ? sql<boolean>`bool_or(${postLikes.userId} = ${currentUserId})`.as("liked_by_current_user")
+                : sql<boolean>`false`.as("liked_by_current_user"),
+        })
+            .from(postLikes)
+            .where(pageIds(postLikes.postId))
+            .groupBy(postLikes.postId)
+    );
+
+    const commentsAgg = db.$with("comments_agg").as(
+        db.select({
+            postId: comments.postId,
+            commentCount: sql<number>`count(*)::int`.as("comment_count"),
+        })
+            .from(comments)
+            .where(pageIds(comments.postId))
+            .groupBy(comments.postId)
+    );
+
+    const mediaAgg = db.$with("media_agg").as(
+        db.select({
+            postId: media.postId,
+            mediaList: sql<Media[]>`json_agg(
+                json_build_object(
+                    'key', ${media.key},
+                    'contentType', ${media.contentType},
+                    'metadata', ${media.metadata}
+                ) order by ${media.createdAt}
+            )`.as("media_list"),
+        })
+            .from(media)
+            .where(pageIds(media.postId))
+            .groupBy(media.postId)
+    );
+
+    const tagsAgg = db.$with("tags_agg").as(
+        db.select({
+            postId: postTags.postId,
+            tagList: sql<string[]>`json_agg(${postTags.tagName} order by ${postTags.tagName})`.as("tag_list"),
+        })
+            .from(postTags)
+            .where(pageIds(postTags.postId))
+            .groupBy(postTags.postId)
+    );
+
+    return db
+        .with(base, likesAgg, commentsAgg, mediaAgg, tagsAgg)
+        .select({
+            postId: base.postId,
+            title: base.title,
+            text: base.text,
+            link: base.link,
+            views: base.views,
+            createdAt: base.createdAt,
+            editedOn: base.editedOn,
+            author: {
+                id: users.id,
+                username: users.username,
+                image: users.image,
+            },
+            game: {
+                id: games.gameId,
+                title: games.title,
+            },
+            likeCount: sql<number>`coalesce(${likesAgg.likeCount}, 0)`,
+            commentCount: sql<number>`coalesce(${commentsAgg.commentCount}, 0)`,
+            likedByCurrentUser: sql<boolean>`coalesce(${likesAgg.likedByCurrentUser}, false)`,
+            media: sql<Media[]>`coalesce(${mediaAgg.mediaList}, '[]'::json)`,
+            tags: sql<string[]>`coalesce(${tagsAgg.tagList}, '[]'::json)`,
+        })
+        .from(base)
+        .innerJoin(users, eq(users.id, base.userId))
+        .leftJoin(games, eq(games.gameId, base.gameId))
+        .leftJoin(likesAgg, eq(likesAgg.postId, base.postId))
+        .leftJoin(commentsAgg, eq(commentsAgg.postId, base.postId))
+        .leftJoin(mediaAgg, eq(mediaAgg.postId, base.postId))
+        .leftJoin(tagsAgg, eq(tagsAgg.postId, base.postId))
+        .orderBy(desc(base.createdAt), desc(base.postId));
+}
+
+/** Builds the WHERE conditions for findAll. */
+function buildFilterConditions(filters: PostFilters = {}): (SQL | undefined)[] {
+    const conditions: (SQL | undefined)[] = [];
+    const liker = alias(users, "liker");
+
+    if (!filters.includePending) {
+        conditions.push(eq(posts.pending, false));
+    }
+
+    if (filters.username) {
+        conditions.push(eq(users.username, filters.username));
+    }
+
+    if (filters.authorId) {
+        conditions.push(eq(posts.userId, filters.authorId));
+    }
+
+    if (filters.gameId) {
+        conditions.push(eq(posts.gameId, filters.gameId));
+    }
+
+    if (filters.tag) {
+        conditions.push(
+            exists(
+                db.select({ one: sql`1` })
+                    .from(postTags)
+                    .where(
+                        and(
+                            eq(postTags.postId, posts.postId),
+                            eq(postTags.tagName, filters.tag)
+                        )
+                    )
+            )
+        );
+    }
+
+    if (filters.likerUsername) {
+        conditions.push(
+            exists(
+                db.select({ one: sql`1` })
+                    .from(postLikes)
+                    .innerJoin(liker, eq(liker.id, postLikes.userId))
+                    .where(
+                        and(
+                            eq(postLikes.postId, posts.postId),
+                            eq(liker.username, filters.likerUsername)
+                        )
+                    )
+            )
+        );
+    }
+
+    if (filters.followerId) {
+        conditions.push(
+            exists(
+                db.select({ one: sql`1` })
+                    .from(followerFollowee)
+                    .where(
+                        and(
+                            eq(followerFollowee.followerId, filters.followerId),
+                            eq(followerFollowee.followeeId, posts.userId)
+                        )
+                    )
+            )
+        );
+    }
+
+    if (filters.cursor) {
+        conditions.push(
+            or(
+                lt(posts.createdAt, filters.cursor.createdAt),
+                and(
+                    eq(posts.createdAt, filters.cursor.createdAt),
+                    lt(posts.postId, filters.cursor.postId)
+                )
+            )
+        );
+    }
+
+    if (filters.searchString) {
+        conditions.push(
+            sql`${posts.searchVector} @@ websearch_to_tsquery('english', ${filters.searchString})`
+        );
+    }
+
+    return conditions;
 }

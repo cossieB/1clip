@@ -1,7 +1,6 @@
 import { Element, Show, createSignal, createUniqueId, onSettled } from "solid-js"
 import styles from "./PostContent.module.css"
-
-export const TOKEN_REGEX = /(?<hash>(?<=^|\s)#\w+\b)|(?<mention>(?<=^|\s)@[A-Za-z]\w{2,14}\b)|(?<url>https?:\/\/\S+)/g
+import { TOKEN_REGEX } from "~/components/Forms/Editor"
 
 const TRAILING_PUNCTUATION = /[.,;:!?)\]}'"]+$/
 
