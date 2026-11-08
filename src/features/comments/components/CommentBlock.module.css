@@ -1,0 +1,190 @@
+/* CommentBlock.module.css */
+    .comment {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        column-gap: .75rem;
+        padding-block: .75rem;
+    }
+
+    .avatarLink {
+        align-self: start;
+    }
+
+    .avatar {
+        --bevel: 6px;
+        width: 2rem;
+        height: 2rem;
+        object-fit: cover;
+        border: 1px solid var(--border-strong);
+        background: var(--surface-1);
+    }
+
+    .body {
+        display: grid;
+        gap: .35rem;
+        min-width: 0;
+    }
+
+    /* ── Header ── */
+    .header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: .25rem .6rem;
+    }
+
+    .username {
+        font-weight: 700;
+        font-size: .9rem;
+        color: var(--text);
+        transition: color .15s;
+
+        &:hover {
+            color: var(--accent-bright);
+        }
+    }
+
+    .meta {
+        font-size: .72rem;
+        color: var(--text-subtle);
+    }
+
+    .text {
+        font-size: .95rem;
+    }
+
+    /* ── Actions ── */
+    .actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: .15rem;
+        margin-left: -.5rem; /* optically align the first button's text with the body */
+    }
+
+    .action {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        padding: .3rem .5rem;
+        font-size: .8rem;
+        letter-spacing: .04em;
+        color: var(--text-muted);
+        font-variant-numeric: tabular-nums;
+        transition: color .15s, background-color .15s;
+
+        &:hover {
+            color: var(--text);
+            background: color-mix(in oklch, var(--accent) 14%, transparent);
+        }
+
+        &:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+    }
+
+    .liked,
+    .active {
+        color: var(--accent);
+    }
+
+    .liked svg {
+        filter: drop-shadow(0 0 6px var(--accent-glow));
+    }
+
+    .repliesToggle {
+        color: var(--accent-bright);
+    }
+
+    .chevron {
+        transition: rotate .2s;
+    }
+
+    .chevronOpen {
+        rotate: 180deg;
+    }
+
+    /* ── Reply box: textarea is height 0 until opened ── */
+    .composer {
+        display: grid;
+        gap: .5rem;
+    }
+
+    .reply {
+        width: 100%;
+        resize: none;
+        overflow: hidden;
+        background: var(--surface-1);
+        color: var(--text);
+        border: 0 solid var(--border-strong);
+        border-radius: var(--radius);
+        font: inherit;
+        line-height: 1.5;
+        interpolate-size: allow-keywords;
+
+        /* collapsed */
+        height: 0;
+        min-height: 0;
+        padding: 0 .8rem;
+        opacity: 0;
+        visibility: hidden;
+        transition:
+            height .2s ease,
+            min-height .2s ease,
+            padding .2s ease,
+            border-width .2s ease,
+            opacity .2s ease,
+            visibility 0s linear .2s; /* hide from tab order/a11y only after it has closed */
+
+        &::placeholder {
+            color: var(--text-subtle);
+        }
+
+        &:focus-visible {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 6px 18px -8px var(--accent-glow);
+        }
+    }
+
+    .open {
+        height: auto;
+        min-height: 5rem;
+        padding: .65rem .8rem;
+        border-width: 1px 1px 2px;
+        opacity: 1;
+        visibility: visible;
+        transition:
+            height .2s ease,
+            min-height .2s ease,
+            padding .2s ease,
+            border-width .2s ease,
+            opacity .2s ease,
+            visibility 0s;
+    }
+
+    .composerActions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: .5rem;
+    }
+
+    .counter {
+        margin-right: auto;
+        font-size: .75rem;
+        color: var(--text-subtle);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .counterLow {
+        color: var(--danger);
+    }
+
+    /* ── Replies ── */
+    .replies {
+        margin-top: .25rem;
+        padding-left: .75rem;
+        border-left: 1px solid var(--line);
+    }

@@ -10,7 +10,7 @@ import { extractFirstVideo } from "../utils/parsePost"
 import { IframeFactory } from "./IframeFactory"
 
 type Props = {
-    post: Awaited<ReturnType<typeof getPostFn>>
+    post: NonNullable<Awaited<ReturnType<typeof getPostFn>>>
     canLike?: boolean
 }
 

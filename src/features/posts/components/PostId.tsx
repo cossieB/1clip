@@ -18,7 +18,7 @@ export function PostId() {
                 fallback={<NotFound />}
                 when={post()}
             >
-                <PostBlock post={post()} />
+                {post => <PostBlock post={post()} />}
             </Show>
         </Loading>
     )
