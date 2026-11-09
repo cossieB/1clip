@@ -9,6 +9,7 @@ import { GET } from "@solidjs/web/server-functions/server";
 import { storageService } from "~/integrations/storageService/index.server";
 import { orphanedFileService } from "~/services/orphanedFileService";
 import { zodSafeParse } from "~/utils/zodSafeParse";
+import { ensureVerified } from "../auth/utils/ensureAuth";
 
 export const getUser = query(async (id: string) => {
     'use server'
@@ -20,9 +21,8 @@ export const getUser = query(async (id: string) => {
 export async function updateUser(profile: z.input<typeof UpdateUserSchema>) {
     'use server'
     const data = zodSafeParse(UpdateUserSchema, profile)
-    const session = await getCurrentUser();
-    if (!session) throw redirect(paths({ dialog: "signin" }))
-    const old = (await userRepository.updateUser(session.user.id, data))[0]
+    const userSession = await ensureVerified()
+    const old = (await userRepository.updateUser(userSession.user.id, data))[0]
     if (data.banner != old.oldBanner) {
         storageService.deleteObject(old.oldBanner);
         orphanedFileService.removePendingUpload(data.banner!)

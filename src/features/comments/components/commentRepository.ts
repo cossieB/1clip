@@ -1,5 +1,4 @@
 import { sql, eq, and, isNull, or, asc, gt, count, InferInsertModel, getColumns } from "drizzle-orm"
-import { alias } from "drizzle-orm/pg-core"
 import { db } from "~/drizzle/db"
 import { commentLikes, comments, posts, users } from "~/drizzle/schema"
 

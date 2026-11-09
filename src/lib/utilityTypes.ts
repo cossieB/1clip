@@ -2,8 +2,12 @@ export type KeysWithValuesOfType<T, V> = { [K in keyof T]-?: T[K] extends V ? K 
 
 export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
-export type Require<T, K extends keyof T> = Omit<T,K> & Required<Pick<T,K>>
+export type Require<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
 
 export type UnwrapPromise<T> = T extends Promise<infer X> ? X : never
 
 export type AwaitedReturn<T extends (...args: any) => any> = Awaited<ReturnType<T>>;
+
+export type ForceNotNull<T, K extends keyof T> = Omit<T, K> & {
+    [P in K]: NonNullable<T[P]>;
+};

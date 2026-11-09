@@ -9,6 +9,8 @@ export type GameQueryFilters = {
     genre?: string
     limit?: number
     cursor?: number
+    title?: string,
+    fullTextQuery?: string
 }
 
 export type GameInsert = {

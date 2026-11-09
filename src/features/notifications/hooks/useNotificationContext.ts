@@ -15,7 +15,6 @@ export function useNotifications() {
         yield markNotificationAsRead(ids)        
     })
 
-
     return {notifications, markAsRead}
 }
 

@@ -2,7 +2,7 @@ import { createMemo, createSignal, Show } from "solid-js";
 import { Editor } from "~/components/Forms/Editor";
 import { TextField } from "~/components/Forms/Textfield";
 import { SearchAutocomplete } from "~/components/SearchAutocomplete/SearchAutocomplete";
-import { simpleSearchGamesFn } from "~/features/games/gamesApi";
+import { getGamesFn } from "~/features/games/gamesApi";
 import { useCreatePost } from "../hooks/useCreatePost";
 import { DropZone } from "~/components/Forms/DropZone";
 import { getCurrentUser } from "~/features/auth/serverFn";
@@ -51,7 +51,7 @@ export function CreatePostPage() {
                 placeholder="Add some detail"
             />
             <SearchAutocomplete
-                search={simpleSearchGamesFn}
+                search={str => getGamesFn({title: str})}
                 getLabel={game => game.title}
                 onSelect={game => {
                     setInput(s => {

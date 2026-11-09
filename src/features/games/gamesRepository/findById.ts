@@ -1,8 +1,92 @@
-import { eq } from "drizzle-orm"
-import { games } from "~/drizzle/schema"
-import { detailedGames } from "./detail"
+import { eq, getColumns, sql } from "drizzle-orm"
+import { actors, appearances, companies, gameGenres, gamePlatforms, games, media, platforms } from "~/drizzle/schema"
+import { alias } from "drizzle-orm/pg-core";
+import { db } from "~/drizzle/db";
+import { Platform, Actor, Appearances } from "~/drizzle/models";
+import { ForceNotNull } from "~/lib/utilityTypes";
 
 export async function findById(gameId: number) {
-    const list = await detailedGames({ filters: [eq(games.gameId, gameId)] })
-    return list.at(0)
+    const { searchVector, ...gamesColumns } = getColumns(games);
+    const developers = alias(companies, "developers")
+    const publishers = alias(companies, "publishers")
+    const actorQuery = db.$with("aq").as(
+        db.select({
+            gameId: appearances.gameId,
+            actorArr: sql`JSONB_AGG(JSONB_BUILD_OBJECT(
+            'character', ${appearances.character},
+            'roleType', ${appearances.roleType},
+            'appearanceId', ${appearances.appearanceId},
+            'actorId', ${actors.actorId},
+            'name', ${actors.name},
+            'photo', ${actors.photo},
+            'bio', ${actors.bio}
+        ) ORDER BY ${appearances.roleType})`.as("a_arr")
+        })
+            .from(appearances)
+            .innerJoin(actors, eq(appearances.actorId, actors.actorId))
+            .groupBy(appearances.gameId)
+    )
+
+    const platformQuery = db.$with("pq").as(
+        db.select({
+            gameId: gamePlatforms.gameId,
+            platformArr: sql`JSONB_AGG(JSONB_BUILD_OBJECT(
+            'platformId', ${platforms.platformId},
+            'name', ${platforms.name},
+            'logo', ${platforms.logo},
+            'summary', ${platforms.summary},
+            'releaseDate', ${platforms.releaseDate}
+        ))`.as("p_arr")
+        })
+            .from(gamePlatforms)
+            .innerJoin(platforms, eq(gamePlatforms.platformId, platforms.platformId))
+            .groupBy(gamePlatforms.gameId)
+    )
+
+    const genresQuery = db.$with("tq").as(
+        db.select({
+            gameId: gameGenres.gameId,
+            tags: sql`ARRAY_AGG(game_genres.genre ORDER BY game_genres.genre)`.as("tags")
+        })
+            .from(gameGenres)
+            .groupBy(gameGenres.gameId)
+    )
+
+    const mediaQuery = db.$with("mq").as(
+        db.select({
+            gameId: media.gameId,
+            media: sql`JSONB_AGG(JSONB_BUILD_OBJECT(
+                'key', ${media.key},
+                'contentType', ${media.contentType},
+                'metadata', ${media.metadata}
+            ))`.as("m_arr")
+        })
+            .from(media)
+            .groupBy(media.gameId)
+    )
+
+    const [result] = await db
+        .with(actorQuery, platformQuery, genresQuery, mediaQuery)
+        .select({
+            ...gamesColumns,
+            publisher: { ...getColumns(companies) },
+            developer: { ...getColumns(companies) },
+            genres: sql<string[]>`COALESCE(${genresQuery.tags}, '{}')`,
+            platforms: sql<Platform[]>`COALESCE(${platformQuery.platformArr}, '[]'::JSONB)`,
+            actors: sql<(Actor & Appearances)[]>`COALESCE(${actorQuery.actorArr}, '[]'::JSONB)`,
+            media: sql<{ key: string, contentType: string, metadata: Record<string, string> }[]>`COALESCE(${mediaQuery.media}, '[]'::JSONB)`
+        })
+        .from(games)
+        .innerJoin(developers, eq(games.developerId, developers.companyId))
+        .innerJoin(publishers, eq(games.publisherId, publishers.companyId))
+        .leftJoin(actorQuery, eq(games.gameId, actorQuery.gameId))
+        .leftJoin(platformQuery, eq(games.gameId, platformQuery.gameId))
+        .leftJoin(genresQuery, eq(games.gameId, genresQuery.gameId))
+        .leftJoin(mediaQuery, eq(games.gameId, mediaQuery.gameId))
+        .where(eq(games.gameId, gameId))
+
+    type Result = typeof result
+    type Output = ForceNotNull<Result, 'developer' | 'publisher'>
+
+    return result as Output | undefined
 }
