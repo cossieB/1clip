@@ -38,7 +38,7 @@ export function CommentComposer(props: Props) {
                     },
                     commentId: -Math.random(),
                     createdAt: new Date(),
-                    editedOn: new Date(),
+                    editedOn: null,
                     likeCount: 0,
                     likedByCurrentUser: false,
                     postId: props.postId,

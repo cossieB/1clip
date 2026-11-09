@@ -9,7 +9,7 @@ export const companies = pgTable("companies", {
     summary: text("summary").notNull().default(""),
     country: varchar("country"),
     dateAdded: timestamp("date_added", { withTimezone: true }).notNull().defaultNow(),
-    dateModified: timestamp("date_modified", { withTimezone: true }).notNull().$onUpdateFn(() => new Date()),
+    dateModified: timestamp("date_modified", { withTimezone: true }),
 })
 
 export const games = pgTable("games", {
@@ -23,7 +23,7 @@ export const games = pgTable("games", {
     banner: text("banner").notNull(),
     trailer: text("trailer"),
     dateAdded: timestamp("date_added", { withTimezone: true }).notNull().defaultNow(),
-    dateModified: timestamp("date_modified", { withTimezone: true }).notNull().$onUpdateFn(() => new Date()),
+    dateModified: timestamp("date_modified", { withTimezone: true }),
     searchVector: customType({ dataType: () => 'tsvector' })("search_vector").generatedAlwaysAs(sql`(setweight(to_tsvector('english'::regconfig, (COALESCE(title, ''::character varying))::text), 'A'::"char") || setweight(to_tsvector('english'::regconfig, COALESCE(summary, ''::text)), 'B'::"char"))`)
 }, table => [
     index().using("gin", table.searchVector),
@@ -38,7 +38,7 @@ export const platforms = pgTable("platforms", {
     releaseDate: date("release_date").notNull(),
     summary: text("summary").notNull().default(""),
     dateAdded: timestamp("date_added", { withTimezone: true }).notNull().defaultNow(),
-    dateModified: timestamp("date_modified", { withTimezone: true }).notNull().$onUpdateFn(() => new Date()),
+    dateModified: timestamp("date_modified", { withTimezone: true }),
 });
 
 export const actors = pgTable("actors", {
@@ -47,14 +47,14 @@ export const actors = pgTable("actors", {
     photo: text("photo"),
     bio: text("bio").notNull().default(""),
     dateAdded: timestamp("date_added", { withTimezone: true }).notNull().defaultNow(),
-    dateModified: timestamp("date_modified", { withTimezone: true }).notNull().$onUpdateFn(() => new Date()),
+    dateModified: timestamp("date_modified", { withTimezone: true }),
 });
 
 export const genres = pgTable("genres", {
     name: varchar("name").primaryKey(),
     description: text("description").notNull().default(""),
     dateAdded: timestamp("date_added", { withTimezone: true }).notNull().defaultNow(),
-    dateModified: timestamp("date_modified", { withTimezone: true }).notNull().$onUpdateFn(() => new Date())
+    dateModified: timestamp("date_modified", { withTimezone: true })
 });
 
 export const roleType = pgEnum('role_type', ["player character", "major character", "minor character"])

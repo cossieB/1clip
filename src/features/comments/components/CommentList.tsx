@@ -29,7 +29,8 @@ export function CommentList(props: Props) {
                 {comment => <CommentBlock
                     comment={comment}
                     canInteract={session().data?.user.emailVerified && comment.commentId > 0}
-                    
+                    comments={comments}
+                    setComments={setComments}
                 />}
             </For>
         </Loading>

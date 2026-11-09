@@ -27,7 +27,7 @@ export function PostBlock(props: Props) {
     })
 
     const created = () => new Date(props.post.createdAt)
-    const wasEdited = () => new Date(props.post.editedOn).getTime() - created().getTime() > 60_000
+    const wasEdited = () => !!props.post.editedOn
 
     const externalVideo = () => extractFirstVideo(props.post.text)
 

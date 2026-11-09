@@ -1,13 +1,15 @@
-import { Show, action, createOptimistic, createSignal, createUniqueId, onFlush, useContext, type ParentProps } from "solid-js"
+import { Refreshable, Show, action, createOptimistic, createSignal, createUniqueId, onFlush, refresh, untrack, useContext, type ParentProps } from "solid-js"
 import type { CommentWithDetails } from "./commentRepository"
 import styles from "./CommentBlock.module.css"
 import { mediaSrc } from "~/utils/mediaSrc"
 import { PostContent } from "~/features/posts/components/PostContent"
-import { addCommentFn, toggleCommentLikeFn } from "./commentsApi"
+import { addCommentFn, getCommentsByPostIdFn, toggleCommentLikeFn } from "./commentsApi"
 import { HeartIcon } from "@lucide/solid"
 import { useToggleLike } from "~/hooks/useToggleLike"
 import { ToastContext } from "~/components/Toast/ToastProvider"
 import { CommentList } from "./CommentList"
+import { StoreSetter } from "solid-js"
+import { session } from "~/features/auth/authApi"
 
 const MAX_LENGTH = 255
 
@@ -16,10 +18,12 @@ const dateFormat = new Intl.DateTimeFormat("en-za", { dateStyle: "medium", timeZ
 type Props = ParentProps<{
     comment: CommentWithDetails
     canInteract?: boolean
+    comments: Refreshable<Awaited<ReturnType<typeof getCommentsByPostIdFn>>>
+    setComments: StoreSetter<Awaited<ReturnType<typeof getCommentsByPostIdFn>>>
 }>
 
 export function CommentBlock(props: Props) {
-    const {addToast} = useContext(ToastContext)
+    const { addToast } = useContext(ToastContext)
     const textareaId = createUniqueId()
     let textarea!: HTMLTextAreaElement
     const [isCommenting, setIsCommenting] = createOptimistic(false)
@@ -50,27 +54,53 @@ export function CommentBlock(props: Props) {
 
     const submit = action(function* () {
         if (isCommenting()) return
+        const user = untrack(session).data?.user
+        if (!user) return addToast({
+            text: "Session expired. Please reload the page",
+            type: "warning",
+            autoFades: false
+        })
         setIsCommenting(true)
         try {
+            props.setComments(s => {
+                s.push({
+                    author: {
+                        id: user.id,
+                        image: user.image!,
+                        username: user.displayUsername!
+                    },
+                    commentId: -Math.random(),
+                    createdAt: new Date(),
+                    editedOn: null,
+                    likeCount: 0,
+                    postId: props.comment.postId,
+                    replyCount: 0,
+                    replyTo: props.comment.commentId,
+                    likedByCurrentUser: false,
+                    text: draft()
+                })
+            })
             yield addCommentFn({
                 replyTo: props.comment.commentId,
                 text: draft().trim(),
                 originalPost: props.comment.postId
             })
             closeReply()
-            addToast({text: "Successfully replied", type: "info"})
+            refresh(props.comments)
         }
-        catch(error: unknown) {
-            addToast({text: error instanceof Error && error.message
+        catch (error: unknown) {
+            addToast({
+                text: error instanceof Error && error.message
                     ? error.message
-                    : "Something went wrong. Please try again later.", type: "error"})
+                    : "Something went wrong. Please try again later.", type: "error"
+            })
         }
     })
 
     const onKeyDown = (e: KeyboardEvent) => {
         if (e.key === "Escape") {
             closeReply()
-        } 
+        }
         else if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
             e.preventDefault()
             submit()
@@ -78,7 +108,7 @@ export function CommentBlock(props: Props) {
     }
 
     const created = () => new Date(props.comment.createdAt)
-    const wasEdited = () => new Date(props.comment.editedOn).getTime() - created().getTime() > 60_000
+    const wasEdited = () => !!props.comment.editedOn
     const interactive = () => props.canInteract !== false
     const remaining = () => MAX_LENGTH - draft().length
 

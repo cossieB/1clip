@@ -10,7 +10,7 @@ export const posts = pgTable('posts', {
     gameId: integer("game_id").references(() => games.gameId, { onDelete: "set null" }),
     text: varchar("text", { length: 1000 }).notNull().default(""),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    editedOn: timestamp("edited_on", { withTimezone: true }).notNull().$onUpdateFn(() => new Date()),
+    editedOn: timestamp("edited_on", { withTimezone: true }),
     views: integer("views").notNull().default(0),
     link: text("link"),
     pending: boolean().notNull().default(false),
@@ -25,7 +25,7 @@ export const lfg = pgTable("lfg", {
     userId: uuid("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
     text: varchar("text", { length: 255 }).notNull().default(""),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    editedOn: timestamp("edited_on", { withTimezone: true }).notNull().$onUpdateFn(() => new Date()),
+    editedOn: timestamp("edited_on", { withTimezone: true }),
     expiresAt: timestamp("expires_at", { withTimezone: true }),
     gameId: integer("game_id").references(() => games.gameId, { onDelete: "set null" }),
     /** excluding owner */
@@ -53,7 +53,7 @@ export const comments = pgTable("comments", {
     text: varchar("text", { length: 255 }).notNull(),
     replyTo: integer("reply_to"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    editedOn: timestamp("edited_on", { withTimezone: true }).notNull().$onUpdateFn(() => new Date())
+    editedOn: timestamp("edited_on", { withTimezone: true })
 }, t => [
     check("comment_min_length", sql`LENGTH(${t.text}) > 0`),
     foreignKey({

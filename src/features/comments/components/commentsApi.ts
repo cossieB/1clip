@@ -6,7 +6,7 @@ import * as commentsRepository from "./commentRepository"
 import { ensureVerified } from "~/features/auth/utils/ensureAuth";
 import { addNotification } from "~/features/notifications/addNotification";
 import { getCurrentUser } from "~/features/auth/serverFn";
-import { getRequestEvent, respond } from "@solidjs/web";
+import { respond } from "@solidjs/web";
 import { HttpStatusCode } from "~/utils/statusCodes";
 import { GET } from "@solidjs/web/server-functions";
 
@@ -45,7 +45,7 @@ export const getCommentsByPostIdFn =  GET(async (input: z.input<typeof GetCommen
     const comments = await commentsRepository.findPostComments(data.postId, data.replyTo, userSession?.user.id)
     return respond(comments, {
         headers: {
-            "Cache-Control": "private, max-age=600"
+            "Cache-Control": "private, max-age=60"
         }
     })
 })
