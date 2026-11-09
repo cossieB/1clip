@@ -19,7 +19,7 @@ export function PostComposer() {
                 <section class={["card", styles.compose]} aria-label="Create post">
                     <img class={styles.avatar} src={mediaSrc(session().data!.user.image!)} alt="" />
 
-                    <Editor content={content} setContent={setContent} maxlength={500} />
+                    <Editor content={content()} setContent={setContent} maxlength={500} />
 
                     <div class={styles.row}>
                         <button>Upload</button>

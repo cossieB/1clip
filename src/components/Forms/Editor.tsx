@@ -20,14 +20,14 @@ function tokenize(input: string): Segment[] {
 }
 
 type Props = {
-    content: SourceAccessor<string>
-    setContent: Setter<string>
+    content: string
+    setContent: (val: string) => void
     maxlength: number
     placeholder?: string
 }
 
 export function Editor(props: Props) {
-    const segments = createMemo(() => tokenize(props.content()))    
+    const segments = createMemo(() => tokenize(props.content))    
     return (
         <div aria-role="group" class={styles.editor}>
             <div class={styles.backdrop} aria-hidden="true">
@@ -40,7 +40,7 @@ export function Editor(props: Props) {
             <textarea
                 placeholder={props.placeholder ?? "What did you just clutch?"}
                 aria-label="Post text"
-                value={props.content()}
+                value={props.content}
                 onInput={(e) => props.setContent(e.currentTarget.value)}
                 maxlength={props.maxlength}
             />

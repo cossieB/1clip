@@ -1,11 +1,11 @@
-import { action, affects, createOptimistic, createSignal, isPending, Loading, refresh, Refreshable, Show, StoreSetter, untrack, useContext } from "solid-js"
+import { action, affects, createOptimistic, createSignal, Loading, refresh, Refreshable, Show, StoreSetter, untrack, useContext } from "solid-js"
 import styles from "./CommentComposer.module.css"
 import { session } from "~/features/auth/authApi"
 import { mediaSrc } from "~/utils/mediaSrc"
 import { Editor } from "~/components/Forms/Editor"
 import { addCommentFn, type getCommentsByPostIdFn } from "./commentsApi"
-import { sleep } from "~/lib/sleep"
 import { ToastContext } from "~/components/Toast/ToastProvider"
+import { Spinner } from "~/components/Loader/Spinner"
 
 type Props = {
     replyTo?: number
@@ -15,10 +15,10 @@ type Props = {
 }
 
 export function CommentComposer(props: Props) {
-    const {addToast} = useContext(ToastContext)
+    const { addToast } = useContext(ToastContext)
     const [content, setContent] = createSignal("")
     const [isSubmitting, setIsSubmitting] = createOptimistic(false)
-    
+
     const sendComment = action(async function* () {
         affects(props.comments);
         setIsSubmitting(true)
@@ -47,15 +47,16 @@ export function CommentComposer(props: Props) {
                     text: content()
                 })
             })
-            yield sleep(500);
             yield addCommentFn({
                 originalPost: props.postId,
                 text: content(),
                 replyTo: props.replyTo
             })
+            setContent("")
             refresh(props.comments)
-            
-        } catch (error: any) {
+
+        }
+        catch (error: any) {
             addToast({
                 text: error.message ?? "Somethign went wrong. Please try again later",
                 type: "error"
@@ -70,7 +71,7 @@ export function CommentComposer(props: Props) {
 
                     <div class={styles.group}>
                         <Editor
-                            content={content}
+                            content={content()}
                             setContent={setContent}
                             maxlength={255}
                             placeholder="Reply to this post"
@@ -79,12 +80,14 @@ export function CommentComposer(props: Props) {
                         <div class={styles.row}>
                             <button
                                 class={["primary", styles.postBtn]}
-                                disabled={isSubmitting()}
+                                disabled={isSubmitting() || !content()}
                                 onClick={() => {
                                     sendComment()
                                 }}
                             >
-                                Post
+                                <Show when={isSubmitting()} fallback="Post">
+                                    <Spinner size="small" />
+                                </Show>
                             </button>
                         </div>
                     </div>

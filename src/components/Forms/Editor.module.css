@@ -14,9 +14,10 @@
             grid-area: 1 / 1;
             font: 400 1rem/1.5 var(--font-ui);
             letter-spacing: normal;
-            padding: .4rem 0;
+            padding: .4rem;
             margin: 0;
             border: 0;
+            overflow-x: hidden;
             white-space: pre-wrap;
             overflow-wrap: break-word;
             min-height: 3.2rem;
@@ -25,6 +26,8 @@
         .backdrop {
             color: var(--text);
             pointer-events: none;
+            background-color: var(--surface-1);
+            border: 1px solid var(--line);
         }
 
         textarea {

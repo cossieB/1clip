@@ -92,7 +92,8 @@ export function CommentBlock(props: Props) {
             addToast({
                 text: error instanceof Error && error.message
                     ? error.message
-                    : "Something went wrong. Please try again later.", type: "error"
+                    : "Something went wrong. Please try again later.",
+                type: "error"
             })
         }
     })

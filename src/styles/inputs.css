@@ -1,0 +1,325 @@
+/* Form controls: select, checkbox, radio, switch.
+   Uses the 1Clip tokens (sharp corners, neon accent, bottom-heavy borders
+   to match the existing `input`). Import after globals.css in layer(base). */
+
+:root {
+    --accent-tint: color-mix(in oklch, var(--accent) 14%, transparent);
+    --accent-tint-strong: color-mix(in oklch, var(--accent) 24%, transparent);
+    --accent-border: color-mix(in oklch, var(--accent) 50%, transparent);
+}
+
+/* ---------- select ---------- */
+
+select {
+    --chevron: var(--text-muted);
+
+    appearance: none;
+    -webkit-appearance: none;
+    font: inherit;
+    font-size: 0.9rem;
+    color: var(--text);
+    background-color: var(--surface-1);
+    border: 1px solid var(--border-strong);
+    border-bottom: 2px solid var(--border-strong);
+    border-radius: var(--radius);
+    padding: 0.65rem 2.4rem 0.65rem 0.8rem;
+    cursor: pointer;
+    /* two gradients draw a solid chevron, so it can follow --chevron */
+    background-image:
+        linear-gradient(45deg, transparent 50%, var(--chevron) 50%),
+        linear-gradient(135deg, var(--chevron) 50%, transparent 50%);
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+    background-position:
+        calc(100% - 1.2rem - 5px) 50%,
+        calc(100% - 1.2rem) 50%;
+    transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+    scrollbar-color: var(--accent) transparent;
+
+    &:hover {
+        background-color: var(--surface-2);
+    }
+
+    &:focus-visible {
+        --chevron: var(--accent);
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 6px 18px -8px var(--accent-glow);
+    }
+
+    &:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+    /* fallback: browsers only honor bg/color on option */
+    option {
+        background: var(--surface-1);
+        color: var(--text);
+    }
+
+    /* ---------- customizable select, where supported ---------- */
+    @supports (appearance: base-select) {
+        appearance: base-select;
+        background-image: none;
+        padding-right: 0.8rem;
+
+        &::picker-icon {
+            color: var(--text-muted);
+            transition: rotate 0.15s ease, color 0.15s ease;
+        }
+
+        &:open::picker-icon {
+            rotate: 180deg;
+            color: var(--accent-bright);
+        }
+
+        &::picker(select) {
+            appearance: base-select;
+            background: var(--surface-2);
+            border: 1px solid var(--border-strong);
+            border-radius: 10px 0 10px 0;
+            corner-shape: bevel square bevel square;
+            padding: 0.35rem;
+            margin-top: 0.4rem;
+            box-shadow: 0 16px 40px oklch(0% 0 0 / 0.55), 0 0 24px -8px var(--accent-glow);
+
+            opacity: 0;
+            transform: translateY(-6px) scale(0.98);
+            transition: opacity 0.15s ease, transform 0.15s ease,
+                display 0.15s allow-discrete, overlay 0.15s allow-discrete;
+        }
+
+        &:open::picker(select) {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        @starting-style {
+            &:open::picker(select) {
+                opacity: 0;
+                transform: translateY(-6px) scale(0.98);
+            }
+        }
+
+        option {
+            border-radius: var(--radius);
+            padding: 0.55rem 0.7rem;
+            margin: 0.1rem 0;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.1s ease;
+
+            &:hover,
+            &:focus-visible {
+                background: var(--accent-tint);
+                color: var(--accent-bright);
+            }
+
+            &:checked {
+                background: var(--accent-tint-strong);
+                color: var(--accent-bright);
+                font-weight: 700;
+            }
+
+            &::checkmark {
+                order: 1;
+                margin-left: auto;
+                color: var(--accent);
+            }
+        }
+    }
+}
+
+/* ---------- checkbox + radio ---------- */
+
+input[type="checkbox"]:not(.switch),
+input[type="radio"] {
+    /* base tier: works basically everywhere off one property */
+    accent-color: var(--accent);
+    inline-size: 18px;
+    block-size: 18px;
+    padding: 0;
+    flex-shrink: 0;
+    cursor: pointer;
+
+    &:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+}
+
+/* enhanced tier: custom-painted, gated on :has() support
+   (the .option-row highlight below depends on it) */
+@supports selector(:has(a)) {
+
+    input[type="checkbox"]:not(.switch),
+    input[type="radio"] {
+        appearance: none;
+        -webkit-appearance: none;
+        margin: 0;
+        inline-size: 20px;
+        block-size: 20px;
+        padding: 0;
+        border: 1.5px solid var(--text-subtle);
+        border-radius: var(--radius);
+        background: var(--surface-1);
+        box-shadow: none;
+        display: inline-grid;
+        place-content: center;
+        transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+
+        &:hover {
+            border-color: var(--text-muted);
+        }
+
+        &:checked {
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 12px -2px var(--accent-glow);
+        }
+
+        /* keyboard focus uses the global ring, not the input glow */
+        &:focus-visible {
+            outline: 2px solid var(--accent-bright);
+            outline-offset: 3px;
+            box-shadow: none;
+        }
+    }
+
+    input[type="checkbox"]:not(.switch) {
+        &::before {
+            content: "";
+            inline-size: 12px;
+            block-size: 12px;
+            background: var(--on-accent);
+            clip-path: polygon(14% 44%, 0 59%, 35% 89%, 100% 18%, 85% 4%, 33% 63%);
+            transform: scale(0);
+            transition: transform 0.14s ease;
+        }
+
+        &:checked::before {
+            transform: scale(1);
+        }
+
+        &:indeterminate {
+            background: var(--accent-tint-strong);
+            border-color: var(--accent-border);
+
+            &::before {
+                clip-path: none;
+                inline-size: 10px;
+                block-size: 2px;
+                background: var(--accent-bright);
+                transform: scale(1);
+            }
+        }
+    }
+
+    /* radios stay round so they read as radios */
+    input[type="radio"] {
+        border-radius: 50%;
+
+        &::before {
+            content: "";
+            inline-size: 8px;
+            block-size: 8px;
+            border-radius: 50%;
+            background: var(--on-accent);
+            transform: scale(0);
+            transition: transform 0.14s ease;
+        }
+
+        &:checked::before {
+            transform: scale(1);
+        }
+    }
+
+    /* the row reacts to its own input, no JS class toggling */
+    .option-row:has(:checked),
+    .option-row:has(:indeterminate) {
+        background: var(--accent-tint);
+        border-color: var(--accent-border);
+
+        & .option-label {
+            color: var(--accent-bright);
+        }
+    }
+}
+
+/* ---------- option row (label wrapping a control + text) ---------- */
+
+.option-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.7rem 0.9rem;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s;
+
+    &:hover {
+        border-color: var(--border-strong);
+    }
+
+    .option-label {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        transition: color 0.15s;
+    }
+}
+
+/* ---------- switch ---------- */
+
+input[type="checkbox"].switch {
+    appearance: none;
+    -webkit-appearance: none;
+    position: relative;
+    inline-size: 44px;
+    block-size: 24px;
+    padding: 0;
+    margin: 0;
+    border-radius: var(--radius);
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    box-shadow: none;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        inline-size: 16px;
+        block-size: 16px;
+        background: var(--text-subtle);
+        transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+
+    &:checked {
+        background: var(--accent);
+        border-color: var(--accent);
+        box-shadow: 0 0 14px -2px var(--accent-glow);
+
+        &::before {
+            transform: translateX(20px);
+            background: var(--on-accent);
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--accent-bright);
+        outline-offset: 3px;
+    }
+
+    &:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+}

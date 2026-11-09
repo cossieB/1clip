@@ -32,10 +32,10 @@ export default function MainLayout(props: ParentProps) {
                         </a>
                     }
                 >
-                    <button class={["primary", styles.postbtn]}>
+                    <a class={["button primary", styles.postbtn]} href={paths.posts.create()}>
                         <PlusIcon />
                         <span>Post a clip</span>
-                    </button>
+                    </a>
                 </ShowWhenAuthed>
                 <UserNavItem />
             </nav>

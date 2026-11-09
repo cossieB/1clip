@@ -1,10 +1,12 @@
-import { createMemo, createSignal, For, onCleanup, Show, type Setter } from "solid-js"
+import { createMemo, createSignal, For, merge, onCleanup, Show, type Setter } from "solid-js"
 import { formatBytes, matchesAccept } from "./fileUtils"
 import styles from "./DropZone.module.css"
+import { RenderMedia } from "../RenderMedia"
 
 type Props = {
     files: File[]
-    setFiles: Setter<File[]>
+    onAdd: (files: File[]) => void
+    onRemove: (file: File) => void
     /** Same syntax as the native input: "image/*,.pdf" */
     accept?: string
     /** Defaults to unlimited */
@@ -19,18 +21,18 @@ type DragState = "idle" | "over" | "invalid"
 const sameFile = (a: File, b: File) =>
     a.name === b.name && a.size === b.size && a.lastModified === b.lastModified
 
-export function DropZone(props: Props) {
+export function DropZone(_props: Props) {
     const [dragState, setDragState] = createSignal<DragState>("idle")
     const [errors, setErrors] = createSignal<string[]>([])
+    const props = merge({ maxFiles: 8, maxSize: 16 * 1024 * 1024 }, _props)
 
-    const limit = () => props.maxFiles ?? Infinity
-    const multiple = () => limit() !== 1
+    const multiple = () => props.maxFiles !== 1
 
     const hint = createMemo(() => {
         const parts: string[] = []
-        if (props.accept) parts.push(props.accept.split(",").map(t => t.trim()).join(", "))
-        if (props.maxSize != null) parts.push(`max ${formatBytes(props.maxSize)} each`)
-        if (Number.isFinite(limit()) && limit() > 1) parts.push(`up to ${limit()} files`)
+        // if (props.accept) parts.push(props.accept.split(",").map(t => t.trim()).join(", "))
+        parts.push(`max ${formatBytes(props.maxSize)} each`)
+        if (Number.isFinite(props.maxFiles) && props.maxFiles > 1) parts.push(`up to ${props.maxFiles} files`)
         return parts.join(" · ")
     })
 
@@ -43,29 +45,29 @@ export function DropZone(props: Props) {
         for (const file of Array.from(list)) {
             if (!matchesAccept(file, props.accept)) {
                 rejected.push(`${file.name}: file type not allowed`)
-            } else if (props.maxSize != null && file.size > props.maxSize) {
-                rejected.push(
-                    `${file.name}: ${formatBytes(file.size)} exceeds ${formatBytes(props.maxSize)}`
-                )
-            } else {
+            }
+            else if (file.size > props.maxSize) {
+                rejected.push(`${file.name}: ${formatBytes(file.size)} exceeds ${formatBytes(props.maxSize)}`)
+            }
+            else {
                 valid.push(file)
             }
         }
 
         if (!multiple()) {
             // Single mode: replace the current file with the first valid one
-            if (valid.length) props.setFiles([valid[0]])
+            if (valid.length) props.onAdd([valid[0]])
             if (valid.length > 1) rejected.push("Only one file is allowed")
         } else {
             const current = props.files
             const fresh = valid.filter(f => !current.some(c => sameFile(c, f)))
-            const room = Math.max(0, limit() - current.length)
+            const room = Math.max(0, props.maxFiles - current.length)
             const accepted = fresh.slice(0, room)
 
             if (fresh.length > room) {
-                rejected.push(`Only ${limit()} files allowed; ${fresh.length - room} skipped`)
+                rejected.push(`Only ${props.maxFiles} files allowed; ${fresh.length - room} skipped`)
             }
-            if (accepted.length) props.setFiles(files => [...files, ...accepted])
+            if (accepted.length) props.onAdd(accepted)
         }
 
         setErrors(rejected)
@@ -74,7 +76,7 @@ export function DropZone(props: Props) {
 
     const removeFile = (file: File) => {
         setErrors([])
-        props.setFiles(files => files.filter(f => f !== file))
+        props.onRemove(file)
     }
 
     return (
@@ -136,7 +138,7 @@ export function DropZone(props: Props) {
                 <ul class={styles.previews}>
                     <For each={props.files}>
                         {file => {
-                            const url = file.type.startsWith("image/")
+                            const url = /^(image\/|video\/|audio\/)/.test(file.type) 
                                 ? URL.createObjectURL(file)
                                 : undefined
                             onCleanup(() => url && URL.revokeObjectURL(url))
@@ -151,7 +153,10 @@ export function DropZone(props: Props) {
                                             </span>
                                         }
                                     >
-                                        <img src={url!} alt="" />
+                                        <RenderMedia
+                                            contentType={file.type}
+                                            url={url!}
+                                        />
                                     </Show>
                                     <div class={styles.meta}>
                                         <span class={styles.name} title={file.name}>

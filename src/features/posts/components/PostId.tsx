@@ -13,7 +13,7 @@ export function PostId() {
     const post = createMemo(() => getPostFn(Number(params.postId)), {
         deferStream: true
     })
-    httpHeader("Cache-Control", "private; max-age=600")
+    httpHeader("Cache-Control", "private, max-age=600")
     return (
         <Loading fallback={<Spinner />}>
             <Show

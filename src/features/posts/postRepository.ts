@@ -126,6 +126,7 @@ function basePostsCte(where: SQL | undefined, limit: number) {
             views: posts.views,
             createdAt: posts.createdAt,
             editedOn: posts.editedOn,
+            pending: posts.pending
         })
             .from(posts)
             .innerJoin(users, eq(users.id, posts.userId))
@@ -204,6 +205,7 @@ function selectPostDetails(base: BasePosts, currentUserId?: string) {
             views: base.views,
             createdAt: base.createdAt,
             editedOn: base.editedOn,
+            pending: base.pending,
             author: {
                 id: users.id,
                 username: users.username,

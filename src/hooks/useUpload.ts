@@ -1,6 +1,6 @@
 import { uploadToSignedUrl } from "~/utils/uploadToSignedUrl";
 import { mergeObjectArrays } from "~/lib/zip";
-import { FileUploadSchema, SignedUrlResponse } from "~/integrations/storageService/zod";
+import { SignedUrlResponse } from "~/integrations/storageService/zod";
 import { convertToWebP } from "~/utils/convertToWebp";
 import { createSignal, createStore, useContext } from "solid-js";
 import { ToastContext } from "~/components/Toast/ToastProvider";

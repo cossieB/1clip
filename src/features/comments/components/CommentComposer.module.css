@@ -18,8 +18,8 @@
 
 .group {
     display: flex;
+    gap: 0.25rem;
     [aria-role="group"] {
-        padding-right: 1rem;
         width: 100%;
         textarea {
             width: 100%;

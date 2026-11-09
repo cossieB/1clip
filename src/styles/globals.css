@@ -1,6 +1,6 @@
 /* ───────── Typed custom property for animated glow ───────── */
 @property --glow {
-    syntax: "";
+    syntax: "<length>";
     inherits: true;
     initial-value: 6px;
 }

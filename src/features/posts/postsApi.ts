@@ -16,6 +16,7 @@ import { GET } from "@solidjs/web/server-functions";
 
 export async function createPostFn(p: z.input<typeof PostCreateSchema>) {
     'use server'
+
     const data = zodSafeParse(PostCreateSchema, p)
     if (data.text.length + data.media.length === 0)
         throw respond(new Error("Empty post"), { status: 400 })
@@ -131,4 +132,32 @@ export async function viewPostFn(postId: number[]) {
     const postIds = data.filter((_, i) => cached[i] === null)
     await postRepository.viewPosts(postIds);
     await Promise.all(postIds.map(postId => redis.setEx(`view:${postId}:${ip}`, 86400, userSession?.user.id ?? "Anon")))
+}
+
+export async function markPostUploadComplete(postId: number) {
+    'use server'
+    const data = zodSafeParse(z.number().positive(), postId)
+    const userSession = await ensureVerified()
+    const post = await postRepository.findById(data, undefined, true);
+    if (!post) {
+        console.error(`[ERROR] markPostUploadComplete(${postId}) called but post not found`)
+        throw respond(new Error("Something went wrong. Please try again later"), {
+            status: 500
+        });
+    }
+
+    if (!post.pending || post.author.id != userSession.user.id) throw respond(new Error("Forbidden"), {
+        status: 403
+    })
+
+    const results = await Promise.all(post.media.map(media => storageService.fileExists(media.key)));
+    const allGood = results.every(r => r);
+    if (allGood) {
+        await postRepository.updatePost(data, {
+            pending: false
+        })
+        post.media.forEach(m => orphanedFileService.removePendingUpload(m.key))
+    }
+    // TODO: add retries with bullmq
+    return post
 }

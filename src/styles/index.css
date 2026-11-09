@@ -3,3 +3,4 @@
 @import "reset.css" layer(reset);
 @import "tokens.css" layer(tokens);
 @import "globals.css" layer(base);
+@import "inputs.css" layer(base);
