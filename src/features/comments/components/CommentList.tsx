@@ -1,4 +1,4 @@
-import { createMemo, createOptimisticStore, For, Loading, Show } from "solid-js";
+import { createEffect, createMemo, createOptimisticStore, For, Loading, Show } from "solid-js";
 import { getCommentsByPostIdFn } from "./commentsApi";
 import { Spinner } from "~/components/Loader/Spinner";
 import { CommentBlock } from "./CommentBlock";
@@ -13,11 +13,12 @@ type Props = {
 export function CommentList(props: Props) {
     const [comments, setComments] = createOptimisticStore(() => getCommentsByPostIdFn(props), [], {
         key: (item) => item.commentId,
-        name: "commentList"
+        name: "commentList",
     })
+
     return (
         <Loading fallback={<Spinner />}>
-            <Show when={session().data}>
+            <Show when={session().data && !props.replyTo}>
                 <CommentComposer
                     comments={comments}
                     setComments={setComments}

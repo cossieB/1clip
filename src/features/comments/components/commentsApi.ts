@@ -1,5 +1,3 @@
-'use server'
-
 import { zodSafeParse } from "~/utils/zodSafeParse";
 import { AddCommentSchema, GetCommentsSchema } from "../utils/zod";
 import z from "zod";
@@ -8,10 +6,12 @@ import * as commentsRepository from "./commentRepository"
 import { ensureVerified } from "~/features/auth/utils/ensureAuth";
 import { addNotification } from "~/features/notifications/addNotification";
 import { getCurrentUser } from "~/features/auth/serverFn";
-import { respond } from "@solidjs/web";
+import { getRequestEvent, respond } from "@solidjs/web";
 import { HttpStatusCode } from "~/utils/statusCodes";
+import { GET } from "@solidjs/web/server-functions";
 
 export async function addCommentFn(input: z.input<typeof AddCommentSchema>) {
+    'use server'
     const data = zodSafeParse(AddCommentSchema, input);
     const userSession = await ensureVerified()
     await rateLimiter("comment:create", userSession.user.id, 5, 60)
@@ -38,14 +38,20 @@ export async function addCommentFn(input: z.input<typeof AddCommentSchema>) {
     return result
 }
 
-export async function getCommentsByPostIdFn(input: z.input<typeof GetCommentsSchema>) {
+export const getCommentsByPostIdFn =  GET(async (input: z.input<typeof GetCommentsSchema>) => {
+    'use server'
     const data = GetCommentsSchema.parse(input);
     const userSession = await getCurrentUser()
-    return await commentsRepository.findPostComments(data.postId, data.replyTo, userSession?.user.id)
-
-}
+    const comments = await commentsRepository.findPostComments(data.postId, data.replyTo, userSession?.user.id)
+    return respond(comments, {
+        headers: {
+            "Cache-Control": "private, max-age=600"
+        }
+    })
+})
 
 export async function toggleCommentLikeFn(commentId: number) {
+    'use server'
     const data = zodSafeParse(z.number(), commentId)
     const userSession = await ensureVerified()
     await rateLimiter("comment:react", userSession.user.id, 10, 60)    
@@ -53,6 +59,7 @@ export async function toggleCommentLikeFn(commentId: number) {
 }
 
 export async function deleteCommentFn(commentId: number) {
+    'use server'
     const data = zodSafeParse(z.number(), commentId)
     const userSession = await ensureVerified()    
     await rateLimiter("comment:delete", userSession.user.id, 5, 60)

@@ -6,14 +6,14 @@ import { getPostFn } from "../postsApi";
 import { Spinner } from "~/components/Loader/Spinner";
 import NotFound from "~/routes/[...404]";
 import { CommentList } from "~/features/comments/components/CommentList";
-import { CommentComposer } from "~/features/comments/components/CommentComposer";
+import { httpHeader } from "@solidjs/web";
 
 export function PostId() {
     const params = useParams(paths.posts)
     const post = createMemo(() => getPostFn(Number(params.postId)), {
         deferStream: true
     })
-
+    httpHeader("Cache-Control", "private; max-age=600")
     return (
         <Loading fallback={<Spinner />}>
             <Show

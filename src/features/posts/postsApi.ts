@@ -1,5 +1,3 @@
-'use server'
-
 import z from "zod";
 import * as postRepository from "~/features/posts/postRepository"
 import { rateLimiter } from "~/utils/rateLimiter.server";
@@ -14,8 +12,10 @@ import { getCurrentUser } from "../auth/serverFn";
 import { ensureVerified } from "../auth/utils/ensureAuth";
 import { redis } from "~/utils/redis";
 import { zodSafeParse } from "~/utils/zodSafeParse";
+import { GET } from "@solidjs/web/server-functions";
 
 export async function createPostFn(p: z.input<typeof PostCreateSchema>) {
+    'use server'
     const data = zodSafeParse(PostCreateSchema, p)
     if (data.text.length + data.media.length === 0)
         throw respond(new Error("Empty post"), { status: 400 })
@@ -66,21 +66,32 @@ export async function createPostFn(p: z.input<typeof PostCreateSchema>) {
 }
 
 
-export async function getPostFn(postId: number) {
+export const getPostFn = GET(async (postId: number) => {
+    'use server'
     const data = zodSafeParse(z.number().positive(), postId)
     const userSession = await getCurrentUser()
-    const post = await postRepository.findById(data, userSession?.user.id); 
-    if (!post) return respond(null, {status: 404})
-    return post
-}
+    const post = await postRepository.findById(data, userSession?.user.id);
+    return respond(post ?? null, {
+        headers: {
+            "Cache-Control": "private, max-age=600"
+        }
+    })
+})
 
-export async function getPostsFn(filters: z.input<typeof GetPostSchema> = {}) {
+export const getPostsFn = GET(async (filters: z.input<typeof GetPostSchema> = {}) => {
+    'use server'
     const data = zodSafeParse(GetPostSchema, filters)
     const userSession = await getCurrentUser()
-    return await postRepository.findAll(data, userSession?.user.id)
-}
+    const post = await postRepository.findAll(data, userSession?.user.id)
+    return respond(post, {
+        headers: {
+            "Cache-Control": "private, max-age=600"
+        }
+    })
+})
 
 export async function toggleLikeFn(postId: number) {
+    'use server'
     const data = zodSafeParse(z.number().positive(), postId)
     const userSession = await ensureVerified()
     await rateLimiter("post:react", userSession.user.id, 10, 60)
@@ -101,6 +112,7 @@ export async function toggleLikeFn(postId: number) {
 }
 
 export async function deletePostFn(postId: number) {
+    'use server'
     const data = zodSafeParse(z.number().positive(), postId)
     const userSession = await ensureVerified()
     await rateLimiter("post:delete", userSession.user.id, 5, 60)
@@ -109,6 +121,7 @@ export async function deletePostFn(postId: number) {
 }
 
 export async function viewPostFn(postId: number[]) {
+    'use server'
     const data = zodSafeParse(z.number().array(), postId)
     if (data.length == 0) return;
     const ip = getRequestEvent()?.request.headers.get("cf-connecting-ip") || getRequestEvent()?.request.headers.get("x-forwarded-for");

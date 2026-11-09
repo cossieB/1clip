@@ -1,5 +1,5 @@
 import { query } from "@solidjs/router";
-import { redirect, respond } from "@solidjs/web";
+import { getRequestEvent, redirect, respond } from "@solidjs/web";
 import z from "zod";
 import * as userRepository from "./userRepository"
 import { getCurrentUser } from "../auth/serverFn";
@@ -13,7 +13,7 @@ import { zodSafeParse } from "~/utils/zodSafeParse";
 export const getUser = query(async (id: string) => {
     'use server'
     const parse = z.uuidv7().safeParse(id)
-    if (!parse.success) throw respond(new Error("User not found"), { status: 404 })
+    if (!parse.success) throw respond(new Error("User not found"), { status: 404 });
     return userRepository.findById(parse.data)
 }, "user")
 

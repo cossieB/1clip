@@ -15,7 +15,7 @@ type Props = {
 }
 
 // Fixed locale + UTC so server and browser render the same string
-const dateFormat = new Intl.DateTimeFormat("en", { dateStyle: "medium", timeZone: "UTC" })
+const dateFormat = new Intl.DateTimeFormat("en-za", { dateStyle: "medium", timeZone: "UTC" })
 
 export function PostBlock(props: Props) {
     const { like, toggle } = useToggleLike({

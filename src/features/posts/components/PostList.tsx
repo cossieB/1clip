@@ -19,7 +19,7 @@ export function PostList(props: { filters?: PostFilters }) {
         if (next.length === 0 ) done = true
         return [...previous, ...next]
     }, {
-        loadingValue: []
+        loadingValue: [],
     })
     const addPostToSet = useViewPost()
     let observer: IntersectionObserver

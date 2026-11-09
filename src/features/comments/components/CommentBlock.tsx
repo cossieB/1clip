@@ -7,10 +7,11 @@ import { addCommentFn, toggleCommentLikeFn } from "./commentsApi"
 import { HeartIcon } from "@lucide/solid"
 import { useToggleLike } from "~/hooks/useToggleLike"
 import { ToastContext } from "~/components/Toast/ToastProvider"
+import { CommentList } from "./CommentList"
 
 const MAX_LENGTH = 255
 
-const dateFormat = new Intl.DateTimeFormat("en", { dateStyle: "medium", timeZone: "UTC" })
+const dateFormat = new Intl.DateTimeFormat("en-za", { dateStyle: "medium", timeZone: "UTC" })
 
 type Props = ParentProps<{
     comment: CommentWithDetails
@@ -203,7 +204,12 @@ export function CommentBlock(props: Props) {
 
                 {/* children are only created once opened, so replies can fetch lazily */}
                 <Show when={showReplies()}>
-                    <div class={styles.replies}>{props.children}</div>
+                    <div class={styles.replies}>
+                        <CommentList
+                            postId={props.comment.postId}
+                            replyTo={props.comment.commentId}
+                        />
+                    </div>
                 </Show>
             </div>
         </article>

@@ -11,6 +11,7 @@ export function YouTubeIframe(props: Props) {
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowfullscreen
             referrerpolicy="strict-origin-when-cross-origin"
+            loading="lazy"
         />
     )
 }
@@ -20,6 +21,7 @@ export function TwitchIframe(props: Props) {
         <iframe
             src={`https://clips.twitch.tv/embed?clip=${props.slug}&parent=localhost&parent=1clip.cossie.dev&preload=metadata`}
             allowfullscreen
+            loading="lazy"
         />
     )
 }
