@@ -3,7 +3,7 @@ import styles from "./CommentComposer.module.css"
 import { session } from "~/features/auth/authApi"
 import { mediaSrc } from "~/utils/mediaSrc"
 import { Editor } from "~/components/Forms/Editor"
-import { addCommentFn, type getCommentsByPostIdFn } from "./commentsApi"
+import { addCommentFn, type getCommentsByPostIdFn } from "../commentsApi"
 import { ToastContext } from "~/components/Toast/ToastProvider"
 import { Spinner } from "~/components/Loader/Spinner"
 

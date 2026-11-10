@@ -9,8 +9,5 @@ export const AddCommentSchema = z.object({
 export const GetCommentsSchema = z.object({
     postId: z.number(),
     replyTo: z.number().nullable().default(null),
-    cursor: z.object({
-        createdAt: z.date(),
-        commentId: z.number()
-    }).optional()
+    cursor: z.int().optional()
 })

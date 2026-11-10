@@ -27,16 +27,11 @@ export type LfgApplicant = {
     image: string
 }
 
-export type LfgCursor = {
-    createdAt: Date
-    lfgId: number
-}
-
 export type LfgFilters = {
     gameId?: number
-    userId?: string // creator
-    limit?: number // default 20, max 100
-    cursor?: LfgCursor // last item of the previous page
+    userId?: string
+    limit?: number
+    cursor?: number
 }
 
 const DEFAULT_LIMIT = 20;
@@ -53,7 +48,7 @@ function lfgSelection(currentUserId?: string) {
         editedOn: lfg.editedOn,
         expiresAt: lfg.expiresAt,
         isActive: lfg.isActive,
-        slots: lfg.slots, // excluding the creator
+        slots: lfg.slots,
         creator: {
             id: users.id,
             username: users.username,
@@ -93,12 +88,7 @@ export async function findAll(args: LfgFilters = {}, currentUserId?: string) {
     const conditions: (SQL | undefined)[] = [
         args.gameId !== undefined ? eq(lfg.gameId, args.gameId) : undefined,
         args.userId ? eq(lfg.userId, args.userId) : undefined,
-        args.cursor
-            ? or(
-                lt(lfg.createdAt, args.cursor.createdAt),
-                and(eq(lfg.createdAt, args.cursor.createdAt), lt(lfg.lfgId, args.cursor.lfgId))
-            )
-            : undefined,
+        args.cursor !== undefined ? lt(lfg.lfgId, args.cursor) : undefined,
     ];
 
     return db
@@ -107,7 +97,7 @@ export async function findAll(args: LfgFilters = {}, currentUserId?: string) {
         .innerJoin(users, eq(users.id, lfg.userId))
         .leftJoin(games, eq(games.gameId, lfg.gameId))
         .where(and(...conditions))
-        .orderBy(desc(lfg.createdAt), desc(lfg.lfgId))
+        .orderBy(desc(lfg.lfgId))
         .limit(limit);
 }
 
@@ -129,8 +119,8 @@ export async function findById(
 }
 
 export type LfgApplicationPagination = {
-    limit?: number // default 20, max 100
-    cursor?: number // applicationId of the last item on the previous page
+    limit?: number
+    cursor?: number
 }
 
 export async function findLfgApplications(

@@ -43,7 +43,7 @@ export function PostList(props: { filters?: PostFilters }) {
                 if (entry.isIntersecting) addPostToSet(postId)
                 if ((postId == lastPostId) && entry.isIntersecting && !done) {
                     const item = posts().find(post => post.postId === postId)
-                    if (item) setCursor({ createdAt: item.createdAt, postId })
+                    if (item) setCursor(postId)
                 }
 
             })

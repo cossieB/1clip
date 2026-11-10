@@ -2,7 +2,7 @@ import { eq, InferInsertModel, InferSelectModel, sql } from "drizzle-orm";
 import { db } from "~/drizzle/db";
 import { platforms } from "~/drizzle/schema";
 
-export function findAll(filters?: {limit?: number, offset?: number}) {
+export function findAll(filters?: { limit?: number, offset?: number }) {
     return db.query.platforms.findMany({
         orderBy: {
             releaseDate: 'desc'
@@ -29,7 +29,12 @@ export async function createPlatform(platform: InferInsertModel<typeof platforms
 }
 
 export function editPlatform(platformId: number, data: Partial<InferSelectModel<typeof platforms>>) {
-    return db.update(platforms).set(data).where(eq(platforms.platformId, platformId)).returning({
-        oldLogo: sql<string>`OLD.logo`
-    })
+    return db
+        .update(platforms).set({
+            ...data,
+            dateModified: sql`NOW()`
+        })
+        .where(eq(platforms.platformId, platformId)).returning({
+            oldLogo: sql<string>`OLD.logo`
+        })
 }

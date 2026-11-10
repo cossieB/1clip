@@ -4,10 +4,7 @@ export const GetSquadsSchema = z.object({
     gameId: z.int(),
     userId: z.string(),
     limit: z.int(),
-    cursor: z.object({
-        createdAt: z.date(),
-        lfgId: z.int()
-    })
+    cursor: z.number()
 }).partial().optional()
 
 export const SquadCreateSchema = z.object({
@@ -21,8 +18,5 @@ export const UpdateSquadSchema = SquadCreateSchema.partial().extend({lfgId: z.in
 
 export const GetApplicationsSchema = z.object({
     squadId: z.int(),
-    pagination: z.object({
-        limit: z.int(),
-        cursor: z.int()
-    })
+    cursor: z.int()
 })

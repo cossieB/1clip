@@ -24,7 +24,12 @@ export async function findById(companyId: number) {
 }
 
 export async function editDeveloper(companyId: number, data: Partial<InferSelectModel<typeof companies>>) {
-    return db.update(companies).set(data).where(eq(companies.companyId, companyId)).returning({
+    return db.update(companies)
+    .set({
+        ...data,
+        dateModified: sql`NOW()`
+    })
+    .where(eq(companies.companyId, companyId)).returning({
         oldLogo: sql<string>`OLD.logo`
     })
 }

@@ -1,5 +1,5 @@
 import { createEffect, createOptimisticStore, createSignal, For, Loading, onSettled, Show, snapshot } from "solid-js";
-import { getCommentsByPostIdFn } from "./commentsApi";
+import { getCommentsByPostIdFn } from "../commentsApi";
 import { Spinner } from "~/components/Loader/Spinner";
 import { CommentBlock } from "./CommentBlock";
 import { session } from "~/features/auth/authApi";
@@ -50,7 +50,7 @@ export function CommentList(props: Props) {
             if (last?.isIntersecting && !done) {
                 const commentId = Number((last.target as HTMLElement).dataset.commentId); 
                 const item = comments.find(comment => comment.commentId === commentId); 
-                if (item) setCursor({ createdAt: item.createdAt, commentId })
+                if (item) setCursor(commentId)
             }            
         })
         return () => observer?.disconnect()

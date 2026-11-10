@@ -1,5 +1,5 @@
 import { zodSafeParse } from "~/utils/zodSafeParse";
-import { AddCommentSchema, GetCommentsSchema } from "../utils/zod";
+import { AddCommentSchema, GetCommentsSchema } from "./utils/zod";
 import z from "zod";
 import { rateLimiter } from "~/utils/rateLimiter.server";
 import * as commentsRepository from "./commentRepository"

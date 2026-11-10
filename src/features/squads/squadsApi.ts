@@ -51,7 +51,7 @@ export const getSquadApplicationsFn = GET(async (arg: z.input<typeof GetApplicat
     'use server'
     const data = zodSafeParse(GetApplicationsSchema, arg)
     const userSession = await ensureVerified()
-    const applications = await squadsRepository.findLfgApplications(data.squadId, userSession.user.id, data.pagination )
+    const applications = await squadsRepository.findLfgApplications(data.squadId, userSession.user.id, {cursor: data.cursor} )
     return respond(applications, {
         headers: {
             "Cache-Control": "private, max-age=60"

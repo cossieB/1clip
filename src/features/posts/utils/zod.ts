@@ -20,10 +20,7 @@ export const GetPostSchema = z.object({
     dislikerUsername: z.string(),
     tag: z.string(),
     limit: z.number(),
-    cursor: z.object({
-        createdAt: z.date(),
-        postId: z.number()
-    }),
+    cursor: z.int(),
     followerId: z.uuidv7(),
     gameId: z.number(),
     includePending: z.boolean().default(false),

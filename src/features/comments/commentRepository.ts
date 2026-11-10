@@ -1,6 +1,7 @@
 import { sql, eq, and, isNull, or, asc, gt, count, InferInsertModel, getColumns, lt, desc } from "drizzle-orm"
 import { db } from "~/drizzle/db"
 import { commentLikes, comments, posts, users } from "~/drizzle/schema"
+import 'server-only'
 
 export async function addComment(comment: InferInsertModel<typeof comments>) {
     const inserted = db.$with("inserted").as(
@@ -27,14 +28,9 @@ export async function addComment(comment: InferInsertModel<typeof comments>) {
     return result[0];
 }
 
-export type CommentCursor = {
-    createdAt: Date
-    commentId: number
-}
-
 export type CommentPagination = {
     limit?: number
-    cursor?: CommentCursor
+    cursor?: number
 }
 
 const COMMENTS_DEFAULT_LIMIT = 20;
@@ -48,7 +44,6 @@ export async function findPostComments(
 ) {
     const pageSize = Math.min(Math.max(limit ?? COMMENTS_DEFAULT_LIMIT, 1), COMMENTS_MAX_LIMIT);
 
-    // 1. Paginated base comments CTE
     const paginatedComments = db.$with("paginated_comments").as(
         db.select({
             commentId: comments.commentId,
@@ -63,21 +58,12 @@ export async function findPostComments(
             .where(and(
                 eq(comments.postId, postId),
                 replyTo === null ? isNull(comments.replyTo) : eq(comments.replyTo, replyTo),
-                cursor
-                    ? or(
-                        lt(comments.createdAt, cursor.createdAt),
-                        and(
-                            eq(comments.createdAt, cursor.createdAt),
-                            lt(comments.commentId, cursor.commentId)
-                        )
-                    )
-                    : undefined
+                cursor !== undefined ? lt(comments.commentId, cursor) : undefined
             ))
-            .orderBy(desc(comments.createdAt), desc(comments.commentId))
+            .orderBy(desc(comments.commentId))
             .limit(pageSize)
     );
 
-// 2. Pre-aggregated Likes CTE (Scoping likes to comments belonging to this post)
     const likesAgg = db.$with("likes_agg").as(
         db.select({
             commentId: commentLikes.commentId,
@@ -92,7 +78,6 @@ export async function findPostComments(
             .groupBy(commentLikes.commentId)
     );
 
-    // 3. Pre-aggregated Replies CTE (Scoping replies to this post)
     const repliesAgg = db.$with("replies_agg").as(
         db.select({
             replyTo: comments.replyTo,
@@ -103,7 +88,6 @@ export async function findPostComments(
             .groupBy(comments.replyTo)
     );
 
-    // 4. Main query combining CTEs via LEFT JOINs
     return db
         .with(paginatedComments, likesAgg, repliesAgg)
         .select({
@@ -126,9 +110,8 @@ export async function findPostComments(
         .innerJoin(users, eq(users.id, paginatedComments.userId))
         .leftJoin(likesAgg, eq(likesAgg.commentId, paginatedComments.commentId))
         .leftJoin(repliesAgg, eq(repliesAgg.replyTo, paginatedComments.commentId))
-        .orderBy(desc(paginatedComments.createdAt), desc(paginatedComments.commentId));
+        .orderBy(desc(paginatedComments.commentId));
 }
-
 
 export type CommentWithDetails = Awaited<ReturnType<typeof findPostComments>>[number];
 
@@ -142,7 +125,6 @@ export async function toggleLike(commentId: number, currentUserId: string) {
 
         if (!comment) return null;
 
-        // Try to unlike first; if a row was removed, we're done
         const removed = await tx
             .delete(commentLikes)
             .where(and(eq(commentLikes.commentId, commentId), eq(commentLikes.userId, currentUserId)))
@@ -166,7 +148,6 @@ export async function toggleLike(commentId: number, currentUserId: string) {
         return { liked, likeCount, authorId: comment.authorId };
     });
 }
-
 
 export async function deleteComment(commentId: number, userId: string) {
     return db.delete(comments).where(and(
