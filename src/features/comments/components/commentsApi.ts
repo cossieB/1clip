@@ -38,11 +38,18 @@ export async function addCommentFn(input: z.input<typeof AddCommentSchema>) {
     return result
 }
 
-export const getCommentsByPostIdFn =  GET(async (input: z.input<typeof GetCommentsSchema>) => {
+export const getCommentsByPostIdFn = GET(async (input: z.input<typeof GetCommentsSchema>) => {
     'use server'
     const data = GetCommentsSchema.parse(input);
     const userSession = await getCurrentUser()
-    const comments = await commentsRepository.findPostComments(data.postId, data.replyTo, userSession?.user.id)
+    const comments = await commentsRepository.findPostComments(
+        data.postId,
+        data.replyTo,
+        userSession?.user.id, {
+        cursor: input.cursor,
+        limit: 20
+    })
+    
     return respond(comments, {
         headers: {
             "Cache-Control": "private, max-age=60"
@@ -54,15 +61,15 @@ export async function toggleCommentLikeFn(commentId: number) {
     'use server'
     const data = zodSafeParse(z.number(), commentId)
     const userSession = await ensureVerified()
-    await rateLimiter("comment:react", userSession.user.id, 10, 60)    
+    await rateLimiter("comment:react", userSession.user.id, 10, 60)
     return await commentsRepository.toggleLike(data, userSession.user.id)
 }
 
 export async function deleteCommentFn(commentId: number) {
     'use server'
     const data = zodSafeParse(z.number(), commentId)
-    const userSession = await ensureVerified()    
+    const userSession = await ensureVerified()
     await rateLimiter("comment:delete", userSession.user.id, 5, 60)
     const result = await commentsRepository.deleteComment(data, userSession.user.id)
-    if (result.length == 0) throw respond(new Error("Failed to delete"), {status: HttpStatusCode.INTERNAL_SERVER_ERROR})
+    if (result.length == 0) throw respond(new Error("Failed to delete"), { status: HttpStatusCode.INTERNAL_SERVER_ERROR })
 }

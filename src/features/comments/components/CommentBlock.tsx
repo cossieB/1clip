@@ -114,7 +114,7 @@ export function CommentBlock(props: Props) {
     const remaining = () => MAX_LENGTH - draft().length
 
     return (
-        <article class={[styles.comment, { [styles.pending]: props.comment.commentId < 0 }]}>
+        <article data-comment-id={props.comment.commentId} class={[styles.comment, { [styles.pending]: props.comment.commentId < 0 }]}>
             <a href={`/users/${props.comment.author.username}`} class={styles.avatarLink} tabindex="-1" aria-hidden="true">
                 <img
                     class={["cutout", styles.avatar]}

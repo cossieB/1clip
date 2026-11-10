@@ -1,24 +1,14 @@
-import { createMemo, createSignal, Show } from "solid-js";
+import { Show } from "solid-js";
 import { Editor } from "~/components/Forms/Editor";
 import { TextField } from "~/components/Forms/Textfield";
 import { SearchAutocomplete } from "~/components/SearchAutocomplete/SearchAutocomplete";
 import { getGamesFn } from "~/features/games/gamesApi";
 import { useCreatePost } from "../hooks/useCreatePost";
 import { DropZone } from "~/components/Forms/DropZone";
-import { getCurrentUser } from "~/features/auth/serverFn";
-import { redirect } from "@solidjs/web";
-import { paths } from "~/router";
-import { query } from "@solidjs/router";
 import { Spinner } from "~/components/Loader/Spinner";
 
-const getSession = query(async () => {
-    'use server'
-    const userSession = await getCurrentUser()
-    if (!userSession) throw redirect(paths({dialog: "signin"}))
-}, "s")
-
 export function CreatePostPage() {
-    createMemo(() => getSession(), {deferStream: true})
+
     const { input, setInput, setFiles, handleSubmit, isSubmitting, abortController, files } = useCreatePost()
     return (
         <form onSubmit={handleSubmit} class="form card">

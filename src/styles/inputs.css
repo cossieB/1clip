@@ -34,7 +34,7 @@ select {
         calc(100% - 1.2rem - 5px) 50%,
         calc(100% - 1.2rem) 50%;
     transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
-    scrollbar-color: var(--accent) transparent;
+    scrollbar-color: var(--accent-deep) transparent;
 
     &:hover {
         background-color: var(--surface-2);
@@ -316,6 +316,94 @@ input[type="checkbox"].switch {
     &:focus-visible {
         outline: 2px solid var(--accent-bright);
         outline-offset: 3px;
+    }
+
+    &:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+}
+
+/* ---------- range ----------
+   WebKit/Blink can't style the filled part natively, so the track paints it
+   from --fill (0-100%). Set it from JS (see the snippet in the docs/preview).
+   Firefox fills natively via ::-moz-range-progress. */
+
+input[type="range"] {
+    --fill: 0%;
+    --track: 6px;
+    --thumb-w: 14px;
+    --thumb-h: 22px;
+
+    appearance: none;
+    -webkit-appearance: none;
+    inline-size: 100%;
+    block-size: var(--thumb-h);
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    cursor: pointer;
+
+    &::-webkit-slider-runnable-track {
+        block-size: var(--track);
+        background: linear-gradient(to right, var(--accent) var(--fill), var(--surface-2) var(--fill));
+        box-shadow: inset 0 0 0 1px var(--border-strong);
+        border-radius: var(--radius);
+    }
+
+    &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        inline-size: var(--thumb-w);
+        block-size: var(--thumb-h);
+        margin-top: calc((var(--track) - var(--thumb-h)) / 2);
+        background: var(--accent);
+        border: none;
+        border-radius: var(--radius);
+        box-shadow: 0 0 12px -2px var(--accent-glow);
+        transition: background-color 0.15s, box-shadow 0.15s;
+    }
+
+    &::-moz-range-track {
+        block-size: var(--track);
+        background: var(--surface-2);
+        box-shadow: inset 0 0 0 1px var(--border-strong);
+        border-radius: var(--radius);
+    }
+
+    &::-moz-range-progress {
+        block-size: var(--track);
+        background: var(--accent);
+        border-radius: var(--radius);
+    }
+
+    &::-moz-range-thumb {
+        inline-size: var(--thumb-w);
+        block-size: var(--thumb-h);
+        background: var(--accent);
+        border: none;
+        border-radius: var(--radius);
+        box-shadow: 0 0 12px -2px var(--accent-glow);
+        transition: background-color 0.15s, box-shadow 0.15s;
+    }
+
+    &:hover::-webkit-slider-thumb,
+    &:active::-webkit-slider-thumb {
+        background: var(--accent-bright);
+        box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    &:hover::-moz-range-thumb,
+    &:active::-moz-range-thumb {
+        background: var(--accent-bright);
+        box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--accent-bright);
+        outline-offset: 3px;
+        box-shadow: none;
     }
 
     &:disabled {

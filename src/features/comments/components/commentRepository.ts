@@ -1,4 +1,4 @@
-import { sql, eq, and, isNull, or, asc, gt, count, InferInsertModel, getColumns } from "drizzle-orm"
+import { sql, eq, and, isNull, or, asc, gt, count, InferInsertModel, getColumns, lt, desc } from "drizzle-orm"
 import { db } from "~/drizzle/db"
 import { commentLikes, comments, posts, users } from "~/drizzle/schema"
 
@@ -59,42 +59,48 @@ export async function findPostComments(
             createdAt: comments.createdAt,
             editedOn: comments.editedOn,
         })
-        .from(comments)
-        .where(and(
-            eq(comments.postId, postId),
-            replyTo === null ? isNull(comments.replyTo) : eq(comments.replyTo, replyTo),
-            cursor
-                ? or(
-                    gt(comments.createdAt, cursor.createdAt),
-                    and(eq(comments.createdAt, cursor.createdAt), gt(comments.commentId, cursor.commentId))
-                )
-                : undefined
-        ))
-        .orderBy(asc(comments.createdAt), asc(comments.commentId))
-        .limit(pageSize)
+            .from(comments)
+            .where(and(
+                eq(comments.postId, postId),
+                replyTo === null ? isNull(comments.replyTo) : eq(comments.replyTo, replyTo),
+                cursor
+                    ? or(
+                        lt(comments.createdAt, cursor.createdAt),
+                        and(
+                            eq(comments.createdAt, cursor.createdAt),
+                            lt(comments.commentId, cursor.commentId)
+                        )
+                    )
+                    : undefined
+            ))
+            .orderBy(desc(comments.createdAt), desc(comments.commentId))
+            .limit(pageSize)
     );
 
-    // 2. Pre-aggregated Likes CTE using GROUP BY
+// 2. Pre-aggregated Likes CTE (Scoping likes to comments belonging to this post)
     const likesAgg = db.$with("likes_agg").as(
         db.select({
             commentId: commentLikes.commentId,
             likeCount: sql<number>`count(*)::int`.as("like_count"),
-            likedByCurrentUser: currentUserId 
+            likedByCurrentUser: currentUserId
                 ? sql<boolean>`bool_or(${commentLikes.userId} = ${currentUserId})`.as("liked_by_current_user")
                 : sql<boolean>`false`.as("liked_by_current_user"),
         })
-        .from(commentLikes)
-        .groupBy(commentLikes.commentId)
+            .from(commentLikes)
+            .innerJoin(comments, eq(comments.commentId, commentLikes.commentId))
+            .where(eq(comments.postId, postId))
+            .groupBy(commentLikes.commentId)
     );
 
-    // 3. Pre-aggregated Replies CTE using GROUP BY
+    // 3. Pre-aggregated Replies CTE (Scoping replies to this post)
     const repliesAgg = db.$with("replies_agg").as(
         db.select({
             replyTo: comments.replyTo,
             replyCount: sql<number>`count(*)::int`.as("reply_count"),
         })
-        .from(comments)
-        .groupBy(comments.replyTo)
+            .from(comments)
+            .where(eq(comments.postId, postId))
+            .groupBy(comments.replyTo)
     );
 
     // 4. Main query combining CTEs via LEFT JOINs
@@ -120,7 +126,7 @@ export async function findPostComments(
         .innerJoin(users, eq(users.id, paginatedComments.userId))
         .leftJoin(likesAgg, eq(likesAgg.commentId, paginatedComments.commentId))
         .leftJoin(repliesAgg, eq(repliesAgg.replyTo, paginatedComments.commentId))
-        .orderBy(asc(paginatedComments.createdAt), asc(paginatedComments.commentId));
+        .orderBy(desc(paginatedComments.createdAt), desc(paginatedComments.commentId));
 }
 
 

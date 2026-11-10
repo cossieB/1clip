@@ -22,7 +22,9 @@ export function PostList(props: { filters?: PostFilters }) {
         loadingValue: [],
     })
     const addPostToSet = useViewPost()
+    
     let observer: IntersectionObserver
+
     createEffect(
         posts,
         () => {

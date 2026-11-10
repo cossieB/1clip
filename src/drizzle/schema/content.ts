@@ -27,10 +27,10 @@ export const lfg = pgTable("lfg", {
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     editedOn: timestamp("edited_on", { withTimezone: true }),
     expiresAt: timestamp("expires_at", { withTimezone: true }),
+    isActive: boolean("is_active").notNull().default(true),
     gameId: integer("game_id").references(() => games.gameId, { onDelete: "set null" }),
     /** excluding owner */
     slots: integer("slots").notNull(),
-    slotsTaken: integer("slots_taken").notNull(),
 }, table => [
     index().on(table.gameId),
     index().on(table.createdAt)
@@ -41,6 +41,7 @@ export const status = pgEnum("status", ["pending", "accepted", "rejected"])
 export const lfgApplications = pgTable("lfg_applications", {
     applicationId: integer("application_id").primaryKey().generatedAlwaysAsIdentity(),
     lfgId: integer("lfg_id").notNull().references(() => lfg.lfgId, { onDelete: "cascade" }),
+    message: varchar("message"),
     candidateId: uuid("candidate_id").notNull().references(() => users.id, { onDelete: "cascade" }),
     status: status("status").notNull().default("pending"),
     appliedAt: timestamp("applied_at", { withTimezone: true }).notNull().defaultNow()

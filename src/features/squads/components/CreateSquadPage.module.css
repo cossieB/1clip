@@ -1,0 +1,39 @@
+.hint {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.75rem;
+    color: var(--text-subtle);
+}
+
+.error {
+    font-size: 0.8rem;
+    color: var(--danger);
+}
+
+.expiry {
+    display: grid;
+    gap: 0.5rem;
+    border: none;
+    padding: 0;
+    min-inline-size: 0;
+
+    legend {
+        font-size: 0.7rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--text-subtle);
+        margin-bottom: 0.5rem;
+    }
+}
+
+.expiryRow {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 1rem;
+
+    select {
+        inline-size: 100%;
+        text-overflow: ellipsis;
+    }
+}
