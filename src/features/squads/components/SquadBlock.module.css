@@ -1,0 +1,239 @@
+.lfg {
+    gap: 1rem;
+}
+
+/* ── Header ── */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+}
+
+.author {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    min-width: 0;
+
+    &:hover .username {
+        color: var(--accent-bright);
+    }
+}
+
+.avatar {
+    --bevel: 8px;
+    width: 2.5rem;
+    height: 2.5rem;
+    object-fit: cover;
+    border: 1px solid var(--border-strong);
+    background: var(--surface-1);
+    flex-shrink: 0;
+}
+
+.names {
+    display: grid;
+    min-width: 0;
+}
+
+.username {
+    font-weight: 700;
+    color: var(--text);
+    transition: color .15s;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.meta {
+    font-size: .75rem;
+    color: var(--text-subtle);
+}
+
+.title {
+    font-size: 1.15rem;
+    letter-spacing: .04em;
+    line-height: 1.25;
+    color: var(--text);
+    overflow-wrap: anywhere;
+
+    a {
+        transition: color .15s;
+
+        &:hover {
+            color: var(--accent-bright);
+        }
+    }
+}
+
+/* ── Party ── */
+.party {
+    display: grid;
+    gap: .6rem;
+    padding: .8rem 1rem;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    background: var(--surface-1);
+}
+
+.partyHeader {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.partyLabel {
+    font-size: .7rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+}
+
+.count {
+    font-size: .85rem;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+}
+
+.pips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .3rem;
+}
+
+.pip {
+    inline-size: 1.75rem;
+    block-size: .35rem;
+    background: var(--surface-3);
+    transition: background-color .2s, box-shadow .2s;
+}
+
+.pipFilled {
+    background: var(--accent);
+    box-shadow: 0 0 8px -1px var(--accent-glow);
+}
+
+.applicants {
+    display: flex;
+    padding-left: .5rem;
+
+    li+li {
+        margin-left: -.5rem;
+    }
+
+    a {
+        display: block;
+        transition: translate .15s;
+
+        &:hover {
+            translate: 0 -2px;
+        }
+    }
+}
+
+.applicantAvatar {
+    --bevel: 6px;
+    width: 1.75rem;
+    height: 1.75rem;
+    object-fit: cover;
+    border: 2px solid var(--surface-1);
+    background: var(--surface-3);
+}
+
+.expires {
+    font-size: .78rem;
+    letter-spacing: .06em;
+    color: var(--text-subtle);
+}
+
+/* ── Footer ── */
+.footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .6rem;
+    padding-top: .75rem;
+    border-top: 1px solid var(--line);
+}
+
+.danger {
+    color: var(--danger);
+    border-color: var(--danger);
+
+    &:hover {
+        background: color-mix(in oklch, var(--danger) 14%, transparent);
+    }
+}
+
+/* ── Applications dialog ── */
+.dialog {
+    /* the reset zeroes every margin, which would pin the dialog top-left */
+    margin: auto;
+    inline-size: min(40rem, calc(100vw - 2rem));
+    max-block-size: min(40rem, calc(100dvh - 2rem));
+    padding: 0;
+    color: var(--text);
+    background: linear-gradient(160deg, var(--surface-2), var(--surface-1));
+    border: 1px solid var(--accent-deep);
+    border-radius: var(--bevel) 0 var(--bevel) 0;
+    corner-shape: bevel square bevel square;
+    box-shadow: 0 24px 60px oklch(0% 0 0 / .6), 0 0 40px -12px var(--accent-glow);
+    overflow: hidden;
+
+    &[open] {
+        animation: dialogIn .18s ease;
+    }
+
+    &::backdrop {
+        background: oklch(0% 0 0 / .7);
+        backdrop-filter: blur(4px);
+    }
+}
+
+.dialogInner {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    max-block-size: inherit;
+}
+
+.dialogHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .75rem 1rem .75rem 1.5rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.dialogTitle {
+    font-size: .85rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+
+.dialogBody {
+    padding: 1.25rem 1.5rem;
+    overflow-y: auto;
+}
+
+@keyframes dialogIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(.98);
+    }
+}
+
+.apply {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    textarea {
+        flex: 1;
+        overflow-x: hidden;
+        overflow-wrap: break-word;
+        word-break: break-word;        
+    }
+}

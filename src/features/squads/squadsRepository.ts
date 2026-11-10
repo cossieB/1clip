@@ -2,32 +2,32 @@ import 'server-only'
 import { and, desc, eq, gt, InferInsertModel, lt, or, SQL, sql, asc } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import { db } from '~/drizzle/db';
-import { games, lfg, lfgApplications, users } from '~/drizzle/schema';
+import { games, squads, squadApplications, users } from '~/drizzle/schema';
 
-export async function createSquad(row: InferInsertModel<typeof lfg>) {
-    return db.insert(lfg).values(row).returning()
+export async function createSquad(row: InferInsertModel<typeof squads>) {
+    return db.insert(squads).values(row).returning()
 }
 
-export async function updateLfg(lfgId: number, row: Partial<Omit<InferInsertModel<typeof lfg>, 'lfgId'>>, userId: string) {
+export async function updateLfg(lfgId: number, row: Partial<Omit<InferInsertModel<typeof squads>, 'lfgId'>>, userId: string) {
     return db
-        .update(lfg)
+        .update(squads)
         .set({
             ...row,
             editedOn: sql`NOW()`
         })
         .where(and(
-            eq(lfg.lfgId, lfgId),
-            eq(lfg.userId, userId)
+            eq(squads.squadId, lfgId),
+            eq(squads.userId, userId)
         ))
 }
 
-export type LfgApplicant = {
+export type SquadApplicant = {
     id: string
     username: string
     image: string
 }
 
-export type LfgFilters = {
+export type SquadFilters = {
     gameId?: number
     userId?: string
     limit?: number
@@ -37,18 +37,18 @@ export type LfgFilters = {
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
 
-function lfgSelection(currentUserId?: string) {
-    const accepted = alias(lfgApplications, "accepted");
+function squadSelection(currentUserId?: string) {
+    const accepted = alias(squadApplications, "accepted");
     const applicant = alias(users, "applicant");
 
     return {
-        lfgId: lfg.lfgId,
-        text: lfg.text,
-        createdAt: lfg.createdAt,
-        editedOn: lfg.editedOn,
-        expiresAt: lfg.expiresAt,
-        isActive: lfg.isActive,
-        slots: lfg.slots,
+        lfgId: squads.squadId,
+        text: squads.text,
+        createdAt: squads.createdAt,
+        editedOn: squads.editedOn,
+        expiresAt: squads.expiresAt,
+        isActive: squads.isActive,
+        slots: squads.slots,
         creator: {
             id: users.id,
             username: users.username,
@@ -60,13 +60,13 @@ function lfgSelection(currentUserId?: string) {
         },
         hasApplied: (currentUserId
             ? sql<boolean>`exists (
-                select 1 from ${lfgApplications}
-                where ${lfgApplications.lfgId} = ${lfg.lfgId}
-                and ${lfgApplications.candidateId} = ${currentUserId}
+                select 1 from ${squadApplications}
+                where ${squadApplications.squadId} = ${squads.squadId}
+                and ${squadApplications.candidateId} = ${currentUserId}
             )`
             : sql<boolean>`false`
         ).as("has_applied"),
-        acceptedApplicants: sql<LfgApplicant[]>`coalesce((
+        acceptedApplicants: sql<SquadApplicant[]>`coalesce((
             select json_agg(
                 json_build_object(
                     'id', ${applicant.id},
@@ -74,45 +74,45 @@ function lfgSelection(currentUserId?: string) {
                     'image', ${applicant.image}
                 ) order by ${accepted.appliedAt}, ${accepted.applicationId}
             )
-            from ${lfgApplications} as accepted
+            from ${squadApplications} as accepted
             inner join ${users} as applicant on ${applicant.id} = ${accepted.candidateId}
-            where ${accepted.lfgId} = ${lfg.lfgId}
+            where ${accepted.squadId} = ${squads.squadId}
             and ${accepted.status} = 'accepted'
         ), '[]'::json)`.as("accepted_applicants"),
     };
 }
 
-export async function findAll(args: LfgFilters = {}, currentUserId?: string) {
+export async function findAll(args: SquadFilters = {}, currentUserId?: string) {
     const limit = Math.min(Math.max(args.limit ?? DEFAULT_LIMIT, 1), MAX_LIMIT);
 
     const conditions: (SQL | undefined)[] = [
-        args.gameId !== undefined ? eq(lfg.gameId, args.gameId) : undefined,
-        args.userId ? eq(lfg.userId, args.userId) : undefined,
-        args.cursor !== undefined ? lt(lfg.lfgId, args.cursor) : undefined,
+        args.gameId !== undefined ? eq(squads.gameId, args.gameId) : undefined,
+        args.userId ? eq(squads.userId, args.userId) : undefined,
+        args.cursor !== undefined ? lt(squads.squadId, args.cursor) : undefined,
     ];
 
     return db
-        .select(lfgSelection(currentUserId))
-        .from(lfg)
-        .innerJoin(users, eq(users.id, lfg.userId))
-        .leftJoin(games, eq(games.gameId, lfg.gameId))
+        .select(squadSelection(currentUserId))
+        .from(squads)
+        .innerJoin(users, eq(users.id, squads.userId))
+        .leftJoin(games, eq(games.gameId, squads.gameId))
         .where(and(...conditions))
-        .orderBy(desc(lfg.lfgId))
+        .orderBy(desc(squads.squadId))
         .limit(limit);
 }
 
-export type LfgWithDetails = Awaited<ReturnType<typeof findAll>>[number];
+export type SquadWithDetails = Awaited<ReturnType<typeof findAll>>[number];
 
 export async function findById(
     lfgId: number,
     currentUserId?: string
-): Promise<LfgWithDetails | null> {
+): Promise<SquadWithDetails | null> {
     const [post] = await db
-        .select(lfgSelection(currentUserId))
-        .from(lfg)
-        .innerJoin(users, eq(users.id, lfg.userId))
-        .leftJoin(games, eq(games.gameId, lfg.gameId))
-        .where(eq(lfg.lfgId, lfgId))
+        .select(squadSelection(currentUserId))
+        .from(squads)
+        .innerJoin(users, eq(users.id, squads.userId))
+        .leftJoin(games, eq(games.gameId, squads.gameId))
+        .where(eq(squads.squadId, lfgId))
         .limit(1);
 
     return post ?? null;
@@ -132,27 +132,32 @@ export async function findLfgApplications(
 
     return db
         .select({
-            applicationId: lfgApplications.applicationId,
-            lfgId: lfgApplications.lfgId,
-            message: lfgApplications.message,
-            status: lfgApplications.status,
-            appliedAt: lfgApplications.appliedAt,
+            applicationId: squadApplications.applicationId,
+            lfgId: squadApplications.squadId,
+            message: squadApplications.message,
+            status: squadApplications.status,
+            appliedAt: squadApplications.appliedAt,
             applicant: {
                 id: users.id,
                 username: users.username,
                 image: users.image,
             },
         })
-        .from(lfgApplications)
-        .innerJoin(users, eq(users.id, lfgApplications.candidateId))
-        .innerJoin(lfg, and(
-            eq(lfgApplications.lfgId, lfg.lfgId),
-            eq(lfg.userId, ownerId)
+        .from(squadApplications)
+        .innerJoin(users, eq(users.id, squadApplications.candidateId))
+        .innerJoin(squads, and(
+            eq(squadApplications.squadId, squads.squadId),
+            eq(squads.userId, ownerId)
         ))
         .where(and(
-            eq(lfgApplications.lfgId, lfgId),
-            cursor !== undefined ? gt(lfgApplications.applicationId, cursor) : undefined
+            eq(squadApplications.squadId, lfgId),
+            cursor !== undefined ? gt(squadApplications.applicationId, cursor) : undefined
         ))
-        .orderBy(asc(lfgApplications.applicationId))
+        .orderBy(asc(squadApplications.applicationId))
         .limit(pageSize);
+}
+
+export async function createSquadApplication(input: InferInsertModel<typeof squadApplications>) {
+    const [inserted] = await db.insert(squadApplications).values(input).returning();
+    return inserted
 }

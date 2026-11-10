@@ -1,8 +1,9 @@
-import { createSignal, For, onSettled, Show } from "solid-js";
+import { createSignal, createStore, For, onSettled, Show } from "solid-js";
 import styles from "./CreateSquadPage.module.css";
 import { SearchAutocomplete } from "~/components/SearchAutocomplete/SearchAutocomplete";
 import { getGamesFn } from "~/features/games/gamesApi";
 import { FALLBACK_TIME_ZONE, detectTimeZone, listTimeZones, MAX_TEXT, MAX_SLOTS, zonedLocalToUtc } from "../utils/timeZone";
+import { createSquadFn } from "../squadsApi";
 
 type Game = Awaited<ReturnType<typeof getGamesFn>>[number];
 
@@ -11,8 +12,7 @@ export type LfgInput = {
     gameId: number | null;
     /** open slots, excluding the owner */
     slots: number;
-    /** ISO 8601 instant in UTC, or null for no expiry */
-    expiresAt: string | null;
+    expiresAt: Date | null;
 };
 
 type FieldErrors = Partial<Record<"text" | "slots" | "expiresAt", string>>;
@@ -21,17 +21,20 @@ export default function CreateSquadPage() {
     const [game, setGame] = createSignal<Game | null>(null);
     const [text, setText] = createSignal("");
     const [slots, setSlots] = createSignal(1);
-    const [expiry, setExpiry] = createSignal("");
+    const [expiry, setExpiry] = createStore({
+        datetime: "",
+        timeZone: ""
+    });
 
-    // The server can't know the browser's zone, so render UTC first and
-    // switch to the detected zone once on the client (keeps hydration matching).
-    const [timeZone, setTimeZone] = createSignal(FALLBACK_TIME_ZONE);
     const [timeZones, setTimeZones] = createSignal([FALLBACK_TIME_ZONE]);
-
+    const epochExpiry = () => expiry.datetime ? Temporal.ZonedDateTime.from(`${expiry.datetime}[${expiry.timeZone}]`).epochMilliseconds : null
+    const isInvalidExpiry = () => (epochExpiry() ?? Number.MAX_SAFE_INTEGER) - Date.now() < 30 * 60 * 1000
     onSettled(() => {
         const detected = detectTimeZone();
         setTimeZones(listTimeZones(detected));
-        setTimeZone(detected);
+        setExpiry(s => {
+            s.timeZone = detected
+        })
     });
 
     const [errors, setErrors] = createSignal<FieldErrors>({});
@@ -49,17 +52,12 @@ export default function CreateSquadPage() {
             next.slots = `Choose between 1 and ${MAX_SLOTS} slots`;
         }
 
-        let expiresAt: string | null = null;
-        if (expiry()) {
-            const instant = zonedLocalToUtc(expiry(), timeZone());
-            if (!instant || Number.isNaN(instant.getTime())) {
-                next.expiresAt = "Enter a valid date and time";
-            } else if (instant.getTime() <= Date.now()) {
-                next.expiresAt = "Expiry must be in the future";
-            } else {
-                expiresAt = instant.toISOString();
-            }
+        let expiresAt: Date | null = null;
+        if (isInvalidExpiry()) {
+            next.expiresAt = "Expiry must be at least 30 minutes in the future";
         }
+        else 
+            expiresAt = epochExpiry() ? new Date(epochExpiry()!) : null
 
         if (Object.keys(next).length) return { errors: next };
         return {
@@ -86,7 +84,7 @@ export default function CreateSquadPage() {
 
         setPending(true);
         try {
-            // await props.onSubmit(result.input);
+            await createSquadFn(result.input);
         } catch (err) {
             setFormError(err instanceof Error ? err.message : "Something went wrong. Try again.");
         } finally {
@@ -153,8 +151,8 @@ export default function CreateSquadPage() {
                         <input
                             id="lfg-expiry"
                             type="datetime-local"
-                            value={expiry()}
-                            onInput={e => setExpiry(e.currentTarget.value)}
+                            value={expiry.datetime}
+                            onInput={e => setExpiry(s => {s.datetime = e.currentTarget.value})}
                             aria-invalid={errors().expiresAt ? "true" : undefined}
                         />
                     </div>
@@ -162,12 +160,12 @@ export default function CreateSquadPage() {
                         <label for="lfg-timezone">Time zone</label>
                         <select
                             id="lfg-timezone"
-                            value={timeZone()}
-                            onChange={e => setTimeZone(e.currentTarget.value)}
+                            value={expiry.timeZone}
+                            onChange={e => setExpiry(s => {s.timeZone = e.currentTarget.value})}
                         >
                             <For each={timeZones()}>
                                 {zone => (
-                                    <option value={zone} selected={zone === timeZone()}>
+                                    <option value={zone} selected={zone === expiry.timeZone}>
                                         {zone.replaceAll("_", " ")}
                                     </option>
                                 )}
@@ -178,7 +176,7 @@ export default function CreateSquadPage() {
                 <Show when={errors().expiresAt}>
                     <span class={styles.error}>{errors().expiresAt}</span>
                 </Show>
-                <Show when={!expiry()}>
+                <Show when={!expiry.datetime}>
                     <span class={styles.hint}>Leave empty to keep the post open until you close it.</span>
                 </Show>
             </fieldset>
@@ -190,7 +188,7 @@ export default function CreateSquadPage() {
             <button
                 type="submit"
                 class="primary"
-                disabled={pending() || !text()}                
+                disabled={pending() || !text()}
             >
                 {pending() ? "Posting…" : "Post LFG"}
             </button>

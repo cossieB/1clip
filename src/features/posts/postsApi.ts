@@ -22,7 +22,7 @@ export async function createPostFn(p: z.input<typeof PostCreateSchema>) {
         throw respond(new Error("Empty post"), { status: 400 })
 
     const userSession = await ensureVerified()
-
+    await rateLimiter("post:create", userSession.user.id, 10, 60)
     const { hashtags, mentions } = extractTokens(data.text)
     const { user } = userSession;
     const media = data.media.map(x => {

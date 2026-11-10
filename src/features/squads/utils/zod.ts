@@ -14,9 +14,19 @@ export const SquadCreateSchema = z.object({
     slots: z.int().min(1).max(12)
 })
 
-export const UpdateSquadSchema = SquadCreateSchema.partial().extend({lfgId: z.int()})
+export const UpdateSquadSchema = SquadCreateSchema
+    .partial()
+    .extend({ 
+        lfgId: z.int(),
+        isActive: z.boolean().optional()
+    })
 
 export const GetApplicationsSchema = z.object({
     squadId: z.int(),
     cursor: z.int()
+})
+
+export const ApplyToSquadSchema = z.object({
+    id: z.int(),
+    message: z.string()
 })

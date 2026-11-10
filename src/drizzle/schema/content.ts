@@ -20,8 +20,8 @@ export const posts = pgTable('posts', {
     index().on(table.createdAt)
 ])
 
-export const lfg = pgTable("lfg", {
-    lfgId: integer("lfg_id").primaryKey().generatedAlwaysAsIdentity(),
+export const squads = pgTable("squads", {
+    squadId: integer("squad_id").primaryKey().generatedAlwaysAsIdentity(),
     userId: uuid("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
     text: varchar("text", { length: 255 }).notNull().default(""),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -38,14 +38,16 @@ export const lfg = pgTable("lfg", {
 
 export const status = pgEnum("status", ["pending", "accepted", "rejected"])
 
-export const lfgApplications = pgTable("lfg_applications", {
+export const squadApplications = pgTable("squad_applications", {
     applicationId: integer("application_id").primaryKey().generatedAlwaysAsIdentity(),
-    lfgId: integer("lfg_id").notNull().references(() => lfg.lfgId, { onDelete: "cascade" }),
+    squadId: integer("squad_id").notNull().references(() => squads.squadId, { onDelete: "cascade" }),
     message: varchar("message"),
     candidateId: uuid("candidate_id").notNull().references(() => users.id, { onDelete: "cascade" }),
     status: status("status").notNull().default("pending"),
     appliedAt: timestamp("applied_at", { withTimezone: true }).notNull().defaultNow()
-})
+}, t => [
+    unique().on(t.squadId, t.candidateId)
+])
 
 export const comments = pgTable("comments", {
     commentId: integer("comment_id").primaryKey().generatedAlwaysAsIdentity(),
