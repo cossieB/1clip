@@ -1,4 +1,4 @@
-import { createMemo, createSignal, For, Loading } from "solid-js";
+import { createMemo, createSignal, For, Loading, refresh } from "solid-js";
 import { getSquadsFn } from "../squadsApi";
 import { SquadBlock } from "./SquadBlock";
 import { session } from "~/features/auth/authApi";

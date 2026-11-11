@@ -4,6 +4,8 @@ import { SearchAutocomplete } from "~/components/SearchAutocomplete/SearchAutoco
 import { getGamesFn } from "~/features/games/gamesApi";
 import { FALLBACK_TIME_ZONE, detectTimeZone, listTimeZones, MAX_TEXT, MAX_SLOTS, zonedLocalToUtc } from "../utils/timeZone";
 import { createSquadFn } from "../squadsApi";
+import { useNavigate } from "@solidjs/router";
+import { paths } from "~/router";
 
 type Game = Awaited<ReturnType<typeof getGamesFn>>[number];
 
@@ -36,7 +38,7 @@ export default function CreateSquadPage() {
             s.timeZone = detected
         })
     });
-
+    const navigate = useNavigate()
     const [errors, setErrors] = createSignal<FieldErrors>({});
     const [formError, setFormError] = createSignal("");
     const [pending, setPending] = createSignal(false);
@@ -85,6 +87,8 @@ export default function CreateSquadPage() {
         setPending(true);
         try {
             await createSquadFn(result.input);
+            navigate(paths.squads())
+
         } catch (err) {
             setFormError(err instanceof Error ? err.message : "Something went wrong. Try again.");
         } finally {
@@ -184,11 +188,10 @@ export default function CreateSquadPage() {
             <Show when={formError()}>
                 <p class={styles.error} role="alert">{formError()}</p>
             </Show>
-
             <button
                 type="submit"
                 class="primary"
-                disabled={pending() || !text()}
+                disabled={pending()}
             >
                 {pending() ? "Posting…" : "Post LFG"}
             </button>

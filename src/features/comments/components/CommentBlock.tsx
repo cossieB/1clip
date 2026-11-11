@@ -10,10 +10,9 @@ import { ToastContext } from "~/components/Toast/ToastProvider"
 import { CommentList } from "./CommentList"
 import { StoreSetter } from "solid-js"
 import { session } from "~/features/auth/authApi"
+import { getRelativeTime } from "~/lib/getRelativeTime"
 
 const MAX_LENGTH = 255
-
-const dateFormat = new Intl.DateTimeFormat("en-za", { dateStyle: "medium", timeZone: "UTC" })
 
 type Props = ParentProps<{
     comment: CommentWithDetails
@@ -131,7 +130,7 @@ export function CommentBlock(props: Props) {
                         @{props.comment.author.username}
                     </a>
                     <span class={styles.meta}>
-                        <time datetime={created().toISOString()}>{dateFormat.format(created())}</time>
+                        <time datetime={created().toISOString()}>{getRelativeTime(created())}</time>
                         <Show when={wasEdited()}>
                             <span> · edited</span>
                         </Show>

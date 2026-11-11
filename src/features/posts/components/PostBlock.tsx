@@ -8,14 +8,12 @@ import { RenderMedia } from "~/components/RenderMedia"
 import { extractFirstVideo } from "../utils/parsePost"
 import { IframeFactory } from "./IframeFactory"
 import { useToggleLike } from "~/hooks/useToggleLike"
+import { getRelativeTime } from "~/lib/getRelativeTime"
 
 type Props = {
     post: NonNullable<Awaited<ReturnType<typeof getPostFn>>>
     canLike?: boolean
 }
-
-// Fixed locale + UTC so server and browser render the same string
-const dateFormat = new Intl.DateTimeFormat("en-za", { dateStyle: "medium", timeZone: "UTC" })
 
 export function PostBlock(props: Props) {
     const { like, toggle } = useToggleLike({
@@ -45,7 +43,7 @@ export function PostBlock(props: Props) {
                     <span class={styles.names}>
                         <span class={styles.username}>@{props.post.author.username}</span>
                         <span class={styles.meta}>
-                            <time datetime={created().toISOString()}>{dateFormat.format(created())}</time>
+                            <time datetime={created().toISOString()}>{getRelativeTime(created())}</time>
                             <Show when={wasEdited()}>
                                 <span> · edited</span>
                             </Show>

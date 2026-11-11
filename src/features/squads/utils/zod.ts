@@ -23,10 +23,15 @@ export const UpdateSquadSchema = SquadCreateSchema
 
 export const GetApplicationsSchema = z.object({
     squadId: z.int(),
-    cursor: z.int()
+    cursor: z.int().optional()
 })
 
 export const ApplyToSquadSchema = z.object({
     id: z.int(),
     message: z.string()
+})
+
+export const UpdateApplicationSchema = z.object({
+    applicationId: z.int(),
+    status: z.enum(["pending", "accepted", "rejected"])
 })

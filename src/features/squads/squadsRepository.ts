@@ -1,14 +1,15 @@
 import 'server-only'
-import { and, desc, eq, gt, InferInsertModel, lt, or, SQL, sql, asc } from 'drizzle-orm';
+import { and, desc, eq, gt, InferInsertModel, lt, or, SQL, sql, asc, inArray } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import { db } from '~/drizzle/db';
 import { games, squads, squadApplications, users } from '~/drizzle/schema';
+import { SquadApplicationStatus } from '~/drizzle/models';
 
 export async function createSquad(row: InferInsertModel<typeof squads>) {
     return db.insert(squads).values(row).returning()
 }
 
-export async function updateLfg(lfgId: number, row: Partial<Omit<InferInsertModel<typeof squads>, 'lfgId'>>, userId: string) {
+export async function updateSquad(lfgId: number, row: Partial<Omit<InferInsertModel<typeof squads>, 'lfgId'>>, userId: string) {
     return db
         .update(squads)
         .set({
@@ -42,7 +43,7 @@ function squadSelection(currentUserId?: string) {
     const applicant = alias(users, "applicant");
 
     return {
-        lfgId: squads.squadId,
+        squadId: squads.squadId,
         text: squads.text,
         createdAt: squads.createdAt,
         editedOn: squads.editedOn,
@@ -123,7 +124,7 @@ export type LfgApplicationPagination = {
     cursor?: number
 }
 
-export async function findLfgApplications(
+export async function findSquadApplications(
     lfgId: number,
     ownerId: string,
     { limit, cursor }: LfgApplicationPagination = {}
@@ -157,7 +158,33 @@ export async function findLfgApplications(
         .limit(pageSize);
 }
 
+export type SquadApplicationWithApplicant = Awaited<ReturnType<typeof findSquadApplications>>[number];
+
 export async function createSquadApplication(input: InferInsertModel<typeof squadApplications>) {
     const [inserted] = await db.insert(squadApplications).values(input).returning();
     return inserted
+}
+
+export async function updateSquadApplication(applicationId: number, status: SquadApplicationStatus, ownerId: string) {
+    return db
+        .update(squadApplications)
+        .set({ status })
+        .where(and(
+            eq(squadApplications.applicationId, applicationId),
+            inArray(
+                squadApplications.squadId,
+                db
+                    .select({ squadId: squads.squadId })
+                    .from(squads)
+                    .where(eq(squads.userId, ownerId))
+            )
+        ))
+}
+
+export async function deleteSquadApplication(applicationId: number, userId: string) {
+    return db.delete(squadApplications)
+        .where(and(
+            eq(squadApplications.applicationId, applicationId),
+            eq(squadApplications.candidateId, userId)
+        ))
 }

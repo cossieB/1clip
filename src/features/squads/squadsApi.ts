@@ -1,6 +1,6 @@
 import { GET } from "@solidjs/web/server-functions";
 import z from "zod";
-import { ApplyToSquadSchema, GetApplicationsSchema, GetSquadsSchema, SquadCreateSchema, UpdateSquadSchema } from "./utils/zod";
+import { ApplyToSquadSchema, GetApplicationsSchema, GetSquadsSchema, SquadCreateSchema, UpdateApplicationSchema, UpdateSquadSchema } from "./utils/zod";
 import * as squadsRepository from "./squadsRepository"
 import { zodSafeParse } from "~/utils/zodSafeParse";
 import { getCurrentUser } from "../auth/serverFn";
@@ -47,14 +47,14 @@ export async function updateSquadFn(input: z.input<typeof UpdateSquadSchema>) {
     const userSession = await ensureVerified();
     await rateLimiter("squad:update", userSession.user.id, 10, 60)
     const { lfgId, ...rest } = data
-    await squadsRepository.updateLfg(lfgId, rest, userSession.user.id)
+    await squadsRepository.updateSquad(lfgId, rest, userSession.user.id)
 }
 
 export const getSquadApplicationsFn = GET(async (arg: z.input<typeof GetApplicationsSchema>) => {
     'use server'
     const data = zodSafeParse(GetApplicationsSchema, arg)
     const userSession = await ensureVerified()
-    const applications = await squadsRepository.findLfgApplications(data.squadId, userSession.user.id, { cursor: data.cursor })
+    const applications = await squadsRepository.findSquadApplications(data.squadId, userSession.user.id, { cursor: data.cursor })
     return respond(applications, {
         headers: {
             "Cache-Control": "private, max-age=60"
@@ -62,7 +62,7 @@ export const getSquadApplicationsFn = GET(async (arg: z.input<typeof GetApplicat
     })
 })
 
-export async function applyToLfgFn(input: z.input<typeof ApplyToSquadSchema>) {
+export async function applyToSquadFn(input: z.input<typeof ApplyToSquadSchema>) {
     'use server'
     const data = zodSafeParse(ApplyToSquadSchema, input)
     const userSession = await ensureVerified()
@@ -78,17 +78,25 @@ export async function applyToLfgFn(input: z.input<typeof ApplyToSquadSchema>) {
         if (error instanceof DrizzleQueryError) {
             const cause = error.cause
 
-            if (
-                cause instanceof Error &&
-                cause.message.includes("violates unique constraint")
-            ) {
-                throw respond(
-                    new Error("You have already applied to this squad"),
-                    { status: 400 }
-                )
+            if (cause instanceof Error && cause.message.includes("violates unique constraint")) {
+                throw respond(new Error("You have already applied to this squad"), { status: 400 })
             }
         }
 
         throw error
     }
+}
+
+export async function updateSquadApplicationFn(input: z.input<typeof UpdateApplicationSchema>) {
+    'use server'
+    const data = zodSafeParse(UpdateApplicationSchema, input)
+    const userSession = await ensureVerified()
+    await squadsRepository.updateSquadApplication(data.applicationId, data.status, userSession.user.id)
+}
+
+export async function deleteSquadApplicationFn(id: number) {
+    'use server'
+    const data = zodSafeParse(z.int(), id)
+    const userSession = await ensureVerified()
+    return squadsRepository.deleteSquadApplication(data, userSession.user.id)
 }

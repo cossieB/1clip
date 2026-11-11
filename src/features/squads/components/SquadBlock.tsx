@@ -1,22 +1,20 @@
 // LFGBlock.tsx
-import { For, Show, action, createOptimistic, createSignal, createUniqueId, onSettled, useContext, type ParentProps } from "solid-js"
+import { For, Loading, Show, action, createEffect, createMemo, createOptimistic, createOptimisticStore, createSignal, createUniqueId, onSettled, refresh, useContext, type ParentProps } from "solid-js"
 import { Portal } from "@solidjs/web"
 import styles from "./SquadBlock.module.css"
 import { PostContent } from "~/features/posts/components/PostContent"
 import { SquadWithDetails } from "../squadsRepository"
 import { ToastContext } from "~/components/Toast/ToastProvider"
 import { mediaSrc } from "~/utils/mediaSrc"
-import { applyToLfgFn, updateSquadFn } from "../squadsApi"
+import { applyToSquadFn, getSquadApplicationsFn, updateSquadFn } from "../squadsApi"
+import { ApplicationBlock } from "./ApplicationBlock"
+import { getRelativeTime } from "~/lib/getRelativeTime"
+import { AwaitedReturn } from "~/lib/utilityTypes"
 
 type Props = ParentProps<{
     squad: SquadWithDetails
     userId: string | null
-    
-    // children: contents of the applications portal (owner only), created lazily when opened
 }>
-
-const dateFormat = new Intl.DateTimeFormat("en-za", { dateStyle: "medium", timeZone: "UTC" })
-
 
 export function SquadBlock(props: Props) {
     const { addToast } = useContext(ToastContext)
@@ -41,11 +39,10 @@ export function SquadBlock(props: Props) {
     const apply = action(function* () {
         try {
             setApplied(true)
-            yield applyToLfgFn({
-                id: props.squad.lfgId,
+            yield applyToSquadFn({
+                id: props.squad.squadId,
                 message: message()
             })
-            setAppliedConfirmed(true)
         } catch (error) {
             toastError(error)
         }
@@ -60,7 +57,7 @@ export function SquadBlock(props: Props) {
         try {
             setActive(false)
             yield updateSquadFn({
-                lfgId: props.squad.lfgId,
+                lfgId: props.squad.squadId,
                 isActive: false
             })
             setActiveConfirmed(false)
@@ -90,7 +87,7 @@ export function SquadBlock(props: Props) {
                     <span class={styles.names}>
                         <span class={styles.username}>@{props.squad.creator.username}</span>
                         <span class={styles.meta}>
-                            <time datetime={created().toISOString()}>{dateFormat.format(created())}</time>
+                            <time datetime={created().toISOString()}>{getRelativeTime(created())}</time>
                             <Show when={wasEdited()}>
                                 <span> · edited</span>
                             </Show>
@@ -149,11 +146,11 @@ export function SquadBlock(props: Props) {
                     </ul>
                 </Show>
             </section>
-            
+
             <Show when={props.squad.expiresAt}>
                 {expires => (
                     <p class={styles.expires}>
-                        Expires <time datetime={new Date(expires()).toISOString()}>{dateFormat.format(new Date(expires()))}</time>
+                        Expires <time datetime={new Date(expires()).toISOString()}>{getRelativeTime(expires())}</time>
                     </p>
                 )}
             </Show>
@@ -163,11 +160,12 @@ export function SquadBlock(props: Props) {
                     when={isOwner()}
                     fallback={
                         <div class={styles.apply}>
-                            <textarea 
+                            <textarea
                                 value={message()}
                                 onInput={e => setMessage(e.currentTarget.value)}
                                 maxlength={255}
                                 placeholder="Add a message to this squad's creator"
+                                disabled={!active()}
                             />
                             <button
                                 type="button"
@@ -206,24 +204,62 @@ export function SquadBlock(props: Props) {
             </footer>
 
             <Show when={showApplications()}>
-                <ApplicationsDialog onClose={() => setShowApplications(false)}>{props.children}</ApplicationsDialog>
+                <ApplicationsDialog
+                    onClose={() => setShowApplications(false)}
+                    id={props.squad.squadId}
+                />
             </Show>
         </article>
     )
 }
 
-function ApplicationsDialog(props: ParentProps<{ onClose: () => void }>) {
+function ApplicationsDialog(props: ParentProps<{ onClose: () => void, id: number }>) {
     const titleId = createUniqueId()
     let dialog!: HTMLDialogElement
+    let lastItem: HTMLElement | undefined
+    let observer!: IntersectionObserver
+    let done = false
+    const [cursor, setCursor] = createSignal<number>()
 
     // showModal() needs the element to be in the document, and Portal may attach it just after mount
     onSettled(() => {
+        observer = new IntersectionObserver((entries) => {
+            const last = entries.at(-1);
+            if (last?.isIntersecting && !done) {
+                const commentId = Number((last.target as HTMLElement).dataset.commentId);
+                const item = applications().find(comment => comment.applicationId === commentId);
+                if (item) setCursor(commentId)
+            }
+        })
         const open = () => {
             if (!dialog.open) dialog.showModal()
         }
         if (dialog.isConnected) open()
         else queueMicrotask(open)
     })
+
+
+    const applications = createMemo(async (prev: AwaitedReturn<typeof getSquadApplicationsFn> = []) => {
+        const next = await getSquadApplicationsFn({
+            squadId: props.id,
+            cursor: cursor()
+        })
+        return [...prev, ...next]
+    }, {
+        id: "applicationId"
+    })
+    createEffect(
+        () => applications.length,
+        () => {
+            setTimeout(() => {
+                const cards = document.querySelectorAll<HTMLElement>(`[data-application-id]`);
+                if (cards.length === 0) return;
+                lastItem && observer?.unobserve(lastItem);
+                lastItem = cards[cards.length - 1];
+                observer?.observe(lastItem);
+            }, 50)
+        }
+    )
 
     return (
         <Portal>
@@ -246,7 +282,17 @@ function ApplicationsDialog(props: ParentProps<{ onClose: () => void }>) {
                             ✕
                         </button>
                     </header>
-                    <div class={styles.dialogBody}>{props.children}</div>
+                    <div class={styles.dialogBody}>
+                        <Loading>
+                            <For each={applications()}>
+                                {application =>
+                                    <ApplicationBlock
+                                        application={application}
+                                        onChange={() => refresh(applications)}
+                                    />}
+                            </For>
+                        </Loading>
+                    </div>
                 </div>
             </dialog>
         </Portal>

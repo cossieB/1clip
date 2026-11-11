@@ -20,6 +20,7 @@ export function PostList(props: { filters?: PostFilters }) {
         return [...previous, ...next]
     }, {
         loadingValue: [],
+        id: "postId"
     })
     const addPostToSet = useViewPost()
     

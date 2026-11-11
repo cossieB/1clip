@@ -1,0 +1,113 @@
+.application {
+    --status: var(--warn);
+    display: grid;
+    gap: .85rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--status);
+    background: var(--surface-1);
+    transition: border-color .2s;
+
+    &[data-status="accepted"] {
+        --status: var(--ok);
+    }
+
+    &[data-status="rejected"] {
+        --status: var(--danger);
+    }
+}
+
+/* ── Header ── */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+}
+
+.applicant {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    min-width: 0;
+
+    &:hover .username {
+        color: var(--accent-bright);
+    }
+}
+
+.avatar {
+    --bevel: 8px;
+    width: 2.5rem;
+    height: 2.5rem;
+    object-fit: cover;
+    border: 1px solid var(--border-strong);
+    background: var(--surface-3);
+    flex-shrink: 0;
+}
+
+.names {
+    display: grid;
+    min-width: 0;
+}
+
+.username {
+    font-weight: 700;
+    color: var(--text);
+    transition: color .15s;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.meta {
+    font-size: .75rem;
+    color: var(--text-subtle);
+}
+
+/* ── Status control ── */
+.segments {
+    display: inline-grid;
+    grid-template-columns: repeat(3, 1fr);
+    justify-self: start;
+    inline-size: min(100%, 24rem);
+    border: 1px solid var(--border-strong);
+    background: var(--surface-2);
+}
+
+.segment {
+    padding: .55rem .5rem;
+    border: 0;
+    font-size: .78rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: transparent;
+    transition: background-color .15s, color .15s, box-shadow .15s;
+
+    &+& {
+        border-left: 1px solid var(--border-strong);
+    }
+
+    &:hover:not(:disabled, [aria-pressed="true"]) {
+        background: color-mix(in oklch, var(--accent) 14%, transparent);
+        color: var(--text);
+    }
+
+    &[aria-pressed="true"] {
+        background: var(--status);
+        color: var(--on-accent);
+        box-shadow: 0 0 14px -2px color-mix(in oklch, var(--status) 60%, transparent);
+    }
+
+    /* the global :disabled rule fades the whole button; keep the selected one readable while saving */
+    &:disabled {
+        cursor: progress;
+    }
+
+    &[aria-pressed="true"]:disabled {
+        background: var(--status);
+        color: var(--on-accent);
+        opacity: .85;
+    }
+}

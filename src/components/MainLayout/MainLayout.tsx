@@ -41,7 +41,7 @@ export default function MainLayout(props: ParentProps) {
             </nav>
 
             {/* <!-- CENTER FEED --> */}
-            <main>
+            <main class={styles.main}>
                 <SearchBar />
                 <VerificationReminder />
                 {props.children}

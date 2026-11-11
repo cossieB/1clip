@@ -5,7 +5,11 @@
     gap: 0 1.75rem;
     max-width: 84rem;
     margin-inline: auto;
-    padding-inline: 1rem
+    padding-inline: 1rem;
+
+    .main {
+        container-type: inline-size;
+    }
 }
 
 .rail,
