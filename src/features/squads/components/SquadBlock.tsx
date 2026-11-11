@@ -31,6 +31,7 @@ export function SquadBlock(props: Props) {
 
     const signedIn = () => props.userId !== null
     const isOwner = () => signedIn() && props.userId === props.squad.creator.id
+    const isExpired = () => props.squad.expiresAt ? new Date() > props.squad.expiresAt : false
 
     // ── Apply (confirmed state resets when the prop is refetched) ──
     const [appliedConfirmed, setAppliedConfirmed] = createSignal(() => props.squad.hasApplied)
@@ -49,7 +50,7 @@ export function SquadBlock(props: Props) {
     })
 
     // ── Close ──
-    const [activeConfirmed, setActiveConfirmed] = createSignal(() => props.squad.isActive)
+    const [activeConfirmed, setActiveConfirmed] = createSignal(() => props.squad.isActive && !isExpired())
     const [active, setActive] = createOptimistic(() => activeConfirmed())
 
     const close = action(function* () {
@@ -150,7 +151,7 @@ export function SquadBlock(props: Props) {
             <Show when={props.squad.expiresAt}>
                 {expires => (
                     <p class={styles.expires}>
-                        Expires <time datetime={new Date(expires()).toISOString()}>{getRelativeTime(expires())}</time>
+                        {isExpired() ? "Expired" : "Expires"} <time datetime={new Date(expires()).toISOString()}>{getRelativeTime(expires())}</time>
                     </p>
                 )}
             </Show>

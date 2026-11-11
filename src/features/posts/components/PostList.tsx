@@ -31,7 +31,7 @@ export function PostList(props: { filters?: PostFilters }) {
         () => {
             setTimeout(() => {
                 const cards = document.querySelectorAll(`[data-post-id]`); 
-                lastPostId = Number((cards.item(cards.length - 1) as HTMLDivElement)?.dataset.postId) || -1
+                lastPostId = Number((cards.item(cards.length - 1) as HTMLElement)?.dataset.postId) || -1
                 cards.forEach(card => observer.observe(card))
             }, 50)
         }
@@ -40,7 +40,7 @@ export function PostList(props: { filters?: PostFilters }) {
     onSettled(() => {
         observer = new IntersectionObserver(entries => {
             entries.forEach((entry, i) => {
-                const postId = Number((entry.target as HTMLDivElement).dataset.postId)
+                const postId = Number((entry.target as HTMLElement).dataset.postId)
                 if (entry.isIntersecting) addPostToSet(postId)
                 if ((postId == lastPostId) && entry.isIntersecting && !done) {
                     const item = posts().find(post => post.postId === postId)

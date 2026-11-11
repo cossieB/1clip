@@ -6,9 +6,9 @@ import { type GameInsert } from "./types";
 export async function updateGame(gameId: number, game: Partial<InferSelectModel<typeof games>>, other: Partial<GameInsert>) {
 
     return db.transaction(async tx => {
-        const old = await tx.update(games).set(game).where(eq(games.gameId, gameId)).returning({
-            oldCover: sql<string>`OLD.cover`,
-            oldBanner: sql<string>`OLD.banner`
+        const old = await tx.update(games).set({...game, dateModified: sql`NOW()`}).where(eq(games.gameId, gameId)).returning({
+            oldCover: sql<string>`OLD.${games.cover.name}`,
+            oldBanner: sql<string>`OLD.${games.banner.name}`
         })
         if (other.platforms) {
             if (other.platforms.length === 0) {

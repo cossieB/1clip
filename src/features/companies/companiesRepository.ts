@@ -30,7 +30,7 @@ export async function editDeveloper(companyId: number, data: Partial<InferSelect
         dateModified: sql`NOW()`
     })
     .where(eq(companies.companyId, companyId)).returning({
-        oldLogo: sql<string>`OLD.logo`
+        oldLogo: sql<string>`OLD.${companies.logo.name}`
     })
 }
 

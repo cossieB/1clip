@@ -31,13 +31,13 @@ export function createActor(actor: InferInsertModel<typeof actors>, characters: 
 }
 
 export async function editActor(actorId: number, actor: Partial<InferSelectModel<typeof actors>>, characters?: Char[]) {
-    if (!characters) return db.update(actors).set(actor).where(eq(actors.actorId, actorId)).returning({
-        oldPhoto: sql<string | null>`OLD.photo`
+    if (!characters) return db.update(actors).set({...actor, dateModified: sql`NOW()`}).where(eq(actors.actorId, actorId)).returning({
+        oldPhoto: sql<string | null>`OLD.${actors.photo.name}`
     })
 
     return db.transaction(async tx => {
-        const a = await tx.update(actors).set(actor).where(eq(actors.actorId, actorId)).returning({
-            oldPhoto: sql<string | null>`OLD.photo`
+        const a = await tx.update(actors).set({...actor, dateModified: sql`NOW()`}).where(eq(actors.actorId, actorId)).returning({
+            oldPhoto: sql<string | null>`OLD.${actors.photo.name}`
         })
         if (characters.length == 0)
             await tx.delete(appearances).where(eq(appearances.actorId, actorId))

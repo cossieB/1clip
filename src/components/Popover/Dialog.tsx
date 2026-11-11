@@ -4,8 +4,8 @@ import { XIcon } from "@lucide/solid";
 import { useSearchParams } from "@solidjs/router";
 import { paths } from "~/router";
 import { LoginForm } from "~/features/auth/components/LoginForm";
-import SignupForm from "~/routes/auth/signup";
 import { RequestPasswordRequestForm, ResetPasswordForm } from "~/features/auth/components/ResetPasswordForm";
+import { SignupForm } from "~/features/auth/components/SignupForm";
 
 export function Dialog() {
     let dialog!: HTMLDialogElement;

@@ -1,0 +1,116 @@
+.landing {
+    display: grid;
+    gap: 2rem;
+    
+    margin-inline: auto;
+    
+}
+
+/* ── Hero ── */
+
+.hero {
+    display: grid;
+    justify-items: center;
+    gap: 1.25rem;
+    padding-block: clamp(1rem, 4vw, 3rem);
+    padding-inline: clamp(1rem, 4vw, 3rem);
+    position: relative;
+    height: 60vh;
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background-image: url("/image1.jpg");
+    }
+    &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+}
+
+.brand {
+    font-family: var(--font-brand);
+    font-size: clamp(2rem, 5cqi, 5rem);
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-align: center;
+    text-shadow: 0 0 18px var(--accent-glow);
+    justify-self: center;
+
+    &::first-letter {
+        color: var(--pink);
+    }
+}
+
+.title {
+    text-wrap-style: pretty;
+    text-align: center;
+    line-height: 1.02;
+    text-shadow: 0 0 40px var(--accent-glow);
+}
+
+.lead {
+    font-size: 1.05rem;
+    line-height: 1.7;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    height: fit-content;
+}
+
+.actions a {
+    display: inline-block;
+    text-align: center;
+}
+
+/* ── Features ── */
+
+.features {
+    display: grid;
+    gap: 0.5rem;
+    padding-inline: clamp(1rem, 4vw, 3rem);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 1.25rem;
+}
+
+.index {
+    font-family: var(--font-brand);
+    font-size: 0.7rem;
+    color: var(--accent-deep);
+}
+
+.cardTitle {
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* ── Quote ── */
+
+.quote {
+    padding-block: 2rem;
+    padding-inline: clamp(1rem, 4vw, 2.5rem);
+    border-inline-start: 3px solid var(--accent);
+    background: linear-gradient(90deg, var(--accent-tint, transparent), transparent 70%);
+}
+
+.quote p {
+    max-width: 40ch;
+    font-family: var(--font-header);
+    font-size: clamp(1.25rem, 3.5vw, 2rem);
+    line-height: 1.35;
+    color: var(--text);
+    text-wrap: balance;
+}

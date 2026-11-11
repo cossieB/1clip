@@ -35,6 +35,6 @@ export function editPlatform(platformId: number, data: Partial<InferSelectModel<
             dateModified: sql`NOW()`
         })
         .where(eq(platforms.platformId, platformId)).returning({
-            oldLogo: sql<string>`OLD.logo`
+            oldLogo: sql<string>`OLD.${platforms.logo.name}`
         })
 }

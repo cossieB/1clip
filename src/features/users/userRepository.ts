@@ -64,8 +64,8 @@ export async function findByUsername(username: string, loggedInUserId?: string) 
 
 export async function updateUser(userId: string, user: Partial<User>) {
     return db.update(users).set(user).where(eq(users.id, userId)).returning({
-        oldAvatar: sql<string>`OLD.image`,
-        oldBanner: sql<string>`OLD.banner`
+        oldAvatar: sql<string>`OLD.${users.image.name}`,
+        oldBanner: sql<string>`OLD.${users.banner.name}`
     })
 }
 

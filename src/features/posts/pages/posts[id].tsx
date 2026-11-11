@@ -1,5 +1,5 @@
 import { useParams } from "@solidjs/router";
-import { PostBlock } from "./PostBlock";
+import { PostBlock } from "../components/PostBlock";
 import { paths } from "~/router";
 import { createMemo, Loading, Show } from "solid-js";
 import { getPostFn } from "../postsApi";

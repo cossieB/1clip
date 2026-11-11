@@ -11,8 +11,9 @@ import SecurityPage from './features/auth/components/SecurityPage';
 import { CreatePostLayout } from './components/layouts/CreatePostLayout';
 import { CreatePostPage } from './features/posts/components/CreatePostPage';
 import { clientOnly } from '@solidjs/web';
-import { PostId } from './features/posts/components/PostId';
-import { SquadList } from './features/squads/components/SquadList';
+import { PostsPage } from './features/posts/pages/posts';
+import { PostId } from './features/posts/pages/posts[id]';
+import { SquadsPage } from './features/squads/pages/squads';
 
 
 // Link preloading is opt-in. intentPreload() is the hover/focus/touch
@@ -50,12 +51,15 @@ export const Router = createRouter({
                     ]
                 }, {
                     component: CreatePostLayout,
+                },{
+                    path: "/posts",
+                    component: PostsPage
                 }, {
                     path: "/posts/:postId",
+                    component: PostId,
                     matchFilters: {
                         postId: int
                     },
-                    component: PostId,
                 }, {
                     component: CreatePostLayout,
                     children: [
@@ -69,7 +73,7 @@ export const Router = createRouter({
                     ]
                 }, {
                     path: "/squads",
-                    component: SquadList
+                    component: SquadsPage
                 }
             ],
         }

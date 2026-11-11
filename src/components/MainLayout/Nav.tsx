@@ -7,7 +7,7 @@ export function Nav() {
     return (
         <div class={styles.nav}>
             <a href="/" > <HomeIcon /> <span>Home</span></a>
-            <a href="/test"> <VideoIcon /> <span>Clips</span></a>
+            <a href={paths.posts()}> <VideoIcon /> <span>Clips</span></a>
             <a href={paths("squads")}> <HandshakeIcon /> <span>Squads</span> <b class="badge ok">12</b></a>
             <ShowWhenAuthed>
                 <a href="/test"> <MessageSquareMoreIcon /> <span>Messages</span><b class="badge info">3</b></a>
@@ -22,7 +22,7 @@ export function Tabbar() {
     return (
         <nav class={styles.tabbar} aria-label="Main">
             <a href="/" > <HomeIcon /> Home</a>
-            <a href="test"> <VideoIcon />Clips</a>
+            <a href={paths.posts()}> <VideoIcon />Clips</a>
             <ShowWhenAuthed
                 fallback={
                     <a
@@ -41,7 +41,7 @@ export function Tabbar() {
                     <i>+</i>
                 </button>
             </ShowWhenAuthed>
-            <a href="test"> <HandshakeIcon /> Squads</a>
+            <a href={paths.squads}> <HandshakeIcon /> Squads</a>
             <a href={paths.profile()}> <User2Icon /> Profile</a>
         </nav>
     )
