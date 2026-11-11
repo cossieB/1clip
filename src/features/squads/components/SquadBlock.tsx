@@ -75,7 +75,7 @@ export function SquadBlock(props: Props) {
     const wasEdited = () => !!props.squad.editedOn
 
     return (
-        <article class={["card", styles.lfg]}>
+        <article class={["card", styles.lfg]} data-squad-id={props.squad.squadId}>
             <header class={styles.header}>
                 <a class={styles.author} href={`/users/${props.squad.creator.username}`}>
                     <img

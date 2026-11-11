@@ -53,7 +53,10 @@ export const Router = createRouter({
                     component: CreatePostLayout,
                 },{
                     path: "/posts",
-                    component: PostsPage
+                    component: PostsPage,
+                    search: z.object({
+                        tag: z.string().optional()
+                    }).optional()
                 }, {
                     path: "/posts/:postId",
                     component: PostId,
@@ -73,7 +76,10 @@ export const Router = createRouter({
                     ]
                 }, {
                     path: "/squads",
-                    component: SquadsPage
+                    component: SquadsPage,
+                    search: z.object({
+                        gameId: z.string().optional()
+                    }).optional()                    
                 }
             ],
         }
