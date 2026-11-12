@@ -1,0 +1,130 @@
+.bone {
+    display: block;
+    max-width: 100%;
+    background: linear-gradient(90deg, var(--surface-2) 30%, var(--surface-3) 50%, var(--surface-2) 70%);
+    background-size: 300% 100%;
+    animation: shimmer 1.4s linear infinite;
+}
+
+@keyframes shimmer {
+    from {
+        background-position: 100% 0;
+    }
+
+    to {
+        background-position: 0 0;
+    }
+}
+
+/* ── Shared bits ── */
+.card {
+    pointer-events: none;
+    /* no hover glow on something that isn't there yet */
+}
+
+.post {
+    gap: 1rem;
+}
+
+.bevelXs {
+    --bevel: 6px;
+}
+
+.bevelSm {
+    --bevel: 6px;
+    flex-shrink: 0;
+}
+
+.bevelMd {
+    --bevel: 8px;
+    flex-shrink: 0;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+}
+
+.person {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+}
+
+.stack {
+    display: grid;
+    gap: .4rem;
+}
+
+.lines {
+    display: grid;
+    gap: .6rem;
+}
+
+.media {
+    aspect-ratio: 16 / 10;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: .75rem;
+    border-top: 1px solid var(--line);
+}
+
+/* ── Comment ── */
+.comment {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: .75rem;
+    padding-block: .75rem;
+    pointer-events: none;
+}
+
+.commentBody {
+    display: grid;
+    gap: .6rem;
+}
+
+.inline {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+}
+
+/* ── LFG party box ── */
+.party {
+    display: grid;
+    gap: .75rem;
+    padding: .8rem 1rem;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--surface-3);
+    background: var(--surface-1);
+}
+
+.partyHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.pips {
+    display: flex;
+    gap: .3rem;
+}
+
+.avatars {
+    display: flex;
+    gap: .35rem;
+}

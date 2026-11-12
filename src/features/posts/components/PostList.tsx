@@ -1,9 +1,11 @@
-import { createEffect, createMemo, createSignal, flush, For, onSettled } from "solid-js";
+import { createEffect, createMemo, createSignal, flush, For, Loading, onSettled, Repeat } from "solid-js";
 import { PostFilters } from "../utils/zod";
 import { getPostsFn } from "../postsApi";
 import { useViewPost } from "../hooks/useViewPost";
 import { PostBlock } from "./PostBlock";
 import { session } from "~/features/auth/authApi";
+import { PostSkeleton } from "~/components/Skeletons/Skeletons";
+import { useLocation } from "@solidjs/router";
 
 type Post = Awaited<ReturnType<typeof getPostsFn>>[number]
 
@@ -16,21 +18,21 @@ export function PostList(props: { filters?: PostFilters }) {
             ...props.filters,
             cursor: cursor()
         })
-        if (next.length === 0 ) done = true
+        if (next.length === 0) done = true
         return [...previous, ...next]
     }, {
         loadingValue: [],
         id: "postId"
     })
     const addPostToSet = useViewPost()
-    
+
     let observer: IntersectionObserver
 
     createEffect(
         posts,
         () => {
             setTimeout(() => {
-                const cards = document.querySelectorAll(`[data-post-id]`); 
+                const cards = document.querySelectorAll(`[data-post-id]`);
                 lastPostId = Number((cards.item(cards.length - 1) as HTMLElement)?.dataset.postId) || -1
                 cards.forEach(card => observer.observe(card))
             }, 50)
@@ -53,11 +55,22 @@ export function PostList(props: { filters?: PostFilters }) {
     })
 
     return (
-        <For each={posts()}>
-            {post => <PostBlock
-                post={post}
-                canLike={session().data?.user.emailVerified === true}
-            />}
-        </For>
+        <Loading on={posts()} fallback={<Skeleton />}>
+
+            <For each={posts()}>
+                {post => <PostBlock
+                    post={post}
+                    canLike={session().data?.user.emailVerified === true}
+                />}
+            </For>
+        </Loading>
+    )
+}
+
+function Skeleton() {
+    return (
+        <Repeat count={5} >
+            {i => <PostSkeleton />}
+        </Repeat>
     )
 }

@@ -1,10 +1,11 @@
-import { createEffect, createOptimisticStore, createSignal, For, Loading, onSettled, Show, snapshot } from "solid-js";
+import { createEffect, createOptimisticStore, createSignal, For, Loading, onSettled, Repeat, Show, snapshot } from "solid-js";
 import { getCommentsByPostIdFn } from "../commentsApi";
 import { Spinner } from "~/components/Loader/Spinner";
 import { CommentBlock } from "./CommentBlock";
 import { session } from "~/features/auth/authApi";
 import { CommentComposer } from "./CommentComposer";
 import { AwaitedReturn } from "~/lib/utilityTypes";
+import { CommentSkeleton } from "~/components/Skeletons/Skeletons";
 
 type Props = {
     postId: number
@@ -58,7 +59,7 @@ export function CommentList(props: Props) {
 
 
     return (
-        <Loading fallback={<Spinner />}>
+        <Loading fallback={<Skeleton />}>
             <Show when={session().data && !props.replyTo}>
                 <CommentComposer
                     comments={comments}
@@ -75,5 +76,13 @@ export function CommentList(props: Props) {
                 />}
             </For>
         </Loading>
+    )
+}
+
+function Skeleton() {
+    return (
+        <Repeat count={5} >
+            {i => <CommentSkeleton />}
+        </Repeat>
     )
 }
