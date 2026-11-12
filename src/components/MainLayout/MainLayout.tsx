@@ -2,7 +2,7 @@ import { type ParentProps } from "solid-js";
 import styles from "./MainLayout.module.css"
 import { PlusIcon, UnlockIcon } from "@lucide/solid"
 import { Nav, Tabbar } from "./Nav";
-import { FriendsOnline } from "./FriendsOnline";
+import { UsersOnline } from "./FriendsOnline";
 import { Trending } from "./Trending";
 import { UserNavItem } from "~/features/auth/components/UserNavItem";
 import { SearchBar } from "./Searchbar";
@@ -49,7 +49,7 @@ export default function MainLayout(props: ParentProps) {
 
             {/* <!-- RIGHT RAIL --> */}
             <aside class={styles.aside} aria-label="Activity">
-                <FriendsOnline />
+                <UsersOnline />
                 <Trending />
             </aside>
             <Tabbar />

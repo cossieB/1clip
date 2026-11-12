@@ -10,3 +10,4 @@ export const authClient = createAuthClient({
 })
 
 export type Session = typeof authClient.$Infer.Session
+export type AuthUser = typeof authClient.$Infer.Session.user

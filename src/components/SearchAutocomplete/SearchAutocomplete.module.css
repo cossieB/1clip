@@ -1,122 +1,128 @@
 .root {
-  --panel-bevel: 12px;
-  position: relative;
-  width: 100%;
+    --panel-bevel: 12px;
+    position: relative;
+    width: 100%;
 }
 
 /* ── Input ── */
 .field {
-  position: relative;
+    position: relative;
 }
 
 .icon {
-  position: absolute;
-  left: .85rem;
-  top: 50%;
-  translate: 0 -50%;
-  width: 1.1rem;
-  height: 1.1rem;
-  color: var(--text-subtle);
-  pointer-events: none;
-  transition: color .15s;
+    position: absolute;
+    left: .85rem;
+    top: 50%;
+    translate: 0 -50%;
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--text-subtle);
+    pointer-events: none;
+    transition: color .15s;
 }
 
 .field:focus-within .icon {
-  color: var(--accent);
+    color: var(--accent);
 }
 
 .input {
-  width: 100%;
-  padding-left: 2.6rem;
-  font-size: .95rem;
-  appearance: none;
+    width: 100%;
+    padding-left: 2.6rem;
+    font-size: .95rem;
+    appearance: none;
 }
 
 .input::-webkit-search-decoration,
 .input::-webkit-search-cancel-button {
-  appearance: none;
+    appearance: none;
 }
 
 /* ── Dropdown panel: same top-left / bottom-right bevel as .card ── */
 .panel {
-  position: absolute;
-  inset-inline: 0;
-  top: calc(100% + .5rem);
-  z-index: 20;
-  overflow: hidden;
-  background: linear-gradient(160deg, var(--surface-2), var(--surface-1));
-  border: 1px solid var(--border-strong);
-  border-radius: var(--panel-bevel) 0 var(--panel-bevel) 0;
-  corner-shape: bevel square bevel square;
-  box-shadow: 0 12px 32px -12px var(--accent-glow);
-  animation: panel-in .14s ease-out;
+    position: absolute;
+    inset-inline: 0;
+    top: calc(anchor(bottom) + 0.5rem);
+    position-try-fallbacks: flip-block;
+    z-index: 20;
+    overflow: hidden;
+    background: linear-gradient(160deg, var(--surface-2), var(--surface-1));
+    border: 1px solid var(--border-strong);
+    border-radius: var(--panel-bevel) 0 var(--panel-bevel) 0;
+    corner-shape: bevel square bevel square;
+    box-shadow: 0 12px 32px -12px var(--accent-glow);
+    animation: panel-in .14s ease-out;
 
-  @supports not (corner-shape: bevel) {
-    border-radius: 0;
-  }
+    &.flip {
+        top: unset;
+        bottom: calc(anchor(top) + 0.5rem);
+    }
+
+    @supports not (corner-shape: bevel) {
+        border-radius: 0;
+    }
 }
 
 @keyframes panel-in {
-  from {
-    opacity: 0;
-    translate: 0 -4px;
-  }
+    from {
+        opacity: 0;
+        translate: 0 -4px;
+    }
 }
 
 /* ── Results ── */
 .list {
-  max-height: 18rem;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border-strong) transparent;
+    max-height: 18rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
 }
 
 .option {
-  padding: .7rem 1rem;
-  border-left: 2px solid transparent;
-  font-size: .95rem;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: background-color .1s, color .1s, border-color .1s;
+    padding: .7rem 1rem;
+    border-left: 2px solid transparent;
+    font-size: .95rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background-color .1s, color .1s, border-color .1s;
 
-  &+& {
-    border-top: 1px solid var(--line);
-  }
+    &+& {
+        border-top: 1px solid var(--line);
+    }
 
-  &[aria-selected="true"] {
-    background: color-mix(in oklch, var(--accent) 14%, transparent);
-    border-left-color: var(--accent);
-    color: var(--text);
-  }
+    &[aria-selected="true"] {
+        background: color-mix(in oklch, var(--accent) 14%, transparent);
+        border-left-color: var(--accent);
+        color: var(--text);
+    }
 }
 
 /* ── Status messages ── */
 .message {
-  display: flex;
-  align-items: center;
-  gap: .6rem;
-  padding: .9rem 1rem;
-  font-size: .875rem;
-  color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .9rem 1rem;
+    font-size: .875rem;
+    color: var(--text-muted);
 }
 
 .messageError {
-  color: var(--danger);
+    color: var(--danger);
 }
 
 .spinner {
-  flex: none;
-  width: .9rem;
-  height: .9rem;
-  border: 2px solid var(--border-strong);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin .7s linear infinite;
+    flex: none;
+    width: .9rem;
+    height: .9rem;
+    border: 2px solid var(--border-strong);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
 }
 
 @keyframes spin {
-  to {
-    rotate: 360deg;
-  }
+    to {
+        rotate: 360deg;
+    }
 }

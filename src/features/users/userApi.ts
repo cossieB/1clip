@@ -9,7 +9,9 @@ import { GET } from "@solidjs/web/server-functions/server";
 import { storageService } from "~/integrations/storageService/index.server";
 import { orphanedFileService } from "~/services/orphanedFileService";
 import { zodSafeParse } from "~/utils/zodSafeParse";
-import { ensureVerified } from "../auth/utils/ensureAuth";
+import { ensureAuthed, ensureVerified } from "../auth/utils/ensureAuth";
+import { redis } from "~/utils/redis";
+import { OnlineUsersService } from "~/services/onlineUsersService";
 
 export const getUser = query(async (id: string) => {
     'use server'
@@ -39,4 +41,44 @@ export const getProfile = GET(async () => {
     const session = await getCurrentUser()
     if (!session) throw redirect(paths({ dialog: "signin" }))
     return getUser(session.user.id)
+})
+
+const G = z.object({
+    gameId: z.int(),
+    title: z.string()
+})
+
+export async function setStatusFn(game: z.input<typeof G>) {
+    'use server'
+    const data = zodSafeParse(G, game)
+    const userSession = await ensureVerified()
+    const key = `userstatus:${userSession.user.id}`;
+    await redis.multi()
+        .hSet(key, {
+            ...data,
+            username: userSession.user.displayUsername!,
+            image: userSession.user.image!
+        })
+        .expire(key, 28800)
+        .exec()
+}
+
+
+
+export const getStatusFn = async (userId?: string) => {
+    'use server'
+    userId ??= (await getCurrentUser())?.user.id
+    if (!userId) throw respond(null, { status: 404 });
+    const status = await OnlineUsersService.getUserStatus(userId)
+    return status
+}
+
+export const getOnlineUsers = GET(async () => {
+    'use server'    
+    const statuses = await OnlineUsersService.getOnlineUsers()
+    return respond(statuses, {
+        headers: {
+            "Cache-Control": "public, max-age=900"
+        }
+    })
 })

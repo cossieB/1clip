@@ -93,11 +93,17 @@
     button {
         width: 100%;
     }
+    button[aria-label^="Set"] {
+        svg {
+            max-width: unset;
+        }
+    }
 
     &:popover-open {
         display: flex;
         opacity: 1;
         transform: scale(1) translateY(0);
+        overflow: visible;
 
         @starting-style {
             opacity: 0;

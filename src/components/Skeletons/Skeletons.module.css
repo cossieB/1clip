@@ -128,3 +128,16 @@
     display: flex;
     gap: .35rem;
 }
+
+.userList {
+    display: grid;
+    gap: .5rem;
+}
+
+.userRow {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding-block: .25rem;
+    pointer-events: none;
+}

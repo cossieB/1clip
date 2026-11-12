@@ -6,6 +6,7 @@ import { debounce } from "~/lib/debounce"
 import { JSX } from "@solidjs/web/jsx-runtime"
 
 export type SearchAutocompleteProps<T> = {
+    onTop?: boolean
     /** Accessible name for the input, also used as the placeholder unless `placeholder` is set */
     label: string
     /** Fetch the results for a query. Called once the user stops typing */
@@ -138,13 +139,13 @@ export function SearchAutocomplete<T>(props: SearchAutocompleteProps<T>) {
     )
 
     return (
-        <div class={styles.root}>
-            <div class={styles.field}>
+        <div class={[styles.root]}>
+            <div class={styles.field} style={{"anchor-name": "--sa-input"}}>
                 <svg class={styles.icon} viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true">
                     <circle cx="8.5" cy="8.5" r="5.5" />
                     <path d="M12.75 12.75 17 17" />
                 </svg>
-                <input
+                <input                    
                     class={styles.input}
                     type="search"
                     placeholder={props.placeholder ?? props.label}
@@ -164,7 +165,7 @@ export function SearchAutocomplete<T>(props: SearchAutocompleteProps<T>) {
             </div>
 
             <Show when={showPanel()}>
-                <div class={styles.panel}>
+                <div style={{"position-anchor": "--sa-input"}} class={[styles.panel, {[styles.flip]: !!props.onTop}]}>
                     {/* Fallback covers the first request only; later ones are handled by isSearching() */}
                     <Loading fallback={searching()}>
                         <Switch>

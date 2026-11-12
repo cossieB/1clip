@@ -16,7 +16,7 @@ export const getGamesFn = GET(async (filters: z.input<typeof GetGamesSchema>) =>
     const games = await gamesRepository.findAll(data)
     return respond(games, {
         headers: {
-            // "Cache-Control": "public, max-age=604800, stale-while-revalidate=86400"
+            "Cache-Control": "public, max-age=604800, stale-while-revalidate=86400"
         }
     })
 })
@@ -27,7 +27,7 @@ export const getGameFn = GET(async (gameId: number) => {
     const game = await gamesRepository.findById(data);
     return respond(game ?? null, {
         headers: {
-            // "Cache-Control": "public, max-age=604800, stale-while-revalidate=86400"
+            "Cache-Control": "public, max-age=604800, stale-while-revalidate=86400"
         }
     })
 })

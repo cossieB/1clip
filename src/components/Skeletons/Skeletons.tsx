@@ -121,3 +121,36 @@ export function LFGSkeleton() {
         </article>
     )
 }
+
+export function UserRowSkeleton(props: { nameWidth?: string; statusWidth?: string }) {
+    return (
+        <div class={styles.userRow} role="status" aria-label="Loading user">
+            <Bone class={["cutout", styles.bevelMd]} width="2.5rem" height="2.5rem" />
+            <div class={styles.stack}>
+                <Bone width={props.nameWidth ?? "4.5rem"} height="1rem" />
+                <Bone width={props.statusWidth ?? "6rem"} height=".75rem" />
+            </div>
+        </div>
+    )
+}
+
+const ROW_WIDTHS = [
+    ["4rem", "5.5rem"],
+    ["5.5rem", "6.5rem"],
+    ["3.5rem", "4.5rem"],
+    ["6rem", "5rem"],
+    ["4.5rem", "7rem"],
+]
+
+export function UserListSkeleton(props: { count?: number }) {
+    const rows = () =>
+        Array.from({ length: props.count ?? 4 }, (_, i) => ROW_WIDTHS[i % ROW_WIDTHS.length])
+
+    return (
+        <div class={styles.userList} role="status" aria-label="Loading users">
+            <For each={rows()}>
+                {row => <UserRowSkeleton nameWidth={row[0]} statusWidth={row[1]} />}
+            </For>
+        </div>
+    )
+}
