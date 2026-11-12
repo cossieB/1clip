@@ -13,6 +13,9 @@ import { ensureVerified } from "../auth/utils/ensureAuth";
 import { redis } from "~/utils/redis";
 import { zodSafeParse } from "~/utils/zodSafeParse";
 import { GET } from "@solidjs/web/server-functions";
+import { db } from "~/drizzle/db";
+import { postTags } from "~/drizzle/schema";
+import { count, sql } from "drizzle-orm";
 
 export async function createPostFn(p: z.input<typeof PostCreateSchema>) {
     'use server'
@@ -161,3 +164,22 @@ export async function markPostUploadComplete(postId: number) {
     // TODO: add retries with bullmq
     return post
 }
+
+export const getTrendingFn = GET(async() => {
+    'use server'
+    const result = await db
+        .select({
+            count: count().as("count"),
+            hash: postTags.tagName
+        })
+        .from(postTags)
+        .groupBy(postTags.tagName)
+        .orderBy(sql`count DESC`)
+        .limit(5)
+
+    return respond(result.map(x => x.hash), {
+        headers: {
+            "Cache-Control": "public, max-age=86400"
+        }
+    })
+})

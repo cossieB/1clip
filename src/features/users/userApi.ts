@@ -63,8 +63,6 @@ export async function setStatusFn(game: z.input<typeof G>) {
         .exec()
 }
 
-
-
 export const getStatusFn = async (userId?: string) => {
     'use server'
     userId ??= (await getCurrentUser())?.user.id
