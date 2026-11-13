@@ -1,6 +1,6 @@
 import { db } from "~/drizzle/db";
 import { GameQueryFilters } from "./types";
-import { SQL, and, eq, getColumns, ilike, inArray, lt, sql } from "drizzle-orm";
+import { SQL, and, desc, eq, getColumns, ilike, inArray, lt, sql } from "drizzle-orm";
 import { games, appearances, gamePlatforms, gameGenres } from "~/drizzle/schema";
 
 export async function findAll(obj: GameQueryFilters = {}) {
@@ -47,5 +47,7 @@ export async function findAll(obj: GameQueryFilters = {}) {
     return db
         .select(rest)
         .from(games)
+        .limit(obj.limit ?? 50)
         .where(and(...filters))
+        .orderBy(desc(games.gameId))
 }

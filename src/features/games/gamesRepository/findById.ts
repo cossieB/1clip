@@ -65,7 +65,7 @@ export async function findById(gameId: number) {
             .groupBy(media.gameId)
     )
 
-    const query = db
+    const [result] = await db
         .with(actorQuery, platformQuery, genresQuery, mediaQuery)
         .select({
             ...gamesColumns,
@@ -87,8 +87,6 @@ export async function findById(gameId: number) {
 
     type Result = typeof result
     type Output = ForceNotNull<Result, 'developer' | 'publisher'>
-console.log(query.toSQL())
 
-const [result] = await query
     return result as Output | undefined
 }

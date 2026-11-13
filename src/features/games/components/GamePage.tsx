@@ -7,6 +7,8 @@ import { session } from "~/features/auth/authApi";
 import { IframeFactory } from "~/features/posts/components/IframeFactory";
 import { formatIsoDate } from "~/lib/formatDate";
 import { Carousel } from "~/components/Carousel/Carousel";
+import { PhotoCardGrid } from "~/components/CardLink/PhotoCardLink";
+import { paths } from "~/router";
 
 export function GamePage(props: { game: NonNullable<AwaitedReturn<typeof getGameFn>> }) {
     return (
@@ -19,7 +21,7 @@ export function GamePage(props: { game: NonNullable<AwaitedReturn<typeof getGame
                 <h1> {props.game.title} </h1>
 
                 <div class={styles.actions}>
-                    <button 
+                    <button
                         class="ghost"
                         onClick={() => navigator.share({
                             title: `${props.game.title} :: 1Clip`,
@@ -77,15 +79,31 @@ export function GamePage(props: { game: NonNullable<AwaitedReturn<typeof getGame
                 <div innerHTML={props.game.summary} />
             </div>
             <Show when={props.game.media.length > 0}>
-                <Carousel
-                    media={props.game.media.filter(m => !m.contentType.startsWith("audio")).map(m => ({
-                        ...m,
-                        url: mediaSrc(m.key)
-                    }))}
-                    showNextBtn
-                    showPrevBtn
-                />
+                <div style={{ "margin-block": "1rem" }}>
+                    <Carousel
+                        media={props.game.media.filter(m => !m.contentType.startsWith("audio")).map(m => ({
+                            ...m,
+                            url: mediaSrc(m.key)
+                        }))}
+                        showNextBtn
+                        showPrevBtn
+                    />
+                </div>
             </Show>
+            <Show when={props.game.actors.length > 0}>
+                <h3 >Cast</h3>
+            </Show>
+            <PhotoCardGrid
+                arr={props.game.actors}
+                getLabel={actor => actor.name}
+                getPic={actor => actor.photo ?? "q.png"}
+                getHref={actor => paths.actors(actor.actorId)()}
+                getAttr={actor => ({
+                    [`data-actor-id`]: actor.actorId.toString()
+                })}
+                getSublabel={actor => actor.character}
+            />
+
         </div>
     )
 }

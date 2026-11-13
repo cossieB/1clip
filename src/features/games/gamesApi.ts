@@ -13,12 +13,17 @@ import { db } from "~/drizzle/db";
 export const getGamesFn = GET(async (filters: z.input<typeof GetGamesSchema>) => {
     'use server'
     const data = zodSafeParse(GetGamesSchema, filters)
-    const games = await gamesRepository.findAll(data)
-    return respond(games, {
-        headers: {
-            "Cache-Control": "public, max-age=604800, stale-while-revalidate=86400"
-        }
-    })
+    try {
+        const games = await gamesRepository.findAll(data)
+        return respond(games, {
+            headers: {
+                "Cache-Control": "public, max-age=604800, stale-while-revalidate=86400"
+            }
+        })      
+    } catch (error) {
+        console.error(error)
+        throw error
+    }
 })
 
 export const getGameFn = GET(async (gameId: number) => {

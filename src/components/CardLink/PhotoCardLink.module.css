@@ -1,0 +1,66 @@
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.25rem;
+
+    @media (width >=768px) {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+}
+
+.card {
+    position: relative;
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 2;
+    overflow: hidden;
+
+    >label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        background-color: #222;
+        padding: 0.25rem;
+        flex-direction: column;
+        --bevel: 8px;
+        font: 400 0.75rem 'Chakra Petch', sans-serif;
+        letter-spacing: .2em;
+        text-transform: uppercase;
+
+        >span {
+            font-weight: 100;
+            text-transform: none;
+            color: var(--accent);
+            font-size: 0.6re;
+        }
+    }
+
+
+    &:hover {
+        outline: 1px solid var(--accent);
+
+        img {
+            scale: 1.05;
+        }
+    }
+}
+
+.imgWrapper {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+
+    >img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+        transition: scale ease 250ms;
+    }
+}
+
+.a {
+    position: absolute;
+    display: inherit;
+    inset: 0;
+}

@@ -4,6 +4,11 @@
         font: 800 34px Orbitron, sans-serif;
         text-transform: uppercase;
     }
+    h3 {
+        text-align: center;
+        font: 800 2rem Orbitron, sans-serif;
+        text-transform: uppercase;
+    }
 }
 
 .header {
