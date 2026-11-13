@@ -3,31 +3,27 @@ import { db } from "~/drizzle/db";
 import { User } from "~/drizzle/models";
 import { commentLikes, comments, followerFollowee, postLikes, posts } from "~/drizzle/schema";
 import { users } from "~/drizzle/schema/auth";
+import z from "zod";
+import { GetUserSchema } from "./utils/zod";
 import "server-only"
 
-export async function findById(userId: string, loggedInUserId?: string) {
+export async function findUser(input: z.input<typeof GetUserSchema>) {
     const { email, emailVerified, createdAt, updatedAt, ...rest } = getColumns(users)
+    if (!input.id && !input.username) {
+        return null;
+    }
 
-    const rows = await db.select({
+    const mainCondition = input.id ? eq(users.id, input.id) : eq(users.username, input.username!);
+
+    const [user] = await db.select({
         ...rest,
         joined: users.createdAt,
-        links: users.links,
-        ...loggedInUserId && ({
-            isFollowing: exists(
-                db
-                    .select({ _: sql`1` })
-                    .from(followerFollowee)
-                    .where(and(
-                        eq(followerFollowee.followerId, loggedInUserId),
-                        eq(followerFollowee.followeeId, userId)
-                    ))
-            ) as SQL<boolean>
-        })
+        links: users.links,        
     })
         .from(users)
-        .where(eq(users.id, userId))
+        .where(mainCondition)
 
-    return rows.at(0)
+    return user ?? null
 }
 
 export async function findByUsername(username: string, loggedInUserId?: string) {
@@ -64,8 +60,8 @@ export async function findByUsername(username: string, loggedInUserId?: string) 
 
 export async function updateUser(userId: string, user: Partial<User>) {
     return db.update(users).set(user).where(eq(users.id, userId)).returning({
-        oldAvatar: sql<string>`OLD.${users.image.name}`,
-        oldBanner: sql<string>`OLD.${users.banner.name}`
+        oldAvatar: sql<string>`OLD.image`,
+        oldBanner: sql<string>`OLD.banner`
     })
 }
 

@@ -7,7 +7,6 @@ import { UserListSkeleton } from "../Skeletons/Skeletons"
 
 export function UsersOnline() {
     const usersOnline = createMemo(() => getOnlineUsers(), { ssrSource: "client" })
-    createEffect(usersOnline, u => console.log(u))
     return (
         <section class="card">
             <h2>Online</h2>

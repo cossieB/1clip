@@ -14,6 +14,10 @@ import { clientOnly } from '@solidjs/web';
 import { PostsPage } from './features/posts/pages/posts';
 import { PostId } from './features/posts/pages/posts[id]';
 import { SquadsPage } from './features/squads/pages/squads';
+import { UserIdLayout } from './features/users/pages/user[id].layout';
+import { UserPosts } from './features/users/pages/user[id].posts';
+import { UserSquads } from './features/users/pages/user[id].squads';
+import { UserIdIndex } from './features/users/pages/user[id].index';
 
 
 // Link preloading is opt-in. intentPreload() is the hover/focus/touch
@@ -80,6 +84,18 @@ export const Router = createRouter({
                     search: z.object({
                         gameId: z.string().optional()
                     }).optional()                    
+                }, {
+                    path: "/users/:username",
+                    component: UserIdLayout,
+                    children: [
+                        {
+                            path: ["/", "/posts"],
+                            component: UserPosts
+                        }, {
+                            path: "/squads",
+                            component: UserSquads
+                        }
+                    ]
                 }
             ],
         }

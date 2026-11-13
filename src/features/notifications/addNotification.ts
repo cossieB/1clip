@@ -9,7 +9,7 @@ type Notification = {
     sourceUserId?: string | null | undefined;
     readAt?: Date | null | undefined;
     actionUrl?: string | null | undefined;
-    type?: "LIKE" | "REPLY" | "MENTION" | "FOLLOW" | "SYSTEM" | null | undefined;
+    type?: "LIKE" | "REPLY" | "MENTION" | "FOLLOW" | "SYSTEM" | "SQUAD" | null | undefined;
     title?: string | null | undefined;
     message?: string | null | undefined;
     entityType?: string | null | undefined;

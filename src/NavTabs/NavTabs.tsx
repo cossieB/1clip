@@ -1,4 +1,4 @@
-import { createEffect, createSignal, For } from "solid-js"
+import { createEffect, createSignal, For, untrack } from "solid-js"
 import styles from "./NavTabs.module.css"
 import { useLocation, useMatch } from "@solidjs/router"
 
@@ -17,7 +17,7 @@ export function NavTabs(props: Props) {
                 {(tab, i) =>
                     <Tab
                         {...tab}
-                        setIdx={() => setI(i())}
+                        setIdx={() => setI(untrack(i))}
                     />
                 }
             </For>

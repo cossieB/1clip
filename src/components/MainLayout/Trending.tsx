@@ -8,13 +8,12 @@ export function Trending() {
     return (
         <section class="card">
             <Loading>
-
-            <h2>Trending</h2>
-            <ul class={styles.trending}>
-                <For each={trending()}>
-                    {tag => <a href={paths.posts({tag})}> #{tag} </a>}
-                </For>
-            </ul>
+                <h2>Trending</h2>
+                <ul class={styles.trending}>
+                    <For each={trending()}>
+                        {tag => <a href={paths.posts({ tag })}> #{tag} </a>}
+                    </For>
+                </ul>
             </Loading>
         </section>
     )

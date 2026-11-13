@@ -1,9 +1,10 @@
 import 'server-only'
-import { and, desc, eq, gt, InferInsertModel, lt, or, SQL, sql, asc, inArray } from 'drizzle-orm';
+import { and, desc, eq, gt, InferInsertModel, lt, or, SQL, sql, asc, inArray, getColumns } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import { db } from '~/drizzle/db';
 import { games, squads, squadApplications, users } from '~/drizzle/schema';
 import { SquadApplicationStatus } from '~/drizzle/models';
+import { SquadFilters } from './utils/zod';
 
 export async function createSquad(row: InferInsertModel<typeof squads>) {
     return db.insert(squads).values(row).returning()
@@ -26,13 +27,6 @@ export type SquadApplicant = {
     id: string
     username: string
     image: string
-}
-
-export type SquadFilters = {
-    gameId?: number
-    userId?: string
-    limit?: number
-    cursor?: number
 }
 
 const DEFAULT_LIMIT = 20;
@@ -86,11 +80,22 @@ function squadSelection(currentUserId?: string) {
 export async function findAll(args: SquadFilters = {}, currentUserId?: string) {
     const limit = Math.min(Math.max(args.limit ?? DEFAULT_LIMIT, 1), MAX_LIMIT);
 
-    const conditions: (SQL | undefined)[] = [
-        args.gameId !== undefined ? eq(squads.gameId, args.gameId) : undefined,
-        args.userId ? eq(squads.userId, args.userId) : undefined,
-        args.cursor !== undefined ? lt(squads.squadId, args.cursor) : undefined,
-    ];
+    const conditions: (SQL | undefined)[] = []
+
+    if (args.gameId) conditions.push(eq(squads.gameId, args.gameId))
+    if (args.userId) {
+        conditions.push(eq(squads.userId, args.userId))
+        delete args.username
+    }
+    if (args.cursor) conditions.push(lt(squads.squadId, args.cursor))
+    if (args.username) conditions.push(eq(
+        squads.userId,
+        db.select({
+            userId: users.id
+        })
+            .from(users)
+            .where(eq(users.username, args.username))
+    ))
 
     return db
         .select(squadSelection(currentUserId))
@@ -161,12 +166,23 @@ export async function findSquadApplications(
 export type SquadApplicationWithApplicant = Awaited<ReturnType<typeof findSquadApplications>>[number];
 
 export async function createSquadApplication(input: InferInsertModel<typeof squadApplications>) {
-    const [inserted] = await db.insert(squadApplications).values(input).returning();
+    const ins = db.$with("ins").as(
+        db.insert(squadApplications).values(input).returning()
+    )
+    const [inserted] = await db
+        .with(ins)
+        .select({
+            ...getColumns(ins),
+            squadCreatorId: squads.userId
+        })
+        .from(ins)
+        .innerJoin(squads, eq(ins.squadId, squads.squadId))
+
     return inserted
 }
 
 export async function updateSquadApplication(applicationId: number, status: SquadApplicationStatus, ownerId: string) {
-    return db
+    const [updated] = await db
         .update(squadApplications)
         .set({ status })
         .where(and(
@@ -179,6 +195,9 @@ export async function updateSquadApplication(applicationId: number, status: Squa
                     .where(eq(squads.userId, ownerId))
             )
         ))
+        .returning()
+
+    return updated
 }
 
 export async function deleteSquadApplication(applicationId: number, userId: string) {

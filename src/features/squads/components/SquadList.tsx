@@ -8,6 +8,7 @@ type Props = {
     filters?: {
         gameId?: number
         userId?: string
+        username?: string
     }
 }
 

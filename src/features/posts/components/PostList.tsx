@@ -1,11 +1,10 @@
-import { createEffect, createMemo, createSignal, flush, For, Loading, onSettled, Repeat } from "solid-js";
+import { createEffect, createMemo, createSignal, For, Loading, onSettled, Repeat } from "solid-js";
 import { PostFilters } from "../utils/zod";
 import { getPostsFn } from "../postsApi";
 import { useViewPost } from "../hooks/useViewPost";
 import { PostBlock } from "./PostBlock";
 import { session } from "~/features/auth/authApi";
 import { PostSkeleton } from "~/components/Skeletons/Skeletons";
-import { useLocation } from "@solidjs/router";
 
 type Post = Awaited<ReturnType<typeof getPostsFn>>[number]
 

@@ -116,7 +116,7 @@ export const notifications = pgTable("notifications", {
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     readAt: timestamp('read_at', { withTimezone: true }),
     actionUrl: text("action_url"),
-    type: varchar("type", { length: 30 }).$type<"LIKE" | "REPLY" | "MENTION" | "FOLLOW" | "SYSTEM">(),
+    type: varchar("type", { length: 30 }).$type<"LIKE" | "REPLY" | "MENTION" | "FOLLOW" | "SQUAD" | "SYSTEM">(),
     title: text(),
     message: text(),
     entityType: varchar("entity_type", { length: 50 }),

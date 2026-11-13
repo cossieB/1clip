@@ -44,3 +44,8 @@ export const UpdateUserSchema = z.object({
     location: z.string().max(100).nullish(),
     links: z.string().array().transform(arr => arr.slice(0, 5)).optional()
 })
+
+export const GetUserSchema = z.union([
+  z.object({ id: z.string(), username: z.string().optional() }),
+  z.object({ id: z.string().optional(), username: z.string() }),
+]);

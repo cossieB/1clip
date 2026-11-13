@@ -8,6 +8,7 @@ import { respond } from "@solidjs/web";
 import { ensureVerified } from "../auth/utils/ensureAuth";
 import { DrizzleQueryError } from "drizzle-orm";
 import { rateLimiter } from "~/utils/rateLimiter.server";
+import { addNotification } from "../notifications/addNotification";
 
 export const getSquadsFn = GET(async (filter: z.input<typeof GetSquadsSchema>) => {
     'use server'
@@ -68,10 +69,19 @@ export async function applyToSquadFn(input: z.input<typeof ApplyToSquadSchema>) 
     const userSession = await ensureVerified()
     await rateLimiter("squad:apply", userSession.user.id, 10, 60)
     try {
-        await squadsRepository.createSquadApplication({
+        const application = await squadsRepository.createSquadApplication({
             candidateId: userSession.user.id,
             squadId: data.id,
             message: data.message
+        })
+        void addNotification([{userId: application.squadCreatorId}], {
+            actionUrl: `/squads/${application.squadId}`,
+            message: `${userSession.user.displayUsername} wants to join your crew`,
+            entityId: application.squadId,
+            entityType: "squads",
+            sourceUserId: userSession.user.id,
+            title: "Your squad is growing",
+            type: "SQUAD"
         })
     }
     catch (error) {
@@ -91,12 +101,21 @@ export async function updateSquadApplicationFn(input: z.input<typeof UpdateAppli
     'use server'
     const data = zodSafeParse(UpdateApplicationSchema, input)
     const userSession = await ensureVerified()
-    await squadsRepository.updateSquadApplication(data.applicationId, data.status, userSession.user.id)
+    const updated = await squadsRepository.updateSquadApplication(data.applicationId, data.status, userSession.user.id)
+    if (updated.status == "accepted") void addNotification([{userId: updated.candidateId}], {
+            actionUrl: `/squads/${updated.squadId}`,
+            message: `${userSession.user.displayUsername} has accepted your application`,
+            entityId: updated.squadId,
+            entityType: "squads",
+            sourceUserId: userSession.user.id,
+            title: "Chosen One",
+            type: "SQUAD"        
+    }) 
 }
 
 export async function deleteSquadApplicationFn(id: number) {
     'use server'
     const data = zodSafeParse(z.int(), id)
     const userSession = await ensureVerified()
-    return squadsRepository.deleteSquadApplication(data, userSession.user.id)
+    await squadsRepository.deleteSquadApplication(data, userSession.user.id)
 }

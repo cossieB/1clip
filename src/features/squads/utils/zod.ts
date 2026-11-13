@@ -3,9 +3,12 @@ import z from "zod";
 export const GetSquadsSchema = z.object({
     gameId: z.int(),
     userId: z.string(),
+    username: z.string().toLowerCase(),
     limit: z.int(),
     cursor: z.number()
 }).partial().optional()
+
+export type SquadFilters = z.input<typeof GetSquadsSchema>
 
 export const SquadCreateSchema = z.object({
     gameId: z.int().nullish(),
