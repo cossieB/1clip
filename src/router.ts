@@ -18,6 +18,7 @@ import { UserIdLayout } from './features/users/pages/user[id].layout';
 import { UserPosts } from './features/users/pages/user[id].posts';
 import { UserSquads } from './features/users/pages/user[id].squads';
 import { UserIdIndex } from './features/users/pages/user[id].index';
+import { GameIdPage } from './features/games/pages/game[id]';
 
 
 // Link preloading is opt-in. intentPreload() is the hover/focus/touch
@@ -54,8 +55,6 @@ export const Router = createRouter({
                         }
                     ]
                 }, {
-                    component: CreatePostLayout,
-                },{
                     path: "/posts",
                     component: PostsPage,
                     search: z.object({
@@ -83,7 +82,7 @@ export const Router = createRouter({
                     component: SquadsPage,
                     search: z.object({
                         gameId: z.string().optional()
-                    }).optional()                    
+                    }).optional()
                 }, {
                     path: "/users/:username",
                     component: UserIdLayout,
@@ -96,8 +95,12 @@ export const Router = createRouter({
                             component: UserSquads
                         }
                     ]
+                }, {
+                    path: "/games/:gameId",
+                    component: GameIdPage
                 }
             ],
+
         }
     ]
 });

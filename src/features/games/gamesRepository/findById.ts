@@ -65,12 +65,12 @@ export async function findById(gameId: number) {
             .groupBy(media.gameId)
     )
 
-    const [result] = await db
+    const query = db
         .with(actorQuery, platformQuery, genresQuery, mediaQuery)
         .select({
             ...gamesColumns,
-            publisher: { ...getColumns(companies) },
-            developer: { ...getColumns(companies) },
+            publisher: { ...getColumns(publishers) },
+            developer: { ...getColumns(developers) },
             genres: sql<string[]>`COALESCE(${genresQuery.tags}, '{}')`,
             platforms: sql<Platform[]>`COALESCE(${platformQuery.platformArr}, '[]'::JSONB)`,
             actors: sql<(Actor & Appearances)[]>`COALESCE(${actorQuery.actorArr}, '[]'::JSONB)`,
@@ -87,6 +87,8 @@ export async function findById(gameId: number) {
 
     type Result = typeof result
     type Output = ForceNotNull<Result, 'developer' | 'publisher'>
+console.log(query.toSQL())
 
+const [result] = await query
     return result as Output | undefined
 }

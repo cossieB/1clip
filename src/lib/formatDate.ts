@@ -19,3 +19,24 @@ export function formatDate(input: Date | string) {
     }
     return input.toLocaleString(undefined, { dateStyle: 'long', timeStyle: 'medium' })
 }
+
+
+export function formatIsoDate(isoString: string) {
+    if (typeof Temporal === 'undefined') {
+        return isoString;
+    }
+
+    try {
+        const date = isoString.includes('T')
+            ? Temporal.Instant.from(isoString).toZonedDateTimeISO('UTC')
+            : Temporal.PlainDate.from(isoString);
+
+        return date.toLocaleString('en-za', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        });
+    } catch {
+        return isoString;
+    }
+}

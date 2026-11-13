@@ -23,7 +23,7 @@ export const getGamesFn = GET(async (filters: z.input<typeof GetGamesSchema>) =>
 
 export const getGameFn = GET(async (gameId: number) => {
     'use server'
-    const data = zodSafeParse(z.number().positive(), gameId)
+    const data = zodSafeParse(z.number().positive(), gameId);
     const game = await gamesRepository.findById(data);
     return respond(game ?? null, {
         headers: {

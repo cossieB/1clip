@@ -1,0 +1,77 @@
+.carousel {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    --idx: 0;
+
+    >div {
+        aspect-ratio: 16 / 9;
+        object-fit: cover;
+        width: 100%;
+        flex-shrink: 0;
+        translate: calc(0% - var(--idx) * 100%);
+        transition: translate 200ms ease-in-out;
+        overflow: hidden;
+        box-shadow: 0 0 10px 1px black;
+        display: flex;
+        justify-content: center;
+        background-color: var(--surface-2);
+    }
+
+    @media (width > 1024px) {
+        gap: 0.5rem;
+
+        >div {
+            width: 50%;
+            translate: calc(50% - var(--idx) * 100%);
+
+        }
+    }
+}
+
+.navBtns {
+    all: unset;
+    padding: 0.25rem;
+    height: 1.5rem;
+    width: 1.5rem;
+    background-color: oklch(from var(--pink) l c h / 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    translate: 0 -50%;
+
+    &:hover {
+        background-color: var(--pink);
+    }
+
+    &:last-of-type {
+        right: 0;
+    }
+}
+
+.notches {
+    width: 100%;
+    justify-content: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 0.5rem auto;
+
+    >button {
+        all: unset;
+        width: 1rem;
+        height: 1rem;
+        background-color: var(--surface-2);
+        transition: background-color 250ms ease-in-out;
+
+        &.active {
+            background-color: var(--accent);
+        }
+    }
+}
+
+.media img, video {
+    object-fit: contain;
+}

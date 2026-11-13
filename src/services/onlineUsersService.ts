@@ -1,6 +1,6 @@
-import { User } from "better-auth";
-import { AuthUser } from "~/features/auth/authClient";
+import { type AuthUser } from "~/features/auth/authClient";
 import { redis } from "~/utils/redis";
+import "server-only"
 
 type UserStatus = {
     gameId: number,
