@@ -1,4 +1,4 @@
-import { and, eq, exists, getColumns, sql, SQL } from "drizzle-orm";
+import { and, count, eq, exists, getColumns, sql, SQL } from "drizzle-orm";
 import { db } from "~/drizzle/db";
 import { User } from "~/drizzle/models";
 import { commentLikes, comments, followerFollowee, postLikes, posts } from "~/drizzle/schema";
@@ -7,7 +7,7 @@ import z from "zod";
 import { GetUserSchema } from "./utils/zod";
 import "server-only"
 
-export async function findUser(input: z.input<typeof GetUserSchema>) {
+export async function findUser(input: z.input<typeof GetUserSchema>, loggedInUserId?: string) {
     const { email, emailVerified, createdAt, updatedAt, ...rest } = getColumns(users)
     if (!input.id && !input.username) {
         return null;
@@ -15,27 +15,14 @@ export async function findUser(input: z.input<typeof GetUserSchema>) {
 
     const mainCondition = input.id ? eq(users.id, input.id) : eq(users.username, input.username!);
 
-    const [user] = await db.select({
-        ...rest,
-        joined: users.createdAt,
-        links: users.links,        
-    })
-        .from(users)
-        .where(mainCondition)
-
-    return user ?? null
-}
-
-export async function findByUsername(username: string, loggedInUserId?: string) {
-    const { email, emailVerified, createdAt, updatedAt, ...rest } = getColumns(users)
     const sub = db.$with("sub").as(
         db.select({
             userId: users.id,
         })
             .from(users)
-            .where(eq(users.username, username))
+            .where(mainCondition)
     )
-    const rows = await db.with(sub).select({
+    const [user] = await db.with(sub).select({
         ...rest,
         joined: users.createdAt,
         links: users.links,
@@ -55,7 +42,8 @@ export async function findByUsername(username: string, loggedInUserId?: string) 
         .innerJoin(sub, eq(sub.userId, users.id))
         .where(eq(users.id, sub.userId))
 
-    return rows.at(0)
+    return user
+
 }
 
 export async function updateUser(userId: string, user: Partial<User>) {
@@ -65,20 +53,39 @@ export async function updateUser(userId: string, user: Partial<User>) {
     })
 }
 
-export async function followUser(followerId: string, followeeId: string) {
-    return db.execute(sql`
-            WITH deleted AS (
-                DELETE FROM ${followerFollowee}
-                WHERE ${followerFollowee.followerId} = ${followerId} AND ${followerFollowee.followeeId} = ${followeeId}
-                RETURNING follower_id, followee_id
-            )
-            INSERT INTO ${followerFollowee} (follower_id, followee_id)
-            SELECT ${followerId}, ${followeeId}
-            WHERE NOT EXISTS (
-                SELECT 1 FROM deleted WHERE follower_id = ${followerId} AND followee_id = ${followeeId}
-            )
-            RETURNING *
-        `)
+export async function toggleFollow(targetUserId: string, currentUserId: string) {
+
+
+    return db.transaction(async tx => {
+        const [target] = await tx
+            .select({ id: users.id })
+            .from(users)
+            .where(eq(users.id, targetUserId))
+            .limit(1);
+
+        if (!target) return null;
+
+        // Try to unfollow first; if a row was removed, we're done
+        const removed = await tx
+            .delete(followerFollowee)
+            .where(and(
+                eq(followerFollowee.followerId, currentUserId),
+                eq(followerFollowee.followeeId, targetUserId)
+            ))
+            .returning({ followerId: followerFollowee.followerId });
+
+        let following = false;
+
+        if (removed.length === 0) {
+            await tx
+                .insert(followerFollowee)
+                .values({ followerId: currentUserId, followeeId: targetUserId })
+                .onConflictDoNothing();
+            following = true;
+        }
+
+        return { following };
+    });
 }
 
 export async function calculateXP(userId: string) {

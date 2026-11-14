@@ -18,7 +18,7 @@
     grid-template-columns: subgrid;
     align-items: center;
     min-height: 2.5rem;
-    background-color: var(--gray1);
+    background-color: var(--surface-1);
     padding: 0.5rem;
     border-radius: 0 0.5rem;
     corner-shape: bevel;
@@ -33,8 +33,8 @@
     }
 
     svg {
-        color: var(--neon-green);
-        /* fill: var(--neon-green); */
+        color: var(--accent);
+        /* fill: var(--accent); */
         flex-shrink: 0;
 
         @media (width > 768px) {
@@ -42,7 +42,7 @@
         }
 
         &:last-child {
-            color: var(--neon-pink);
+            color: var(--pink);
         }
     }
 
@@ -64,7 +64,7 @@
         cursor: pointer;
 
         svg {
-            color: var(--neon-green) !important;
+            color: var(--accent) !important;
         }
 
         span {

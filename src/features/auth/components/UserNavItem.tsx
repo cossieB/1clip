@@ -1,4 +1,4 @@
-import { action, createMemo, createOptimisticStore, isPending, Loading, refresh, Show } from "solid-js"
+import { action, createMemo, createOptimisticStore, isPending, Loading, refresh, Show, useContext } from "solid-js"
 import styles from "./UserNavItem.module.css"
 import env from "virtual:solid-env/client"
 import { HoldClickBtn } from "~/components/HoldClickBtn/HoldClickBtn"
@@ -6,6 +6,7 @@ import { session, useLogout } from "../authApi"
 import { SearchAutocomplete } from "~/components/SearchAutocomplete/SearchAutocomplete"
 import { getGamesFn } from "~/features/games/gamesApi"
 import { getStatusFn, setStatusFn } from "~/features/users/userApi"
+import { ToastContext } from "~/components/Toast/ToastProvider"
 
 type G = {
     gameId: number
@@ -18,11 +19,21 @@ export function UserNavItem() {
         gameId: -1,
         title: "In Lobby"
     })
-
+    const {addToast} = useContext(ToastContext)
     const update = action(function* (game: G) {
-        setStatus(s => game)
-        yield setStatusFn(game)
-        refresh(status)
+        try {
+            setStatus(() => game)
+            yield setStatusFn(game)
+            refresh(status)
+        } 
+        catch (error) {
+            addToast({
+                text: error instanceof Error && error.message
+                    ? error.message
+                    : "Something went wrong. Please try again later.",
+                type: "error"
+            })            
+        }
     })
 
     return (

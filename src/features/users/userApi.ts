@@ -1,5 +1,5 @@
 import { query } from "@solidjs/router";
-import { getRequestEvent, redirect, respond } from "@solidjs/web";
+import { redirect, respond } from "@solidjs/web";
 import z from "zod";
 import * as userRepository from "./userRepository"
 import { getCurrentUser } from "../auth/serverFn";
@@ -9,19 +9,21 @@ import { GET } from "@solidjs/web/server-functions/server";
 import { storageService } from "~/integrations/storageService/index.server";
 import { orphanedFileService } from "~/services/orphanedFileService";
 import { zodSafeParse } from "~/utils/zodSafeParse";
-import { ensureAuthed, ensureVerified } from "../auth/utils/ensureAuth";
-import { redis } from "~/utils/redis";
+import { ensureVerified } from "../auth/utils/ensureAuth";
 import { OnlineUsersService } from "~/services/onlineUsersService";
 import { broadcast } from "@solidjs/web/server-functions";
 import { sleep } from "~/lib/sleep";
+import { rateLimiter } from "~/utils/rateLimiter.server";
+import { addNotification } from "../notifications/addNotification";
 
 export const getUser = query(async (input: z.input<typeof GetUserSchema>) => {
     'use server'
     const data = zodSafeParse(GetUserSchema, input)
-    const user = await userRepository.findUser(data)
+    const userSession = await getCurrentUser()
+    const user = await userRepository.findUser(data, userSession?.user.id)
     return respond(user, {
         headers: {
-            "Cache-Control": "private, max-age=60"
+            // "Cache-Control": "private, max-age=60"
         }
     })
 }, "user")
@@ -78,16 +80,6 @@ export const getStatusFn = async (userId?: string) => {
     return status
 }
 
-export const getOnlineUsers = GET(async () => {
-    'use server'
-    const statuses = await OnlineUsersService.getOnlineUsers()
-    return respond(statuses, {
-        headers: {
-            "Cache-Control": "public, max-age=900"
-        }
-    })
-})
-
 const POLL_MS = 5_000;
 
 export const watchOnlineUsers = broadcast(async function* () {
@@ -103,3 +95,24 @@ export const watchOnlineUsers = broadcast(async function* () {
         await sleep(POLL_MS)
     }
 })
+
+export async function toggleFollowFn(targetUserId: string) {
+    'use server'
+    const userSession = await ensureVerified()
+    if (targetUserId === userSession.user.id) {
+        throw respond(new Error("You can't follow yourself."));
+    }
+    await rateLimiter("user:follow", userSession.user.id, 10, 60)
+    const res = await userRepository.toggleFollow(targetUserId, userSession.user.id)
+
+    if (res?.following) {
+        void addNotification([{ userId: targetUserId }], {
+            actionUrl: "/users/" + userSession.user.username,
+            type: "FOLLOW",
+            title: `You have a new follower!`,
+            message: `${userSession.user.displayUsername} has followed you.`,
+            sourceUserId: userSession.user.id,
+        })
+    }
+    return res
+}

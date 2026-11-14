@@ -8,6 +8,7 @@ import styles from "./user[id].module.css"
 import { mediaSrc } from "~/utils/mediaSrc";
 import { session } from "~/features/auth/authApi";
 import { NavTabs } from "~/NavTabs/NavTabs";
+import { FollowBtn } from "../components/FollowBtn";
 
 export function UserIdLayout(props: ParentProps) {
     const params = useParams(paths.users)
@@ -52,15 +53,14 @@ function Page(props: { user: NonNullable<AwaitedReturn<typeof getUser>> }) {
                 </div>
                 <div class={styles.actions}>
                     <Loading>
-
-                    <Switch>
-                        <Match when={session().data?.user.id === props.user.id}>
-                            <a class="button ghost" href={paths.profile()}>Edit Profile</a>
-                        </Match>
-                        <Match when={session().data?.user.id}>
-                            <button>Follow</button>
-                        </Match>
-                    </Switch>
+                        <Switch>
+                            <Match when={session().data?.user.id === props.user.id}>
+                                <a class="button ghost" href={paths.profile()}>Edit Profile</a>
+                            </Match>
+                            <Match when={session().data?.user.id}>
+                                <FollowBtn isFollowing={!!props.user.isFollowing} targetUserId={props.user.id} />
+                            </Match>
+                        </Switch>
                     </Loading>
                 </div>
             </header>
@@ -81,7 +81,7 @@ function Page(props: { user: NonNullable<AwaitedReturn<typeof getUser>> }) {
                         {link => {
                             const url = new URL(link);
                             const display = `${url.host}${url.pathname}`
-                            return <a href={link}> {display} </a>
+                            return <a target="_blank" rel="noopener" href={link}> {display} </a>
                         }}
                     </For>
                 </div>

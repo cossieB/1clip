@@ -1,12 +1,12 @@
-import { createEffect, createMemo, For, Loading } from "solid-js"
+import { createMemo, For, Loading } from "solid-js"
 import styles from "./FriendsOnline.module.css"
-import { getOnlineUsers, watchOnlineUsers } from "~/features/users/userApi"
+import { watchOnlineUsers } from "~/features/users/userApi"
 import z from "zod"
 import { mediaSrc } from "~/utils/mediaSrc"
 import { UserListSkeleton } from "../Skeletons/Skeletons"
 
 export function UsersOnline() {
-    const usersOnline = createMemo(() => watchOnlineUsers())
+    const usersOnline = createMemo(() => watchOnlineUsers(), {ssrSource: "client"})
     return (
         <section class="card">
             <h2>Online</h2>

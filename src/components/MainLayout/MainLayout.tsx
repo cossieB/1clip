@@ -15,7 +15,6 @@ export default function MainLayout(props: ParentProps) {
 
     return (
         <div class={styles.shell}>
-
             {/* <!-- LEFT RAIL --> */}
             <nav class={styles.rail} aria-label="Main">
                 <div class={styles.brand}>1Clip</div>

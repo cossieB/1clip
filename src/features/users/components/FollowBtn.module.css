@@ -1,0 +1,29 @@
+.follow {
+    display: inline-grid;
+    min-inline-size: 7.5rem;
+    justify-items: center;
+}
+
+.label {
+    grid-area: 1 / 1;
+}
+
+.hover {
+    visibility: hidden;
+}
+
+@media (hover: hover) {
+    .follow[aria-pressed="true"]:hover:not(:disabled) {
+        color: var(--danger);
+        border-color: var(--danger);
+        background: color-mix(in oklch, var(--danger) 14%, transparent);
+
+        .idle {
+            visibility: hidden;
+        }
+
+        .hover {
+            visibility: visible;
+        }
+    }
+}

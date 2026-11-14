@@ -1,36 +1,40 @@
 import { useNotifications } from "~/features/notifications/hooks/useNotificationContext";
-import { For, Show } from "solid-js";
-import { AtSignIcon, MailCheckIcon, MailIcon, MailOpenIcon, MessageCircleIcon, SettingsIcon, ThumbsUpIcon, UserPlusIcon } from "@lucide/solid";
+import { For, isPending, Loading, Show } from "solid-js";
+import { AtSignIcon, HandshakeIcon, MailCheckIcon, MailIcon, MailOpenIcon, MessageCircleIcon, SettingsIcon, ThumbsUpIcon, UserPlusIcon } from "@lucide/solid";
 import { getRelativeTime } from "~/lib/getRelativeTime";
 import styles from "./Notifications.module.css"
 import { Notification } from "~/drizzle/models";
 import { Dynamic } from "@solidjs/web";
+import { notificationsMemo } from "../notificationsApi";
 
 export function NotificationsList() {
-    const { notifications, markAsRead } = useNotifications()
+    const markAsRead = useNotifications()
 
     return (
         <div class={styles.notifList}>
-            <button
-                class={styles.notification}
-                onClick={() => {
-                    const ids = notifications.filter(n => !n.readAt).map(n => n.notificationId)
-                    if (!ids.length) return
-                    markAsRead(ids)
-                }}
-            >
-                <span class={styles.markRead} >
-                    {notifications.length > 0 ? "Mark All As Read" : "No Notifications"}
-                </span>
-                <Show 
-                    when={notifications.length > 0}
+            <Loading>
+
+                <button
+                    class={styles.notification}
+                    onClick={() => {
+                        const ids = notificationsMemo.filter(n => !n.readAt).map(n => n.notificationId)
+                        if (!ids.length) return
+                        markAsRead(ids)
+                    }}
                 >
-                    <MailCheckIcon />
-                </Show>
-            </button>
-            <For each={notifications}>
-                {notification => <Notif notification={notification} />}
-            </For>
+                    <span class={styles.markRead} >
+                        {notificationsMemo.length > 0 ? "Mark All As Read" : "No Notifications"}
+                    </span>
+                    <Show
+                        when={notificationsMemo.length > 0}
+                    >
+                        <MailCheckIcon />
+                    </Show>
+                </button>
+                <For each={notificationsMemo}>
+                    {notification => <Notif notification={notification} />}
+                </For>
+            </Loading>
         </div>
     )
 }
@@ -40,15 +44,16 @@ const icons = {
     REPLY: MessageCircleIcon,
     MENTION: AtSignIcon,
     FOLLOW: UserPlusIcon,
-    SYSTEM: SettingsIcon
+    SYSTEM: SettingsIcon,
+    SQUAD: HandshakeIcon
 }
 
 type Props = {
-    notification: Notification;
+    notification: Notification & {pending?: boolean};
 };
 
 function Notif(props: Props) {
-    const { markAsRead } = useNotifications()
+    const markAsRead = useNotifications()
     const markRead = () => {
         if (!props.notification.readAt)
             markAsRead([props.notification.notificationId])
@@ -57,7 +62,7 @@ function Notif(props: Props) {
         <div
             class={styles.notification}
         >
-            <Dynamic component={icons[props.notification.type ?? "MENTION"]} />
+            <Dynamic component={icons[props.notification.type ?? "SYSTEM"]} />
             <div class={styles.message}>
                 {props.notification.message}
             </div>
@@ -74,6 +79,9 @@ function Notif(props: Props) {
                 onClick={e => {
                     e.preventDefault();
                     markRead()
+                }}
+                style={{
+                    opacity: props.notification.pending ? 0.5 : undefined
                 }}
             >
                 <Show

@@ -4,7 +4,7 @@ import { getTrendingFn } from "~/features/posts/postsApi"
 import { paths } from "~/router"
 
 export function Trending() {
-    const trending = createMemo(() => getTrendingFn())
+    const trending = createMemo(() => getTrendingFn(), {ssrSource: "client"})
     return (
         <section class="card">
             <Loading>

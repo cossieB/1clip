@@ -23,8 +23,6 @@ export function SquadList(props: Props) {
             cursor: cursor()
         })
         return [...prev, ...next]
-    }, {
-        id: "squadId"
     })
 
     let observer: IntersectionObserver

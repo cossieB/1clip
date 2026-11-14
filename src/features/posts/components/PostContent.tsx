@@ -36,10 +36,11 @@ function renderContent(content: string): Element[] {
             // "see https://example.com." shouldn't swallow the full stop
             const raw = match.groups.url
             const trailing = TRAILING_PUNCTUATION.exec(raw)?.[0] ?? ""
-            const url = trailing ? raw.slice(0, -trailing.length) : raw
+            const urlString = trailing ? raw.slice(0, -trailing.length) : raw;
+            const url = new URL(urlString)
             nodes.push(
-                <a class={styles.link} href={url} target="_blank" rel="noopener noreferrer">
-                    {url}
+                <a class={[styles.link, styles.external]} href={urlString} target="_blank" rel="noopener">
+                    {url.host + url.pathname}
                 </a>,
             )
             if (trailing) nodes.push(trailing)

@@ -26,7 +26,8 @@ export const UpdateSquadSchema = SquadCreateSchema
 
 export const GetApplicationsSchema = z.object({
     squadId: z.int(),
-    cursor: z.int().optional()
+    cursor: z.int().optional(),
+    limit: z.int().default(20)
 })
 
 export const ApplyToSquadSchema = z.object({

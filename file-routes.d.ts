@@ -53,6 +53,13 @@ declare module "virtual:file-routes" {
       $POST: FileRouteLazyRef<Pick<typeof import("./src/routes/api/auth/[...auth]"), Extract<"POST", keyof typeof import("./src/routes/api/auth/[...auth]")>>>;
       $HEAD: FileRouteLazyRef<Pick<typeof import("./src/routes/api/auth/[...auth]"), Extract<"GET", keyof typeof import("./src/routes/api/auth/[...auth]")>>>;
       $$route?: undefined;
+    },
+    {
+      path: "/api/notifications";
+      page: false;
+      $GET: FileRouteLazyRef<Pick<typeof import("./src/routes/api/notifications"), Extract<"GET", keyof typeof import("./src/routes/api/notifications")>>>;
+      $HEAD: FileRouteLazyRef<Pick<typeof import("./src/routes/api/notifications"), Extract<"GET", keyof typeof import("./src/routes/api/notifications")>>>;
+      $$route?: undefined;
     }
   ];
   export default routes;

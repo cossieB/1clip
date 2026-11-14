@@ -247,11 +247,16 @@ function ApplicationsDialog(props: ParentProps<{ onClose: () => void, id: number
     const applications = createMemo(async (prev: AwaitedReturn<typeof getSquadApplicationsFn> = []) => {
         const next = await getSquadApplicationsFn({
             squadId: props.id,
-            cursor: cursor()
+            cursor: cursor(),
         })
-        return [...prev, ...next]
+        const nextIds = new Set(next.map(x => x.applicationId))
+
+        return [
+            ...prev.filter(x => !nextIds.has(x.applicationId)),
+            ...next]
+
     }, {
-        id: "applicationId"
+        
     })
     createEffect(
         () => applications.length,

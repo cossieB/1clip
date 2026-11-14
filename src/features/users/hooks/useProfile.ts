@@ -40,7 +40,12 @@ export function useProfile() {
         }
         catch (error) {
             console.error(error)
-            addToast({ text: "Something went wrong. Please try again later", type: "error" })
+            addToast({
+                text: error instanceof Error && error.message
+                    ? error.message
+                    : "Something went wrong. Please try again later.",
+                type: "error"
+            })
         }
     })
 

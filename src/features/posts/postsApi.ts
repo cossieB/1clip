@@ -77,7 +77,7 @@ export const getPostFn = GET(async (postId: number) => {
     const post = await postRepository.findById(data, userSession?.user.id);
     return respond(post ?? null, {
         headers: {
-            "Cache-Control": "private, max-age=600"
+            // "Cache-Control": "private, max-age=600"
         }
     })
 })
@@ -89,7 +89,7 @@ export const getPostsFn = GET(async (filters: z.input<typeof GetPostSchema> = {}
     const post = await postRepository.findAll(data, userSession?.user.id)
     return respond(post, {
         headers: {
-            "Cache-Control": "private, max-age=600"
+            // "Cache-Control": "private, max-age=600"
         }
     })
 })

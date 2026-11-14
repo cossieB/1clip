@@ -17,7 +17,7 @@ export const getSquadsFn = GET(async (filter: z.input<typeof GetSquadsSchema>) =
     const squads = await squadsRepository.findAll(data, userSession?.user.id)
     return respond(squads, {
         headers: {
-            "Cache-Control": "private, max-age=60"
+            // "Cache-Control": "private, max-age=60"
         }
     })
 })
@@ -29,7 +29,7 @@ export const getSquadFn = GET(async (id: number) => {
     const squad = await squadsRepository.findById(data, userSession?.user.id)
     return respond(squad, {
         headers: {
-            "Cache-Control": "private, max-age=60"
+            // "Cache-Control": "private, max-age=60"
         }
     })
 })
@@ -58,7 +58,7 @@ export const getSquadApplicationsFn = GET(async (arg: z.input<typeof GetApplicat
     const applications = await squadsRepository.findSquadApplications(data.squadId, userSession.user.id, { cursor: data.cursor })
     return respond(applications, {
         headers: {
-            "Cache-Control": "private, max-age=60"
+            // "Cache-Control": "private, max-age=60"
         }
     })
 })

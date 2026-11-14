@@ -23,6 +23,8 @@ import { GamesPage } from './features/games/pages/games';
 import { CompanyIdRoute } from './features/companies/pages/company[id]';
 import { ActorIdRoute } from './features/actors/pages/actor[id]';
 import { PlatformIdRoute } from './features/platforms/pages/platform[id]';
+import { NotificationsRoute } from './features/notifications/pages/notifications';
+import { ensureAuthOrRedirect } from './features/auth/utils/ensureAuth';
 
 
 // Link preloading is opt-in. intentPreload() is the hover/focus/touch
@@ -115,6 +117,10 @@ export const Router = createRouter({
                 }, {
                     path: "/platforms/:platformId",
                     component: PlatformIdRoute
+                }, {
+                    path: "/notifications",
+                    component: NotificationsRoute,
+                    preload: () => void ensureAuthOrRedirect()
                 }
             ],
 
