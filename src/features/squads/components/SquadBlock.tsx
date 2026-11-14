@@ -6,15 +6,17 @@ import { PostContent } from "~/features/posts/components/PostContent"
 import { SquadWithDetails } from "../squadsRepository"
 import { ToastContext } from "~/components/Toast/ToastProvider"
 import { mediaSrc } from "~/utils/mediaSrc"
-import { applyToSquadFn, getSquadApplicationsFn, updateSquadFn } from "../squadsApi"
+import { applyToSquadFn, deleteSquadFn, getSquadApplicationsFn, updateSquadFn } from "../squadsApi"
 import { ApplicationBlock } from "./ApplicationBlock"
 import { getRelativeTime } from "~/lib/getRelativeTime"
 import { AwaitedReturn } from "~/lib/utilityTypes"
 import { session } from "~/features/auth/authApi"
+import { HoldClickBtn } from "~/components/HoldClickBtn/HoldClickBtn"
+import { TrashIcon } from "@lucide/solid"
 
 type Props = ParentProps<{
     squad: SquadWithDetails
-
+    onDelete: () => void
 }>
 
 export function SquadBlock(props: Props) {
@@ -74,6 +76,23 @@ export function SquadBlock(props: Props) {
 
     const created = () => new Date(props.squad.createdAt)
     const wasEdited = () => !!props.squad.editedOn
+
+    const [deleting, setDeleting] = createSignal(false)
+    const deleteAction = action(function* () {
+        setDeleting(true)
+        try {
+            yield deleteSquadFn(props.squad.squadId)
+            props.onDelete()
+        }
+        catch (error) {
+            addToast({
+                text: error instanceof Error && error.message
+                    ? error.message
+                    : "Something went wrong. Please try again later.",
+                type: "error"
+            })
+        }
+    })
 
     return (
         <article class={["card", styles.lfg]} data-squad-id={props.squad.squadId}>
@@ -187,6 +206,13 @@ export function SquadBlock(props: Props) {
                             Show applications
                         </button>
 
+                        <HoldClickBtn
+                            disabled={deleting()}
+                            action={async () => deleteAction()}
+                            label={<TrashIcon color="var(--danger)" />}
+
+                        />
+
                         <Show when={active()}>
                             <Show
                                 when={confirmingClose()}
@@ -256,7 +282,7 @@ function ApplicationsDialog(props: ParentProps<{ onClose: () => void, id: number
             ...next]
 
     }, {
-        
+
     })
     createEffect(
         () => applications.length,

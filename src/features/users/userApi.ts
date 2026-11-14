@@ -100,7 +100,7 @@ export async function toggleFollowFn(targetUserId: string) {
     'use server'
     const userSession = await ensureVerified()
     if (targetUserId === userSession.user.id) {
-        throw respond(new Error("You can't follow yourself."));
+        throw respond(new Error("You can't follow yourself."), {status: 400});
     }
     await rateLimiter("user:follow", userSession.user.id, 10, 60)
     const res = await userRepository.toggleFollow(targetUserId, userSession.user.id)

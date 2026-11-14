@@ -1,4 +1,4 @@
-import { useParams } from "@solidjs/router";
+import { useNavigate, useParams } from "@solidjs/router";
 import { PostBlock } from "../components/PostBlock";
 import { paths } from "~/router";
 import { createMemo, Loading, Show } from "solid-js";
@@ -12,6 +12,7 @@ import { SiteTitle } from "~/components/CustomSiteTitle";
 export function PostId() {
     const params = useParams(paths.posts)
     const post = createMemo(() => getPostFn(Number(params.postId)))
+    const navigate = useNavigate()
     httpHeader("Cache-Control", "private, max-age=600")
     return (
         <Loading fallback={<PostSkeleton />}>
@@ -22,7 +23,7 @@ export function PostId() {
                 {post => 
                     <div>
                         <SiteTitle> {post().title} </SiteTitle>
-                        <PostBlock post={post()} />
+                        <PostBlock post={post()} onDelete={() => navigate(paths.posts())} />
                         <CommentList postId={Number(params.postId)} />
                     </div>
                 }

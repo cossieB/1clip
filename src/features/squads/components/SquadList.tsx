@@ -3,6 +3,7 @@ import { getSquadsFn } from "../squadsApi";
 import { SquadBlock } from "./SquadBlock";
 import { session } from "~/features/auth/authApi";
 import { AwaitedReturn } from "~/lib/utilityTypes";
+import { ReactiveSet } from "@solid-primitives/set";
 
 type Props = {
     filters?: {
@@ -16,7 +17,7 @@ export function SquadList(props: Props) {
     const [cursor, setCursor] = createSignal<number>()
     let done = false
     let lastItem: HTMLElement | undefined
-    
+    const deleted = new ReactiveSet<number>()
     const squads = createMemo(async (prev: AwaitedReturn<typeof getSquadsFn> = []) => {
         const next = await getSquadsFn({
             ...props.filters,
@@ -55,9 +56,10 @@ export function SquadList(props: Props) {
 
     return (
         <Loading>
-            <For each={squads()}>
+            <For each={squads().filter(x => !deleted.has(x.squadId))}>
                 {squad => <SquadBlock
                     squad={squad}
+                    onDelete={() => deleted.add(squad.squadId)}
                 />}
             </For>
         </Loading>

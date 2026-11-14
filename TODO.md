@@ -2,7 +2,7 @@
 
 [ ] Mini profile
 
-[ ] Delete posts
+[x] Delete posts
 
 [ ] Admin pages
 

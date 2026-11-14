@@ -121,7 +121,9 @@ export async function deletePostFn(postId: number) {
     const userSession = await ensureVerified()
     await rateLimiter("post:delete", userSession.user.id, 5, 60)
     const result = await postRepository.deletePost(data, userSession.user.id);
-    return result.length > 0
+    if (result.length == 0) throw respond(new Error("Failed to delete"), {
+        status: 500
+    })
 }
 
 export async function viewPostFn(postId: number[]) {

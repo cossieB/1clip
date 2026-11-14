@@ -4,10 +4,12 @@ import { getPostsFn } from "../postsApi";
 import { useViewPost } from "../hooks/useViewPost";
 import { PostBlock } from "./PostBlock";
 import { PostSkeleton } from "~/components/Skeletons/Skeletons";
+import { ReactiveSet } from "@solid-primitives/set";
 
-type Post = Awaited<ReturnType<typeof getPostsFn>>[number]
+type Post = Awaited<ReturnType<typeof getPostsFn>>[number] & { deleted?: boolean }
 
 export function PostList(props: { filters?: PostFilters }) {
+    const deleted = new ReactiveSet<number>()
     const [cursor, setCursor] = createSignal<NonNullable<Parameters<typeof getPostsFn>[0]>['cursor']>()
     let lastPostId = -1
     let done = false
@@ -19,7 +21,7 @@ export function PostList(props: { filters?: PostFilters }) {
         if (next.length === 0) done = true
         return [...previous, ...next]
     }, {
-        id: "postId"
+
     })
     const addPostToSet = useViewPost()
 
@@ -53,8 +55,13 @@ export function PostList(props: { filters?: PostFilters }) {
 
     return (
         <Loading fallback={<Skeleton />}>
-            <For each={posts()}>
-                {post => <PostBlock post={post} />}
+            <For each={posts().filter(x => !deleted.has(x.postId))}>
+                {post => <PostBlock
+                    post={post}
+                    onDelete={() => {
+                        deleted.add(post.postId)
+                    }}
+                />}
             </For>
         </Loading>
     )

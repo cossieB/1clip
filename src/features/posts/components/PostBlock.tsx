@@ -1,9 +1,9 @@
-import { For, Loading, Show } from "solid-js"
+import { action, createSignal, For, Loading, Show, useContext } from "solid-js"
 import { PostContent } from "./PostContent"
 import styles from "./PostBlock.module.css"
 import { mediaSrc } from "~/utils/mediaSrc"
-import { toggleLikeFn, type getPostFn } from "../postsApi"
-import { HeartIcon, MessageCircleIcon } from "@lucide/solid"
+import { deletePostFn, toggleLikeFn, type getPostFn } from "../postsApi"
+import { HeartIcon, MessageCircleIcon, TrashIcon } from "@lucide/solid"
 import { RenderMedia } from "~/components/RenderMedia"
 import { extractFirstVideo } from "../utils/parsePost"
 import { IframeFactory } from "./IframeFactory"
@@ -11,12 +11,16 @@ import { useToggleLike } from "~/hooks/useToggleLike"
 import { getRelativeTime } from "~/lib/getRelativeTime"
 import { session } from "~/features/auth/authApi"
 import { paths } from "~/router"
+import { HoldClickBtn } from "~/components/HoldClickBtn/HoldClickBtn"
+import { ToastContext } from "~/components/Toast/ToastProvider"
 
 type Props = {
-    post: NonNullable<Awaited<ReturnType<typeof getPostFn>>>
+    post: NonNullable<Awaited<ReturnType<typeof getPostFn>>> & { deleted?: boolean }
+    onDelete: () => void
 }
 
 export function PostBlock(props: Props) {
+    const { addToast } = useContext(ToastContext)
     const { like, toggle } = useToggleLike({
         initial: () => ({
             liked: props.post.likedByCurrentUser,
@@ -27,6 +31,23 @@ export function PostBlock(props: Props) {
 
     const wasEdited = () => !!props.post.editedOn
     const externalVideo = () => extractFirstVideo(props.post.text)
+
+    const [deleting, setDeleting] = createSignal(false)
+    const deleteAction = action(function* () {
+        setDeleting(true)
+        try {
+            yield deletePostFn(props.post.postId)
+            props.onDelete()
+        }
+        catch (error) {
+            addToast({
+                text: error instanceof Error && error.message
+                    ? error.message
+                    : "Something went wrong. Please try again later.",
+                type: "error"
+            })
+        }
+    })
 
     return (
         <article class={["card", styles.post]} data-post-id={props.post.postId}>
@@ -99,6 +120,14 @@ export function PostBlock(props: Props) {
 
             <footer class={styles.footer}>
                 <div class={styles.actions}>
+                    <a
+                        class={styles.action}
+                        href={`/posts/${props.post.postId}#comments`}
+                        aria-label={`${props.post.commentCount} comments`}
+                    >
+                        <MessageCircleIcon />
+                        <span>{props.post.commentCount}</span>
+                    </a>
                     <Loading>
                         <button
                             type="button"
@@ -111,16 +140,16 @@ export function PostBlock(props: Props) {
                             <HeartIcon />
                             <span>{like().count}</span>
                         </button>
+                        <Show when={session().data?.user.id === props.post.author.id}>
+                            <HoldClickBtn
+                                disabled={deleting()}
+                                action={async () => deleteAction()}
+                                label={<TrashIcon color="var(--danger)" />}
+
+                            />
+                        </Show>
                     </Loading>
 
-                    <a
-                        class={styles.action}
-                        href={`/posts/${props.post.postId}#comments`}
-                        aria-label={`${props.post.commentCount} comments`}
-                    >
-                        <MessageCircleIcon />
-                        <span>{props.post.commentCount}</span>
-                    </a>
                 </div>
 
                 <span class={styles.views}>{props.post.views.toLocaleString("en")} views</span>

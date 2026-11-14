@@ -107,6 +107,15 @@ export async function findAll(args: SquadFilters = {}, currentUserId?: string) {
         .limit(limit);
 }
 
+export async function deleteSquad(squadId: number, userId: string) {
+    return db.delete(squads)
+        .where(and(
+            eq(squads.squadId, squadId),
+            eq(squads.userId, userId)
+        ))
+        .returning({ squadId: squads.squadId });
+}
+
 export type SquadWithDetails = Awaited<ReturnType<typeof findAll>>[number];
 
 export async function findById(

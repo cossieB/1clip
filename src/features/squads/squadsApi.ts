@@ -51,6 +51,17 @@ export async function updateSquadFn(input: z.input<typeof UpdateSquadSchema>) {
     await squadsRepository.updateSquad(lfgId, rest, userSession.user.id)
 }
 
+export async function deleteSquadFn(postId: number) {
+    'use server'
+    const data = zodSafeParse(z.int().positive(), postId)
+    const userSession = await ensureVerified()
+    await rateLimiter("post:delete", userSession.user.id, 5, 60)
+    const result = await squadsRepository.deleteSquad(data, userSession.user.id);
+    if (result.length == 0) throw respond(new Error("Failed to delete"), {
+        status: 500
+    })
+}
+
 export const getSquadApplicationsFn = GET(async (arg: z.input<typeof GetApplicationsSchema>) => {
     'use server'
     const data = zodSafeParse(GetApplicationsSchema, arg)

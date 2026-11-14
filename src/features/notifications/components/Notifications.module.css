@@ -1,14 +1,13 @@
 .notifList {
-    width: min(90%, 800px);
     margin: 0 auto;
     display: grid;
     gap: 0.5rem;
 
-    @media (width <=768px) {
+    @container (width <=600px) {
         grid-template-columns: max-content auto;
     }
 
-    @media (width > 768px) {
+    @container (width > 600px) {
         grid-template-columns: 3rem auto max-content max-content;
     }
 }
@@ -23,24 +22,21 @@
     border-radius: 0 0.5rem;
     corner-shape: bevel;
     position: relative;
+    gap: 1rem;
 
-    @media (width <=768px) {
+    @container (width <=600px) {
         grid-column: span 2;
     }
 
-    @media (width > 768px) {
+    @container (width > 600px) {
         grid-column: span 4;
     }
 
     svg {
         color: var(--accent);
-        /* fill: var(--accent); */
         flex-shrink: 0;
-
-        @media (width > 768px) {
-            justify-self: center;
-        }
-
+        justify-self: center;
+        
         &:last-child {
             color: var(--pink);
         }
@@ -53,7 +49,10 @@
         margin-left: auto;
     }
     button {
-        z-index: 50;    
+        z-index: 50; 
+        @container (width < 600px) {
+            padding: 0.5rem;
+        }
     }
     a {
         position: absolute;
@@ -68,7 +67,7 @@
         }
 
         span {
-            @media (width > 768px) {
+            @container (width > 600px) {
                 grid-column: span 3;
             }
 
@@ -76,7 +75,7 @@
         }
     }
 
-    @media (width <=768px) {
+    @container (width <=600px) {
         .time {
             grid-column-start: 2;
             grid-row-start: 2;
