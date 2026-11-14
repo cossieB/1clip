@@ -4,8 +4,8 @@ export const actorCreateSchema = z.object({
     name: z.string(),
     bio: z.string().optional(),
     characters: z.array(z.object({
-        appearanceId: z.number().optional(),
-        gameId: z.number(),
+        appearanceId: z.int().optional(),
+        gameId: z.int(),
         character: z.string(),
         roleType: z.enum(['player character', 'major character', 'minor character'])
     })),
@@ -13,5 +13,5 @@ export const actorCreateSchema = z.object({
 })
 
 export const actorEditSchema = actorCreateSchema.partial().extend({
-    actorId: z.number(),
+    actorId: z.int(),
 })

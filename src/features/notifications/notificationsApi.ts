@@ -21,7 +21,7 @@ export const getNotifications = GET(async () => {
 
 export async function markNotificationAsRead(notificationIds: number[]) {
     'use server'
-    const data = z.number().array().parse(notificationIds)
+    const data = z.int().array().parse(notificationIds)
     const userSession = await getCurrentUser();
     if (!userSession) throw respond("Unauthorized", {
         status: HttpStatusCode.UNAUTHORIZED

@@ -72,7 +72,7 @@ export async function createPostFn(p: z.input<typeof PostCreateSchema>) {
 
 export const getPostFn = GET(async (postId: number) => {
     'use server'
-    const data = zodSafeParse(z.number().positive(), postId)
+    const data = zodSafeParse(z.int().positive(), postId)
     const userSession = await getCurrentUser()
     const post = await postRepository.findById(data, userSession?.user.id);
     return respond(post ?? null, {
@@ -96,7 +96,7 @@ export const getPostsFn = GET(async (filters: z.input<typeof GetPostSchema> = {}
 
 export async function toggleLikeFn(postId: number) {
     'use server'
-    const data = zodSafeParse(z.number().positive(), postId)
+    const data = zodSafeParse(z.int().positive(), postId)
     const userSession = await ensureVerified()
     await rateLimiter("post:react", userSession.user.id, 10, 60)
     const res = await postRepository.toggleLike(data, userSession.user.id)
@@ -117,7 +117,7 @@ export async function toggleLikeFn(postId: number) {
 
 export async function deletePostFn(postId: number) {
     'use server'
-    const data = zodSafeParse(z.number().positive(), postId)
+    const data = zodSafeParse(z.int().positive(), postId)
     const userSession = await ensureVerified()
     await rateLimiter("post:delete", userSession.user.id, 5, 60)
     const result = await postRepository.deletePost(data, userSession.user.id);
@@ -126,7 +126,7 @@ export async function deletePostFn(postId: number) {
 
 export async function viewPostFn(postId: number[]) {
     'use server'
-    const data = zodSafeParse(z.number().array(), postId)
+    const data = zodSafeParse(z.int().array(), postId)
     if (data.length == 0) return;
     const ip = getRequestEvent()?.request.headers.get("cf-connecting-ip") || getRequestEvent()?.request.headers.get("x-forwarded-for");
     if (!ip) return;
@@ -139,7 +139,7 @@ export async function viewPostFn(postId: number[]) {
 
 export async function markPostUploadComplete(postId: number) {
     'use server'
-    const data = zodSafeParse(z.number().positive(), postId)
+    const data = zodSafeParse(z.int().positive(), postId)
     const userSession = await ensureVerified()
     const post = await postRepository.findById(data, undefined, true);
     if (!post) {

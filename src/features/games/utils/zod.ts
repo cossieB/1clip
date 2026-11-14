@@ -2,8 +2,8 @@ import z from "zod"
 
 export const GameCreateSchema = z.object({
     title: z.string(),
-    developerId: z.number(),
-    publisherId: z.number(),
+    developerId: z.int(),
+    publisherId: z.int(),
     banner: z.string(),
     cover: z.string(),
     summary: z.string().optional(),
@@ -14,30 +14,30 @@ export const GameCreateSchema = z.object({
         contentType: z.string(),
         metadata: z.record(z.string(), z.string()).optional()
     })),
-    platforms: z.number().array(),
+    platforms: z.int().array(),
     genres: z.string().array(),
     characters: z.array(z.object({
-        appearanceId: z.number().optional(),
-        actorId: z.number(),
+        appearanceId: z.int().optional(),
+        actorId: z.int(),
         character: z.string(),
         roleType: z.enum(['player character', 'major character', 'minor character'])
     })),
 })
 
-export const GameEditSchema = GameCreateSchema.partial().extend({ gameId: z.number() })
+export const GameEditSchema = GameCreateSchema.partial().extend({ gameId: z.int() })
 
 export const GetGamesSchema = z.object({
-    developerId: z.number(),
-    publisherId: z.number(),
-    actorId: z.number(),
-    platformId: z.number(),
+    developerId: z.int(),
+    publisherId: z.int(),
+    actorId: z.int(),
+    platformId: z.int(),
     genre: z.string(),
-    cursor: z.number(),
+    cursor: z.int(),
     fullTextSearch: z.string(),
     title: z.string()
 }).partial()
     .extend({
-        limit: z.number().default(50)
+        limit: z.int().default(50)
     })
     .optional()
 
@@ -46,7 +46,7 @@ export const GameFileSchema = z.object({
     files: z.array(z.object({
         filename: z.string(),
         contentType: z.string().startsWith("image/"),
-        contentLength: z.number().max(8 * 1024 * 1024),
+        contentLength: z.int().max(8 * 1024 * 1024),
         metadata: z.record(z.string(), z.string()).optional()
     }))
 })    

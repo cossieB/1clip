@@ -12,6 +12,8 @@ import { zodSafeParse } from "~/utils/zodSafeParse";
 import { ensureAuthed, ensureVerified } from "../auth/utils/ensureAuth";
 import { redis } from "~/utils/redis";
 import { OnlineUsersService } from "~/services/onlineUsersService";
+import { broadcast } from "@solidjs/web/server-functions";
+import { sleep } from "~/lib/sleep";
 
 export const getUser = query(async (input: z.input<typeof GetUserSchema>) => {
     'use server'
@@ -28,28 +30,28 @@ export async function updateUser(profile: z.input<typeof UpdateUserSchema>) {
     'use server'
     const data = zodSafeParse(UpdateUserSchema, profile)
     const userSession = await ensureVerified()
-try {
+    try {
         const old = (await userRepository.updateUser(userSession.user.id, data))[0]
         if (data.banner != old.oldBanner) {
             storageService.deleteObject(old.oldBanner);
             orphanedFileService.removePendingUpload(data.banner!)
         }
-    
+
         if (data.image != old.oldAvatar) {
             storageService.deleteObject(old.oldAvatar)
             orphanedFileService.removePendingUpload(data.image!)
         }
-} catch (error) {
-    console.error(error)
-    throw error
-}
+    } catch (error) {
+        console.error(error)
+        throw error
+    }
 }
 
 export const getProfile = GET(async () => {
     'use server'
     const session = await getCurrentUser()
     if (!session) throw redirect(paths({ dialog: "signin" }))
-    return getUser({id: session.user.id})
+    return getUser({ id: session.user.id })
 })
 
 const G = z.object({
@@ -61,15 +63,11 @@ export async function setStatusFn(game: z.input<typeof G>) {
     'use server'
     const data = zodSafeParse(G, game)
     const userSession = await ensureVerified()
-    const key = `userstatus:${userSession.user.id}`;
-    await redis.multi()
-        .hSet(key, {
-            ...data,
-            username: userSession.user.displayUsername!,
-            image: userSession.user.image!
-        })
-        .expire(key, 28800)
-        .exec()
+    await OnlineUsersService.setStatus(userSession.user.id, {
+        ...data,
+        username: userSession.user.displayUsername!,
+        image: userSession.user.image!
+    })
 }
 
 export const getStatusFn = async (userId?: string) => {
@@ -81,11 +79,27 @@ export const getStatusFn = async (userId?: string) => {
 }
 
 export const getOnlineUsers = GET(async () => {
-    'use server'    
+    'use server'
     const statuses = await OnlineUsersService.getOnlineUsers()
     return respond(statuses, {
         headers: {
             "Cache-Control": "public, max-age=900"
         }
     })
+})
+
+const POLL_MS = 5_000;
+
+export const watchOnlineUsers = broadcast(async function* () {
+    'use server'
+    let last = "";
+    while (true) {
+        const users = await OnlineUsersService.getOnlineUsers();
+        const next = JSON.stringify(users);
+        if (next !== last) {
+            last = next;
+            yield users;
+        }
+        await sleep(POLL_MS)
+    }
 })

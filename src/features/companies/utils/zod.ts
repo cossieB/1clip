@@ -1,6 +1,6 @@
 import z from "zod"
 
-export const developerCreateSchema = z.object({
+export const CompanyCreateSchema = z.object({
     name: z.string(),
     summary: z.string().default(""),
     location: z.string().nullish(),
@@ -8,6 +8,6 @@ export const developerCreateSchema = z.object({
     logo: z.string(),
 })
 
-export const developerEditSchema = developerCreateSchema.partial().extend({
-    developerId: z.number(),
+export const CompanyEditSchema = CompanyCreateSchema.partial().extend({
+    developerId: z.int(),
 })

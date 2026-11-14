@@ -55,6 +55,7 @@ export async function editActorFn(input: z.input<typeof actorEditSchema>) {
 }
 
 export const getActorsWithCharacters = GET(async (id: number) => {
+    'use server'
     const data = zodSafeParse(z.int(), id)
     const actor = await actorRepository.findActorWithGames(data)
     return respond(actor ?? null, {
@@ -65,6 +66,7 @@ export const getActorsWithCharacters = GET(async (id: number) => {
 })
 
 export const searchActorsFn = GET(async (name: string) => {
+    'use server'
     const data = zodSafeParse(z.string().nonempty(), name)
     const actors = await db.query.actors.findMany({
         where: {

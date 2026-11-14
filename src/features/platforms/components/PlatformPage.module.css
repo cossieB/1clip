@@ -1,0 +1,11 @@
+.container {
+    composes: container from "~/features/companies/components/CompanyPage.module.css";
+}
+
+.overview {
+    composes: overview from "~/features/companies/components/CompanyPage.module.css";
+}
+
+.logoContainer {
+    composes: logoContainer from "~/features/companies/components/CompanyPage.module.css";
+}

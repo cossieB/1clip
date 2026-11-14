@@ -56,7 +56,7 @@ export function GamePage(props: { game: NonNullable<AwaitedReturn<typeof getGame
                     <label>Tags</label>
                     <div class={styles.list}>
                         <For each={props.game.genres}>
-                            {genre => <span class={styles.item} > {genre} </span>}
+                            {genre => <a href={paths.games({genre})} class={styles.item} > {genre} </a>}
                         </For>
                     </div>
                 </div>
@@ -64,7 +64,7 @@ export function GamePage(props: { game: NonNullable<AwaitedReturn<typeof getGame
                     <label >Platforms</label>
                     <div class={styles.list}>
                         <For each={props.game.platforms}>
-                            {platform => <span class={styles.item} > {platform.name} </span>}
+                            {platform => <a href={paths.platforms(platform.platformId)} class={styles.item} > {platform.name} </a>}
                         </For>
                     </div>
                 </div>

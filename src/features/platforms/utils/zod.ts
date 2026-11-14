@@ -8,5 +8,5 @@ export const platformCreateSchema = z.object({
 })
 
 export const platformEditSchema = platformCreateSchema.partial().extend({
-    platformId: z.number(),
+    platformId: z.int(),
 })

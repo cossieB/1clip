@@ -1,0 +1,23 @@
+.container {
+    composes: container from "~/features/games/components/GamePage.module.css";
+    margin-bottom: 2rem;
+    h1 {
+        margin-top: 0.5rem;
+    }
+}
+
+.overview {
+    composes: overview from "~/features/games/components/GamePage.module.css";
+}
+
+.logoContainer {
+    display: flex;
+    background-color: var(--accent-wash);
+    justify-content: center;
+    align-items: center;
+    height: 10rem;
+
+    img {
+        height: 50%;
+    }
+}

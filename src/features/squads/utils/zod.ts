@@ -5,7 +5,7 @@ export const GetSquadsSchema = z.object({
     userId: z.string(),
     username: z.string().toLowerCase(),
     limit: z.int(),
-    cursor: z.number()
+    cursor: z.int()
 }).partial().optional()
 
 export type SquadFilters = z.input<typeof GetSquadsSchema>

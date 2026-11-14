@@ -17,9 +17,12 @@ import { SquadsPage } from './features/squads/pages/squads';
 import { UserIdLayout } from './features/users/pages/user[id].layout';
 import { UserPosts } from './features/users/pages/user[id].posts';
 import { UserSquads } from './features/users/pages/user[id].squads';
-import { GameIdPage } from './features/games/pages/game[id]';
+import { GameIdRoute } from './features/games/pages/game[id]';
 import { GetGamesSchema } from './features/games/utils/zod';
 import { GamesPage } from './features/games/pages/games';
+import { CompanyIdRoute } from './features/companies/pages/company[id]';
+import { ActorIdRoute } from './features/actors/pages/actor[id]';
+import { PlatformIdRoute } from './features/platforms/pages/platform[id]';
 
 
 // Link preloading is opt-in. intentPreload() is the hover/focus/touch
@@ -98,11 +101,20 @@ export const Router = createRouter({
                     ]
                 }, {
                     path: "/games/:gameId",
-                    component: GameIdPage
+                    component: GameIdRoute
                 }, {
                     path: "/games",
                     search: GetGamesSchema,
                     component: GamesPage
+                }, {
+                    path: "/companies/:companyId",
+                    component: CompanyIdRoute
+                }, {
+                    path: "/actors/:actorId",
+                    component: ActorIdRoute
+                }, {
+                    path: "/platforms/:platformId",
+                    component: PlatformIdRoute
                 }
             ],
 

@@ -1,6 +1,6 @@
 import * as companiesRepository from "./companiesRepository"
 import { LimitOffsetSchema } from "~/utils/zod";
-import { developerCreateSchema, developerEditSchema } from "./utils/zod";
+import { CompanyCreateSchema, CompanyEditSchema } from "./utils/zod";
 import { orphanedFileService } from "~/services/orphanedFileService";
 import { storageService } from "~/integrations/storageService/index.server";
 import z from "zod";
@@ -10,7 +10,7 @@ import { zodSafeParse } from "~/utils/zodSafeParse";
 import { respond } from "@solidjs/web";
 import { ensureAdmin } from "../auth/utils/ensureAuth";
 
-export const getDevelopersFn = GET(async (args: z.input<typeof LimitOffsetSchema>) => {
+export const getCompaniesFn = GET(async (args: z.input<typeof LimitOffsetSchema>) => {
     'use server'
     const data = zodSafeParse(LimitOffsetSchema, args)
     const companies = await companiesRepository.findAll(data);
@@ -21,7 +21,7 @@ export const getDevelopersFn = GET(async (args: z.input<typeof LimitOffsetSchema
     })
 })
 
-export const getDeveloperFn = GET(async (id: number) => {
+export const getCompanyFn = GET(async (id: number) => {
     'use server'
     const data = zodSafeParse(z.int(), id)
     const dev = await companiesRepository.findById(data)
@@ -32,18 +32,18 @@ export const getDeveloperFn = GET(async (id: number) => {
     })
 })
 
-export async function createDeveloperFn(input: z.input<typeof developerCreateSchema>) {
+export async function createCompanyFn(input: z.input<typeof CompanyCreateSchema>) {
     'use server'
-    const data = zodSafeParse(developerCreateSchema, input)
+    const data = zodSafeParse(CompanyCreateSchema, input)
     await ensureAdmin()
     const d = await companiesRepository.createDeveloper(data)
     orphanedFileService.removePendingUpload(data.logo)
     return d;
 }
 
-export async function editDeveloperFn(input: z.input<typeof developerEditSchema>) {
+export async function editCompanyFn(input: z.input<typeof CompanyEditSchema>) {
     'use server'
-    const data = zodSafeParse(developerEditSchema, input)
+    const data = zodSafeParse(CompanyEditSchema, input)
     await ensureAdmin()
     const { developerId, ...rest } = data;
     const [old] = await companiesRepository.editDeveloper(developerId, rest);      

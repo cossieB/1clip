@@ -5,12 +5,12 @@ export const PostCreateSchema = z.object({
     title: z.string().min(3).max(30),
     text: z.string().max(env.VITE_POST_LIMIT),
     media: z.array(z.object({
-        size: z.number().lte(8 * 1024 * 1024),
+        size: z.int().lte(8 * 1024 * 1024),
         contentType: z.string().refine(str => /^(image|video|audio)/.test(str)),
         filename: z.string(),
         metadata: z.record(z.string(), z.string()).optional()
     })).default([]),
-    gameId: z.number().optional(),
+    gameId: z.int().optional(),
 });
 
 export const GetPostSchema = z.object({
@@ -19,10 +19,10 @@ export const GetPostSchema = z.object({
     likerUsername: z.string(),
     dislikerUsername: z.string(),
     tag: z.string(),
-    limit: z.number(),
+    limit: z.int(),
     cursor: z.int(),
     followerId: z.uuidv7(),
-    gameId: z.number(),
+    gameId: z.int(),
     includePending: z.boolean().default(false),
     searchString: z.string().optional()
 }).partial().optional();

@@ -13,10 +13,6 @@ export function findAll(filters?: { limit?: number, offset?: number }) {
 
 export function findById(platformId: number) {
     return db.query.platforms.findFirst({
-        columns: {
-            dateAdded: false,
-            dateModified: false
-        },
         where: {
             platformId
         }

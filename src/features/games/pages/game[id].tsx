@@ -9,7 +9,7 @@ import { httpHeader } from "@solidjs/web";
 import { Meta } from "@solidjs/meta";
 import { mediaSrc } from "~/utils/mediaSrc";
 
-export function GameIdPage() {
+export function GameIdRoute() {
     const params = useParams(paths.games)
     const game = createMemo(() => {
         const gameId = Number(params.gameId)

@@ -13,10 +13,6 @@ export async function findAll(filters?: { limit?: number, offset?: number }) {
 
 export async function findById(companyId: number) {
     return await db.query.companies.findFirst({
-        columns: {
-            dateAdded: false,
-            dateModified: false
-        },
         where: {
             companyId
         },

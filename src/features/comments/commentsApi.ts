@@ -59,7 +59,7 @@ export const getCommentsByPostIdFn = GET(async (input: z.input<typeof GetComment
 
 export async function toggleCommentLikeFn(commentId: number) {
     'use server'
-    const data = zodSafeParse(z.number(), commentId)
+    const data = zodSafeParse(z.int(), commentId)
     const userSession = await ensureVerified()
     await rateLimiter("comment:react", userSession.user.id, 10, 60)
     return await commentsRepository.toggleLike(data, userSession.user.id)
@@ -67,7 +67,7 @@ export async function toggleCommentLikeFn(commentId: number) {
 
 export async function deleteCommentFn(commentId: number) {
     'use server'
-    const data = zodSafeParse(z.number(), commentId)
+    const data = zodSafeParse(z.int(), commentId)
     const userSession = await ensureVerified()
     await rateLimiter("comment:delete", userSession.user.id, 5, 60)
     const result = await commentsRepository.deleteComment(data, userSession.user.id)
