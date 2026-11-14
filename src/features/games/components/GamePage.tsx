@@ -17,7 +17,7 @@ export function GamePage(props: { game: NonNullable<AwaitedReturn<typeof getGame
                 <img class={styles.banner} src={mediaSrc(props.game.banner)} alt="" />
             </div>
             <header class={styles.header}>
-                <img src={mediaSrc(props.game.cover)} alt="" />
+                <img style={{"view-transition-name": "gameId" + props.game.gameId}} src={mediaSrc(props.game.cover)} alt="" />
                 <h1> {props.game.title} </h1>
 
                 <div class={styles.actions}>
@@ -45,11 +45,11 @@ export function GamePage(props: { game: NonNullable<AwaitedReturn<typeof getGame
                     </div>
                     <div>
                         <label> Developer </label>
-                        <span> {props.game.developer.name} </span>
+                        <a href={paths.companies(props.game.developerId)}> {props.game.developer.name} </a>
                     </div>
                     <div>
                         <label> Publisher </label>
-                        <span> {props.game.publisher.name} </span>
+                        <a href={paths.companies(props.game.publisherId)}> {props.game.publisher.name} </a>
                     </div>
                 </div>
                 <div class={styles.row}>

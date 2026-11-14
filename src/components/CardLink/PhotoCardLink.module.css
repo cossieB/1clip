@@ -14,7 +14,15 @@
     grid-template-rows: subgrid;
     grid-row: span 2;
     overflow: hidden;
-
+    img {
+        height: 12.5rem;
+        max-width: unset;
+        width: 100%;
+        object-fit: cover;
+        transition: 
+            scale 100ms ease,
+            translate 100ms ease;
+    }
     >label {
         display: flex;
         align-items: center;
@@ -42,6 +50,7 @@
 
         img {
             scale: 1.05;
+            translate: 0 -5px;
         }
     }
 }

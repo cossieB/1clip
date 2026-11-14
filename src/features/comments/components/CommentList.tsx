@@ -1,6 +1,5 @@
 import { createEffect, createOptimisticStore, createSignal, For, Loading, onSettled, Repeat, Show, snapshot } from "solid-js";
 import { getCommentsByPostIdFn } from "../commentsApi";
-import { Spinner } from "~/components/Loader/Spinner";
 import { CommentBlock } from "./CommentBlock";
 import { session } from "~/features/auth/authApi";
 import { CommentComposer } from "./CommentComposer";
@@ -70,7 +69,6 @@ export function CommentList(props: Props) {
             <For each={comments}>
                 {comment => <CommentBlock
                     comment={comment}
-                    canInteract={session().data?.user.emailVerified && comment.commentId > 0}
                     comments={comments}
                     setComments={setComments}
                 />}

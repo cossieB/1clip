@@ -1,5 +1,4 @@
 import styles from "./PhotoCardLink.module.css"
-import type { Require } from "~/lib/utilityTypes"
 import { For, Loading } from "solid-js"
 import { mediaSrc } from "~/utils/mediaSrc"
 
@@ -8,24 +7,30 @@ type Props = {
     picture: string
     sublabel?: string
     href: string
-    attr?: {
+    attr: {
         [x: string]: string;
     }
-
 }
 
-export function PhotoCardLink(props: Props) {
+function parseDataAttributes(attr: Props['attr']) {
+    const [key, value] = Object.entries(attr)[0]
+    return  key
+      .replace(/^data-/, '')
+      .replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())
+      .concat(value)
+}
 
+
+export function PhotoCardLink(props: Props) {
+    
     return (
-        <div {...props.attr} class={styles.card} >
-            <div class={`${styles.imgWrapper}`}>
+        <div {...props.attr} class={styles.card} style={{"view-transition-name": parseDataAttributes(props.attr)}} >
                 <img
                     // style={{ "view-transition-name": key + value }}
                     src={mediaSrc(props.picture)}
                     loading="lazy"
                     alt=""
                 />
-            </div>
             <label class="cutout">
                 {props.label}
                 <span>{props.sublabel}</span>
@@ -41,7 +46,7 @@ type P<T> = {
     getPic: (item: T) => string
     getSublabel?: (item: T) => string
     getHref: (item: T) => string
-    getAttr?: (item: T) => {
+    getAttr: (item: T) => {
         [x: string]: string;
     }
 
@@ -58,7 +63,7 @@ export function PhotoCardGrid<T>(props: P<T>) {
                             picture={props.getPic(item)}
                             href={props.getHref(item)}
                             sublabel={props.getSublabel?.(item)}
-                            attr={props.getAttr?.(item)}
+                            attr={props.getAttr(item)}
                         />
                     }
                 </For>

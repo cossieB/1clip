@@ -11,9 +11,7 @@ import { SiteTitle } from "~/components/CustomSiteTitle";
 
 export function PostId() {
     const params = useParams(paths.posts)
-    const post = createMemo(() => getPostFn(Number(params.postId)), {
-        deferStream: true
-    })
+    const post = createMemo(() => getPostFn(Number(params.postId)))
     httpHeader("Cache-Control", "private, max-age=600")
     return (
         <Loading fallback={<PostSkeleton />}>

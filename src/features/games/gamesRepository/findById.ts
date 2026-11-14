@@ -2,7 +2,7 @@ import { eq, getColumns, sql } from "drizzle-orm"
 import { actors, appearances, companies, gameGenres, gamePlatforms, games, media, platforms } from "~/drizzle/schema"
 import { alias } from "drizzle-orm/pg-core";
 import { db } from "~/drizzle/db";
-import { Platform, Actor, Appearances } from "~/drizzle/models";
+import { Platform, Actor, Appearances, RoleType } from "~/drizzle/models";
 import { ForceNotNull } from "~/lib/utilityTypes";
 
 export async function findById(gameId: number) {
@@ -18,8 +18,7 @@ export async function findById(gameId: number) {
             'appearanceId', ${appearances.appearanceId},
             'actorId', ${actors.actorId},
             'name', ${actors.name},
-            'photo', ${actors.photo},
-            'bio', ${actors.bio}
+            'photo', ${actors.photo}
         ) ORDER BY ${appearances.roleType})`.as("a_arr")
         })
             .from(appearances)
@@ -33,9 +32,7 @@ export async function findById(gameId: number) {
             platformArr: sql`JSONB_AGG(JSONB_BUILD_OBJECT(
             'platformId', ${platforms.platformId},
             'name', ${platforms.name},
-            'logo', ${platforms.logo},
-            'summary', ${platforms.summary},
-            'releaseDate', ${platforms.releaseDate}
+            'logo', ${platforms.logo}
         ))`.as("p_arr")
         })
             .from(gamePlatforms)
@@ -64,7 +61,14 @@ export async function findById(gameId: number) {
             .from(media)
             .groupBy(media.gameId)
     )
-
+    type A = {
+        character: string
+        roleType: RoleType
+        actorId: number
+        name: string
+        photo?: string
+        appearanceId: number
+    }
     const [result] = await db
         .with(actorQuery, platformQuery, genresQuery, mediaQuery)
         .select({
@@ -72,8 +76,8 @@ export async function findById(gameId: number) {
             publisher: { ...getColumns(publishers) },
             developer: { ...getColumns(developers) },
             genres: sql<string[]>`COALESCE(${genresQuery.tags}, '{}')`,
-            platforms: sql<Platform[]>`COALESCE(${platformQuery.platformArr}, '[]'::JSONB)`,
-            actors: sql<(Actor & Appearances)[]>`COALESCE(${actorQuery.actorArr}, '[]'::JSONB)`,
+            platforms: sql<Pick<Platform, 'name' | 'logo' | 'platformId'>[]>`COALESCE(${platformQuery.platformArr}, '[]'::JSONB)`,
+            actors: sql<A[]>`COALESCE(${actorQuery.actorArr}, '[]'::JSONB)`,
             media: sql<{ key: string, contentType: string, metadata: Record<string, string> }[]>`COALESCE(${mediaQuery.media}, '[]'::JSONB)`
         })
         .from(games)

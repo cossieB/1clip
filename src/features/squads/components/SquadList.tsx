@@ -60,7 +60,6 @@ export function SquadList(props: Props) {
             <For each={squads()}>
                 {squad => <SquadBlock
                     squad={squad}
-                    userId={session().data?.user.id ?? null}
                 />}
             </For>
         </Loading>

@@ -17,7 +17,6 @@ import { SquadsPage } from './features/squads/pages/squads';
 import { UserIdLayout } from './features/users/pages/user[id].layout';
 import { UserPosts } from './features/users/pages/user[id].posts';
 import { UserSquads } from './features/users/pages/user[id].squads';
-import { UserIdIndex } from './features/users/pages/user[id].index';
 import { GameIdPage } from './features/games/pages/game[id]';
 import { GetGamesSchema } from './features/games/utils/zod';
 import { GamesPage } from './features/games/pages/games';

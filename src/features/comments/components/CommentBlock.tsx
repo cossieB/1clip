@@ -1,4 +1,4 @@
-import { Refreshable, Show, action, createOptimistic, createSignal, createUniqueId, onFlush, refresh, untrack, useContext, type ParentProps } from "solid-js"
+import { Loading, Refreshable, Show, action, createOptimistic, createSignal, createUniqueId, onFlush, refresh, untrack, useContext, type ParentProps } from "solid-js"
 import type { CommentWithDetails } from "../commentRepository"
 import styles from "./CommentBlock.module.css"
 import { mediaSrc } from "~/utils/mediaSrc"
@@ -16,7 +16,6 @@ const MAX_LENGTH = 255
 
 type Props = ParentProps<{
     comment: CommentWithDetails
-    canInteract?: boolean
     comments: Refreshable<Awaited<ReturnType<typeof getCommentsByPostIdFn>>>
     setComments: StoreSetter<Awaited<ReturnType<typeof getCommentsByPostIdFn>>>
 }>
@@ -109,7 +108,7 @@ export function CommentBlock(props: Props) {
 
     const created = () => new Date(props.comment.createdAt)
     const wasEdited = () => !!props.comment.editedOn
-    const interactive = () => props.canInteract !== false
+    const interactive = () => session().data?.user.emailVerified && props.comment.commentId > 0
     const remaining = () => MAX_LENGTH - draft().length
 
     return (
@@ -142,30 +141,33 @@ export function CommentBlock(props: Props) {
                 </div>
 
                 <div class={styles.actions}>
-                    <button
-                        type="button"
-                        class={["ghost", styles.action, { [styles.liked]: like().liked }]}
-                        // aria-pressed={like().liked}
-                        aria-label={like().liked ? "Unlike comment" : "Like comment"}
-                        disabled={!interactive()}
-                        onClick={() => toggleLike()}
-                    >
-                        <HeartIcon />
-                        <span>{like().count}</span>
-                    </button>
+                    <Loading on={session()}>
 
-                    <Show when={props.canInteract}>
                         <button
                             type="button"
-                            class={["ghost", styles.action, { [styles.active]: replying() }]}
-                            // aria-expanded={replying()}
-                            aria-controls={textareaId}
+                            class={["ghost", styles.action, { [styles.liked]: like().liked }]}
+                            // aria-pressed={like().liked}
+                            aria-label={like().liked ? "Unlike comment" : "Like comment"}
                             disabled={!interactive()}
-                            onClick={() => (replying() ? closeReply() : openReply())}
+                            onClick={() => toggleLike()}
                         >
-                            Reply
+                            <HeartIcon />
+                            <span>{like().count}</span>
                         </button>
-                    </Show>
+
+                        <Show when={interactive()}>
+                            <button
+                                type="button"
+                                class={["ghost", styles.action, { [styles.active]: replying() }]}
+                                // aria-expanded={replying()}
+                                aria-controls={textareaId}
+                                disabled={!interactive()}
+                                onClick={() => (replying() ? closeReply() : openReply())}
+                            >
+                                Reply
+                            </button>
+                        </Show>
+                    </Loading>
 
                     <Show when={props.comment.replyCount > 0}>
                         <button

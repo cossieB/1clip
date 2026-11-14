@@ -3,7 +3,6 @@ import { PostFilters } from "../utils/zod";
 import { getPostsFn } from "../postsApi";
 import { useViewPost } from "../hooks/useViewPost";
 import { PostBlock } from "./PostBlock";
-import { session } from "~/features/auth/authApi";
 import { PostSkeleton } from "~/components/Skeletons/Skeletons";
 
 type Post = Awaited<ReturnType<typeof getPostsFn>>[number]
@@ -20,7 +19,6 @@ export function PostList(props: { filters?: PostFilters }) {
         if (next.length === 0) done = true
         return [...previous, ...next]
     }, {
-        loadingValue: [],
         id: "postId"
     })
     const addPostToSet = useViewPost()
@@ -28,7 +26,7 @@ export function PostList(props: { filters?: PostFilters }) {
     let observer: IntersectionObserver
 
     createEffect(
-        posts,
+        () => posts.length,
         () => {
             setTimeout(() => {
                 const cards = document.querySelectorAll(`[data-post-id]`);
@@ -54,13 +52,9 @@ export function PostList(props: { filters?: PostFilters }) {
     })
 
     return (
-        <Loading on={posts()} fallback={<Skeleton />}>
-
+        <Loading fallback={<Skeleton />}>
             <For each={posts()}>
-                {post => <PostBlock
-                    post={post}
-                    canLike={session().data?.user.emailVerified === true}
-                />}
+                {post => <PostBlock post={post} />}
             </For>
         </Loading>
     )

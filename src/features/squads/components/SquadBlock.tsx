@@ -10,10 +10,11 @@ import { applyToSquadFn, getSquadApplicationsFn, updateSquadFn } from "../squads
 import { ApplicationBlock } from "./ApplicationBlock"
 import { getRelativeTime } from "~/lib/getRelativeTime"
 import { AwaitedReturn } from "~/lib/utilityTypes"
+import { session } from "~/features/auth/authApi"
 
 type Props = ParentProps<{
     squad: SquadWithDetails
-    userId: string | null
+
 }>
 
 export function SquadBlock(props: Props) {
@@ -29,8 +30,8 @@ export function SquadBlock(props: Props) {
     const [confirmingClose, setConfirmingClose] = createSignal(false)
     const [message, setMessage] = createSignal("")
 
-    const signedIn = () => props.userId !== null
-    const isOwner = () => signedIn() && props.userId === props.squad.creator.id
+    const signedIn = () => session().data?.user.id !== null
+    const isOwner = () => signedIn() && session().data?.user.id === props.squad.creator.id
     const isExpired = () => props.squad.expiresAt ? new Date() > props.squad.expiresAt : false
 
     // ── Apply (confirmed state resets when the prop is refetched) ──
@@ -157,51 +158,54 @@ export function SquadBlock(props: Props) {
             </Show>
 
             <footer class={styles.footer}>
-                <Show
-                    when={isOwner()}
-                    fallback={
-                        <div class={styles.apply}>
-                            <textarea
-                                value={message()}
-                                onInput={e => setMessage(e.currentTarget.value)}
-                                maxlength={255}
-                                placeholder="Add a message to this squad's creator"
-                                disabled={!active()}
-                            />
-                            <button
-                                type="button"
-                                class="primary"
-                                disabled={!signedIn() || !active() || applied()}
-                                title={signedIn() ? undefined : "Sign in to apply"}
-                                onClick={() => apply()}
-                            >
-                                {!active() ? "Closed" : applied() ? "Applied ✓" : "Apply"}
-                            </button>
-                        </div>
-                    }
-                >
-                    <button type="button" class="primary" onClick={() => setShowApplications(true)}>
-                        Show applications
-                    </button>
+                <Loading>
+                    <Show
+                        when={isOwner()}
+                        fallback={
+                            <div class={styles.apply}>
+                                <textarea
+                                    value={message()}
+                                    onInput={e => setMessage(e.currentTarget.value)}
+                                    maxlength={255}
+                                    placeholder="Add a message to this squad's creator"
+                                    disabled={!active()}
+                                />
 
-                    <Show when={active()}>
-                        <Show
-                            when={confirmingClose()}
-                            fallback={
-                                <button type="button" class={["secondary", styles.danger]} onClick={() => setConfirmingClose(true)}>
-                                    Close LFG
+                                <button
+                                    type="button"
+                                    class="primary"
+                                    disabled={!signedIn() || !active() || applied()}
+                                    title={signedIn() ? undefined : "Sign in to apply"}
+                                    onClick={() => apply()}
+                                >
+                                    {!active() ? "Closed" : applied() ? "Applied ✓" : "Apply"}
                                 </button>
-                            }
-                        >
-                            <button type="button" class={["secondary", styles.danger]} onClick={() => close()}>
-                                Confirm close
-                            </button>
-                            <button type="button" class="ghost" onClick={() => setConfirmingClose(false)}>
-                                Cancel
-                            </button>
+                            </div>
+                        }
+                    >
+                        <button type="button" class="primary" onClick={() => setShowApplications(true)}>
+                            Show applications
+                        </button>
+
+                        <Show when={active()}>
+                            <Show
+                                when={confirmingClose()}
+                                fallback={
+                                    <button type="button" class={["secondary", styles.danger]} onClick={() => setConfirmingClose(true)}>
+                                        Close LFG
+                                    </button>
+                                }
+                            >
+                                <button type="button" class={["secondary", styles.danger]} onClick={() => close()}>
+                                    Confirm close
+                                </button>
+                                <button type="button" class="ghost" onClick={() => setConfirmingClose(false)}>
+                                    Cancel
+                                </button>
+                            </Show>
                         </Show>
                     </Show>
-                </Show>
+                </Loading>
             </footer>
 
             <Show when={showApplications()}>

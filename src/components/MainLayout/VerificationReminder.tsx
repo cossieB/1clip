@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, Show, useContext } from "solid-js";
+import { createEffect, createMemo, createSignal, Loading, Show, useContext } from "solid-js";
 import { session } from "~/features/auth/authApi";
 import { authClient } from "~/features/auth/authClient";
 import { ToastContext } from "../Toast/ToastProvider";
@@ -14,33 +14,35 @@ export function VerificationReminder() {
 
     const [isPending, setIsPending] = createSignal(false)
     return (
-        <Show when={isUnverified()}>
-            <aside class={styles.verificationReminder}>
-                {search.error == "token_expired" ? "That link has expired. " : "Your account is unverified. Check your email for the verification link. "}
-                Click{" "}
-                <button
-                    class="ghost"
-                    disabled={isPending()}
-                    onClick={async (e) => {
-                        await authClient.sendVerificationEmail({
-                            email: session().data!.user.email
-                        }, {
-                            onRequest() {
-                                setIsPending(true)
-                            },
-                            onError({ error }) {
-                                addToast({ text: error.message, type: "error" })
-                                setIsPending(false)
-                            },
-                            onSuccess() {
-                                addToast({ text: "Check your mail for the link", type: "info" })
-                            }
-                        });
-                    }}
+        <Loading>
+            <Show when={isUnverified()}>
+                <aside class={styles.verificationReminder}>
+                    {search.error == "token_expired" ? "That link has expired. " : "Your account is unverified. Check your email for the verification link. "}
+                    Click{" "}
+                    <button
+                        class="ghost"
+                        disabled={isPending()}
+                        onClick={async (e) => {
+                            await authClient.sendVerificationEmail({
+                                email: session().data!.user.email
+                            }, {
+                                onRequest() {
+                                    setIsPending(true)
+                                },
+                                onError({ error }) {
+                                    addToast({ text: error.message, type: "error" })
+                                    setIsPending(false)
+                                },
+                                onSuccess() {
+                                    addToast({ text: "Check your mail for the link", type: "info" })
+                                }
+                            });
+                        }}
                     >
-                    HERE
-                </button> to resend the email.
-            </aside>
-        </Show>
+                        HERE
+                    </button> to resend the email.
+                </aside>
+            </Show>
+        </Loading>
     )
 }

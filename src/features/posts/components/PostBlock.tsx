@@ -1,4 +1,4 @@
-import { For, Show } from "solid-js"
+import { For, Loading, Show } from "solid-js"
 import { PostContent } from "./PostContent"
 import styles from "./PostBlock.module.css"
 import { mediaSrc } from "~/utils/mediaSrc"
@@ -9,10 +9,11 @@ import { extractFirstVideo } from "../utils/parsePost"
 import { IframeFactory } from "./IframeFactory"
 import { useToggleLike } from "~/hooks/useToggleLike"
 import { getRelativeTime } from "~/lib/getRelativeTime"
+import { session } from "~/features/auth/authApi"
+import { paths } from "~/router"
 
 type Props = {
     post: NonNullable<Awaited<ReturnType<typeof getPostFn>>>
-    canLike?: boolean
 }
 
 export function PostBlock(props: Props) {
@@ -24,15 +25,13 @@ export function PostBlock(props: Props) {
         request: () => toggleLikeFn(props.post.postId),
     })
 
-    const created = () => new Date(props.post.createdAt)
     const wasEdited = () => !!props.post.editedOn
-
     const externalVideo = () => extractFirstVideo(props.post.text)
 
     return (
         <article class={["card", styles.post]} data-post-id={props.post.postId}>
             <header class={styles.header}>
-                <a class={styles.author} href={`/users/${props.post.author.username}`}>
+                <a class={styles.author} href={paths.users(props.post.author.username)}>
                     <img
                         class={["cutout", styles.avatar]}
                         src={mediaSrc(props.post.author.image)}
@@ -43,7 +42,7 @@ export function PostBlock(props: Props) {
                     <span class={styles.names}>
                         <span class={styles.username}>@{props.post.author.username}</span>
                         <span class={styles.meta}>
-                            <time datetime={created().toISOString()}>{getRelativeTime(created())}</time>
+                            <time datetime={props.post.createdAt.toISOString()}>{getRelativeTime(props.post.createdAt)}</time>
                             <Show when={wasEdited()}>
                                 <span> · edited</span>
                             </Show>
@@ -100,17 +99,19 @@ export function PostBlock(props: Props) {
 
             <footer class={styles.footer}>
                 <div class={styles.actions}>
-                    <button
-                        type="button"
-                        class={["ghost", styles.action, { [styles.liked]: like().liked }]}
-                        // aria-pressed={like().liked}
-                        aria-label={like().liked ? "Unlike post" : "Like post"}
-                        disabled={props.canLike === false}
-                        onClick={() => toggle()}
-                    >
-                        <HeartIcon />
-                        <span>{like().count}</span>
-                    </button>
+                    <Loading>
+                        <button
+                            type="button"
+                            class={["ghost", styles.action, { [styles.liked]: like().liked }]}
+                            // aria-pressed={like().liked}
+                            aria-label={like().liked ? "Unlike post" : "Like post"}
+                            disabled={!session().data}
+                            onClick={() => toggle()}
+                        >
+                            <HeartIcon />
+                            <span>{like().count}</span>
+                        </button>
+                    </Loading>
 
                     <a
                         class={styles.action}
