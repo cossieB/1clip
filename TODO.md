@@ -1,4 +1,4 @@
-[ ] Search
+[x] Search
 
 [ ] Mini profile
 

@@ -19,12 +19,14 @@ import { UserPosts } from './features/users/pages/user[id].posts';
 import { UserSquads } from './features/users/pages/user[id].squads';
 import { GameIdRoute } from './features/games/pages/game[id]';
 import { GetGamesSchema } from './features/games/utils/zod';
-import { GamesPage } from './features/games/pages/games';
+import { GamesPage as GamesRoute } from './features/games/pages/games';
 import { CompanyIdRoute } from './features/companies/pages/company[id]';
 import { ActorIdRoute } from './features/actors/pages/actor[id]';
 import { PlatformIdRoute } from './features/platforms/pages/platform[id]';
 import { NotificationsRoute } from './features/notifications/pages/notifications';
 import { ensureAuthOrRedirect } from './features/auth/utils/ensureAuth';
+import SearchRoute from './features/search/routes/search';
+import { SquadIdRoute } from './features/squads/pages/squad[id]';
 
 
 // Link preloading is opt-in. intentPreload() is the hover/focus/touch
@@ -89,6 +91,12 @@ export const Router = createRouter({
                     search: z.object({
                         gameId: z.string().optional()
                     }).optional()
+                },{
+                    path: "/squads/:squadId",
+                    matchFilters: {
+                        squadId: int
+                    },
+                    component: SquadIdRoute
                 }, {
                     path: "/users/:username",
                     component: UserIdLayout,
@@ -107,7 +115,7 @@ export const Router = createRouter({
                 }, {
                     path: "/games",
                     search: GetGamesSchema,
-                    component: GamesPage
+                    component: GamesRoute
                 }, {
                     path: "/companies/:companyId",
                     component: CompanyIdRoute
@@ -121,6 +129,15 @@ export const Router = createRouter({
                     path: "/notifications",
                     component: NotificationsRoute,
                     preload: () => void ensureAuthOrRedirect()
+                }, {
+                    path: "/search",
+                    component: SearchRoute,
+                    search: z.object({
+                        q: z.string().catch(""),
+                        type: z.enum(["posts", "games", "squads"]),
+                        page: z.string(),
+                        
+                    })
                 }
             ],
 

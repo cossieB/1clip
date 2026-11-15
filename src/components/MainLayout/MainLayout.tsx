@@ -5,9 +5,9 @@ import { Nav, Tabbar } from "./Nav";
 import { UsersOnline } from "./FriendsOnline";
 import { Trending } from "./Trending";
 import { UserNavItem } from "~/features/auth/components/UserNavItem";
-import { SearchBar } from "./Searchbar";
+import { SearchBar } from "~/features/search/components/Searchbar";
 import { ShowWhenAuthed } from "~/features/auth/components/ShowWhenAuthed";
-import { Dialog } from "../Popover/Dialog";
+import { Dialog } from "~/components/Popover/Dialog";
 import { paths } from "~/router";
 import { VerificationReminder } from "./VerificationReminder";
 

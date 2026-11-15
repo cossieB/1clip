@@ -80,7 +80,7 @@ export function CommentSkeleton() {
     )
 }
 
-export function LFGSkeleton() {
+export function SquadSkeleton() {
     return (
         <article class={["card", styles.card, styles.post]} role="status" aria-label="Loading looking-for-group post">
             <header class={styles.header}>
@@ -152,5 +152,21 @@ export function UserListSkeleton(props: { count?: number }) {
                 {row => <UserRowSkeleton nameWidth={row[0]} statusWidth={row[1]} />}
             </For>
         </div>
+    )
+}
+
+const CHIP_WIDTHS = ["7.5rem", "5.5rem", "4rem", "3.5rem", "3.75rem", "6rem"]
+
+export function TrendingSkeleton(props: { count?: number }) {
+    const chips = () =>
+        Array.from({ length: props.count ?? 5 }, (_, i) => CHIP_WIDTHS[i % CHIP_WIDTHS.length])
+
+    return (
+        <section class={["card", styles.card]} role="status" aria-label="Loading trending tags">
+            <Bone class={[styles.trendingTitle]} width="5rem" height=".8rem" />
+            <div class={styles.chips}>
+                <For each={chips()}>{width => <Bone width={width} height="1.9rem" />}</For>
+            </div>
+        </section>
     )
 }

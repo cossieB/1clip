@@ -141,3 +141,15 @@
     padding-block: .25rem;
     pointer-events: none;
 }
+
+/* ── Trending tags ── */
+.trendingTitle {
+    margin-bottom: .6rem;
+    /* the real h2 has margin-bottom: 1rem on top of the card's grid gap */
+}
+
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+}

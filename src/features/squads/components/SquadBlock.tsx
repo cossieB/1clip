@@ -24,22 +24,22 @@ export function SquadBlock(props: Props) {
 
     const [showApplications, setShowApplications] = createSignal(false)
 
-    const signedIn = () => session().data?.user.id !== null
+    const signedIn = () => !!session().data
     const isOwner = () => signedIn() && session().data?.user.id === props.squad.creator.id
     const isExpired = () => props.squad.expiresAt ? new Date() > props.squad.expiresAt : false
 
-    
+
     // ── Slots ──
     const filled = () => props.squad.acceptedApplicants.length
     const pips = () => Array.from({ length: props.squad.slots }, (_, i) => i < filled())
-    
+
     const created = () => new Date(props.squad.createdAt)
     const wasEdited = () => !!props.squad.editedOn
-    
-    const {deleteAction, deleting} = useSquadDelete(props.squad.squadId, props.onDelete)
-    const {applied, setMessage, apply, message} = useApplyToSquad(props.squad.squadId, () => props.squad.hasApplied)
-    const {active, close} = useCloseSquad(props.squad.squadId, () => props.squad.isActive && !isExpired())
-    
+
+    const { deleteAction, deleting } = useSquadDelete(props.squad.squadId, props.onDelete)
+    const { applied, setMessage, apply, message } = useApplyToSquad(props.squad.squadId, () => props.squad.hasApplied)
+    const { active, close } = useCloseSquad(props.squad.squadId, () => props.squad.isActive && !isExpired())
+
     return (
         <article class={["card", styles.lfg]} data-squad-id={props.squad.squadId}>
             <header class={styles.header}>
@@ -79,39 +79,52 @@ export function SquadBlock(props: Props) {
                 <div class={styles.partyHeader}>
                     <span class={styles.partyLabel}>Party</span>
                     <span class={styles.count}>
-                        {filled()} / {props.squad.slots} filled
+                        {filled() + 1} / {props.squad.slots + 1} filled
                     </span>
                 </div>
 
                 <div class={styles.pips} role="img" aria-label={`${filled()} of ${props.squad.slots} slots filled`}>
+                    <span class={[styles.pip, { [styles.pipFilled]: true }]} />
                     <For each={pips()} keyed={false}>
                         {isFilled => <span class={[styles.pip, { [styles.pipFilled]: isFilled() }]} />}
                     </For>
                 </div>
-
-                <Show when={props.squad.acceptedApplicants.length}>
-                    <ul class={styles.applicants}>
-                        <For each={props.squad.acceptedApplicants}>
-                            {person => (
-                                <li>
-                                    <a
-                                        href={`/users/${person.username}`}
-                                        title={`@${person.username}`}
-                                        aria-label={`@${person.username}`}
-                                    >
-                                        <img
-                                            class={["cutout", styles.applicantAvatar]}
-                                            src={mediaSrc(person.image)}
-                                            alt=""
-                                            width="28"
-                                            height="28"
-                                        />
-                                    </a>
-                                </li>
-                            )}
-                        </For>
-                    </ul>
-                </Show>
+                <ul class={styles.applicants}>
+                    <li>
+                        <a
+                            href={`/users/${props.squad.creator.username}`}
+                            title={`@${props.squad.creator.username}`}
+                            aria-label={`@${props.squad.creator.username}`}
+                        >
+                            <img
+                                class={["cutout", styles.applicantAvatar]}
+                                src={mediaSrc(props.squad.creator.image)}
+                                alt=""
+                                width="28"
+                                height="28"
+                            />
+                        </a>
+                    </li>
+                    <For each={props.squad.acceptedApplicants}>
+                        {person => (
+                            <li>
+                                <a
+                                    href={`/users/${person.username}`}
+                                    title={`@${person.username}`}
+                                    aria-label={`@${person.username}`}
+                                >
+                                    <img
+                                        class={["cutout", styles.applicantAvatar]}
+                                        src={mediaSrc(person.image)}
+                                        alt=""
+                                        width="28"
+                                        height="28"
+                                    />
+                                </a>
+                            </li>
+                        )}
+                    </For>
+                </ul>
             </section>
 
             <Show when={props.squad.expiresAt}>
@@ -133,7 +146,7 @@ export function SquadBlock(props: Props) {
                                     onInput={e => setMessage(e.currentTarget.value)}
                                     maxlength={255}
                                     placeholder="Add a message to this squad's creator"
-                                    disabled={!active()}
+                                    disabled={!active() || !signedIn()}
                                 />
 
                                 <button
@@ -164,7 +177,7 @@ export function SquadBlock(props: Props) {
                                 label="Close LFG"
                                 action={close}
                                 variant="danger"
-                            />                            
+                            />
                         </Show>
                     </Show>
                 </Loading>

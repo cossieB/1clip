@@ -10,7 +10,7 @@ export async function createSquad(row: InferInsertModel<typeof squads>) {
     return db.insert(squads).values(row).returning()
 }
 
-export async function updateSquad(lfgId: number, row: Partial<Omit<InferInsertModel<typeof squads>, 'lfgId'>>, userId: string) {
+export async function updateSquad(squadId: number, row: Partial<Omit<InferInsertModel<typeof squads>, 'squadId'>>, userId: string) {
     return db
         .update(squads)
         .set({
@@ -18,7 +18,7 @@ export async function updateSquad(lfgId: number, row: Partial<Omit<InferInsertMo
             editedOn: sql`NOW()`
         })
         .where(and(
-            eq(squads.squadId, lfgId),
+            eq(squads.squadId, squadId),
             eq(squads.userId, userId)
         ))
 }
@@ -119,7 +119,7 @@ export async function deleteSquad(squadId: number, userId: string) {
 export type SquadWithDetails = Awaited<ReturnType<typeof findAll>>[number];
 
 export async function findById(
-    lfgId: number,
+    squadId: number,
     currentUserId?: string
 ): Promise<SquadWithDetails | null> {
     const [post] = await db
@@ -127,28 +127,28 @@ export async function findById(
         .from(squads)
         .innerJoin(users, eq(users.id, squads.userId))
         .leftJoin(games, eq(games.gameId, squads.gameId))
-        .where(eq(squads.squadId, lfgId))
+        .where(eq(squads.squadId, squadId))
         .limit(1);
 
     return post ?? null;
 }
 
-export type LfgApplicationPagination = {
+export type SquadApplicationPagination = {
     limit?: number
     cursor?: number
 }
 
 export async function findSquadApplications(
-    lfgId: number,
+    squadId: number,
     ownerId: string,
-    { limit, cursor }: LfgApplicationPagination = {}
+    { limit, cursor }: SquadApplicationPagination = {}
 ) {
     const pageSize = Math.min(Math.max(limit ?? DEFAULT_LIMIT, 1), MAX_LIMIT);
 
     return db
         .select({
             applicationId: squadApplications.applicationId,
-            lfgId: squadApplications.squadId,
+            squadId: squadApplications.squadId,
             message: squadApplications.message,
             status: squadApplications.status,
             appliedAt: squadApplications.appliedAt,
@@ -165,7 +165,7 @@ export async function findSquadApplications(
             eq(squads.userId, ownerId)
         ))
         .where(and(
-            eq(squadApplications.squadId, lfgId),
+            eq(squadApplications.squadId, squadId),
             cursor !== undefined ? gt(squadApplications.applicationId, cursor) : undefined
         ))
         .orderBy(asc(squadApplications.applicationId))

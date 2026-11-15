@@ -9,7 +9,7 @@ import { paths } from "~/router";
 
 type Game = Awaited<ReturnType<typeof getGamesFn>>[number];
 
-export type LfgInput = {
+export type SquadInput = {
     text: string;
     gameId: number | null;
     /** open slots, excluding the owner */
@@ -43,7 +43,7 @@ export default function CreateSquadPage() {
     const [formError, setFormError] = createSignal("");
     const [pending, setPending] = createSignal(false);
 
-    function validate(): { input: LfgInput } | { errors: FieldErrors } {
+    function validate(): { input: SquadInput } | { errors: FieldErrors } {
         const next: FieldErrors = {};
         const trimmed = text().trim();
 

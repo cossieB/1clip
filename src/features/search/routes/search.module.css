@@ -1,0 +1,144 @@
+.page {
+    display: grid;
+    gap: 1.5rem;
+    align-content: start;
+    inline-size: min(100%, 52rem);
+    margin-inline: auto;
+    padding: 1.5rem 1rem 3rem;
+}
+
+.header {
+    display: grid;
+    gap: .4rem;
+}
+
+.title {
+    font-size: clamp(1.6rem, 5vw, 2.2rem);
+}
+
+.summary {
+    color: var(--text-muted);
+    overflow-wrap: anywhere;
+}
+
+/* ── Tabs ── */
+.tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .25rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.tab {
+    padding: .65rem 1rem;
+    font-size: .8rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color .15s, background-color .15s, border-color .15s;
+
+    &:hover {
+        color: var(--text);
+        background: color-mix(in oklch, var(--accent) 14%, transparent);
+    }
+
+    &[aria-current="page"] {
+        color: var(--accent);
+        border-bottom-color: var(--accent);
+    }
+}
+
+/* ── Results ── */
+.results {
+    display: grid;
+    gap: 1.5rem;
+    transition: opacity .15s;
+}
+
+/* the previous page stays visible, dimmed, while the next one loads */
+.stale {
+    opacity: .55;
+}
+
+.list {
+    display: grid;
+    gap: .75rem;
+}
+
+.status {
+    padding: 2rem 0;
+    text-align: center;
+    color: var(--text-subtle);
+}
+
+.result {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: .9rem 1.1rem;
+}
+
+.cover {
+    --bevel: 8px;
+    inline-size: 3rem;
+    block-size: 4rem;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+}
+
+.avatar {
+    --bevel: 8px;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: var(--surface-3);
+    border: 1px solid var(--border-strong);
+}
+
+.text {
+    display: grid;
+    gap: .2rem;
+    min-inline-size: 0;
+}
+
+.primary {
+    font-weight: 700;
+    color: var(--text);
+    overflow-wrap: anywhere;
+}
+
+.excerpt {
+    font-size: .88rem;
+    color: var(--text-muted);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+}
+
+.secondary {
+    font-size: .78rem;
+    color: var(--text-subtle);
+}
+
+/* ── Pagination ── */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.pageNumber {
+    font-size: .8rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+}

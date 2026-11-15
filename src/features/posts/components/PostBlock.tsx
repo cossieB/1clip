@@ -94,7 +94,7 @@ export function PostBlock(props: Props) {
                     <For each={props.post.tags}>
                         {tag => (
                             <li>
-                                <a class={styles.tag} href={`/posts/?tag=${tag}`}>
+                                <a class={styles.tag} href={paths.posts({tag})}>
                                     #{tag}
                                 </a>
                             </li>
@@ -107,7 +107,7 @@ export function PostBlock(props: Props) {
                 <div class={styles.actions}>
                     <a
                         class={styles.action}
-                        href={`/posts/${props.post.postId}#comments`}
+                        href={paths.posts(props.post.postId)}
                         aria-label={`${props.post.commentCount} comments`}
                     >
                         <MessageCircleIcon />

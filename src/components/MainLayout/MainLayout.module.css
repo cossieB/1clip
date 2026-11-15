@@ -143,6 +143,9 @@
 
 /* ── mobile: bottom tab bar ── */
 @media (max-width:720px) {
+    body {
+        margin-bottom: 5rem;
+    }
     .shell {
         grid-template-columns: minmax(0, 1fr);
         padding-inline: .75rem

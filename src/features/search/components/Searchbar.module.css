@@ -1,0 +1,167 @@
+.search {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    padding: 1.25rem 0 .5rem;
+    background: linear-gradient(var(--bg) 75%, transparent);
+
+    input {
+        width: 100%;
+        border-bottom-width: 2px
+    }
+}
+
+.icon {
+    position: absolute;
+    inset-inline-start: .85rem;
+    margin-block: auto;
+    color: var(--text-subtle);
+    pointer-events: none;
+    transition: color .15s;
+}
+
+.search:focus-within .icon {
+    color: var(--accent);
+}
+
+.input {
+    --bevel: .5rem;
+    inline-size: 100%;
+    padding-inline-start: 2.6rem;
+}
+
+/* ── Results panel ── */
+.panel {
+    position: absolute;
+    z-index: 50;
+    inset-inline: 0;
+    inset-block-start: calc(100% + .5rem);
+    max-block-size: min(32rem, 70dvh);
+    overflow-y: auto;
+    padding: .35rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    border-radius: 10px 0 10px 0;
+    corner-shape: bevel square bevel square;
+    box-shadow: 0 16px 40px oklch(0% 0 0 / .55), 0 0 24px -8px var(--accent-glow);
+    scrollbar-color: var(--accent-deep) transparent;
+    animation: panelIn .15s ease;
+}
+
+@keyframes panelIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+}
+
+.content {
+    display: grid;
+    gap: .25rem;
+    transition: opacity .15s;
+}
+
+/* previous results stay visible, dimmed, while a newer search is in flight */
+.stale {
+    opacity: .55;
+}
+
+.status {
+    padding: .9rem .8rem;
+    font-size: .85rem;
+    color: var(--text-subtle);
+}
+
+/* ── Groups ── */
+.group {
+    display: grid;
+    gap: .1rem;
+    padding-block: .25rem;
+
+    &+& {
+        border-top: 1px solid var(--line);
+    }
+}
+
+.groupTitle {
+    padding: .35rem .7rem;
+    font-size: .68rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .5rem .7rem;
+    border-left: 2px solid transparent;
+    transition: background-color .1s, border-color .1s;
+
+    &:hover,
+    &:focus-visible {
+        background: color-mix(in oklch, var(--accent) 14%, transparent);
+        border-left-color: var(--accent);
+    }
+
+    &:focus-visible {
+        outline-offset: -2px;
+    }
+}
+
+.thumb {
+    --bevel: 6px;
+    inline-size: 2rem;
+    block-size: 2.6rem;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+}
+
+.text {
+    display: grid;
+    min-inline-size: 0;
+}
+
+.primary {
+    font-weight: 700;
+    font-size: .92rem;
+    color: var(--text);
+}
+
+.secondary {
+    font-size: .78rem;
+    color: var(--text-subtle);
+}
+
+.primary,
+.secondary {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.viewAll {
+    display: block;
+    margin-top: .25rem;
+    padding: .7rem;
+    border-top: 1px solid var(--line);
+    font-size: .8rem;
+    letter-spacing: .06em;
+    text-align: center;
+    color: var(--accent-bright);
+    transition: background-color .1s;
+
+    &:hover,
+    &:focus-visible {
+        background: color-mix(in oklch, var(--accent) 14%, transparent);
+    }
+
+    &:focus-visible {
+        outline-offset: -2px;
+    }
+}
