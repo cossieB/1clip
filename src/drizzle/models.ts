@@ -1,6 +1,6 @@
 import type { InferSelectModel, InferSelectViewModel } from "drizzle-orm";
 import { users } from "./schema/auth";
-import { games, developers, publishers, actors, platforms, posts, notifications, appearances } from "./schema/schema";
+import { games, developers, publishers, actors, platforms, posts, notifications, appearances } from "./schema";
 
 export type Game = InferSelectModel<typeof games>
 export type Developer = InferSelectModel<typeof developers>

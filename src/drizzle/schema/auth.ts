@@ -7,8 +7,7 @@ import {
     uuid,
     index,
     varchar,
-    date,
-    uniqueIndex,
+    date
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {

@@ -8,7 +8,10 @@
     "build": "vite build && tsc --noEmit",
     "preview": "vite preview",
     "start": "node .output/server/index.mjs",
-    "test": "vitest --mode test"
+    "test": "vitest --mode test",
+    "test:e2e": "npx playwright test",
+    "pretest:e2e": "docker compose up -d",
+    "posttest:e2e": "docker compose down -v"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.970.0",
@@ -50,8 +53,7 @@
     "typescript": "^7.0.2",
     "vite": "^8.0.3",
     "vite-plugin-solid": "^2.11.10",
-    "vitest": "^5.0.0",
-    "wait-on": "^9.1.0"
+    "vitest": "^5.0.0"
   },
   "engines": {
     "node": ">=24",

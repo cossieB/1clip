@@ -1,6 +1,6 @@
 import { and, eq, InferSelectModel, notInArray, sql } from "drizzle-orm";
 import { db } from "~/drizzle/db";
-import { gamePlatforms, gameGenres, media, games, genres, appearances } from "~/drizzle/schema/schema";
+import { gamePlatforms, gameGenres, media, games, genres, appearances } from "~/drizzle/schema";
 import { type GameInsert } from "./types";
 
 export async function updateGame(gameId: number, game: Partial<InferSelectModel<typeof games>>, other: Partial<GameInsert>) {

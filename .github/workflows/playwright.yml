@@ -21,6 +21,9 @@ jobs:
         
     - name: Install dependencies
       run: npm ci
+
+    - name: Start Docker Services & Wait for Database Health
+      run: docker compose up -d --wait
       
     - name: Create .env.test
       run: |

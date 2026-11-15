@@ -28,7 +28,7 @@ export function PostBlock(props: Props) {
     const externalVideo = () => extractFirstVideo(props.post.text)
 
     return (
-        <div data-type="post" data-postId={props.post.postId} class={styles.postContainer}>
+        <div data-post-id={props.post.postId} class={styles.postContainer}>
             <PostAuthor
                 entityId={props.post.postId}
                 user={props.post.user}

@@ -1,6 +1,6 @@
 import { and, desc, eq, getColumns, SQL, sql } from "drizzle-orm";
 import { db } from "~/drizzle/db";
-import { appearances, gamePlatforms, gameGenres, actors, platforms, media, games, publishers, developers, genres } from "~/drizzle/schema/schema";
+import { appearances, gamePlatforms, gameGenres, actors, platforms, media, games, publishers, developers } from "~/drizzle/schema";
 import { Actor, Appearances, Platform } from "~/drizzle/models";
 
 type Args = {

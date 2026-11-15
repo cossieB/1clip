@@ -126,7 +126,6 @@ export function Tags(props: P) {
             <For each={props.tags}>
                 {tag => (
                     <button
-                        style={{ "view-transition-name": `--tag-${tag}` }}
                         type="button"
                         tabIndex={-1}
                         class={styles.dropdownItem}

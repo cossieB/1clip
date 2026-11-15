@@ -24,7 +24,7 @@ export const getUsersSignedUrls = createServerFn({method: "POST"})
     .validator(ImageUploadSchema)
     .handler(async ({ data, context: { user } }) => {
         await rateLimiter("upload", user.id, 5, 60)
-        return generateAndStoreSignedUrls(data, user.id, "users")
+        return generateAndStoreSignedUrls(data, user.id, `users/${user.id}`)
     })
 
 export const getGamesSignedUrls = createServerFn({method: "POST"})
