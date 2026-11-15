@@ -55,6 +55,19 @@ declare module "virtual:file-routes" {
       $$route?: undefined;
     },
     {
+      path: "/api/cleanup";
+      page: false;
+      $POST: FileRouteLazyRef<Pick<typeof import("./src/routes/api/cleanup"), Extract<"POST", keyof typeof import("./src/routes/api/cleanup")>>>;
+      $$route?: undefined;
+    },
+    {
+      path: "/api/health";
+      page: false;
+      $GET: FileRouteLazyRef<Pick<typeof import("./src/routes/api/health"), Extract<"GET", keyof typeof import("./src/routes/api/health")>>>;
+      $HEAD: FileRouteLazyRef<Pick<typeof import("./src/routes/api/health"), Extract<"GET", keyof typeof import("./src/routes/api/health")>>>;
+      $$route?: undefined;
+    },
+    {
       path: "/api/notifications";
       page: false;
       $GET: FileRouteLazyRef<Pick<typeof import("./src/routes/api/notifications"), Extract<"GET", keyof typeof import("./src/routes/api/notifications")>>>;

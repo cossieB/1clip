@@ -52,7 +52,8 @@ export const auth = betterAuth({
                     text: `To: ${user.email}\nClick the link to confirm that you want to delete your account: ${url} \n\n`,
                     id: "account-deletion",
                     variables: {
-                        link: url
+                        link: url,
+                        handle: user.name
                     }
                 })
             }
@@ -67,7 +68,8 @@ export const auth = betterAuth({
                 text: `To: ${data.user.email}\nClick the link to reset your password: ${data.url}`,
                 id: "password-reset",
                 variables: {
-                    link: data.url
+                    link: data.url,
+                    handle: data.user.name
                 }
             })
         },
@@ -81,7 +83,8 @@ export const auth = betterAuth({
                 text: `To: ${user.email}\nClick the link to verify your email: ${url} \n\n`,
                 id: "email-verification",
                 variables: {
-                    link: url
+                    link: url,
+                    handle: user.name
                 }
             })
         },
