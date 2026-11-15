@@ -1,6 +1,6 @@
 import { createMemo, createSignal, createUniqueId, omit, Show } from "solid-js";
 import type { z } from "zod";
-import styles from "./TextField.module.css";
+import styles from "./Textfield.module.css";
 import { JSX } from "@solidjs/web/jsx-runtime";
 
 export type TextFieldProps = Omit<
