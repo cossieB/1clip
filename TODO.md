@@ -11,3 +11,5 @@
 [ ] DMs
 
 [ ] Daily Challenges & XP system
+
+[ ] User Prefs

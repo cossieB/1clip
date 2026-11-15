@@ -7,9 +7,12 @@
     margin-inline: auto;
     padding-inline: 1rem;
 
-    .main {
-        container-type: inline-size;
-    }
+}
+.main {
+    container-type: inline-size;
+    min-height: 100dvh;
+    display: grid;
+    grid-template-rows: auto 1fr auto
 }
 
 .rail,
@@ -218,10 +221,15 @@
 }
 
 .verificationReminder {
-    background-color: var(--danger);
+    background-color: color-mix(in oklch, var(--danger) 50%, black );
     margin-bottom: 0.5rem;
     padding: 0.35rem;
-
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    padding: 1rem;
     button {
         padding: 0.15rem;
 
@@ -238,5 +246,32 @@
     .card,
     .nav a {
         transition: none
+    }
+}
+
+.creds {
+    padding: 1rem;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    hr {
+        border: none;
+        border-top: 1px solid #ccc;
+        height: 1px;
+        margin-bottom: 1rem;
+    }
+
+
+    svg {
+        display: inline;
+        height: 1.5rem;
+        width: 1.5rem;
+    }
+
+    a {
+        font-weight: bold;
+        margin-left: 0.5rem;
+        text-decoration: underline;
+
     }
 }
