@@ -4,13 +4,13 @@ import { action, affects, createMemo, createOptimistic, createStore, refresh, us
 import { getProfile, updateUser } from "../userApi";
 import { useUpload } from "~/hooks/useUpload";
 import { useAbortController } from "~/hooks/useAbortController";
-import { ToastContext } from "~/components/Toast/ToastProvider";
 import { getUsersSignedUrls } from "~/integrations/storageService/serverFn";
+import { useToastError } from "~/hooks/useToastError";
 
 export function useProfile() {
     const abortController = useAbortController()
-    const { addToast } = useContext(ToastContext)
-    const { setFiles, upload, isUploading, getSignedUrls, convertAndUpload } = useUpload(abortController)
+    const toastError = useToastError()
+    const { setFiles, convertAndUpload } = useUpload(abortController)
     const user = createMemo(() => getProfile())
     const [isSubmitting, setIsSubmitting] = createOptimistic(false)
 
@@ -40,12 +40,7 @@ export function useProfile() {
         }
         catch (error) {
             console.error(error)
-            addToast({
-                text: error instanceof Error && error.message
-                    ? error.message
-                    : "Something went wrong. Please try again later.",
-                type: "error"
-            })
+            toastError(error)
         }
     })
 

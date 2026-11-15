@@ -1,18 +1,19 @@
-// LFGBlock.tsx
-import { For, Loading, Show, action, createEffect, createMemo, createOptimistic, createOptimisticStore, createSignal, createUniqueId, onSettled, refresh, useContext, type ParentProps } from "solid-js"
+import { For, Loading, Show, createEffect, createMemo, createSignal, createUniqueId, onSettled, refresh, type ParentProps } from "solid-js"
 import { Portal } from "@solidjs/web"
 import styles from "./SquadBlock.module.css"
 import { PostContent } from "~/features/posts/components/PostContent"
 import { SquadWithDetails } from "../squadsRepository"
-import { ToastContext } from "~/components/Toast/ToastProvider"
 import { mediaSrc } from "~/utils/mediaSrc"
-import { applyToSquadFn, deleteSquadFn, getSquadApplicationsFn, updateSquadFn } from "../squadsApi"
+import { getSquadApplicationsFn } from "../squadsApi"
 import { ApplicationBlock } from "./ApplicationBlock"
 import { getRelativeTime } from "~/lib/getRelativeTime"
 import { AwaitedReturn } from "~/lib/utilityTypes"
 import { session } from "~/features/auth/authApi"
 import { HoldClickBtn } from "~/components/HoldClickBtn/HoldClickBtn"
 import { TrashIcon } from "@lucide/solid"
+import { useSquadDelete } from "../hooks/useSquadDelete"
+import { useCloseSquad } from "../hooks/useCloseSquad"
+import { useApplyToSquad } from "../hooks/useApplyToSquad"
 
 type Props = ParentProps<{
     squad: SquadWithDetails
@@ -20,80 +21,25 @@ type Props = ParentProps<{
 }>
 
 export function SquadBlock(props: Props) {
-    const { addToast } = useContext(ToastContext)
-    const toastError = (error: unknown) => addToast({
-        text: error instanceof Error && error.message
-            ? error.message
-            : "Something went wrong. Please try again later.",
-        type: "error",
-    })
 
     const [showApplications, setShowApplications] = createSignal(false)
-    const [confirmingClose, setConfirmingClose] = createSignal(false)
-    const [message, setMessage] = createSignal("")
 
     const signedIn = () => session().data?.user.id !== null
     const isOwner = () => signedIn() && session().data?.user.id === props.squad.creator.id
     const isExpired = () => props.squad.expiresAt ? new Date() > props.squad.expiresAt : false
 
-    // ── Apply (confirmed state resets when the prop is refetched) ──
-    const [appliedConfirmed, setAppliedConfirmed] = createSignal(() => props.squad.hasApplied)
-    const [applied, setApplied] = createOptimistic(() => appliedConfirmed())
-
-    const apply = action(function* () {
-        try {
-            setApplied(true)
-            yield applyToSquadFn({
-                id: props.squad.squadId,
-                message: message()
-            })
-        } catch (error) {
-            toastError(error)
-        }
-    })
-
-    // ── Close ──
-    const [activeConfirmed, setActiveConfirmed] = createSignal(() => props.squad.isActive && !isExpired())
-    const [active, setActive] = createOptimistic(() => activeConfirmed())
-
-    const close = action(function* () {
-        setConfirmingClose(false)
-        try {
-            setActive(false)
-            yield updateSquadFn({
-                lfgId: props.squad.squadId,
-                isActive: false
-            })
-            setActiveConfirmed(false)
-        } catch (error) {
-            toastError(error)
-        }
-    })
-
+    
     // ── Slots ──
     const filled = () => props.squad.acceptedApplicants.length
     const pips = () => Array.from({ length: props.squad.slots }, (_, i) => i < filled())
-
+    
     const created = () => new Date(props.squad.createdAt)
     const wasEdited = () => !!props.squad.editedOn
-
-    const [deleting, setDeleting] = createSignal(false)
-    const deleteAction = action(function* () {
-        setDeleting(true)
-        try {
-            yield deleteSquadFn(props.squad.squadId)
-            props.onDelete()
-        }
-        catch (error) {
-            addToast({
-                text: error instanceof Error && error.message
-                    ? error.message
-                    : "Something went wrong. Please try again later.",
-                type: "error"
-            })
-        }
-    })
-
+    
+    const {deleteAction, deleting} = useSquadDelete(props.squad.squadId, props.onDelete)
+    const {applied, setMessage, apply, message} = useApplyToSquad(props.squad.squadId, () => props.squad.hasApplied)
+    const {active, close} = useCloseSquad(props.squad.squadId, () => props.squad.isActive && !isExpired())
+    
     return (
         <article class={["card", styles.lfg]} data-squad-id={props.squad.squadId}>
             <header class={styles.header}>
@@ -210,25 +156,15 @@ export function SquadBlock(props: Props) {
                             disabled={deleting()}
                             action={async () => deleteAction()}
                             label={<TrashIcon color="var(--danger)" />}
-
+                            variant="danger"
                         />
 
                         <Show when={active()}>
-                            <Show
-                                when={confirmingClose()}
-                                fallback={
-                                    <button type="button" class={["secondary", styles.danger]} onClick={() => setConfirmingClose(true)}>
-                                        Close LFG
-                                    </button>
-                                }
-                            >
-                                <button type="button" class={["secondary", styles.danger]} onClick={() => close()}>
-                                    Confirm close
-                                </button>
-                                <button type="button" class="ghost" onClick={() => setConfirmingClose(false)}>
-                                    Cancel
-                                </button>
-                            </Show>
+                            <HoldClickBtn
+                                label="Close LFG"
+                                action={close}
+                                variant="danger"
+                            />                            
                         </Show>
                     </Show>
                 </Loading>
@@ -320,7 +256,7 @@ function ApplicationsDialog(props: ParentProps<{ onClose: () => void, id: number
                     </header>
                     <div class={styles.dialogBody}>
                         <Loading>
-                            <For each={applications()}>
+                            <For each={applications()} fallback={<p>No Applications Yet</p>}>
                                 {application =>
                                     <ApplicationBlock
                                         application={application}

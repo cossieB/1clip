@@ -15,9 +15,9 @@
         width: calc(var(--percent) * 1%);
     }
 
-    &[data-type="danger"] {
+    &[data-variant="danger"] {
         &::after {
-            background-color: var(--danger);
+            background-color: color-mix(in oklch, var(--danger) 30%, transparent);
         }
     }
 

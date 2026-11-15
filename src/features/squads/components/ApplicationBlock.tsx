@@ -1,12 +1,12 @@
-import { For, Show, action, createOptimistic, createSignal, useContext } from "solid-js"
+import { For, Show, action, createOptimistic, createSignal } from "solid-js"
 import { SquadApplicationWithApplicant } from "../squadsRepository"
 import { updateSquadApplicationFn } from "../squadsApi"
-import { ToastContext } from "~/components/Toast/ToastProvider"
 import { mediaSrc } from "~/utils/mediaSrc"
 import { PostContent } from "~/features/posts/components/PostContent"
 import { SquadApplicationStatus } from "~/drizzle/models"
 import styles from "./ApplicationBlock.module.css"
 import { getRelativeTime } from "~/lib/getRelativeTime"
+import { useToastError } from "~/hooks/useToastError"
 
 type Props = {
     application: SquadApplicationWithApplicant
@@ -27,7 +27,7 @@ const TONES: Record<SquadApplicationStatus, "warn" | "ok" | "danger"> = {
 }
 
 export function ApplicationBlock(props: Props) {
-    const {addToast} = useContext(ToastContext)
+    const toastError = useToastError()
     // confirmed status, resets whenever the application prop is refetched
     const [confirmed, setConfirmed] = createSignal<SquadApplicationStatus>(() => props.application.status)
     // what the screen shows: optimistic inside the action, confirmed otherwise
@@ -46,12 +46,7 @@ export function ApplicationBlock(props: Props) {
             setConfirmed(next)
             props.onChange?.(next)
         } catch (error) {
-            addToast({
-                text: error instanceof Error && error.message
-                    ? error.message
-                    : "Something went wrong. Please try again later.",
-                type: "error",
-            })
+            toastError(error)
         } finally {
             setSaving(false)
         }

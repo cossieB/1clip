@@ -1,9 +1,9 @@
-import { ToastContext } from "~/components/Toast/ToastProvider";
 import { markNotificationAsRead, notificationsMemo, setNotificationsMemo } from "../notificationsApi";
-import { action, affects, refresh, useContext } from "solid-js";
+import { action, affects, refresh } from "solid-js";
+import { useToastError } from "~/hooks/useToastError";
 
 export function useNotifications() {
-    const { addToast } = useContext(ToastContext)
+    const toastError = useToastError()
     const markAsRead = action(function* (ids: number[]) {
         affects(notificationsMemo)
         setNotificationsMemo(s => {
@@ -19,12 +19,7 @@ export function useNotifications() {
             refresh(notificationsMemo)
         }
         catch (error) {
-            addToast({
-                text: error instanceof Error && error.message
-                    ? error.message
-                    : "Something went wrong. Please try again later.",
-                type: "error"
-            })
+            toastError(error)
         }
     })
 

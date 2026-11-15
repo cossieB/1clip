@@ -1,8 +1,8 @@
-import { action, createSignal, For, Loading, Show, useContext } from "solid-js"
+import { For, Loading, Show } from "solid-js"
 import { PostContent } from "./PostContent"
 import styles from "./PostBlock.module.css"
 import { mediaSrc } from "~/utils/mediaSrc"
-import { deletePostFn, toggleLikeFn, type getPostFn } from "../postsApi"
+import { toggleLikeFn, type getPostFn } from "../postsApi"
 import { HeartIcon, MessageCircleIcon, TrashIcon } from "@lucide/solid"
 import { RenderMedia } from "~/components/RenderMedia"
 import { extractFirstVideo } from "../utils/parsePost"
@@ -12,7 +12,7 @@ import { getRelativeTime } from "~/lib/getRelativeTime"
 import { session } from "~/features/auth/authApi"
 import { paths } from "~/router"
 import { HoldClickBtn } from "~/components/HoldClickBtn/HoldClickBtn"
-import { ToastContext } from "~/components/Toast/ToastProvider"
+import { useDeletePost } from "../hooks/useDeletePost"
 
 type Props = {
     post: NonNullable<Awaited<ReturnType<typeof getPostFn>>> & { deleted?: boolean }
@@ -20,7 +20,7 @@ type Props = {
 }
 
 export function PostBlock(props: Props) {
-    const { addToast } = useContext(ToastContext)
+
     const { like, toggle } = useToggleLike({
         initial: () => ({
             liked: props.post.likedByCurrentUser,
@@ -32,22 +32,7 @@ export function PostBlock(props: Props) {
     const wasEdited = () => !!props.post.editedOn
     const externalVideo = () => extractFirstVideo(props.post.text)
 
-    const [deleting, setDeleting] = createSignal(false)
-    const deleteAction = action(function* () {
-        setDeleting(true)
-        try {
-            yield deletePostFn(props.post.postId)
-            props.onDelete()
-        }
-        catch (error) {
-            addToast({
-                text: error instanceof Error && error.message
-                    ? error.message
-                    : "Something went wrong. Please try again later.",
-                type: "error"
-            })
-        }
-    })
+    const {deleteAction, deleting} = useDeletePost(props.post.postId, props.onDelete)
 
     return (
         <article class={["card", styles.post]} data-post-id={props.post.postId}>
@@ -145,7 +130,7 @@ export function PostBlock(props: Props) {
                                 disabled={deleting()}
                                 action={async () => deleteAction()}
                                 label={<TrashIcon color="var(--danger)" />}
-
+                                variant="danger"
                             />
                         </Show>
                     </Loading>

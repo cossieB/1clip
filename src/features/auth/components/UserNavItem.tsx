@@ -6,7 +6,7 @@ import { session, useLogout } from "../authApi"
 import { SearchAutocomplete } from "~/components/SearchAutocomplete/SearchAutocomplete"
 import { getGamesFn } from "~/features/games/gamesApi"
 import { getStatusFn, setStatusFn } from "~/features/users/userApi"
-import { ToastContext } from "~/components/Toast/ToastProvider"
+import { useToastError } from "~/hooks/useToastError"
 
 type G = {
     gameId: number
@@ -14,12 +14,13 @@ type G = {
 }
 
 export function UserNavItem() {
+    const toastError = useToastError()
     const src = createMemo(() => session().data ? `${env.VITE_STORAGE_DOMAIN}/${session().data!.user.image}` : undefined)
     const [status, setStatus] = createOptimisticStore<G>(() => getStatusFn(), {
         gameId: -1,
         title: "In Lobby"
     })
-    const {addToast} = useContext(ToastContext)
+
     const update = action(function* (game: G) {
         try {
             setStatus(() => game)
@@ -27,12 +28,7 @@ export function UserNavItem() {
             refresh(status)
         } 
         catch (error) {
-            addToast({
-                text: error instanceof Error && error.message
-                    ? error.message
-                    : "Something went wrong. Please try again later.",
-                type: "error"
-            })            
+            toastError(error)            
         }
     })
 

@@ -1,4 +1,3 @@
-
 import { useAbortController } from "~/hooks/useAbortController"
 import { useUpload } from "~/hooks/useUpload"
 import { createPostFn, markPostUploadComplete } from "~/features/posts/postsApi"
@@ -6,11 +5,11 @@ import { action, createOptimistic, createStore, useContext } from "solid-js"
 import { useNavigate } from "@solidjs/router"
 import { paths } from "~/router"
 import { AwaitedReturn } from "~/lib/utilityTypes"
-import { ToastContext } from "~/components/Toast/ToastProvider"
+import { useToastError } from "~/hooks/useToastError"
 
 export function useCreatePost() {
     const navigate = useNavigate()
-    const { addToast } = useContext(ToastContext)
+    const toastError = useToastError()
     const abortController = useAbortController();
     const [isSubmitting, setIsSubmitting] = createOptimistic(false)
     const { setFiles, upload, files, convertFiles } = useUpload(abortController)
@@ -43,12 +42,7 @@ export function useCreatePost() {
             navigate(paths.posts(response.post.postId))
         }
         catch (error) {
-            addToast({
-                text: error instanceof Error && error.message
-                    ? error.message
-                    : "Something went wrong. Please try again later.",
-                type: "error"
-            })
+            toastError(error)
         }
     })
 

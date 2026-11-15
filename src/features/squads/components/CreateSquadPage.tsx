@@ -89,9 +89,11 @@ export default function CreateSquadPage() {
             await createSquadFn(result.input);
             navigate(paths.squads())
 
-        } catch (err) {
+        } 
+        catch (err) {
             setFormError(err instanceof Error ? err.message : "Something went wrong. Try again.");
-        } finally {
+        } 
+        finally {
             setPending(false);
         }
     }

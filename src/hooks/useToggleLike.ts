@@ -1,5 +1,5 @@
-import { action, createOptimistic, createSignal, useContext, type Accessor } from "solid-js"
-import { ToastContext } from "~/components/Toast/ToastProvider"
+import { action, createOptimistic, createSignal, type Accessor } from "solid-js"
+import { useToastError } from "./useToastError"
 
 export type LikeState = {
     liked: boolean
@@ -22,7 +22,7 @@ export function useToggleLike(options: Options): {
     like: Accessor<LikeState>
     toggle: () => void
 } {
-    const { addToast } = useContext(ToastContext)
+    const toastError = useToastError()
     // confirmed state, resets whenever `initial` changes
     const [likeState, setLikeState] = createSignal(() => options.initial())
     // what the screen shows: optimistic inside the action, confirmed otherwise
@@ -39,12 +39,7 @@ export function useToggleLike(options: Options): {
             if (result) setLikeState({ liked: result.liked, count: result.likeCount })
         }
         catch (error) {
-            addToast({
-                text: error instanceof Error && error.message
-                    ? error.message
-                    : "Something went wrong. Please try again later.",
-                type: "error",
-            })
+            toastError(error)
         }
     })
 

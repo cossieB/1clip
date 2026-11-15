@@ -24,7 +24,7 @@ export function HoldClickBtn(props: Props) {
     return (
         <button
             class={[styles.btn, rest.class]}
-            data-type={props.variant}
+            data-variant={props.variant}
             type="button"
             style={{
                 ...(rest.style ?? {}),

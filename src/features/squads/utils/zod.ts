@@ -20,7 +20,7 @@ export const SquadCreateSchema = z.object({
 export const UpdateSquadSchema = SquadCreateSchema
     .partial()
     .extend({ 
-        lfgId: z.int(),
+        squadId: z.int(),
         isActive: z.boolean().optional()
     })
 

@@ -11,6 +11,7 @@ import { CommentList } from "./CommentList"
 import { StoreSetter } from "solid-js"
 import { session } from "~/features/auth/authApi"
 import { getRelativeTime } from "~/lib/getRelativeTime"
+import { useToastError } from "~/hooks/useToastError"
 
 const MAX_LENGTH = 255
 
@@ -22,6 +23,7 @@ type Props = ParentProps<{
 
 export function CommentBlock(props: Props) {
     const { addToast } = useContext(ToastContext)
+    const toastError = useToastError()
     const textareaId = createUniqueId()
     let textarea!: HTMLTextAreaElement
     const [isCommenting, setIsCommenting] = createOptimistic(false)
@@ -87,12 +89,7 @@ export function CommentBlock(props: Props) {
             refresh(props.comments)
         }
         catch (error: unknown) {
-            addToast({
-                text: error instanceof Error && error.message
-                    ? error.message
-                    : "Something went wrong. Please try again later.",
-                type: "error"
-            })
+            toastError(error)
         }
     })
 

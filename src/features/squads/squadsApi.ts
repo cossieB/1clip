@@ -47,8 +47,8 @@ export async function updateSquadFn(input: z.input<typeof UpdateSquadSchema>) {
     const data = zodSafeParse(UpdateSquadSchema, input)
     const userSession = await ensureVerified();
     await rateLimiter("squad:update", userSession.user.id, 10, 60)
-    const { lfgId, ...rest } = data
-    await squadsRepository.updateSquad(lfgId, rest, userSession.user.id)
+    const { squadId, ...rest } = data
+    await squadsRepository.updateSquad(squadId, rest, userSession.user.id)
 }
 
 export async function deleteSquadFn(postId: number) {

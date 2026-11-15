@@ -3,6 +3,7 @@ import { Show, action, createOptimistic, createSignal, useContext } from "solid-
 import styles from "./FollowBtn.module.css"
 import { toggleFollowFn } from "../userApi"
 import { ToastContext } from "~/components/Toast/ToastProvider"
+import { useToastError } from "~/hooks/useToastError"
 
 type FollowResult = {
     following: boolean
@@ -18,6 +19,7 @@ type Props = {
 
 export function FollowBtn(props: Props) {
     const {addToast} = useContext(ToastContext)
+    const toastError = useToastError()
     // confirmed state, resets whenever the isFollowing prop is refetched
     const [confirmed, setConfirmed] = createSignal(() => props.isFollowing)
     // what the screen shows: optimistic inside the action, confirmed otherwise
@@ -36,14 +38,11 @@ export function FollowBtn(props: Props) {
             } else {
                 addToast({ text: "That user no longer exists.", type: "error" })
             }
-        } catch (error) {
-            addToast({
-                text: error instanceof Error && error.message
-                    ? error.message
-                    : "Something went wrong. Please try again later.",
-                type: "error",
-            })
-        } finally {
+        } 
+        catch (error) {
+            toastError(error)
+        } 
+        finally {
             setSaving(false)
         }
     })
