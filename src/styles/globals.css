@@ -234,6 +234,7 @@ input, textarea, .input {
     font: inherit;
     border-radius: var(--radius);
     caret-color: var(--accent);
+    caret-shape: block;
 
     &:focus-visible,
     &:focus-within {

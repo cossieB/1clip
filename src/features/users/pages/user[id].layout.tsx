@@ -7,7 +7,7 @@ import { AwaitedReturn } from "~/lib/utilityTypes";
 import styles from "./user[id].module.css"
 import { mediaSrc } from "~/utils/mediaSrc";
 import { session } from "~/features/auth/authApi";
-import { NavTabs } from "~/NavTabs/NavTabs";
+import { NavTabs } from "~/components/NavTabs/NavTabs";
 import { FollowBtn } from "../components/FollowBtn";
 
 export function UserIdLayout(props: ParentProps) {

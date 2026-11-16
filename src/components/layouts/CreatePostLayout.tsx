@@ -3,7 +3,7 @@ import { getRequestEvent, redirect } from "@solidjs/web";
 import { createEffect, createMemo, ParentProps } from "solid-js";
 import { session } from "~/features/auth/authApi";
 import { getCurrentUser } from "~/features/auth/serverFn";
-import { NavTabs } from "~/NavTabs/NavTabs";
+import { NavTabs } from "~/components/NavTabs/NavTabs";
 import { paths } from "~/router";
 
 const getSession = query(async () => {

@@ -78,7 +78,7 @@ export const getSimilarGames = GET(async (gameId: number) => {
     })
 })
 
-export const getAllGenres = GET(async () => {
+export const getAllGenresFn = GET(async () => {
     'use server'
     const res = await db.query.genres.findMany({
         orderBy: {

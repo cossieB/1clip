@@ -1,0 +1,73 @@
+.popover {
+    --dur: 0.3s;
+    --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+    /* reset.css zeroes margins, so re-center the modal */
+    margin: auto;
+    padding: 2rem;
+    color: var(--text);
+    background: linear-gradient(160deg, var(--surface-2), var(--surface-1));
+    border: 1px solid var(--accent-deep);
+    box-shadow: 0 0 40px -8px var(--accent-glow);
+
+    /* Exit state (also the pre-entry state) */
+    opacity: 0;
+    translate: 0 1.5rem;
+    scale: 0.96;
+    filter: blur(6px);
+
+    transition:
+        opacity var(--dur) var(--ease),
+        translate var(--dur) var(--ease),
+        scale var(--dur) var(--ease),
+        filter var(--dur) var(--ease),
+        overlay var(--dur) allow-discrete,
+        display var(--dur) allow-discrete;
+
+    &:popover-open {
+        opacity: 1;
+        translate: 0 0;
+        scale: 1;
+        filter: blur(0);
+    }
+
+    &::backdrop {
+        background: oklch(0 0 0 / 0);
+        backdrop-filter: blur(0);
+        transition:
+            background var(--dur) var(--ease),
+            backdrop-filter var(--dur) var(--ease),
+            overlay var(--dur) allow-discrete,
+            display var(--dur) allow-discrete;
+    }
+
+    &:popover-open::backdrop {
+        background: oklch(0 0 0 / 0.65);
+        backdrop-filter: blur(6px);
+    }
+
+    button {
+        margin-top: 1rem;
+        padding: 0.5rem 1rem;
+        background-color: var(--accent);
+    }
+
+    span+div {
+        margin-top: 2rem;
+    }
+
+}
+
+@starting-style {
+    .popover:popover-open {
+        opacity: 0;
+        translate: 0 1.5rem;
+        scale: 0.96;
+        filter: blur(6px);
+    }
+
+    .popover:popover-open::backdrop {
+        background: oklch(0 0 0 / 0);
+        backdrop-filter: blur(0);
+    }
+}

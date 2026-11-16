@@ -29,3 +29,9 @@ export const ensureAuthOrRedirect = query(async () => {
     const userSession = await getCurrentUser()
     if (!userSession) return redirect(paths({dialog: "signin"}))
 }, "authcheck")
+
+export const ensureAdminOrRedirect = query(async () => {
+    'use server'
+    const userSession = await getCurrentUser()
+    if (!userSession || userSession.user.role.toLowerCase() !== "admin") return redirect(paths())
+}, "admincheck")
