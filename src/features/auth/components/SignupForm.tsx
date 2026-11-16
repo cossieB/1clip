@@ -4,6 +4,7 @@ import { paths } from "~/router"
 import { session, useSignUp } from "../authApi"
 import { isPending, Show } from "solid-js"
 import { Spinner } from "~/components/Loader/Spinner"
+import { useSearchParams } from "@solidjs/router"
 
 const SignupSchema = z.object({
     email: z.email(),
@@ -22,7 +23,7 @@ const SignupSchema = z.object({
     })
 
 export function SignupForm() {
-
+    const [, setSearch] = useSearchParams()
     const { signup, isSubmitting, input, setInput } = useSignUp()
 
     const disabled = () => !SignupSchema.safeParse(input).success
@@ -65,7 +66,7 @@ export function SignupForm() {
                     "font-size": "small"
                 }}
             >
-                <a href={paths({ dialog: "signin" })} replace>Already have an account?</a>
+                <a href="?dialog=signin" replace>Already have an account?</a>
             </div>
             <button
                 class="primary"

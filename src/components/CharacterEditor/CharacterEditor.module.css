@@ -1,0 +1,167 @@
+.root {
+    container-type: inline-size;
+    display: grid;
+    gap: 1rem;
+}
+
+/* ── Header ── */
+.header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.title {
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+
+.count {
+    padding: 0.1rem 0.5rem;
+    font: 600 0.68rem var(--font-ui);
+    letter-spacing: 0.08em;
+    color: var(--accent-bright);
+    background: color-mix(in oklch, var(--accent) 12%, transparent);
+    border: 1px solid color-mix(in oklch, var(--accent) 50%, transparent);
+}
+
+/* ── Empty / hint ── */
+.empty {
+    padding: 1.25rem 1rem;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-subtle);
+    border: 1px dashed var(--border-strong);
+    max-width: none;
+}
+
+.hint {
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    color: var(--warn);
+}
+
+/* ── Table ── */
+.table {
+    --cols: minmax(0, 1.2fr) minmax(0, 1.6fr) minmax(0, 1fr) 2rem;
+
+    display: grid;
+    gap: 0.5rem;
+}
+
+.columnHeaders {
+    display: grid;
+    grid-template-columns: var(--cols);
+    gap: 0.75rem;
+    padding-inline: 0.75rem;
+    font: 600 0.65rem var(--font-ui);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+}
+
+.list {
+    display: grid;
+    gap: 0.4rem;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: var(--cols);
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: border-color 0.15s, background-color 0.15s, opacity 0.2s, translate 0.2s;
+
+    &:hover,
+    &:focus-within {
+        border-color: var(--border-strong);
+        background: var(--surface-2);
+    }
+
+    /* new rows slide in */
+    @starting-style {
+        opacity: 0;
+        translate: 0 -6px;
+    }
+}
+
+.name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+    color: var(--text);
+}
+
+/* inputs and select pick up the global look, this only sizes them */
+.field {
+    inline-size: 100%;
+    min-inline-size: 0;
+    font-size: 0.9rem;
+}
+
+.character:invalid:not(:focus-visible) {
+    border-bottom-color: var(--danger);
+}
+
+/* ── Remove ── */
+.remove {
+    display: grid;
+    place-items: center;
+    inline-size: 2rem;
+    block-size: 2rem;
+    padding: 0;
+    color: var(--text-muted);
+    background: transparent;
+    border: 1px solid transparent;
+    transition: color 0.15s, background-color 0.15s, border-color 0.15s;
+
+    svg {
+        inline-size: 0.75rem;
+        block-size: 0.75rem;
+    }
+
+    &:hover {
+        color: var(--danger);
+        background: color-mix(in oklch, var(--danger) 14%, transparent);
+        border-color: color-mix(in oklch, var(--danger) 50%, transparent);
+    }
+}
+
+/* ── Narrow: stack each row ── */
+@container (max-width: 36rem) {
+    .columnHeaders {
+        display: none;
+    }
+
+    .row {
+        grid-template-columns: minmax(0, 1fr) 2rem;
+        grid-template-areas:
+            "name remove"
+            "character character"
+            "role role";
+        gap: 0.5rem;
+    }
+
+    .name {
+        grid-area: name;
+    }
+
+    .character {
+        grid-area: character;
+    }
+
+    .role {
+        grid-area: role;
+    }
+
+    .remove {
+        grid-area: remove;
+    }
+}

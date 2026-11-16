@@ -10,9 +10,10 @@ import { ShowWhenAuthed } from "~/features/auth/components/ShowWhenAuthed";
 import { Dialog } from "~/components/Popover/Dialog";
 import { paths } from "~/router";
 import { VerificationReminder } from "./VerificationReminder";
+import { useSearchParams } from "@solidjs/router";
 
 export default function MainLayout(props: ParentProps) {
-
+    const [, setSearch] = useSearchParams()
     return (
         <div class={styles.shell}>
             {/* <!-- LEFT RAIL --> */}
@@ -21,14 +22,13 @@ export default function MainLayout(props: ParentProps) {
                 <Nav />
                 <ShowWhenAuthed
                     fallback={
-                        <a
+                        <button
                             class={["button", "primary", styles.postbtn]}
-                            href={paths({ dialog: "signin" },)}
-                            replace
+                            onClick={() => setSearch({dialog: "signin"}, {replace: true})}
                         >
                             <UnlockIcon />
                             <span>Login</span>
-                        </a>
+                        </button>
                     }
                 >
                     <a class={["button primary", styles.postbtn]} href={paths.posts.create()}>

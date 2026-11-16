@@ -24,9 +24,12 @@ import { CompanyIdRoute } from './features/companies/pages/company[id]';
 import { ActorIdRoute } from './features/actors/pages/actor[id]';
 import { PlatformIdRoute } from './features/platforms/pages/platform[id]';
 import { NotificationsRoute } from './features/notifications/pages/notifications';
-import { ensureAuthOrRedirect } from './features/auth/utils/ensureAuth';
+import { ensureAdminOrRedirect, ensureAuthOrRedirect } from './features/auth/utils/ensureAuth';
 import SearchRoute from './features/search/routes/search';
 import { SquadIdRoute } from './features/squads/pages/squad[id]';
+import { AdminLayout } from './components/layouts/AdminLayout';
+import { AdminGameRoute } from './features/games/pages/admin.game[id]';
+import { AdminGameCreateRoute } from './features/games/pages/admin.game.create';
 
 
 // Link preloading is opt-in. intentPreload() is the hover/focus/touch
@@ -135,13 +138,28 @@ export const Router = createRouter({
                     search: z.object({
                         q: z.string().catch(""),
                         type: z.enum(["posts", "games", "squads"]),
-                        page: z.string(),
-                        
+                        page: z.string(),                        
                     })
                 }
-            ],
-
+            ],                         
+        }, {
+            path: "/admin",
+            component: AdminLayout,
+            preload: () => void ensureAdminOrRedirect(),
+            children: [
+                {
+                    path: "/games/:gameId",
+                    matchFilters: {
+                        gameId: int
+                    },
+                    component: AdminGameRoute
+                }, {
+                    path: "/games/new",
+                    component: AdminGameCreateRoute
+                }
+            ]
         }
+        
     ]
 });
 

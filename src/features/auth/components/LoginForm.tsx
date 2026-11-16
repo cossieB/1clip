@@ -30,8 +30,8 @@ export function LoginForm() {
                     "font-size": "small"
                 }}
             >
-                <a href={paths({ dialog: "signup" })} replace>Click here to create account</a>
-                <a href={paths({ dialog: "reset" })} replace>Forgot password?</a>
+                <a href="?dialog=signup"  replace>Click here to create account</a>
+                <a href="?dialog=reset"  replace>Forgot password?</a>
             </div>
             <button
                 class="primary"

@@ -47,8 +47,8 @@ export function RequestPasswordRequestForm() {
                     "font-size": "small"
                 }}
             >
-                <a href={paths({ dialog: "signup" })} replace>Click here to create account</a>
-                <a href={paths({ dialog: "signin" })} replace>Remembered password?</a>
+                <a href="?dialog=signup" replace>Click here to create account</a>
+                <a href="?dialog=signin" replace>Remembered password?</a>
             </div>
             <button disabled={!z.email().safeParse(email()).success || submitting()} type="submit">Reset</button>
         </form>

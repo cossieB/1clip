@@ -1,7 +1,7 @@
 import { useNavigate } from "@solidjs/router";
 import { createEffect, ParentProps } from "solid-js";
 import { session } from "~/features/auth/authApi";
-import { NavTabs } from "~/NavTabs/NavTabs";
+import { NavTabs } from "~/components/NavTabs/NavTabs";
 import { paths } from "~/router";
 
 export function SettingsLayout(props: ParentProps) {

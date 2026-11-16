@@ -1,0 +1,83 @@
+.root {
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0.75rem 1rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 0;
+
+    &:disabled {
+        opacity: 0.45;
+    }
+}
+
+.legend {
+    padding-inline: 0.5rem;
+    font: 600 0.7rem var(--font-ui);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+
+.list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+
+    li {
+            flex-grow: 1;
+    }
+}
+
+.option {
+
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.8rem;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s;
+
+    &:hover {
+        border-color: var(--border-strong);
+    }
+
+    /* the row reacts to its own checkbox, no JS class toggling */
+    &:has(.input:checked) {
+        background: color-mix(in oklch, var(--accent) 14%, transparent);
+        border-color: color-mix(in oklch, var(--accent) 50%, transparent);
+
+        .text {
+            color: var(--accent-bright);
+        }
+    }
+
+    .root:disabled & {
+        cursor: not-allowed;
+    }
+}
+
+/* the checkbox itself is painted by the global inputs.css */
+.input {
+    flex-shrink: 0;
+}
+
+.text {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    transition: color 0.15s;
+}
+
+.message {
+    padding: 0.6rem 0;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+}
+
+.messageError {
+    color: var(--danger);
+}

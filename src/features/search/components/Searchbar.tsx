@@ -3,6 +3,7 @@ import styles from "./Searchbar.module.css"
 import { mediaSrc } from "~/utils/mediaSrc"
 import { SearchIcon } from "@lucide/solid"
 import { searchSuggestionsFn } from "../searchApi"
+import { session } from "~/features/auth/authApi"
 
 const MIN_LENGTH = 2
 const DEBOUNCE_MS = 250
@@ -43,7 +44,7 @@ export function SearchBar() {
     }
 
     const onSubmit = (e: SubmitEvent) => {
-        if (input.value.trim().length === 0) e.preventDefault()
+        if (input.value.trim().length === 0 || disabled()) e.preventDefault()
     }
 
     // Arrow keys move real focus between the result links; Escape closes the panel.
@@ -69,7 +70,7 @@ export function SearchBar() {
     const onFocusOut = (e: FocusEvent) => {
         if (!root.contains(e.relatedTarget as Node | null)) setOpen(false)
     }
-
+const disabled = createMemo(() => !session().data, {loadingValue: true})
     return (
         <form
             ref={root}
@@ -80,6 +81,7 @@ export function SearchBar() {
             onSubmit={onSubmit}
             onKeyDown={onKeyDown}
             onFocusOut={onFocusOut}
+            
         >
             <SearchIcon size={18} class={styles.icon} />
 
@@ -88,8 +90,8 @@ export function SearchBar() {
                 class={["cutout", styles.input]}
                 type="search"
                 name="q"
-                placeholder="Search squads, posts, games"
-                aria-label="Search squads, posts and games"
+                placeholder={disabled() ? "Login in to search" : "Search squads, posts, games"}
+                aria-label={disabled() ? "Login in to search": "Search squads, posts and games"}
                 aria-controls={panelId}
                 // aria-expanded={visible()}
                 autocomplete="off"
@@ -97,6 +99,7 @@ export function SearchBar() {
                 enterkeyhint="search"
                 maxlength={100}
                 onInput={onInput}
+                disabled={disabled()}
                 onFocus={() => setOpen(true)}
             />
 
@@ -108,7 +111,7 @@ export function SearchBar() {
                     onMouseDown={e => e.preventDefault()}
                     onClick={() => setOpen(false)}
                 >
-                    <Errored fallback={<p class={styles.status}>Search failed. Please try again.</p>}>
+                    <Errored fallback={err => <p class={styles.status}>{(err() as Error).message || "Search failed. Please try again later"}</p>}>
                         <Loading fallback={<p class={styles.status}>Searching…</p>}>
                             <Show when={results()}>
                                 {data => (
