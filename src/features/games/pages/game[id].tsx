@@ -21,7 +21,7 @@ export function GameIdRoute() {
             <Show when={game()} fallback={<NotFound message="These aren't the games you're looking for" />}>
                 {game => (
                     <>
-                        {httpHeader("Cache-Control", "public, max-age=604800, stale-while-revalidate=86400")}
+                        {httpHeader("Cache-Control", "public, max-age=604800, stale-while-revalidate=604800")}
                         {httpHeader("Last-Modified", (game().dateModified ?? game().dateAdded).toUTCString())}
                         <Meta property="og:title" content={game().title} />
                         <Meta property="og:image" content={mediaSrc(game().banner)} />

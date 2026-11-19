@@ -5,7 +5,6 @@ import { createMemo, Loading, Show } from "solid-js";
 import { getPostFn } from "../postsApi";
 import NotFound from "~/routes/[...404]";
 import { CommentList } from "~/features/comments/components/CommentList";
-import { httpHeader } from "@solidjs/web";
 import { PostSkeleton } from "~/components/Skeletons/Skeletons";
 import { SiteTitle } from "~/components/CustomSiteTitle";
 
@@ -13,7 +12,6 @@ export function PostId() {
     const params = useParams(paths.posts)
     const post = createMemo(() => getPostFn(Number(params.postId)))
     const navigate = useNavigate()
-    httpHeader("Cache-Control", "private, max-age=600")
     return (
         <Loading fallback={<PostSkeleton />}>
             <Show

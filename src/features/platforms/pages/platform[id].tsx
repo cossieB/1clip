@@ -22,7 +22,7 @@ export function PlatformIdRoute() {
             <Show when={platform()} fallback={<NotFound />}>
                 {platform => (
                     <>
-                        {httpHeader("Cache-Control", "public, max-age=604800, stale-while-revalidate=86400")}
+                        {httpHeader("Cache-Control", "public, max-age=604800, stale-while-revalidate=604800")}
                         {httpHeader("Last-Modified", (platform().dateModified ?? platform().dateAdded).toUTCString())}
                         <Meta property="og:title" content={platform().name} />
                         <Meta property="og:image" content={mediaSrc(platform().logo)} />

@@ -22,7 +22,7 @@ export function CompanyIdRoute() {
             <Show when={company()} fallback={<NotFound />}>
                 {company => (
                     <>
-                        {httpHeader("Cache-Control", "public, max-age=604800, stale-while-revalidate=86400")}
+                        {httpHeader("Cache-Control", "public, max-age=604800, stale-while-revalidate=604800")}
                         {httpHeader("Last-Modified", (company().dateModified ?? company().dateAdded).toUTCString())}
                         <Meta property="og:title" content={company().name} />
                         <Meta property="og:image" content={mediaSrc(company().logo)} />

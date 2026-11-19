@@ -152,8 +152,7 @@ export const Router = createRouter({
                     })
                 }
             ],
-        },
-        {
+        }, {
             component: AdminLayout,
             path: "/admin",
             preload: () => void ensureAdminOrRedirect(),

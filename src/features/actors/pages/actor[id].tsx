@@ -22,7 +22,7 @@ export function ActorIdRoute() {
             <Show when={actor()} fallback={<NotFound  />}>
                 {actor => (
                     <>
-                        {httpHeader("Cache-Control", "public, max-age=604800, stale-while-revalidate=86400")}
+                        {httpHeader("Cache-Control", "public, max-age=604800, stale-while-revalidate=604800")}
                         {httpHeader("Last-Modified", (actor().dateModified ?? actor().dateAdded).toUTCString())}
                         <Meta property="og:title" content={actor().name} />
                         <Show when={actor().photo}>

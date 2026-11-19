@@ -1,6 +1,5 @@
 import { useNavigate, useParams } from "@solidjs/router"
-import { httpHeader } from "@solidjs/web"
-import { createMemo, Loading, Show, untrack } from "solid-js"
+import { createMemo, Loading, Show } from "solid-js"
 import { NotFound } from "~/components/NotFound/NotFound"
 import { SquadSkeleton } from "~/components/Skeletons/Skeletons"
 import { paths } from "~/router"
@@ -11,7 +10,6 @@ export function SquadIdRoute() {
     const params = useParams(paths.squads)
     const squad = createMemo(() => getSquadFn(Number(params.squadId)))
     const navigate = useNavigate()
-    httpHeader("Cache-Control", "private, max-age=600");
     return (
         <Loading fallback={<SquadSkeleton />}>
             <Show
