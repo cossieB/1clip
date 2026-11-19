@@ -6,8 +6,9 @@ import { GET } from "@solidjs/web/server-functions"
 import { LimitOffsetSchema } from "~/utils/zod"
 import { zodSafeParse } from "~/utils/zodSafeParse"
 import z from "zod"
-import { respond } from "@solidjs/web"
+import { redirect, respond } from "@solidjs/web"
 import { ensureAdmin } from "../auth/utils/ensureAuth"
+import { paths } from "~/router"
 
 export const getPlatformsFn = GET(async (arg: z.input<typeof LimitOffsetSchema>) => {
     'use server'
@@ -26,9 +27,12 @@ export const getPlatformFn = GET(async (id: number) => {
     const platform = await platformRepository.findById(data)
     return respond(platform ?? null, {
         headers: {
-            "Cache-Control": "public, max-age=604800, stale-while-revalidate=86400"
+            "Cache-Control": platform ? "public, max-age=604800, stale-while-revalidate=86400" : "public, max-age=300",
+            ...(platform && {
+                "Last-Modified": (platform.dateModified ?? platform.dateAdded).toUTCString()
+            })
         }
-    })
+    });
 })
 
 export async function createPlatformFn(platform: z.input<typeof platformCreateSchema>) {
@@ -37,7 +41,7 @@ export async function createPlatformFn(platform: z.input<typeof platformCreateSc
     await ensureAdmin()
     const p = await platformRepository.createPlatform(data)
     orphanedFileService.removePendingUpload(data.logo)
-    return p
+    return redirect(paths.admin.platforms(p.platformId)())
 }
 
 export async function editPlatformFn(platform: z.input<typeof platformEditSchema>) {
@@ -50,5 +54,15 @@ export async function editPlatformFn(platform: z.input<typeof platformEditSchema
         orphanedFileService.removePendingUpload(data.logo);
         (data.logo != old.oldLogo) && storageService.moveToDeletedBucket(old.oldLogo)
     }
+    return old
 }
 
+export const getPlatformsAdminFn = GET(async (args: z.input<typeof LimitOffsetSchema>) => {
+    'use server'
+    const platforms = await getPlatformsFn(args)
+    return respond(platforms, {
+        headers: {
+            "Cache-Control": "no-store"
+        }
+    })
+})

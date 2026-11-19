@@ -28,7 +28,8 @@ export default {
     ACCESS_KEY_ID: z.string(),
     SECRET_ACCESS_KEY: z.string(),
     CLOUDFLARE_ENDPOINT: z.string(),
-    R2_DOMAIN: z.string()
+    R2_DOMAIN: z.string(),
+    BUCKET: z.string().default("clipz")
   },
   client: {
     VITE_STORAGE_DOMAIN: z.string(),

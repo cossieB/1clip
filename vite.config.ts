@@ -18,6 +18,7 @@ export default defineConfig({
     // cloudflare({ viteEnvironment: { name: "ssr" } }),
     solid({
       start: {
+        devtools: false,
         middleware: './src/middleware/index.ts',
         // Emit dist/server/node.js: a ready-to-run Node server (static
         // assets + the handler). Other platforms import dist/server/server.js.

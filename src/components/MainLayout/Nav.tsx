@@ -3,6 +3,7 @@ import styles from "./MainLayout.module.css"
 import { ShowWhenAuthed } from "~/features/auth/components/ShowWhenAuthed"
 import { paths } from "~/router"
 import { NavNotifications } from "~/features/notifications/components/NavNotifications"
+import { useSearchParams } from "@solidjs/router"
 
 export function Nav() {
     return (
@@ -20,20 +21,20 @@ export function Nav() {
 }
 
 export function Tabbar() {
+    const [, setSearch] = useSearchParams()
     return (
         <nav class={styles.tabbar} aria-label="Main">
             <a href="/" > <HomeIcon /> Home</a>
             <a href={paths.posts()}> <VideoIcon />Clips</a>
             <ShowWhenAuthed
                 fallback={
-                    <a
+                    <button
                         class={[styles.postmobile]}
                         aria-label="Login"
-                        href={paths({ dialog: "signin" })}
-                        replace
+                        onClick={() => setSearch({ dialog: "signin" }, {replace: true})}                        
                     >
                         <UnlockIcon />
-                    </a>
+                    </button>
                 }
             >
                 <button

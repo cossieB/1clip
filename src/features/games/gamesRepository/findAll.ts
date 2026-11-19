@@ -39,8 +39,8 @@ export async function findAll(obj: GameQueryFilters = {}) {
     if (obj.title)
         filters.push(ilike(games.title, `%${obj.title}%`))
 
-    if (obj.fullTextQuery)
-        filters.push(sql`${games.searchVector} @@ websearch_to_tsquery('english', ${obj.fullTextQuery})`)
+    if (obj.fullTextSearch)
+        filters.push(sql`${games.searchVector} @@ websearch_to_tsquery('english', ${obj.fullTextSearch})`)
 
     const {searchVector, dateModified, dateAdded, ...rest} = getColumns(games)
 

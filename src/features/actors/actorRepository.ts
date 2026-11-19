@@ -1,4 +1,4 @@
-import { and, eq, getColumns, InferInsertModel, InferSelectModel, notInArray, sql } from "drizzle-orm";
+import { and, eq, getColumns, InferInsertModel, InferSelectModel, notInArray, SQL, sql } from "drizzle-orm";
 import { db } from "~/drizzle/db";
 import { actors, appearances, games } from "~/drizzle/schema";
 
@@ -11,7 +11,13 @@ export function findById(actorId: number) {
 }
 
 export async function findAll(filters?: { limit?: number, offset?: number }) {
-    return db.query.actors.findMany(filters)
+    return db.query.actors.findMany({
+        ...filters,
+        orderBy: {
+            name: "asc",
+            actorId: "asc"
+        }
+    })
 }
 
 type Char = {
@@ -31,13 +37,13 @@ export function createActor(actor: InferInsertModel<typeof actors>, characters: 
 }
 
 export async function editActor(actorId: number, actor: Partial<InferSelectModel<typeof actors>>, characters?: Char[]) {
-    if (!characters) return db.update(actors).set({...actor, dateModified: sql`NOW()`}).where(eq(actors.actorId, actorId)).returning({
-        oldPhoto: sql<string | null>`OLD.${actors.photo.name}`
+    if (!characters) return db.update(actors).set({ ...actor, dateModified: sql`NOW()` }).where(eq(actors.actorId, actorId)).returning({
+        oldPhoto: sql.raw(`OLD.${actors.photo.name}`) as SQL<string>
     })
 
     return db.transaction(async tx => {
-        const a = await tx.update(actors).set({...actor, dateModified: sql`NOW()`}).where(eq(actors.actorId, actorId)).returning({
-            oldPhoto: sql<string | null>`OLD.${actors.photo.name}`
+        const a = await tx.update(actors).set({ ...actor, dateModified: sql`NOW()` }).where(eq(actors.actorId, actorId)).returning({
+            oldPhoto: sql.raw(`OLD.${actors.photo.name}`) as SQL<string>
         })
         if (characters.length == 0)
             await tx.delete(appearances).where(eq(appearances.actorId, actorId))

@@ -16,7 +16,7 @@ const adminOnly = async () => {
 }
 
 export async function getLogoSignedUrls(img: z.input<typeof ImageUploadSchema>) {
-    'use server'
+    'use server'    
     const userSession = await adminOnly()
     const data = ImageUploadSchema.parse(img)
     return generateAndStoreSignedUrls(data, userSession.user.id, "logos")

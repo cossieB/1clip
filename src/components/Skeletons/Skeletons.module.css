@@ -153,3 +153,32 @@
     flex-wrap: wrap;
     gap: .5rem;
 }
+
+/* ── Game grid ── */
+.gameGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: .25rem;
+}
+
+.game {
+    display: grid;
+    gap: .4rem;
+    pointer-events: none;
+}
+
+.cover {
+    aspect-ratio: 4 / 5;
+}
+
+.gameTitle {
+    --bevel: 10px;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: .4rem;
+    /* two lines of title text plus padding, so the grid doesn't shift when real titles land */
+    min-height: 3.5rem;
+    padding: .6rem .75rem;
+    background: var(--surface-2);
+}

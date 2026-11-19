@@ -32,6 +32,7 @@ declare module 'virtual:solid-env/server' {
     readonly "SECRET_ACCESS_KEY": __Out<__Schema["server"]["SECRET_ACCESS_KEY"]>;
     readonly "CLOUDFLARE_ENDPOINT": __Out<__Schema["server"]["CLOUDFLARE_ENDPOINT"]>;
     readonly "R2_DOMAIN": __Out<__Schema["server"]["R2_DOMAIN"]>;
+    readonly "BUCKET": __Out<__Schema["server"]["BUCKET"]>;
     readonly "VITE_STORAGE_DOMAIN": __Out<__Schema["client"]["VITE_STORAGE_DOMAIN"]>;
     readonly "VITE_SITE_URL": __Out<__Schema["client"]["VITE_SITE_URL"]>;
     readonly "VITE_POST_LIMIT": __Out<__Schema["client"]["VITE_POST_LIMIT"]>;

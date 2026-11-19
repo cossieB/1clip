@@ -27,15 +27,25 @@ import { NotificationsRoute } from './features/notifications/pages/notifications
 import { ensureAdminOrRedirect, ensureAuthOrRedirect } from './features/auth/utils/ensureAuth';
 import SearchRoute from './features/search/routes/search';
 import { SquadIdRoute } from './features/squads/pages/squad[id]';
-import { AdminLayout } from './components/layouts/AdminLayout';
 import { AdminGameRoute } from './features/games/pages/admin.game[id]';
-
+import { AdminGameCreateRoute } from './features/games/pages/admin.game.create';
+import { AdminCompanyRoute } from './features/companies/pages/admin.company[id]';
+import { AdminCompanyCreate } from './features/companies/pages/admin.company.new';
+import { AdminPlatformRoute } from './features/platforms/pages/admin.platform[id]';
+import { AdminPlatformCreate } from './features/platforms/pages/admin.platform.new';
+import { AdminActorCreate } from './features/actors/pages/admin.actor.new';
+import { AdminActorRoute } from './features/actors/pages/admin.actor[id]';
+import { AdminGamesRoute } from './features/games/pages/admin.games';
+import { AdminCompaniesRoute } from './features/companies/pages/admin.companies';
+import { AdminPlatformsRoute } from './features/platforms/pages/admin.platforms';
+import { AdminActorsRoute } from './features/actors/pages/admin.actors';
 
 // Link preloading is opt-in. intentPreload() is the hover/focus/touch
 // strategy: resting on a link warms its code and runs its preload, which is
 // what makes navigation feel instant once the data lives on the server.
 
 const CreateSquadPage = clientOnly(() => import("~/features/squads/components/CreateSquadPage"))
+const AdminLayout = clientOnly(() => import("~/components/layouts/AdminLayout"))
 
 export const Router = createRouter({
     routes: [
@@ -93,7 +103,7 @@ export const Router = createRouter({
                     search: z.object({
                         gameId: z.string().optional()
                     }).optional()
-                },{
+                }, {
                     path: "/squads/:squadId",
                     matchFilters: {
                         squadId: int
@@ -120,7 +130,8 @@ export const Router = createRouter({
                     component: GamesRoute
                 }, {
                     path: "/companies/:companyId",
-                    component: CompanyIdRoute
+                    component: CompanyIdRoute,
+
                 }, {
                     path: "/actors/:actorId",
                     component: ActorIdRoute
@@ -137,25 +148,68 @@ export const Router = createRouter({
                     search: z.object({
                         q: z.string().catch(""),
                         type: z.enum(["posts", "games", "squads"]),
-                        page: z.string(),                        
+                        page: z.string(),
                     })
                 }
-            ],                         
-        }, {
-            path: "/admin",
+            ],
+        },
+        {
             component: AdminLayout,
+            path: "/admin",
             preload: () => void ensureAdminOrRedirect(),
             children: [
                 {
+                    path: "/games",
+                    component: AdminGamesRoute
+                }, {
                     path: "/games/:gameId",
                     matchFilters: {
                         gameId: int
                     },
                     component: AdminGameRoute
-                }
+                }, {
+                    path: "/games/add",
+                    component: AdminGameCreateRoute
+                }, {
+                    path: "/companies",
+                    component: AdminCompaniesRoute
+                }, {
+                    path: "/companies/:companyId",
+                    matchFilters: {
+                        companyId: int
+                    },
+                    component: AdminCompanyRoute,
+                }, {
+                    path: "/companies/add",
+                    component: AdminCompanyCreate
+                }, {
+                    path: "/platforms",
+                    component: AdminPlatformsRoute
+                }, {
+                    path: "/platforms/:platformId",
+                    component: AdminPlatformRoute,
+                    matchFilters: {
+                        platformId: int
+                    },
+                }, {
+                    path: "/platforms/add",
+                    component: AdminPlatformCreate
+                }, {
+                    path: "/actors",
+                    component: AdminActorsRoute
+                }, {
+                    path: "/actors/add",
+                    component: AdminActorCreate
+                }, {
+                    path: "/actors/:actorId",
+                    component: AdminActorRoute,
+                    matchFilters: {
+                        actorId: int
+                    }
+                },
             ]
         }
-        
+
     ]
 });
 

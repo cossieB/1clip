@@ -1,6 +1,6 @@
 import { GET } from "@solidjs/web/server-functions";
 import * as gamesRepository from "./gamesRepository";
-import { respond } from "@solidjs/web";
+import { redirect, respond } from "@solidjs/web";
 import z from "zod";
 import { GameCreateSchema, GameEditSchema, GetGamesSchema } from "./utils/zod";
 import { zodSafeParse } from "~/utils/zodSafeParse";
@@ -9,6 +9,7 @@ import { orphanedFileService } from "~/services/orphanedFileService";
 import { storageService } from "~/integrations/storageService/index.server";
 import { cacheAside } from "~/utils/cacheAside";
 import { db } from "~/drizzle/db";
+import { paths } from "~/router";
 
 export const getGamesFn = GET(async (filters: z.input<typeof GetGamesSchema>) => {
     'use server'
@@ -19,7 +20,7 @@ export const getGamesFn = GET(async (filters: z.input<typeof GetGamesSchema>) =>
             headers: {
                 "Cache-Control": "public, max-age=604800, stale-while-revalidate=86400"
             }
-        })      
+        })
     } catch (error) {
         console.error(error)
         throw error
@@ -32,9 +33,12 @@ export const getGameFn = GET(async (gameId: number) => {
     const game = await gamesRepository.findById(data);
     return respond(game ?? null, {
         headers: {
-            "Cache-Control": "public, max-age=604800, stale-while-revalidate=86400"
+            "Cache-Control": game ? "public, max-age=604800, stale-while-revalidate=86400" : "public, max-age=300",
+            ...(game && {
+                "Last-Modified": (game.dateModified ?? game.dateAdded).toUTCString()
+            })
         }
-    })
+    });
 })
 
 export async function createGameFn(g: z.input<typeof GameCreateSchema>) {
@@ -42,7 +46,8 @@ export async function createGameFn(g: z.input<typeof GameCreateSchema>) {
     const data = zodSafeParse(GameCreateSchema, g)
     await ensureAdmin()
     const { platforms, genres, characters, ...game } = data;
-    return await gamesRepository.createGame(game, { platforms, media: [], genres, characters })
+    const result = await gamesRepository.createGame(game, { platforms, media: [], genres, characters })
+    return redirect(paths.admin.games(result)())
 }
 
 export async function updateGameFn(g: z.input<typeof GameEditSchema>) {
@@ -88,6 +93,16 @@ export const getAllGenresFn = GET(async () => {
     return respond(res, {
         headers: {
             "Cache-Control": "public, max-age=604800, stale-while-revalidate=86400"
+        }
+    })
+})
+
+export const getGamesAdminFn = GET(async (filters: z.input<typeof GetGamesSchema>) => {
+    'use server'
+    const games = await getGamesFn(filters)
+    return respond(games, {
+        headers: {
+            "Cache-Control": "no-store"
         }
     })
 })

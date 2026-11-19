@@ -1,17 +1,7 @@
 import z from "zod"
-import { GameCreateSchema } from "../utils/zod"
+import { GameCreateSchema, GetGamesSchema } from "../utils/zod"
 
-export type GameQueryFilters = {
-    developerId?: number
-    publisherId?: number
-    actorId?: number
-    platformId?: number
-    genre?: string
-    limit?: number
-    cursor?: number
-    title?: string,
-    fullTextQuery?: string
-}
+export type GameQueryFilters = z.input<typeof GetGamesSchema>
 
 export type GameInsert = {
     platforms: number[]

@@ -4,7 +4,7 @@ import styles from "./ImageUpload.module.css"
 import { mediaSrc } from "~/utils/mediaSrc"
 
 type Props = {
-    setFile: (file: File) => void
+    setFile: (file: File, objectUrl: string) => void
     image?: string | null
     /** Max size in bytes */
     maxSize?: number
@@ -49,8 +49,9 @@ export function ImageUpload(props: Props) {
 
         setError("")
         URL.revokeObjectURL(objectUrl())
-        setObjectUrl(URL.createObjectURL(imageFile))
-        props.setFile(imageFile)
+        const obj = URL.createObjectURL(imageFile)
+        setObjectUrl(obj)
+        props.setFile(imageFile, obj)
     }
 
     return (

@@ -170,3 +170,39 @@ export function TrendingSkeleton(props: { count?: number }) {
         </section>
     )
 }
+
+export function GameCardSkeleton(props: { titleWidth?: string; subtitleWidth?: string }) {
+    return (
+        <article class={styles.game} role="status" aria-label="Loading game">
+            <Bone class={[styles.cover]} width="100%" />
+            <div class={["cutout", styles.gameTitle]}>
+                <Bone width={props.titleWidth ?? "80%"} height=".8rem" />
+                <Show when={props.subtitleWidth}>
+                    <Bone width={props.subtitleWidth} height=".8rem" />
+                </Show>
+            </div>
+        </article>
+    )
+}
+
+const GAME_TITLE_WIDTHS = [
+    ["70%", "45%"],
+    ["85%", undefined],
+    ["60%", undefined],
+    ["75%", "40%"],
+    ["90%", undefined],
+    ["55%", "65%"],
+]
+
+export function GameGridSkeleton(props: { count?: number }) {
+    const games = () =>
+        Array.from({ length: props.count ?? 12 }, (_, i) => GAME_TITLE_WIDTHS[i % GAME_TITLE_WIDTHS.length])
+
+    return (
+        <div class={styles.gameGrid} role="status" aria-label="Loading games">
+            <For each={games()}>
+                {game => <GameCardSkeleton titleWidth={game[0]} subtitleWidth={game[1]} />}
+            </For>
+        </div>
+    )
+}

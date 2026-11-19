@@ -81,7 +81,7 @@ export default function SearchPage() {
                     </For>
                 </nav>
 
-                <Errored fallback={<p class={styles.status}>Search failed. Please try again.</p>}>
+                <Errored fallback={err => <p class={styles.status}>{(err() as Error).message ?? "Search failed. Please try again."}</p>}>
                     <Loading fallback={<ResultsSkeleton />}>
                         <Show when={results()}>
                             {data => (

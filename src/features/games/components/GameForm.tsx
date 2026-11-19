@@ -1,6 +1,6 @@
 import { AwaitedReturn } from "~/lib/utilityTypes";
 import { getGameFn } from "../gamesApi";
-import { useGameForm } from "../hooks/useGameForm";
+import { MediaField, useGameForm } from "../hooks/useGameForm";
 import styles from "./GameForm.module.css"
 import { TextField } from "~/components/Forms/Textfield";
 import z from "zod";
@@ -17,10 +17,9 @@ import { RenderMedia } from "~/components/RenderMedia";
 import { InfoIcon, MinusIcon, PlusIcon, Trash2Icon } from "@lucide/solid";
 import { Popover } from "~/components/Popover/Popover";
 import { PlatformSelector } from "./PlatformSelector";
-import { Portal } from "@solidjs/web";
 import { CharacterEditor } from "~/components/CharacterEditor/CharacterEditor";
 
-export function GameForm(props: { game: AwaitedReturn<typeof getGameFn> }) {
+export function GameForm(props: { game?: AwaitedReturn<typeof getGameFn> }) {
     const {
         game,
         setGame,
@@ -33,6 +32,8 @@ export function GameForm(props: { game: AwaitedReturn<typeof getGameFn> }) {
     return (
         <form
             class={["form card", styles.form]}
+            autocomplete="off"
+            onSubmit={handleSubmit}
         >
 
             <TextField
@@ -44,47 +45,59 @@ export function GameForm(props: { game: AwaitedReturn<typeof getGameFn> }) {
             />
             <div class={styles.images} >
                 <ImageUpload
-                    setFile={file => setFiles(s => {
-                        const existing = s.find(f => f.field === "cover")
-                        if (existing) {
-                            existing.file = file;
-                            existing.metadata = undefined
-                            existing.convertedFile = undefined
-                            return;
-                        }
-                        s.push({
-                            field: "cover",
-                            file,
+                    setFile={(file, objectUrl) => {
+                        setGame(g => {g.cover = objectUrl})
+                        setFiles(s => {
+                            const existing = s.find(f => f.field === MediaField.Cover)
+                            if (existing) {
+                                existing.file = file;
+                                existing.metadata = undefined
+                                existing.convertedFile = undefined
+                                return;
+                            }
+                            s.push({
+                                field: MediaField.Cover,
+                                file,
+                            })
                         })
-                    })}
+                        setGame(g => {
+                            g.cover = file.name
+                        })
+                    }}
                     image={game.cover}
                     maxSize={2 * 1024 * 1024}
                 />
                 <ImageUpload
-                    setFile={file => setFiles(s => {
-                        const existing = s.find(f => f.field === "banner")
-                        if (existing) {
-                            existing.file = file;
-                            existing.metadata = undefined
-                            existing.convertedFile = undefined
-                            return;
-                        }
-                        s.push({
-                            field: "banner",
-                            file,
+                    setFile={(file, objectUrl) => {
+                        setGame(g => {g.banner = objectUrl})
+                        setFiles(s => {
+                            const existing = s.find(f => f.field === MediaField.Banner)
+                            if (existing) {
+                                existing.file = file;
+                                existing.metadata = undefined
+                                existing.convertedFile = undefined
+                                return;
+                            }
+                            s.push({
+                                field: MediaField.Banner,
+                                file,
+                            })
                         })
-                    })}
+                        setGame(g => {
+                            g.banner = file.name
+                        })
+                    }}
                     image={game.banner}
                     maxSize={4 * 1024 * 1024}
                 />
             </div>
             <DropZone
-                files={files().map(x => x.file)}
+                files={files().filter(x => x.field == MediaField.Media).map(x => x.file)}
                 onAdd={added => {
                     setFiles(s => {
                         s.push(...added.map(a => ({
                             file: a,
-                            field: "media"
+                            field: MediaField.Media
                         })))
                     })
                 }}
@@ -158,7 +171,7 @@ export function GameForm(props: { game: AwaitedReturn<typeof getGameFn> }) {
             <PlatformSelector
                 initialPlatformIds={game.platforms.map(platform => platform.platformId)}
                 onPlatformsChanged={platforms => setGame(g => {
-                    g.platforms = platforms.map(platformId => ({ platformId })) as any
+                    g.platforms = platforms.map(platformId => ({ platformId }))
                 })}
             />
             <TextField
@@ -207,6 +220,7 @@ export function GameForm(props: { game: AwaitedReturn<typeof getGameFn> }) {
                     !game.releaseDate ||
                     !game.trailer ||
                     game.platforms.length == 0 ||
+                    isUploading() ||
                     game.actors.some(role => !role.character)
                 }
             >

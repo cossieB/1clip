@@ -24,9 +24,9 @@ function parseDataAttributes(attr: Props['attr']) {
 export function PhotoCardLink(props: Props) {
     
     return (
-        <div {...props.attr} class={styles.card} style={{"view-transition-name": parseDataAttributes(props.attr)}} >
+        <div {...props.attr} class={styles.card} >
                 <img
-                    // style={{ "view-transition-name": key + value }}
+                    style={{"view-transition-name": parseDataAttributes(props.attr)}}
                     src={mediaSrc(props.picture)}
                     loading="lazy"
                     alt=""
@@ -54,7 +54,6 @@ type P<T> = {
 
 export function PhotoCardGrid<T>(props: P<T>) {
     return (
-        <Loading fallback={<PhotoCardGridSkeleton />}>
             <div class={styles.grid} >
                 <For each={props.arr}>
                     {item =>
@@ -68,7 +67,6 @@ export function PhotoCardGrid<T>(props: P<T>) {
                     }
                 </For>
             </div>
-        </Loading>
     )
 }
 

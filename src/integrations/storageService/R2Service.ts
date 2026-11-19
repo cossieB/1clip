@@ -13,12 +13,13 @@ type Options = {
 
 export class R2StorageService {
     private readonly client: S3Client;
+    private readonly bucket = env.BUCKET
     private readonly protectedKeys = [
             "users/default_banner.jpg",
             "users/default_avatar.png",
             "q.png",        
         ];
-    constructor(private readonly bucket: string) {
+    constructor() {
 
         this.client = new S3Client({
             region: "auto",

@@ -48,8 +48,8 @@ export async function findUser(input: z.input<typeof GetUserSchema>, loggedInUse
 
 export async function updateUser(userId: string, user: Partial<User>) {
     return db.update(users).set(user).where(eq(users.id, userId)).returning({
-        oldAvatar: sql<string>`OLD.image`,
-        oldBanner: sql<string>`OLD.banner`
+        oldAvatar: sql.raw(`OLD.${users.image.name}`) as SQL<string>,
+        oldBanner: sql.raw(`OLD.${users.banner.name}`) as SQL<string>
     })
 }
 

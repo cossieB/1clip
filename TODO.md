@@ -4,7 +4,7 @@
 
 [x] Delete posts
 
-[ ] Admin pages
+[x] Admin pages
 
 [ ] Steam widgets
 

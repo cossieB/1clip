@@ -7,8 +7,9 @@ import { storageService } from "~/integrations/storageService/index.server";
 import { db } from "~/drizzle/db";
 import { GET } from "@solidjs/web/server-functions";
 import { zodSafeParse } from "~/utils/zodSafeParse";
-import { respond } from "@solidjs/web";
+import { redirect, respond } from "@solidjs/web";
 import { ensureAdmin } from "../auth/utils/ensureAuth";
+import { paths } from "~/router";
 
 export const getActorFn = GET(async (id: number) => {
     'use server'
@@ -39,7 +40,7 @@ export async function createActorFn(input: z.input<typeof actorCreateSchema>) {
     const { characters, ...actor } = data
     const a = await actorRepository.createActor(actor, characters)
     if (data.photo) orphanedFileService.removePendingUpload(data.photo)
-    return a
+    return redirect(paths.admin.actors(a.actorId)())
 }
 
 export async function editActorFn(input: z.input<typeof actorEditSchema>) {
@@ -54,15 +55,18 @@ export async function editActorFn(input: z.input<typeof actorEditSchema>) {
     }
 }
 
-export const getActorsWithCharacters = GET(async (id: number) => {
+export const getActorsWithCharactersFn = GET(async (id: number) => {
     'use server'
     const data = zodSafeParse(z.int(), id)
     const actor = await actorRepository.findActorWithGames(data)
     return respond(actor ?? null, {
         headers: {
-            "Cache-Control": "public, max-age=604800, stale-while-revalidate=86400"
+            "Cache-Control": actor ? "public, max-age=604800, stale-while-revalidate=86400" : "public, max-age=300",
+            ...(actor && {
+                "Last-Modified": (actor.dateModified ?? actor.dateAdded).toUTCString()
+            })
         }
-    })
+    });
 })
 
 export const searchActorsFn = GET(async (name: string) => {
@@ -81,6 +85,16 @@ export const searchActorsFn = GET(async (name: string) => {
     return respond(actors, {
         headers: {
             "Cache-Control": "public, max-age=604800, stale-while-revalidate=86400"
+        }
+    })
+})
+
+export const getActorsAdminFn = GET(async (args: z.input<typeof LimitOffsetSchema>) => {
+    'use server'
+    const actors = await getActorsFn(args)
+    return respond(actors, {
+        headers: {
+            "Cache-Control": "no-store"
         }
     })
 })
