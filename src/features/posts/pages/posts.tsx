@@ -6,7 +6,10 @@ import { paths } from "~/router";
 export function PostsPage() {
     const [search] = useSearchParams(paths.posts)
 
-    const filters = () => ({...search})
+    const filters = () => ({
+        ...search,
+        gameId: Number(search?.gameId) || undefined
+    })
     
     return (
         // remount the PostList component to reset the infinite scroll

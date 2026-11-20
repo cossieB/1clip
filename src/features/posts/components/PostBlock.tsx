@@ -3,18 +3,17 @@ import { PostContent } from "./PostContent"
 import styles from "./PostBlock.module.css"
 import { mediaSrc } from "~/utils/mediaSrc"
 import { toggleLikeFn, type getPostFn } from "../postsApi"
-import { HeartIcon, MessageCircleIcon, TrashIcon } from "@lucide/solid"
+import { HeartIcon, MessageCircleIcon, ShareIcon, TrashIcon } from "@lucide/solid"
 import { RenderMedia } from "~/components/RenderMedia"
 import { extractFirstVideo } from "../utils/parsePost"
 import { IframeFactory } from "./IframeFactory"
 import { useToggleLike } from "~/hooks/useToggleLike"
-import { getRelativeTime } from "~/lib/getRelativeTime"
 import { session } from "~/features/auth/authApi"
 import { paths } from "~/router"
 import { HoldClickBtn } from "~/components/HoldClickBtn/HoldClickBtn"
 import { useDeletePost } from "../hooks/useDeletePost"
-import { UserMiniProfile } from "~/features/users/components/MiniProfile"
 import { PostAuthor } from "~/features/users/components/PostAuthor"
+import env from "virtual:solid-env/client"
 
 type Props = {
     post: NonNullable<Awaited<ReturnType<typeof getPostFn>>> & { deleted?: boolean }
@@ -124,7 +123,15 @@ export function PostBlock(props: Props) {
                             />
                         </Show>
                     </Loading>
-
+                    <button
+                        onClick={() => navigator.share({
+                            title: props.post.title + " :: 1Clip",
+                            url: `${env.VITE_SITE_URL}/posts/${props.post.postId}`
+                        })}
+                        title="Share"
+                    >
+                        <ShareIcon />
+                    </button>
                 </div>
 
                 <span class={styles.views}>{props.post.views.toLocaleString("en")} views</span>

@@ -11,6 +11,8 @@ import { PhotoCardGrid } from "~/components/CardLink/PhotoCardLink";
 import { paths } from "~/router";
 import { AudioPlayer } from "~/components/AudioPlayer/AudioPlayer";
 import { LazyRender } from "~/components/LazyRender";
+import { NavTabs } from "~/components/NavTabs/NavTabs";
+import { EditInfoBtn } from "~/components/EditInfoBtn";
 
 export function GamePage(props: { game: NonNullable<AwaitedReturn<typeof getGameFn>> }) {
     const screenshots = createMemo(() => props.game.media.filter(m => !m.contentType.startsWith("audio")).map(m => ({
@@ -39,13 +41,21 @@ export function GamePage(props: { game: NonNullable<AwaitedReturn<typeof getGame
                     >
                         Share
                     </button>
-                    <Loading>
-                        <Show when={session().data?.user.role == "admin"}>
-                            <a href={paths.admin.games(props.game.gameId)} class="button ghost">Edit</a>
-                        </Show>
-                    </Loading>
+                    <EditInfoBtn href={paths.admin.games(props.game.gameId)} />
                 </div>
             </header>
+                        <NavTabs
+                tabs={[{
+                    href: paths.games(props.game.gameId)(),
+                    label: "Info"
+                }, {
+                    href: paths.posts({ gameId: props.game.gameId.toString() }),
+                    label: "Posts"
+                }, {
+                    href: paths.squads({ gameId: props.game.gameId.toString() }),
+                    label: "Squads"
+                }]}
+            />
             <div class={["card", styles.basic]}>
                 <div class={[styles.row, styles.flex]}>
                     <div>
@@ -78,6 +88,7 @@ export function GamePage(props: { game: NonNullable<AwaitedReturn<typeof getGame
                     </div>
                 </div>
             </div>
+
             <Show when={props.game.trailer}>
                 <div class={styles.iframe}>
                     <IframeFactory link={props.game.trailer!} />

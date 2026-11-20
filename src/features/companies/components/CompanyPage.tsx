@@ -4,27 +4,30 @@ import styles from "./CompanyPage.module.css"
 import { mediaSrc } from "~/utils/mediaSrc";
 import { LazyRender } from "~/components/LazyRender";
 import { GamesList } from "~/features/games/components/GamesList";
+import { EditInfoBtn } from "~/components/EditInfoBtn";
+import { paths } from "~/router";
 
-export function CompanyPage(props: {company: NonNullable<AwaitedReturn<typeof getCompanyFn>>}) {
+export function CompanyPage(props: { company: NonNullable<AwaitedReturn<typeof getCompanyFn>> }) {
     return (
         <div class={styles.container}>
             <div class={styles.logoContainer}>
-            <img src={mediaSrc(props.company.logo)} alt={props.company.name} />
+                <img src={mediaSrc(props.company.logo)} alt={props.company.name} />
             </div>
             <h1> {props.company.name} </h1>
+            <EditInfoBtn href={paths.admin.companies(props.company.companyId)} />
             <div class={["card", styles.overview]}  >
                 <label >Overview</label>
                 <div innerHTML={props.company.summary} />
             </div>
             <LazyRender>
                 <h2>Games Developed</h2>
-                <GamesList filters={{developerId: props.company.companyId}} />
-            </LazyRender>      
-            &nbsp;  
+                <GamesList filters={{ developerId: props.company.companyId }} />
+            </LazyRender>
+            &nbsp;
             <LazyRender>
                 <h2>Games Published</h2>
-                <GamesList filters={{publisherId: props.company.companyId}} />
-            </LazyRender>        
+                <GamesList filters={{ publisherId: props.company.companyId }} />
+            </LazyRender>
         </div>
     )
 }

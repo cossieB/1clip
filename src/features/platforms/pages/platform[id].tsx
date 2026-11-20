@@ -30,7 +30,7 @@ export function PlatformIdRoute() {
                         <Meta property="og:description" content={`1Clip info page for ${platform().name}`} />
                         <Meta property="og:image:alt" content={`${platform().name} logo`} />
                         <SiteTitle> {platform().name} </SiteTitle>
-                        <PlatformPage company={platform()} />
+                        <PlatformPage platform={platform()} />
                     </>
                 )}
             </Show>

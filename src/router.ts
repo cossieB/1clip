@@ -78,7 +78,8 @@ export const Router = createRouter({
                     path: "/posts",
                     component: PostsPage,
                     search: z.object({
-                        tag: z.string().optional()
+                        tag: z.string().optional(),
+                        gameId: z.string().optional()
                     }).optional()
                 }, {
                     path: "/posts/:postId",

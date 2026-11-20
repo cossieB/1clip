@@ -10,11 +10,12 @@ import { getRelativeTime } from "~/lib/getRelativeTime"
 import { AwaitedReturn } from "~/lib/utilityTypes"
 import { session } from "~/features/auth/authApi"
 import { HoldClickBtn } from "~/components/HoldClickBtn/HoldClickBtn"
-import { TrashIcon } from "@lucide/solid"
+import { ShareIcon, TrashIcon } from "@lucide/solid"
 import { useSquadDelete } from "../hooks/useSquadDelete"
 import { useCloseSquad } from "../hooks/useCloseSquad"
 import { useApplyToSquad } from "../hooks/useApplyToSquad"
 import { PostAuthor } from "~/features/users/components/PostAuthor"
+import env from "virtual:solid-env/client"
 
 type Props = ParentProps<{
     squad: SquadWithDetails

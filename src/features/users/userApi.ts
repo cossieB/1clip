@@ -23,7 +23,7 @@ export const getUserFn = query(async (input: z.input<typeof GetUserSchema>) => {
     const user = await userRepository.findUser(data, userSession?.user.id)
     return respond(user, {
         headers: {
-            "Cache-Control": "private, max-age=60"
+            // "Cache-Control": "private, max-age=60"
         }
     })
 }, "user")
