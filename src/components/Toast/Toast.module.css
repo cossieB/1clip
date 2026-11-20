@@ -12,11 +12,11 @@
     left: 1rem;
     height: 2.5rem;
     transition: 
-        opacity 200ms ease,
-        scale 200ms ease,
-        top 200ms ease,
-        overlay 200ms allow-discrete,
-        display 200ms allow-discrete;
+        opacity 1200ms var(--bounce),
+        scale 1200ms var(--bounce),
+        top 1200ms var(--bounce),
+        overlay 1200ms allow-discrete,
+        display 1200ms allow-discrete;
 
     font-family: 'Orbitron';
     backdrop-filter: blur(10px);

@@ -20,8 +20,8 @@
         width: 100%;
         object-fit: cover;
         transition: 
-            scale 100ms ease,
-            translate 100ms ease;
+            scale 600ms var(--bounce),
+            translate 600ms var(--bounce);
     }
     >label {
         display: flex;
@@ -64,7 +64,7 @@
         height: 100%;
         width: 100%;
         object-fit: cover;
-        transition: scale ease 250ms;
+        transition: scale 600ms var(--bounce);
     }
 }
 

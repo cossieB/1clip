@@ -88,13 +88,11 @@ export function GamePage(props: { game: NonNullable<AwaitedReturn<typeof getGame
                 <div innerHTML={props.game.summary} />
             </div>
             <Show when={screenshots().length > 0}>
-                <div>
-                    <Carousel
-                        media={screenshots()}
-                        showNextBtn
-                        showPrevBtn
-                    />
-                </div>
+                <Carousel
+                    media={screenshots()}
+                    showNextBtn
+                    showPrevBtn
+                />
             </Show>
             <Show when={props.game.actors.length > 0}>
                 <h3 >Cast</h3>
@@ -131,16 +129,16 @@ function SimilarGames(props: { gameId: number }) {
 
     return (
         <>
-        <h3>Similar Games</h3>
-        <PhotoCardGrid
-            arr={games()}
-            getPic={game => game.cover}
-            getHref={game => `/games/${game.gameId}`}
-            getLabel={game => game.title}
-            getAttr={game => ({
-                [`data-game-id`]: game.gameId.toString()
-            })}
+            <h3>Similar Games</h3>
+            <PhotoCardGrid
+                arr={games()}
+                getPic={game => game.cover}
+                getHref={game => `/games/${game.gameId}`}
+                getLabel={game => game.title}
+                getAttr={game => ({
+                    [`data-game-id`]: game.gameId.toString()
+                })}
             />
-            </>
+        </>
     )
 }
