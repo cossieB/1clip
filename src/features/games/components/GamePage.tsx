@@ -1,8 +1,8 @@
 import { AwaitedReturn } from "~/lib/utilityTypes";
-import { getGameFn } from "../gamesApi";
+import { getGameFn, getSimilarGamesFn } from "../gamesApi";
 import styles from "./GamePage.module.css"
 import { mediaSrc } from "~/utils/mediaSrc";
-import { createMemo, For, Loading, Show } from "solid-js";
+import { createMemo, createSignal, For, Loading, Show } from "solid-js";
 import { session } from "~/features/auth/authApi";
 import { IframeFactory } from "~/features/posts/components/IframeFactory";
 import { formatIsoDate } from "~/lib/formatDate";
@@ -10,6 +10,7 @@ import { Carousel } from "~/components/Carousel/Carousel";
 import { PhotoCardGrid } from "~/components/CardLink/PhotoCardLink";
 import { paths } from "~/router";
 import { AudioPlayer } from "~/components/AudioPlayer/AudioPlayer";
+import { LazyRender } from "~/components/LazyRender";
 
 export function GamePage(props: { game: NonNullable<AwaitedReturn<typeof getGameFn>> }) {
     const screenshots = createMemo(() => props.game.media.filter(m => !m.contentType.startsWith("audio")).map(m => ({
@@ -40,7 +41,7 @@ export function GamePage(props: { game: NonNullable<AwaitedReturn<typeof getGame
                     </button>
                     <Loading>
                         <Show when={session().data?.user.role == "admin"}>
-                            <button>Edit</button>
+                            <a href={paths.admin.games(props.game.gameId)} class="button ghost">Edit</a>
                         </Show>
                     </Loading>
                 </div>
@@ -87,7 +88,7 @@ export function GamePage(props: { game: NonNullable<AwaitedReturn<typeof getGame
                 <div innerHTML={props.game.summary} />
             </div>
             <Show when={screenshots().length > 0}>
-                <div style={{ "margin-block": "1rem" }}>
+                <div>
                     <Carousel
                         media={screenshots()}
                         showNextBtn
@@ -100,23 +101,46 @@ export function GamePage(props: { game: NonNullable<AwaitedReturn<typeof getGame
             </Show>
             <section class={styles.cast}>
 
-            <PhotoCardGrid
-                arr={props.game.actors}
-                getLabel={actor => actor.name}
-                getPic={actor => actor.photo ?? "q.png"}
-                getHref={actor => paths.actors(actor.actorId)()}
-                getAttr={actor => ({
-                    [`data-actor-id`]: actor.actorId.toString()
-                })}
-                getSublabel={actor => actor.character}
+                <PhotoCardGrid
+                    arr={props.game.actors}
+                    getLabel={actor => actor.name}
+                    getPic={actor => actor.photo ?? "q.png"}
+                    getHref={actor => paths.actors(actor.actorId)()}
+                    getAttr={actor => ({
+                        [`data-actor-id`]: actor.actorId.toString()
+                    })}
+                    getSublabel={actor => actor.character}
                 />
-                </section>
+            </section>
             <div class={styles.audio}>
 
-            <Show when={audio()}>
-                {audio => <AudioPlayer audio={audio()} />}
-            </Show>
+                <Show when={audio()}>
+                    {audio => <AudioPlayer audio={audio()} />}
+                </Show>
             </div>
+            <LazyRender>
+                <SimilarGames gameId={props.game.gameId} />
+            </LazyRender>
         </div>
+    )
+}
+
+
+function SimilarGames(props: { gameId: number }) {
+    const games = createMemo(() => getSimilarGamesFn(props.gameId), { lazy: true })
+
+    return (
+        <>
+        <h3>Similar Games</h3>
+        <PhotoCardGrid
+            arr={games()}
+            getPic={game => game.cover}
+            getHref={game => `/games/${game.gameId}`}
+            getLabel={game => game.title}
+            getAttr={game => ({
+                [`data-game-id`]: game.gameId.toString()
+            })}
+            />
+            </>
     )
 }

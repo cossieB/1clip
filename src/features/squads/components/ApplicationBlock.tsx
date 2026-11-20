@@ -61,7 +61,7 @@ export function ApplicationBlock(props: Props) {
                     <img
                         class={["cutout", styles.avatar]}
                         src={mediaSrc(props.application.applicant.image)}
-                        alt=""
+                        alt={props.application.applicant.username}
                         width="40"
                         height="40"
                     />

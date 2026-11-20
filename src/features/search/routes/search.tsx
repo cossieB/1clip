@@ -152,7 +152,7 @@ function GameResult(props: { game: GameItem }) {
                 <img
                     class={["cutout", styles.cover]}
                     src={mediaSrc(props.game.cover)}
-                    alt=""
+                    alt={props.game.title}
                     width="48"
                     height="64"
                     loading="lazy"
@@ -175,7 +175,7 @@ function PostResult(props: { post: PostItem }) {
                 <img
                     class={["cutout", styles.avatar]}
                     src={mediaSrc(props.post.author.image)}
-                    alt=""
+                    alt={props.post.author.username}
                     width="40"
                     height="40"
                     loading="lazy"
@@ -201,7 +201,7 @@ function LfgResult(props: { squad: SquadItem }) {
                 <img
                     class={["cutout", styles.avatar]}
                     src={mediaSrc(props.squad.creator.image)}
-                    alt=""
+                    alt={props.squad.creator.username}
                     width="40"
                     height="40"
                     loading="lazy"

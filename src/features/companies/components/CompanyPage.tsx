@@ -9,7 +9,7 @@ export function CompanyPage(props: {company: NonNullable<AwaitedReturn<typeof ge
     return (
         <div class={styles.container}>
             <div class={styles.logoContainer}>
-            <img src={mediaSrc(props.company.logo)} alt="" />
+            <img src={mediaSrc(props.company.logo)} alt={props.company.name} />
             </div>
             <h1> {props.company.name} </h1>
             <div class={["card", styles.overview]}  >

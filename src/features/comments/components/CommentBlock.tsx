@@ -114,7 +114,7 @@ export function CommentBlock(props: Props) {
                 <img
                     class={["cutout", styles.avatar]}
                     src={mediaSrc(props.comment.author.image)}
-                    alt=""
+                    alt={props.comment.author.username}
                     width="32"
                     height="32"
                 />

@@ -67,7 +67,7 @@ export function CommentComposer(props: Props) {
         <Loading>
             <Show when={session().data?.user.emailVerified}>
                 <section class={["card", styles.compose]} aria-label="Create post">
-                    <img class={styles.avatar} src={mediaSrc(session().data!.user.image!)} alt="" />
+                    <img class={styles.avatar} src={mediaSrc(session().data!.user.image!)} alt="You" />
 
                     <div class={styles.group}>
                         <Editor

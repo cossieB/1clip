@@ -1,18 +1,14 @@
 .popover {
-    --dur: 0.3s;
-    --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --dur: 0.6s;
+    --ease: var(--bounce);
 
-    /* reset.css zeroes margins, so re-center the modal */
-    margin: auto;
-    padding: 2rem;
     color: var(--text);
     background: linear-gradient(160deg, var(--surface-2), var(--surface-1));
     border: 1px solid var(--accent-deep);
     box-shadow: 0 0 40px -8px var(--accent-glow);
 
-    /* Exit state (also the pre-entry state) */
+    /* Exit state (also pre-entry state) */
     opacity: 0;
-    translate: 0 1.5rem;
     scale: 0.96;
     filter: blur(6px);
 
@@ -26,7 +22,6 @@
 
     &:popover-open {
         opacity: 1;
-        translate: 0 0;
         scale: 1;
         filter: blur(0);
     }
@@ -45,23 +40,54 @@
         background: oklch(0 0 0 / 0.65);
         backdrop-filter: blur(6px);
     }
+}
 
-    button {
-        margin-top: 1rem;
-        padding: 0.5rem 1rem;
-        background-color: var(--accent);
+/* Centered modal-like popover */
+.centered {
+    /* reset.css zeroes margins, so re-center in the viewport */
+    margin: auto;
+    translate: 0 1.5rem;
+
+    &:popover-open {
+        translate: 0 0;
+    }
+}
+
+/* Anchored popover (position-anchor injected dynamically) */
+.anchored {
+    margin: 0;
+    inset: auto;
+    position-area: block-end span-inline-end;
+    position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+    translate: 0 0.5rem;
+
+    &::backdrop {
+        background: transparent;
+        backdrop-filter: none;
+        transition: none;
     }
 
-    span+div {
-        margin-top: 2rem;
-    }
+    &:popover-open {
+        translate: 0 0;
 
+        &::backdrop {
+            background: transparent;
+            backdrop-filter: none;
+        }
+    }
 }
 
 @starting-style {
-    .popover:popover-open {
+    .centered:popover-open {
         opacity: 0;
         translate: 0 1.5rem;
+        scale: 0.96;
+        filter: blur(6px);
+    }
+
+    .anchored:popover-open {
+        opacity: 0;
+        translate: 0 0.5rem;
         scale: 0.96;
         filter: blur(6px);
     }

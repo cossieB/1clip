@@ -9,7 +9,7 @@ export function ActorPage(props: {actor: NonNullable<AwaitedReturn<typeof getAct
     return (
         <div class={styles.container}>
             <div class={styles.logoContainer}>
-            <img src={mediaSrc(props.actor.photo ?? "q.png")} alt="" />
+            <img src={mediaSrc(props.actor.photo ?? "q.png")} alt={props.actor.name} />
             </div>
             <h1> {props.actor.name} </h1>
             <div class={["card", styles.overview]}  >

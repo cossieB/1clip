@@ -14,6 +14,7 @@ import { TrashIcon } from "@lucide/solid"
 import { useSquadDelete } from "../hooks/useSquadDelete"
 import { useCloseSquad } from "../hooks/useCloseSquad"
 import { useApplyToSquad } from "../hooks/useApplyToSquad"
+import { PostAuthor } from "~/features/users/components/PostAuthor"
 
 type Props = ParentProps<{
     squad: SquadWithDetails
@@ -33,9 +34,6 @@ export function SquadBlock(props: Props) {
     const filled = () => props.squad.acceptedApplicants.length
     const pips = () => Array.from({ length: props.squad.slots }, (_, i) => i < filled())
 
-    const created = () => new Date(props.squad.createdAt)
-    const wasEdited = () => !!props.squad.editedOn
-
     const { deleteAction, deleting } = useSquadDelete(props.squad.squadId, props.onDelete)
     const { applied, setMessage, apply, message } = useApplyToSquad(props.squad.squadId, () => props.squad.hasApplied)
     const { active, close } = useCloseSquad(props.squad.squadId, () => props.squad.isActive && !isExpired())
@@ -43,24 +41,12 @@ export function SquadBlock(props: Props) {
     return (
         <article class={["card", styles.lfg]} data-squad-id={props.squad.squadId}>
             <header class={styles.header}>
-                <a class={styles.author} href={`/users/${props.squad.creator.username}`}>
-                    <img
-                        class={["cutout", styles.avatar]}
-                        src={mediaSrc(props.squad.creator.image)}
-                        alt=""
-                        width="40"
-                        height="40"
-                    />
-                    <span class={styles.names}>
-                        <span class={styles.username}>@{props.squad.creator.username}</span>
-                        <span class={styles.meta}>
-                            <time datetime={created().toISOString()}>{getRelativeTime(created())}</time>
-                            <Show when={wasEdited()}>
-                                <span> · edited</span>
-                            </Show>
-                        </span>
-                    </span>
-                </a>
+                <PostAuthor
+                    author={props.squad.creator}
+                    createdAt={props.squad.createdAt}
+                    entityId={props.squad.squadId}
+                    edited={!!props.squad.editedOn}
+                />
 
                 <span class={["badge", active() ? "ok" : "danger"]}>{active() ? "Open" : "Closed"}</span>
             </header>
@@ -99,7 +85,7 @@ export function SquadBlock(props: Props) {
                             <img
                                 class={["cutout", styles.applicantAvatar]}
                                 src={mediaSrc(props.squad.creator.image)}
-                                alt=""
+                                alt={props.squad.creator.username}
                                 width="28"
                                 height="28"
                             />

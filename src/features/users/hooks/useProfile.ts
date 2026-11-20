@@ -1,7 +1,7 @@
 import z from "zod";
 import { UpdateUserSchema } from "../utils/zod";
 import { action, affects, createMemo, createOptimistic, createStore, refresh, useContext } from "solid-js";
-import { getProfile, updateUser } from "../userApi";
+import { getProfileFn, updateUserFn } from "../userApi";
 import { useUpload } from "~/hooks/useUpload";
 import { useAbortController } from "~/hooks/useAbortController";
 import { getUsersSignedUrls } from "~/integrations/storageService/serverFn";
@@ -11,7 +11,7 @@ export function useProfile() {
     const abortController = useAbortController()
     const toastError = useToastError()
     const { setFiles, convertAndUpload } = useUpload(abortController)
-    const user = createMemo(() => getProfile())
+    const user = createMemo(() => getProfileFn())
     const [isSubmitting, setIsSubmitting] = createOptimistic(false)
 
     const [input, setInput] = createStore(() => user() as unknown as z.infer<typeof UpdateUserSchema>, {
@@ -35,7 +35,7 @@ export function useProfile() {
                 if (newAvatar) s.image = newAvatar.key
                 if (newBanner) s.banner = newBanner.key
             })
-            yield updateUser(input)
+            yield updateUserFn(input)
             refresh(user)
         }
         catch (error) {

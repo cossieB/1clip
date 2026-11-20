@@ -9,7 +9,7 @@
 .logoContainer {
     composes: logoContainer from "~/features/companies/components/CompanyPage.module.css";
     img {
-        height: 95%;
+        height: 95% !important;
         box-shadow: 0 0 10px 2px color-mix(in oklch shorter hue, var(--accent) 41%, black);
         /* outline: 1px solid var(--accent); */
         border-radius: 0 8px 0 8px;

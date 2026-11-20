@@ -126,7 +126,7 @@ export function GameForm(props: { game?: AwaitedReturn<typeof getGameFn> }) {
                             >
                                 <InfoIcon size={16} />
                             </button>
-                            <Popover id={m.key}>
+                            <Popover id={m.key} variant="centered">
                                 <MetadataEdit
                                     metadata={m.metadata}
                                     setMetadata={metadata => {

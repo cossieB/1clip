@@ -13,6 +13,8 @@ import { session } from "~/features/auth/authApi"
 import { paths } from "~/router"
 import { HoldClickBtn } from "~/components/HoldClickBtn/HoldClickBtn"
 import { useDeletePost } from "../hooks/useDeletePost"
+import { UserMiniProfile } from "~/features/users/components/MiniProfile"
+import { PostAuthor } from "~/features/users/components/PostAuthor"
 
 type Props = {
     post: NonNullable<Awaited<ReturnType<typeof getPostFn>>> & { deleted?: boolean }
@@ -32,29 +34,17 @@ export function PostBlock(props: Props) {
     const wasEdited = () => !!props.post.editedOn
     const externalVideo = () => extractFirstVideo(props.post.text)
 
-    const {deleteAction, deleting} = useDeletePost(props.post.postId, props.onDelete)
+    const { deleteAction, deleting } = useDeletePost(props.post.postId, props.onDelete)
 
     return (
         <article class={["card", styles.post]} data-post-id={props.post.postId}>
             <header class={styles.header}>
-                <a class={styles.author} href={paths.users(props.post.author.username)}>
-                    <img
-                        class={["cutout", styles.avatar]}
-                        src={mediaSrc(props.post.author.image)}
-                        alt=""
-                        width="40"
-                        height="40"
-                    />
-                    <span class={styles.names}>
-                        <span class={styles.username}>@{props.post.author.username}</span>
-                        <span class={styles.meta}>
-                            <time datetime={props.post.createdAt.toISOString()}>{getRelativeTime(props.post.createdAt)}</time>
-                            <Show when={wasEdited()}>
-                                <span> · edited</span>
-                            </Show>
-                        </span>
-                    </span>
-                </a>
+                <PostAuthor
+                    author={props.post.author}
+                    createdAt={props.post.createdAt}
+                    edited={wasEdited()}
+                    entityId={props.post.postId}
+                />
 
                 <Show when={props.post.game}>
                     {game => (
@@ -94,7 +84,7 @@ export function PostBlock(props: Props) {
                     <For each={props.post.tags}>
                         {tag => (
                             <li>
-                                <a class={styles.tag} href={paths.posts({tag})}>
+                                <a class={styles.tag} href={paths.posts({ tag })}>
                                     #{tag}
                                 </a>
                             </li>

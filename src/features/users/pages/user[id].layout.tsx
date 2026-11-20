@@ -1,5 +1,5 @@
 import { createMemo, For, Loading, Match, ParentProps, Show, Switch } from "solid-js";
-import { getUser } from "../userApi";
+import { getUserFn } from "../userApi";
 import { useParams } from "@solidjs/router";
 import { paths } from "~/router";
 import NotFound from "~/routes/[...404]";
@@ -12,7 +12,7 @@ import { FollowBtn } from "../components/FollowBtn";
 
 export function UserIdLayout(props: ParentProps) {
     const params = useParams(paths.users)
-    const user = createMemo(() => getUser({ username: params.username }))
+    const user = createMemo(() => getUserFn({ username: params.username }))
 
     return (
         <Loading>
@@ -33,13 +33,12 @@ export function UserIdLayout(props: ParentProps) {
                         {props.children}
                     </>
                 }
-
             </Show>
         </Loading>
     )
 }
 
-function Page(props: { user: NonNullable<AwaitedReturn<typeof getUser>> }) {
+function Page(props: { user: NonNullable<AwaitedReturn<typeof getUserFn>> }) {
     return (
         <div class={styles.container}>
             <div class={styles.hero} >

@@ -156,56 +156,58 @@ export const Router = createRouter({
             component: AdminLayout,
             path: "/admin",
             preload: () => void ensureAdminOrRedirect(),
-            children: [
-                {
-                    path: "/games",
-                    component: AdminGamesRoute
-                }, {
-                    path: "/games/:gameId",
-                    matchFilters: {
-                        gameId: int
-                    },
-                    component: AdminGameRoute
-                }, {
-                    path: "/games/add",
-                    component: AdminGameCreateRoute
-                }, {
-                    path: "/companies",
-                    component: AdminCompaniesRoute
-                }, {
-                    path: "/companies/:companyId",
-                    matchFilters: {
-                        companyId: int
-                    },
-                    component: AdminCompanyRoute,
-                }, {
-                    path: "/companies/add",
-                    component: AdminCompanyCreate
-                }, {
-                    path: "/platforms",
-                    component: AdminPlatformsRoute
-                }, {
-                    path: "/platforms/:platformId",
-                    component: AdminPlatformRoute,
-                    matchFilters: {
-                        platformId: int
-                    },
-                }, {
-                    path: "/platforms/add",
-                    component: AdminPlatformCreate
-                }, {
-                    path: "/actors",
-                    component: AdminActorsRoute
-                }, {
-                    path: "/actors/add",
-                    component: AdminActorCreate
-                }, {
-                    path: "/actors/:actorId",
-                    component: AdminActorRoute,
-                    matchFilters: {
-                        actorId: int
-                    }
+            children: [{
+                path: "/",
+                component: () => "Admin Page"
+            }, {
+                path: "/games",
+                component: AdminGamesRoute
+            },{
+                path: "/games/add",
+                component: AdminGameCreateRoute
+            }, {
+                path: "/games/:gameId",
+                matchFilters: {
+                    gameId: int
                 },
+                component: AdminGameRoute
+            }, {
+                path: "/companies",
+                component: AdminCompaniesRoute
+            }, {
+                path: "/companies/:companyId",
+                matchFilters: {
+                    companyId: int
+                },
+                component: AdminCompanyRoute,
+            }, {
+                path: "/companies/add",
+                component: AdminCompanyCreate
+            }, {
+                path: "/platforms",
+                component: AdminPlatformsRoute
+            }, {
+                path: "/platforms/:platformId",
+                component: AdminPlatformRoute,
+                matchFilters: {
+                    platformId: int
+                },
+            }, {
+                path: "/platforms/add",
+                component: AdminPlatformCreate
+            }, {
+                path: "/actors",
+                component: AdminActorsRoute
+            }, {
+                path: "/actors/add",
+                component: AdminActorCreate
+            }, {
+                path: "/actors/:actorId",
+                component: AdminActorRoute,
+                matchFilters: {
+                    actorId: int
+                }
+            },
             ]
         }
 

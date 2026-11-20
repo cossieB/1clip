@@ -131,7 +131,7 @@ const disabled = createMemo(() => !session().data, {loadingValue: true})
                                                                         <img
                                                                             class={["cutout", styles.thumb]}
                                                                             src={mediaSrc(game.cover)}
-                                                                            alt=""
+                                                                            alt={game.title}
                                                                             width="32"
                                                                             height="42"
                                                                             loading="lazy"

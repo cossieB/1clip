@@ -47,7 +47,7 @@ export async function createGameFn(g: z.input<typeof GameCreateSchema>) {
     await ensureAdmin()
     const { platforms, genres, characters, ...game } = data;
     const result = await gamesRepository.createGame(game, { platforms, media: [], genres, characters })
-    return redirect(paths.admin.games(result)())
+    return result
 }
 
 export async function updateGameFn(g: z.input<typeof GameEditSchema>) {
@@ -72,13 +72,13 @@ export async function updateGameFn(g: z.input<typeof GameEditSchema>) {
     }
 }
 
-export const getSimilarGames = GET(async (gameId: number) => {
+export const getSimilarGamesFn = GET(async (gameId: number) => {
     'use server'
     const data = zodSafeParse(z.int(), gameId);
     const result = await cacheAside(`similar:${data}`, () => gamesRepository.similarGames(data), 604800);
     return respond(result, {
         headers: {
-            "Cache-Control": "public, max-age=604800, stale-while-revalidate=86400"
+            "Cache-Control": "public, max-age=604800, stale-while-revalidate=604800"
         }
     })
 })

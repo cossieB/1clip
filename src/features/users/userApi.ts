@@ -16,19 +16,19 @@ import { sleep } from "~/lib/sleep";
 import { rateLimiter } from "~/utils/rateLimiter.server";
 import { addNotification } from "../notifications/addNotification";
 
-export const getUser = query(async (input: z.input<typeof GetUserSchema>) => {
+export const getUserFn = query(async (input: z.input<typeof GetUserSchema>) => {
     'use server'
     const data = zodSafeParse(GetUserSchema, input)
     const userSession = await getCurrentUser()
     const user = await userRepository.findUser(data, userSession?.user.id)
     return respond(user, {
         headers: {
-            // "Cache-Control": "private, max-age=60"
+            "Cache-Control": "private, max-age=60"
         }
     })
 }, "user")
 
-export async function updateUser(profile: z.input<typeof UpdateUserSchema>) {
+export async function updateUserFn(profile: z.input<typeof UpdateUserSchema>) {
     'use server'
     const data = zodSafeParse(UpdateUserSchema, profile)
     const userSession = await ensureVerified()
@@ -49,11 +49,11 @@ export async function updateUser(profile: z.input<typeof UpdateUserSchema>) {
     }
 }
 
-export const getProfile = GET(async () => {
+export const getProfileFn = GET(async () => {
     'use server'
     const session = await getCurrentUser()
     if (!session) throw redirect(paths({ dialog: "signin" }))
-    return getUser({ id: session.user.id })
+    return getUserFn({ id: session.user.id })
 })
 
 const G = z.object({
@@ -82,7 +82,7 @@ export const getStatusFn = async (userId?: string) => {
 
 const POLL_MS = 5_000;
 
-export const watchOnlineUsers = broadcast(async function* () {
+export const watchOnlineUsersFn = broadcast(async function* () {
     'use server'
     let last = "";
     while (true) {

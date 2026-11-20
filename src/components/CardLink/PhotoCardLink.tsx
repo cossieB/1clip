@@ -14,23 +14,23 @@ type Props = {
 
 function parseDataAttributes(attr: Props['attr']) {
     const [key, value] = Object.entries(attr)[0]
-    return  key
-      .replace(/^data-/, '')
-      .replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())
-      .concat(value)
+    return key
+        .replace(/^data-/, '')
+        .replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())
+        .concat(value)
 }
 
 
 export function PhotoCardLink(props: Props) {
-    
+
     return (
         <div {...props.attr} class={styles.card} >
-                <img
-                    style={{"view-transition-name": parseDataAttributes(props.attr)}}
-                    src={mediaSrc(props.picture)}
-                    loading="lazy"
-                    alt=""
-                />
+            <img
+                style={{ "view-transition-name": parseDataAttributes(props.attr) }}
+                src={mediaSrc(props.picture)}
+                loading="lazy"
+                alt={props.label}
+            />
             <label class="cutout">
                 {props.label}
                 <span>{props.sublabel}</span>
@@ -54,19 +54,19 @@ type P<T> = {
 
 export function PhotoCardGrid<T>(props: P<T>) {
     return (
-            <div class={styles.grid} >
-                <For each={props.arr}>
-                    {item =>
-                        <PhotoCardLink
-                            label={props.getLabel(item)}
-                            picture={props.getPic(item)}
-                            href={props.getHref(item)}
-                            sublabel={props.getSublabel?.(item)}
-                            attr={props.getAttr(item)}
-                        />
-                    }
-                </For>
-            </div>
+        <div class={styles.grid} >
+            <For each={props.arr}>
+                {item =>
+                    <PhotoCardLink
+                        label={props.getLabel(item)}
+                        picture={props.getPic(item)}
+                        href={props.getHref(item)}
+                        sublabel={props.getSublabel?.(item)}
+                        attr={props.getAttr(item)}
+                    />
+                }
+            </For>
+        </div>
     )
 }
 

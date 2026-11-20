@@ -4,6 +4,8 @@ import { getGamesSignedUrls } from "~/integrations/storageService/serverFn"
 import { Platform, RoleType } from "~/drizzle/models"
 import { createStore, useContext } from "solid-js"
 import { ToastContext } from "~/components/Toast/ToastProvider"
+import { useNavigate } from "@solidjs/router"
+import { paths } from "~/router"
 
 export type Game = Awaited<ReturnType<typeof gamesApi.getGameFn>>
 
@@ -24,6 +26,7 @@ type Cast = {
 }
 
 export function useGameForm(props: { game?: Game }) {
+    const navigate = useNavigate()
     const { addToast } = useContext(ToastContext);
     const abortController = new AbortController
     const [game, setGame] = createStore(() => ({
@@ -99,6 +102,8 @@ export function useGameForm(props: { game?: Game }) {
                     media: media
                 })
 
+            navigate(paths.admin.games(newId))
+
         }
         catch (error) {
             addToast({ text: String(error), type: "error" })
@@ -107,8 +112,7 @@ export function useGameForm(props: { game?: Game }) {
     return {
         game,
         setGame,
-        isUploading,
-        
+        isUploading,        
         setFiles,
         handleSubmit,
         files
