@@ -106,7 +106,7 @@ export function PostBlock(props: Props) {
                         <button
                             type="button"
                             class={["ghost", styles.action, { [styles.liked]: like().liked }]}
-                            // aria-pressed={like().liked}
+                            aria-pressed={like().liked ? "true" : "false"}
                             aria-label={like().liked ? "Unlike post" : "Like post"}
                             disabled={!session().data}
                             onClick={() => toggle()}

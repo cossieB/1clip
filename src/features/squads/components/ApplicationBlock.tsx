@@ -86,7 +86,7 @@ export function ApplicationBlock(props: Props) {
                         <button
                             type="button"
                             class={styles.segment}
-                            // aria-pressed={status() === option.value}
+                            aria-pressed={status() === option.value ? "true" : "false"}
                             disabled={saving()}
                             onClick={() => update(option.value)}
                         >

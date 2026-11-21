@@ -102,7 +102,7 @@ export function PostContent(props: Props) {
                 <button
                     type="button"
                     class={["ghost", styles.toggle]}
-                    // aria-expanded={expanded()}
+                    aria-expanded={expanded() ? "true" : "false"}
                     aria-controls={id}
                     onClick={() => setExpanded(v => !v)}
                 >

@@ -133,7 +133,7 @@ export const challenges = pgTable("challenges", {
     isActive: boolean("is_active").notNull().default(true)
 })
 
-export const xpAwards = pgTable("user_challenges", {
+export const userChallenges = pgTable("user_challenges", {
     userId: uuid("user_id").notNull().references(() => users.id, {onDelete: "cascade"}),
     challengeId: integer("challenge_id").notNull().references(() => challenges.challengeId),
     awardedOn: date("awarded_on").notNull().default(sql`(now() at time zone 'utc')::date`),

@@ -70,7 +70,10 @@ export async function toggleCommentLikeFn(commentId: number) {
     const userSession = await ensureVerified()
     await rateLimiter("comment:react", userSession.user.id, 10, 60)
     return await db.transaction(async tx => {
-        return await commentsRepository.toggleLike(tx, data, userSession.user.id)
+        const comment = await commentsRepository.toggleLike(tx, data, userSession.user.id)
+        if (comment)
+            await awardXp(tx, comment.authorId, CHALLENGE.receiveLike)
+        return comment
     })
 }
 

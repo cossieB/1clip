@@ -93,7 +93,7 @@ const disabled = createMemo(() => !session().data, {loadingValue: true})
                 placeholder={disabled() ? "Login in to search" : "Search squads, posts, games"}
                 aria-label={disabled() ? "Login in to search": "Search squads, posts and games"}
                 aria-controls={panelId}
-                // aria-expanded={visible()}
+                aria-expanded={visible() ? "true" : "false"}
                 autocomplete="off"
                 spellcheck={false}
                 enterkeyhint="search"

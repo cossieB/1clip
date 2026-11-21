@@ -143,7 +143,7 @@ export function CommentBlock(props: Props) {
                         <button
                             type="button"
                             class={["ghost", styles.action, { [styles.liked]: like().liked }]}
-                            // aria-pressed={like().liked}
+                            aria-pressed={like().liked ? "true" : "false"}
                             aria-label={like().liked ? "Unlike comment" : "Like comment"}
                             disabled={!interactive()}
                             onClick={() => toggleLike()}
@@ -156,7 +156,7 @@ export function CommentBlock(props: Props) {
                             <button
                                 type="button"
                                 class={["ghost", styles.action, { [styles.active]: replying() }]}
-                                // aria-expanded={replying()}
+                                aria-expanded={replying() ? "true" : "false"}
                                 aria-controls={textareaId}
                                 disabled={!interactive()}
                                 onClick={() => (replying() ? closeReply() : openReply())}
@@ -170,7 +170,7 @@ export function CommentBlock(props: Props) {
                         <button
                             type="button"
                             class={["ghost", styles.action, styles.repliesToggle]}
-                            // aria-expanded={showReplies()}
+                            aria-expanded={showReplies() ? "true" : "false"}
                             onClick={() => setShowReplies(v => !v)}
                         >
                             <svg

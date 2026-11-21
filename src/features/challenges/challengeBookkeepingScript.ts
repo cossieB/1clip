@@ -1,6 +1,6 @@
 import { sql, eq } from "drizzle-orm";
-import { challenges } from "../../drizzle/schema";
-import { db } from "../../drizzle/db";
+import { challenges } from "~/drizzle/schema";
+import { db } from "~/drizzle/db";
 
 export const DEFINITIONS = [
     { key: "createPost",     title: "Make A Post",              description: "Create a new post",                        xpReward: 2 },

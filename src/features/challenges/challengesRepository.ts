@@ -1,6 +1,6 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, asc, eq, sql } from "drizzle-orm";
 import { db, Tx } from "~/drizzle/db";
-import { challenges, users, xpAwards } from "~/drizzle/schema";
+import { challenges, users, userChallenges } from "~/drizzle/schema";
 import { ChallengeTitle } from "./challengeBookkeepingScript";
 import "server-only";
 
@@ -31,10 +31,10 @@ export async function awardXp(
     if (!challenge) return 0;
 
     const inserted = await client
-        .insert(xpAwards)
+        .insert(userChallenges)
         .values({ userId, challengeId: challenge.id })
         .onConflictDoNothing()
-        .returning({ challengeId: xpAwards.challengeId });
+        .returning({ challengeId: userChallenges.challengeId });
 
     // Conflict means already awarded today: don't touch the total
     if (inserted.length === 0) return 0;
@@ -45,4 +45,32 @@ export async function awardXp(
         .where(eq(users.id, userId));
 
     return challenge.xp;
+}
+
+export async function getTodaysChallengeProgress(userId: string) {
+    const rows = await db
+        .select({
+            challengeId: challenges.challengeId,
+            title: challenges.title,
+            description: challenges.description,
+            xpReward: challenges.xpReward,
+            completedAt: userChallenges.createdAt,
+        })
+        .from(challenges)
+        .leftJoin(
+            userChallenges,
+            and(
+                eq(userChallenges.challengeId, challenges.challengeId),
+                eq(userChallenges.userId, userId),
+                eq(userChallenges.awardedOn, sql`(now() at time zone 'utc')::date`),
+            ),
+        )
+        .where(eq(challenges.isActive, true))
+        .orderBy(asc(challenges.challengeId));
+
+    return rows.map(({ completedAt, ...challenge }) => ({
+        ...challenge,
+        completed: completedAt !== null,
+        completedAt,
+    }));
 }

@@ -51,7 +51,7 @@ export function FollowBtn(props: Props) {
         <button
             type="button"
             class={[following() ? "secondary" : "primary", styles.follow]}
-            // aria-pressed={following()}
+            aria-pressed={following() ? "true" : "false"}
             disabled={saving()}
             onClick={() => toggle()}
         >

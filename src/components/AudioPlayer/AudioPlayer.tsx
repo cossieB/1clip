@@ -153,7 +153,7 @@ export function AudioPlayer(props: {audio: AudioPlayerProps}) {
                     class={`ghost ${styles.mute}`}
                     onClick={() => setMuted(!muted())}
                     aria-label={muted() ? "Unmute" : "Mute"}
-                    // aria-pressed={muted()}
+                    aria-pressed={muted() ? "true" : "false"}
                 >
                     <svg viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M3 9v6h4l5 4V5L7 9z" fill="currentColor" />
