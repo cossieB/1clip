@@ -9,28 +9,35 @@ import { getCurrentUser } from "~/features/auth/serverFn";
 import { respond } from "@solidjs/web";
 import { HttpStatusCode } from "~/utils/statusCodes";
 import { GET } from "@solidjs/web/server-functions";
+import { db } from "~/drizzle/db";
+import { awardXp, CHALLENGE } from "../challenges/challengesRepository";
 
 export async function addCommentFn(input: z.input<typeof AddCommentSchema>) {
     'use server'
     const data = zodSafeParse(AddCommentSchema, input);
     const userSession = await ensureVerified()
     await rateLimiter("comment:create", userSession.user.id, 5, 60)
-    const { recipientUserId, ...result } = await commentsRepository.addComment({
-        userId: userSession.user.id,
-        postId: data.originalPost,
-        text: data.text,
-        replyTo: data.replyTo
-    });
+    
+    const { recipientUserId, ...result } = await db.transaction(async tx => {
+        const comment = await commentsRepository.addComment(tx, {
+            userId: userSession.user.id,
+            postId: data.originalPost,
+            text: data.text,
+            replyTo: data.replyTo
+        });
+        await awardXp(tx, userSession.user.id, CHALLENGE.comment)        
+        return comment
+    })
 
     let link = `/posts/${data.originalPost}/${result.commentId}`
 
     if (userSession.user.id !== recipientUserId) {
-        await addNotification([{ userId: recipientUserId, }], {
+        await addNotification(db, [{ userId: recipientUserId, }], {
             actionUrl: link,
             sourceUserId: userSession.user.id,
             type: "REPLY",
             title: `${userSession.user.displayUsername} replied to you`,
-            message: data.text.slice(50) + (data.text.length > 50 ? "..." : ""),
+            message: data.text.slice(0, 50) + (data.text.length > 50 ? "..." : ""),
             entityType: data.replyTo ? "comment" : "post",
             entityId: data.replyTo ?? data.originalPost
         })
@@ -62,7 +69,9 @@ export async function toggleCommentLikeFn(commentId: number) {
     const data = zodSafeParse(z.int(), commentId)
     const userSession = await ensureVerified()
     await rateLimiter("comment:react", userSession.user.id, 10, 60)
-    return await commentsRepository.toggleLike(data, userSession.user.id)
+    return await db.transaction(async tx => {
+        return await commentsRepository.toggleLike(tx, data, userSession.user.id)
+    })
 }
 
 export async function deleteCommentFn(commentId: number) {

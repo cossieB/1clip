@@ -1,16 +1,16 @@
 import { sql, eq, and, isNull, or, asc, gt, count, InferInsertModel, getColumns, lt, desc } from "drizzle-orm"
-import { db } from "~/drizzle/db"
+import { db, Tx } from "~/drizzle/db"
 import { commentLikes, comments, posts, users } from "~/drizzle/schema"
 import 'server-only'
 
-export async function addComment(comment: InferInsertModel<typeof comments>) {
-    const inserted = db.$with("inserted").as(
-        db.insert(comments)
+export async function addComment(tx: Tx, comment: InferInsertModel<typeof comments>) {
+    const inserted = tx.$with("inserted").as(
+        tx.insert(comments)
             .values(comment)
             .returning()
     );
 
-    const result = await db
+    const result = await tx
         .with(inserted)
         .select({
             ...getColumns(inserted),
@@ -115,38 +115,37 @@ export async function findPostComments(
 
 export type CommentWithDetails = Awaited<ReturnType<typeof findPostComments>>[number];
 
-export async function toggleLike(commentId: number, currentUserId: string) {
-    return db.transaction(async tx => {
-        const [comment] = await tx
-            .select({ commentId: comments.commentId, authorId: comments.userId })
-            .from(comments)
-            .where(eq(comments.commentId, commentId))
-            .limit(1);
+export async function toggleLike(tx: Tx, commentId: number, currentUserId: string) {
+    const [comment] = await tx
+        .select({ commentId: comments.commentId, authorId: comments.userId })
+        .from(comments)
+        .where(eq(comments.commentId, commentId))
+        .limit(1);
 
-        if (!comment) return null;
+    if (!comment) return null;
 
-        const removed = await tx
-            .delete(commentLikes)
-            .where(and(eq(commentLikes.commentId, commentId), eq(commentLikes.userId, currentUserId)))
-            .returning({ userId: commentLikes.userId });
+    const removed = await tx
+        .delete(commentLikes)
+        .where(and(eq(commentLikes.commentId, commentId), eq(commentLikes.userId, currentUserId)))
+        .returning({ userId: commentLikes.userId });
 
-        let liked = false;
+    let liked = false;
 
-        if (removed.length === 0) {
-            await tx
-                .insert(commentLikes)
-                .values({ commentId, userId: currentUserId })
-                .onConflictDoNothing();
-            liked = true;
-        }
+    if (removed.length === 0) {
+        await tx
+            .insert(commentLikes)
+            .values({ commentId, userId: currentUserId })
+            .onConflictDoNothing();
+        liked = true;
+    }
 
-        const [{ likeCount }] = await tx
-            .select({ likeCount: count() })
-            .from(commentLikes)
-            .where(eq(commentLikes.commentId, commentId));
+    const [{ likeCount }] = await tx
+        .select({ likeCount: count() })
+        .from(commentLikes)
+        .where(eq(commentLikes.commentId, commentId));
 
-        return { liked, likeCount, authorId: comment.authorId };
-    });
+    return { liked, likeCount, authorId: comment.authorId };
+    
 }
 
 export async function deleteComment(commentId: number, userId: string) {

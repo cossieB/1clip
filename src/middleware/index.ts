@@ -11,7 +11,6 @@
 import type { StartMiddleware } from '@solidjs/vite-plugin';
 import { createAPIHandler } from 'filesystem-routing/api';
 import routes from 'virtual:file-routes';
-import { authenticate } from './authenticate';
 
 // createAPIHandler serves the GET/POST/... exports of route modules
 // (see src/routes/api) and passes everything else down the chain. It still
@@ -21,4 +20,4 @@ const api = createAPIHandler(routes);
 
 const handleAPI: StartMiddleware = (event, next) => api(event.request, next);
 
-export default [handleAPI, authenticate];
+export default [handleAPI];

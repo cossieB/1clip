@@ -15,6 +15,7 @@ import { broadcast } from "@solidjs/web/server-functions";
 import { sleep } from "~/lib/sleep";
 import { rateLimiter } from "~/utils/rateLimiter.server";
 import { addNotification } from "../notifications/addNotification";
+import { db } from "~/drizzle/db";
 
 export const getUserFn = query(async (input: z.input<typeof GetUserSchema>) => {
     'use server'
@@ -75,7 +76,10 @@ export async function setStatusFn(game: z.input<typeof G>) {
 export const getStatusFn = async (userId?: string) => {
     'use server'
     userId ??= (await getCurrentUser())?.user.id
-    if (!userId) throw respond(null, { status: 404 });
+    if (!userId) return {
+        gameId: -1,
+        title: "In Lobby"
+    }
     const status = await OnlineUsersService.getUserStatus(userId)
     return status
 }
@@ -106,7 +110,7 @@ export async function toggleFollowFn(targetUserId: string) {
     const res = await userRepository.toggleFollow(targetUserId, userSession.user.id)
 
     if (res?.following) {
-        void addNotification([{ userId: targetUserId }], {
+        void addNotification(db, [{ userId: targetUserId }], {
             actionUrl: "/users/" + userSession.user.username,
             type: "FOLLOW",
             title: `You have a new follower!`,

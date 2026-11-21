@@ -1,5 +1,5 @@
 import { eq, inArray, InferInsertModel } from "drizzle-orm";
-import { db } from "~/drizzle/db";
+import type { db, Tx } from "~/drizzle/db";
 import { notifications, users } from "~/drizzle/schema";
 import * as notificationsRepository from "./notificationsRepository"
 import { notificationsService } from "~/integrations/notificationService";
@@ -20,7 +20,7 @@ type Recipient =
     | { username: string; }
     | { userId: string; };
 
-export async function addNotification(recipients: Recipient[], notification: Notification) {
+export async function addNotification(client: Tx | typeof db, recipients: Recipient[], notification: Notification) {
     if (!recipients.length) return [];
 
     const directUserIds = new Set<string>();
@@ -37,7 +37,7 @@ export async function addNotification(recipients: Recipient[], notification: Not
 
     let fetchedUserIds: string[] = [];
     if (usernamesToFetch.size > 0) {
-        const foundUsers = await db
+        const foundUsers = await client
             .select({ id: users.id })
             .from(users)
             .where(inArray(users.username, Array.from(usernamesToFetch)));
@@ -59,7 +59,7 @@ export async function addNotification(recipients: Recipient[], notification: Not
         entityType: notification.entityType,
         entityId: notification.entityId,
     }));
-    const inserted = await notificationsRepository.createNotification(recordsToInsert)
+    const inserted = await notificationsRepository.createNotification(client, recordsToInsert)
 
     for (const ins of inserted) {
         void notificationsService.publish(ins.recipientId)

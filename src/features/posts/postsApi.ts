@@ -16,6 +16,7 @@ import { GET } from "@solidjs/web/server-functions";
 import { db } from "~/drizzle/db";
 import { postTags } from "~/drizzle/schema";
 import { count, sql } from "drizzle-orm";
+import { awardXp, CHALLENGE } from "../challenges/challengesRepository";
 
 export async function createPostFn(p: z.input<typeof PostCreateSchema>) {
     'use server'
@@ -37,14 +38,33 @@ export async function createPostFn(p: z.input<typeof PostCreateSchema>) {
             metadata: x.metadata
         }
     })
+    const post = await db.transaction(async tx => {
 
-    const post = await postRepository.createPost({
-        ...data,
-        userId: user.id,
-        media,
-        pending: data.media.length > 0,
-        tags: hashtags.map(tag => tag.toLowerCase())
+        const post = await postRepository.createPost(tx, {
+            ...data,
+            userId: user.id,
+            media,
+            pending: data.media.length > 0,
+            tags: hashtags.map(tag => tag.toLowerCase())
+        })
+        await awardXp(tx, user.id, CHALLENGE.createPost);
+        if (mentions.length > 0)
+            addNotification(
+                tx,
+                mentions.map(username => ({ username: username.toLowerCase() })).filter(u => u.username != user.username),
+                {
+                    actionUrl: `/posts/${post.postId}`,
+                    createdAt: post.createdAt,
+                    type: "MENTION",
+                    sourceUserId: user.id,
+                    title: `${user.username} mentioned you`,
+                    message: post.text.slice(0, 20),
+                    entityId: post.postId,
+                    entityType: "post"
+                })
+        return post
     })
+
     const urls = await Promise.all(media.map(obj => storageService.generateSignedUrl({
         ...obj,
         metadata: {
@@ -52,20 +72,8 @@ export async function createPostFn(p: z.input<typeof PostCreateSchema>) {
             userid: user.id
         }
     })));
+
     await orphanedFileService.storePendingUploads(urls, user.id)
-    if (mentions.length > 0)
-        addNotification(
-            mentions.map(username => ({ username: username.toLowerCase() })).filter(u => u.username != user.username),
-            {
-                actionUrl: `/posts/${post.postId}`,
-                createdAt: post.createdAt,
-                type: "MENTION",
-                sourceUserId: user.id,
-                title: `${user.username} mentioned you`,
-                message: post.text.slice(0, 20),
-                entityId: post.postId,
-                entityType: "post"
-            })
     return { post, urls }
 }
 
@@ -98,20 +106,27 @@ export async function toggleLikeFn(postId: number) {
     'use server'
     const data = zodSafeParse(z.int().positive(), postId)
     const userSession = await ensureVerified()
-    await rateLimiter("post:react", userSession.user.id, 10, 60)
-    const res = await postRepository.toggleLike(data, userSession.user.id)
+    await rateLimiter("post:react", userSession.user.id, 10, 60);
+    const res = await db.transaction(async tx => {
+        const res = await postRepository.toggleLike(tx, data, userSession.user.id)
+        await awardXp(tx, userSession.user.id, CHALLENGE.likePost)
+        if (!res) return res;
+        if (userSession.user.id != res.authorId && res.liked) {
+            await awardXp(tx, userSession.user.id, CHALLENGE.likePost)
+            await awardXp(tx, res.authorId, CHALLENGE.receiveLike)
+            await addNotification(tx, [{ userId: res.authorId }], {
+                actionUrl: "/posts/" + data,
+                type: "LIKE",
+                title: "You got a like",
+                message: `${userSession.user.name} liked your post`,
+                entityType: "post",
+                entityId: data,
+                sourceUserId: userSession.user.id
+            })
+        }
+        return res
+    })
     if (!res) throw respond(new Error("That post might have been deleted"), { status: 404 })
-    if (userSession.user.id != res.authorId && res.liked) {
-        await addNotification([{ userId: res.authorId }], {
-            actionUrl: "/posts/" + data,
-            type: "LIKE",
-            title: "You got a like",
-            message: `${userSession.user.name} liked your post`,
-            entityType: "post",
-            entityId: data,
-            sourceUserId: userSession.user.id
-        })
-    }
     return res
 }
 
@@ -167,7 +182,7 @@ export async function markPostUploadComplete(postId: number) {
     return post
 }
 
-export const getTrendingFn = GET(async() => {
+export const getTrendingFn = GET(async () => {
     'use server'
     const result = await db
         .select({

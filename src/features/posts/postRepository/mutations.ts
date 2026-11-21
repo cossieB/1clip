@@ -1,5 +1,5 @@
 import { and, count, eq, inArray, sql } from "drizzle-orm";
-import { db } from "~/drizzle/db";
+import { db, Tx } from "~/drizzle/db";
 import { postLikes, posts } from "~/drizzle/schema";
 import type { Post } from "~/drizzle/models";
 import "server-only";
@@ -25,40 +25,38 @@ export function updatePost(postId: number, post: Partial<Post>) {
         .where(eq(posts.postId, postId));
 }
 
-export async function toggleLike(postId: number, currentUserId: string) {
-    return db.transaction(async tx => {
-        const [post] = await tx
-            .select({ postId: posts.postId, authorId: posts.userId })
-            .from(posts)
-            .where(eq(posts.postId, postId))
-            .limit(1);
+export async function toggleLike(tx: Tx, postId: number, currentUserId: string) {
+    const [post] = await tx
+        .select({ postId: posts.postId, authorId: posts.userId })
+        .from(posts)
+        .where(eq(posts.postId, postId))
+        .limit(1);
 
-        if (!post) return null;
+    if (!post) return null;
 
-        const removed = await tx
-            .delete(postLikes)
-            .where(and(
-                eq(postLikes.postId, postId),
-                eq(postLikes.userId, currentUserId)
-            ))
-            .returning({ userId: postLikes.userId });
+    const removed = await tx
+        .delete(postLikes)
+        .where(and(
+            eq(postLikes.postId, postId),
+            eq(postLikes.userId, currentUserId)
+        ))
+        .returning({ userId: postLikes.userId });
 
-        let liked = false;
+    let liked = false;
 
-        if (removed.length === 0) {
-            await tx
-                .insert(postLikes)
-                .values({ postId, userId: currentUserId })
-                .onConflictDoNothing();
+    if (removed.length === 0) {
+        await tx
+            .insert(postLikes)
+            .values({ postId, userId: currentUserId })
+            .onConflictDoNothing();
 
-            liked = true;
-        }
+        liked = true;
+    }
 
-        const [{ likeCount }] = await tx
-            .select({ likeCount: count() })
-            .from(postLikes)
-            .where(eq(postLikes.postId, postId));
+    const [{ likeCount }] = await tx
+        .select({ likeCount: count() })
+        .from(postLikes)
+        .where(eq(postLikes.postId, postId));
 
-        return { liked, likeCount, authorId: post.authorId };
-    });
+    return { liked, likeCount, authorId: post.authorId };    
 }

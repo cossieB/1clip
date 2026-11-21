@@ -1,11 +1,11 @@
 import { and, eq, inArray, InferInsertModel } from "drizzle-orm";
-import { db } from "~/drizzle/db";
+import { db, Tx } from "~/drizzle/db";
 import { notifications } from "~/drizzle/schema";
 import { sql, gt } from "drizzle-orm";
 
-export async function createNotification(notification: InferInsertModel<typeof notifications> | InferInsertModel<typeof notifications>[]) {
+export async function createNotification(client: Tx | typeof db , notification: InferInsertModel<typeof notifications> | InferInsertModel<typeof notifications>[]) {
     // @ts-expect-error
-    return await db.insert(notifications).values(notification).returning();
+    return await client.insert(notifications).values(notification).returning();
 }
 
 export function getNotifications(filter: { userId: string }) {

@@ -7,7 +7,8 @@ import {
     uuid,
     index,
     varchar,
-    date
+    date,
+    integer
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
@@ -30,7 +31,8 @@ export const users = pgTable("users", {
     bio: varchar("bio", { length: 255 }).notNull().default(""),
     dob: date('dob'),
     location: varchar("location", { length: 100 }),
-    links: text('links').array().notNull().default([])
+    links: text('links').array().notNull().default([]),
+    xp: integer("xp").notNull().default(0)
 });
 
 export const sessions = pgTable(

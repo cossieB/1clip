@@ -1,7 +1,7 @@
 import 'server-only'
 import { and, desc, eq, gt, InferInsertModel, lt, or, SQL, sql, asc, inArray, getColumns } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
-import { db } from '~/drizzle/db';
+import { db, Tx } from '~/drizzle/db';
 import { games, squads, squadApplications, users } from '~/drizzle/schema';
 import { SquadApplicationStatus } from '~/drizzle/models';
 import { SquadFilters } from './utils/zod';
@@ -174,11 +174,11 @@ export async function findSquadApplications(
 
 export type SquadApplicationWithApplicant = Awaited<ReturnType<typeof findSquadApplications>>[number];
 
-export async function createSquadApplication(input: InferInsertModel<typeof squadApplications>) {
-    const ins = db.$with("ins").as(
-        db.insert(squadApplications).values(input).returning()
+export async function createSquadApplication(tx: Tx, input: InferInsertModel<typeof squadApplications>) {
+    const ins = tx.$with("ins").as(
+        tx.insert(squadApplications).values(input).returning()
     )
-    const [inserted] = await db
+    const [inserted] = await tx
         .with(ins)
         .select({
             ...getColumns(ins),
@@ -190,8 +190,8 @@ export async function createSquadApplication(input: InferInsertModel<typeof squa
     return inserted
 }
 
-export async function updateSquadApplication(applicationId: number, status: SquadApplicationStatus, ownerId: string) {
-    const [updated] = await db
+export async function updateSquadApplication(client: Tx | typeof db, applicationId: number, status: SquadApplicationStatus, ownerId: string) {
+    const [updated] = await client
         .update(squadApplications)
         .set({ status })
         .where(and(

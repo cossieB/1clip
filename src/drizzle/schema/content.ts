@@ -124,3 +124,22 @@ export const notifications = pgTable("notifications", {
 }, table => [
     index().on(table.recipientId)
 ])
+
+export const challenges = pgTable("challenges", {
+    challengeId: integer("challenge_id").primaryKey().generatedAlwaysAsIdentity(),
+    title: varchar("title", {length: 50}).notNull(),
+    description: text("description").notNull().default(""),
+    xpReward: integer("xp_reward").notNull(),
+    isActive: boolean("is_active").notNull().default(true)
+})
+
+export const xpAwards = pgTable("user_challenges", {
+    userId: uuid("user_id").notNull().references(() => users.id, {onDelete: "cascade"}),
+    challengeId: integer("challenge_id").notNull().references(() => challenges.challengeId),
+    awardedOn: date("awarded_on").notNull().default(sql`(now() at time zone 'utc')::date`),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, t => [
+    primaryKey({
+        columns: [t.userId, t.challengeId, t.awardedOn]
+    })
+])

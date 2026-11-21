@@ -102,7 +102,7 @@ export function GameForm(props: { game?: AwaitedReturn<typeof getGameFn> }) {
                     })
                 }}
                 onRemove={removed => setFiles(s => s.filter(x => x.file != removed))}
-                accept="video/mp4, video/webm, video/ogg, audio/mpeg, audio/wav, audio/ogg, audio/aac, audio/midi, audio/x-midi, audio/webm, image/jpeg, image/png, image/webp, image/gif"
+                accept="video/*,image/*,audio/*"
                 maxSize={8 * 1024 * 1024}
             />
             <div class={styles.screenshots}>
