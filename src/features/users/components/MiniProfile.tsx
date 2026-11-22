@@ -1,4 +1,4 @@
-import { createSignal, Show, Loading, createMemo } from "solid-js"
+import { createSignal, Show, Loading, createMemo, createEffect } from "solid-js"
 import styles from "./MiniProfle.module.css"
 import { Spinner } from "~/components/Loader/Spinner"
 import { getUserFn } from "../userApi"
@@ -15,10 +15,18 @@ type Props = {
 
 export function UserMiniProfile(props: Props) {
     let elem!: HTMLDivElement
-    
+    let [popover, setPopover] = createSignal<HTMLDivElement>()
     const [enabled, setEnabled] = createSignal(false)
 
     const user = createMemo(() => enabled() ? getUserFn({ id: props.userId }) : undefined)
+
+    createEffect(
+        () => [user(), popover()],
+        ([u, p]) => {
+            if (u && p)  {
+                p.style.backgroundImage = `url("${mediaSrc(u.banner)}")`
+            }
+        })
 
     return (
         <Popover
@@ -43,13 +51,7 @@ export function UserMiniProfile(props: Props) {
                 >
                     <Show when={user()}>
                         {user => (
-                            <div 
-                                class={styles.miniProfile} 
-                                style={{
-                                    "background-image": `url("${mediaSrc(user().banner)}")`,
-                                    "--bg-url": `url("${mediaSrc(user().banner)}")`
-                                }}
-                                >
+                            <div class={styles.miniProfile} ref={setPopover}>
                                 <img class={styles.avatar} src={mediaSrc(user().image)} alt="" />
                                 <div class={styles.name}>
                                     <span>{user().displayName}</span>
