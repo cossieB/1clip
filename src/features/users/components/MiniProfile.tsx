@@ -1,4 +1,4 @@
-import { createSignal, Show, Loading, createMemo, createEffect } from "solid-js"
+import { createSignal, Show, Loading, createMemo } from "solid-js"
 import styles from "./MiniProfle.module.css"
 import { Spinner } from "~/components/Loader/Spinner"
 import { getUserFn } from "../userApi"
@@ -15,18 +15,10 @@ type Props = {
 
 export function UserMiniProfile(props: Props) {
     let elem!: HTMLDivElement
-    let [popover, setPopover] = createSignal<HTMLDivElement>()
+    let el!: HTMLElement
     const [enabled, setEnabled] = createSignal(false)
 
     const user = createMemo(() => enabled() ? getUserFn({ id: props.userId }) : undefined)
-
-    createEffect(
-        () => [user(), popover()],
-        ([u, p]) => {
-            if (u && p)  {
-                p.style.backgroundImage = `url("${mediaSrc(u.banner)}")`
-            }
-        })
 
     return (
         <Popover
@@ -40,7 +32,7 @@ export function UserMiniProfile(props: Props) {
             }}
 
         >
-            <section class={styles.container}>
+            <section ref={el} class={styles.container}>
                 <Loading
                     on={enabled()}
                     fallback={
@@ -51,16 +43,14 @@ export function UserMiniProfile(props: Props) {
                 >
                     <Show when={user()}>
                         {user => (
-                            <div class={styles.miniProfile} ref={setPopover}>
+                            <div class={styles.miniProfile}>
+                                <img class={styles.banner} src={mediaSrc(user().banner)} alt="" aria-hidden="true" />
                                 <img class={styles.avatar} src={mediaSrc(user().image)} alt="" />
                                 <div class={styles.name}>
                                     <span>{user().displayName}</span>
                                     <span> @{user().displayUsername} </span>
                                 </div>
-                                <UserRank
-                                    xp={user().xp}
-                                    detail
-                                />
+                                <UserRank xp={user().xp} detail />
                                 <Show when={session().data && session().data!.user.id != props.userId}>
                                     <FollowBtn
                                         isFollowing={!!user().isFollowing}
