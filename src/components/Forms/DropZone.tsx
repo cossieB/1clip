@@ -2,6 +2,7 @@ import { createMemo, createSignal, For, merge, onCleanup, Show, type Setter } fr
 import { formatBytes, matchesAccept } from "./fileUtils"
 import styles from "./DropZone.module.css"
 import { RenderMedia } from "../RenderMedia"
+import { MetadataEditor, type Metadata } from "./MetadataEditor"
 
 type Props = {
     files: File[]
@@ -14,6 +15,10 @@ type Props = {
     /** Max size per file, in bytes */
     maxSize?: number
     onReject?: (messages: string[]) => void
+    /** Return the current metadata for a file (read reactively) */
+    getMetadata?: (file: File) => Metadata | undefined
+    /** When provided, each preview shows an edit-metadata button */
+    onMetadataChange?: (file: File, metadata: Metadata) => void
 }
 
 type DragState = "idle" | "over" | "invalid"
@@ -24,6 +29,7 @@ const sameFile = (a: File, b: File) =>
 export function DropZone(_props: Props) {
     const [dragState, setDragState] = createSignal<DragState>("idle")
     const [errors, setErrors] = createSignal<string[]>([])
+    const [editing, setEditing] = createSignal<File | null>(null)
     const props = merge({ maxFiles: 8, maxSize: 16 * 1024 * 1024 }, _props)
 
     const multiple = () => props.maxFiles !== 1
@@ -138,7 +144,7 @@ export function DropZone(_props: Props) {
                 <ul class={styles.previews}>
                     <For each={props.files}>
                         {file => {
-                            const url = /^(image\/|video\/|audio\/)/.test(file.type) 
+                            const url = /^(image\/|video\/|audio\/)/.test(file.type)
                                 ? URL.createObjectURL(file)
                                 : undefined
                             onCleanup(() => url && URL.revokeObjectURL(url))
@@ -172,11 +178,31 @@ export function DropZone(_props: Props) {
                                     >
                                         ✕
                                     </button>
+                                    <Show when={props.onMetadataChange}>
+                                        <button
+                                            type="button"
+                                            class={[styles.edit, { [styles.hasMeta]: !!Object.keys(props.getMetadata?.(file) ?? {}).length }]}
+                                            aria-label={`Edit metadata for ${file.name}`}
+                                            onClick={() => setEditing(file)}
+                                        >
+                                            ✎
+                                        </button>
+                                    </Show>
                                 </li>
                             )
                         }}
                     </For>
                 </ul>
+            </Show>
+            <Show when={editing()}>
+                {file => (
+                    <MetadataEditor
+                        title={file().name}
+                        initial={props.getMetadata?.(file())}
+                        onSave={m => props.onMetadataChange?.(file(), m)}
+                        onClose={() => setEditing(null)}
+                    />
+                )}
             </Show>
         </div>
     )

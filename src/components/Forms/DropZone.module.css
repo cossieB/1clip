@@ -69,7 +69,9 @@
     border: 1px solid var(--border);
     background: var(--surface-1);
 
-    img, audio, video {
+    img,
+    audio,
+    video {
         width: 100%;
         height: 100%;
         object-fit: cover;
@@ -128,14 +130,65 @@
         }
     }
 
+    .remove,
+    .edit {
+        position: absolute;
+        top: 0.3rem;
+        width: 1.5rem;
+        height: 1.5rem;
+        padding: 0;
+        display: grid;
+        place-items: center;
+        font-size: 0.7rem;
+        background: color-mix(in oklch, var(--bg) 80%, transparent);
+        border: 1px solid var(--line);
+        opacity: 0;
+        transition: opacity 0.15s;
+    }
+
+    .remove {
+        right: 0.3rem;
+
+        &:hover {
+            background: var(--danger);
+            border-color: var(--danger);
+        }
+    }
+
+    .edit {
+        right: 2.1rem;
+
+        &:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--on-accent);
+        }
+
+        /* stays visible when the file already has metadata */
+        &.hasMeta {
+            opacity: 1;
+            border-color: var(--accent);
+            color: var(--accent-bright);
+        }
+    }
+
+    &:hover .remove,
+    &:hover .edit,
+    .remove:focus-visible,
+    .edit:focus-visible {
+        opacity: 1;
+    }
+
     &:hover .remove,
     .remove:focus-visible {
         opacity: 1;
     }
+
 }
 
 @media (hover: none) {
-    .preview .remove {
+    .preview .remove,
+    .preview .edit {
         opacity: 1;
     }
 }

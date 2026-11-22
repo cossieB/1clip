@@ -9,7 +9,7 @@ import { Spinner } from "~/components/Loader/Spinner";
 
 export function CreatePostPage() {
 
-    const { input, setInput, setFiles, handleSubmit, isSubmitting, abortController, files } = useCreatePost()
+    const { input, setInput, setFiles, handleSubmit, isSubmitting, files } = useCreatePost()
     return (
         <form onSubmit={handleSubmit} class="form card">
             <TextField
@@ -33,6 +33,11 @@ export function CreatePostPage() {
                 accept="video/mp4, video/webm, video/ogg, audio/mpeg, audio/wav, audio/ogg, audio/aac, audio/midi, audio/x-midi, audio/webm, image/jpeg, image/png, image/webp, image/gif"
                 maxSize={8 * 1024 * 1024}
                 maxFiles={4}
+                onMetadataChange={(file, metadata) => setFiles(f => {
+                    const item = f.find(f => f.file == file)
+                    if (item) (item.metadata = metadata)
+                })}
+                getMetadata={file => files().find(f => f.file === file)?.metadata}
             />
             <Editor
                 content={input.text}

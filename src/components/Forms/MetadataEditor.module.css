@@ -1,0 +1,77 @@
+.dialog {
+    composes: dialog from "~/components/Popover/Dialog.module.css";
+    --bevel: 16px;
+    margin: auto;
+    width: min(32rem, calc(100vw - 2rem));
+    max-height: calc(100dvh - 2rem);
+    padding: 0;
+    color: var(--text);
+    background: linear-gradient(160deg, var(--surface-2), var(--surface-1));
+    border: 1px solid var(--accent-deep);
+    border-radius: var(--bevel) 0 var(--bevel) 0;
+    corner-shape: bevel square bevel square;
+    box-shadow: 0 16px 40px oklch(0% 0 0 / 0.55), 0 0 28px -8px var(--accent-glow);
+
+    &::backdrop {
+        background: oklch(0% 0 0 / 0.6);
+        backdrop-filter: blur(3px);
+    }
+}
+
+.form {
+    display: grid;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+}
+
+.header {
+    display: grid;
+    gap: 0.25rem;
+
+    h2 { margin: 0; }
+}
+
+.filename {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rows {
+    display: grid;
+    gap: 0.75rem;
+    max-height: 50dvh;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr auto;
+    gap: 0.5rem;
+    align-items: end;
+
+    input { min-width: 0; }
+}
+
+@media (max-width: 30rem) {
+    .row {
+        grid-template-columns: 1fr auto;
+
+        > :nth-child(2) { grid-column: 1; }
+        > button { grid-row: 1 / span 2; grid-column: 2; }
+    }
+}
+
+.error {
+    color: var(--danger);
+    font-size: 0.78rem;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}

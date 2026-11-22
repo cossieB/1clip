@@ -14,7 +14,7 @@ export function PlatformSelector(props: Props) {
     const platforms = createMemo(() => getPlatformsFn({}))
 
     // Initial value only, same pattern as GenreSelector
-    const [selectedIds, setSelectedIds] = createSignal<number[]>(props.initialPlatformIds ?? [])
+    const [selectedIds, setSelectedIds] = createSignal<number[]>(() => props.initialPlatformIds ?? [])
 
     const handleChange = (platformIds: number[]) => {
         setSelectedIds(platformIds)

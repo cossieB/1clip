@@ -1,6 +1,6 @@
 .dialog {
-    --dur: 0.3s;
-    --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --dur: 0.6s;
+    --ease: var(--bounce);
 
     /* reset.css zeroes margins, so re-center the modal */
     margin: auto;
