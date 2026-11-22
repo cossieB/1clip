@@ -15,7 +15,7 @@ type Props = {
 
 export function UserMiniProfile(props: Props) {
     let elem!: HTMLDivElement
-    let el!: HTMLElement
+    
     const [enabled, setEnabled] = createSignal(false)
 
     const user = createMemo(() => enabled() ? getUserFn({ id: props.userId }) : undefined)
@@ -32,7 +32,7 @@ export function UserMiniProfile(props: Props) {
             }}
 
         >
-            <section ref={el} class={styles.container}>
+            <section class={styles.container}>
                 <Loading
                     on={enabled()}
                     fallback={
@@ -43,7 +43,13 @@ export function UserMiniProfile(props: Props) {
                 >
                     <Show when={user()}>
                         {user => (
-                            <div class={styles.miniProfile} style={{"background-image": `url("${mediaSrc(user().banner)}")`}}>
+                            <div 
+                                class={styles.miniProfile} 
+                                style={{
+                                    "background-image": `url("${mediaSrc(user().banner)}")`,
+                                    "--bg-url": `"${mediaSrc(user().banner)}`
+                                }}
+                                >
                                 <img class={styles.avatar} src={mediaSrc(user().image)} alt="" />
                                 <div class={styles.name}>
                                     <span>{user().displayName}</span>

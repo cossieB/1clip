@@ -3,6 +3,7 @@
 }
 
 .miniProfile {
+    --bg-url: "/q.png";
     padding: 1.25rem;
     background-position: center;
     background-size: cover;
@@ -15,8 +16,10 @@
     background-position: center;
     background-color: rgba(0, 0, 0, 0.75);
     background-blend-mode: darken;
+    background-image: var(--bg-url);
 
-    button, [data-rank] {
+    button,
+    [data-rank] {
         grid-column: span 2;
     }
 
@@ -33,14 +36,26 @@
     place-self: center;
     display: flex;
     flex-direction: column;
+
     >span:first-of-type {
         font-weight: bold;
         color: var(--accent-deep);
         text-transform: uppercase;
     }
+
     >span:last-of-type {
         font: 600 .95rem var(--font-ui);
         color: var(--text-muted);
     }
 }
 
+.wait {
+    height: 10rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+        animation: spin infinite 2s linear;
+    }
+}
