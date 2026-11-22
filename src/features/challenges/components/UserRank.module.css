@@ -1,0 +1,72 @@
+/* Per-rank accent. Uses only the badge colour; everything else follows project tokens. */
+.rank {
+    --c: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    &[data-rank="bronze"]   { --c: oklch(0.65 0.12 55); }
+    &[data-rank="silver"]   { --c: oklch(0.82 0.02 250); }
+    &[data-rank="gold"]     { --c: oklch(0.84 0.15 85); }
+    &[data-rank="platinum"] { --c: oklch(0.82 0.10 195); }
+    &[data-rank="diamond"]  { --c: oklch(0.78 0.14 235); }
+    &[data-rank="master"]   { --c: var(--pink); }
+}
+
+.rank-badge {
+    inline-size: var(--size);
+    block-size: var(--size);
+    object-fit: contain;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 calc(var(--size) / 6) color-mix(in oklch, var(--c) 45%, transparent));
+}
+
+/* four pips under/next to the badge: more filled = higher in the tier */
+.rank-pips {
+    display: grid;
+    grid-auto-flow: column;
+    gap: 3px;
+
+    i {
+        inline-size: 6px;
+        block-size: 6px;
+        background: var(--surface-3);
+        border: 1px solid var(--border-strong);
+        rotate: 45deg;
+
+        &.on {
+            background: var(--c);
+            border-color: var(--c);
+        }
+    }
+}
+
+.rank-detail {
+    display: grid;
+    gap: 0.3rem;
+    min-inline-size: 9rem;
+}
+
+.rank-label {
+    font-family: var(--font-header);
+    color: var(--c);
+    line-height: 1;
+}
+
+.rank-bar {
+    block-size: 4px;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+}
+
+.rank-fill {
+    block-size: 100%;
+    background: var(--c);
+    box-shadow: 0 0 10px -1px color-mix(in oklch, var(--c) 60%, transparent);
+    transition: width 0.4s ease;
+}
+
+.rank-xp {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}

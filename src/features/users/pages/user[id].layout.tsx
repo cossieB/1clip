@@ -9,6 +9,7 @@ import { mediaSrc } from "~/utils/mediaSrc";
 import { session } from "~/features/auth/authApi";
 import { NavTabs } from "~/components/NavTabs/NavTabs";
 import { FollowBtn } from "../components/FollowBtn";
+import { UserRank } from "~/features/challenges/components/UserRank";
 
 export function UserIdLayout(props: ParentProps) {
     const params = useParams(paths.users)
@@ -41,6 +42,7 @@ export function UserIdLayout(props: ParentProps) {
 function Page(props: { user: NonNullable<AwaitedReturn<typeof getUserFn>> }) {
     return (
         <div class={styles.container}>
+            <UserRank xp={props.user.xp} />
             <div class={styles.hero} >
                 <img class={styles.banner} src={mediaSrc(props.user.banner)} alt="" />
             </div>

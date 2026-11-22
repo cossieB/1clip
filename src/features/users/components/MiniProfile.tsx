@@ -4,9 +4,9 @@ import { Spinner } from "~/components/Loader/Spinner"
 import { getUserFn } from "../userApi"
 import { mediaSrc } from "~/utils/mediaSrc"
 import { FollowBtn } from "./FollowBtn"
-import { UserRank } from "./UserRank"
 import { session } from "~/features/auth/authApi"
 import { Popover } from "~/components/Popover/Popover"
+import { UserRank } from "~/features/challenges/components/UserRank"
 
 type Props = {
     entityId: string | number
@@ -30,9 +30,9 @@ export function UserMiniProfile(props: Props) {
             onToggle={e => {
                 if (e.newState == "open") setEnabled(true)
             }}
-            
+
         >
-            <section ref={el} class={styles.miniProfile}>
+            <section ref={el} class={styles.container}>
                 <Loading
                     on={enabled()}
                     fallback={
@@ -43,23 +43,23 @@ export function UserMiniProfile(props: Props) {
                 >
                     <Show when={user()}>
                         {user => (
-                            <>
-                                <section >
-                                    <img src={mediaSrc(user().image)} alt="" />
-                                    <Show when={session().data && session().data!.user.id != props.userId}>
-                                        <FollowBtn
-                                            isFollowing={!!user().isFollowing}
-                                            targetUserId={user().id}
-                                        />
-                                    </Show>
-                                </section>
-                                <section class={styles.rank}>
-                                    {user().displayName}
-                                    <UserRank userId={props.userId} enabled={enabled} />
-                                </section>
-                                <img class={styles.bg} src={mediaSrc(user().banner)} alt="" />
-                                <div class={styles.shade} />
-                            </>
+                            <div class={styles.miniProfile} style={{"background-image": `url(${mediaSrc(user().banner)})`}}>
+                                <img class={styles.avatar} src={mediaSrc(user().image)} alt="" />
+                                <div class={styles.name}>
+                                    <span>{user().displayName}</span>
+                                    <span> @{user().displayUsername} </span>
+                                </div>
+                                <UserRank
+                                    xp={user().xp}
+                                    detail
+                                />
+                                <Show when={session().data && session().data!.user.id != props.userId}>
+                                    <FollowBtn
+                                        isFollowing={!!user().isFollowing}
+                                        targetUserId={user().id}
+                                    />
+                                </Show>
+                            </div>
                         )}
                     </Show>
                 </Loading>
