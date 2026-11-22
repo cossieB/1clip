@@ -3,7 +3,6 @@
 }
 
 .miniProfile {
-    --bg-url: "/q.png";
     padding: 1.25rem;
     background-position: center;
     background-size: cover;
@@ -16,6 +15,7 @@
     background-position: center;
     background-color: rgba(0, 0, 0, 0.75);
     background-blend-mode: darken;
+    --bg-url: url("/image1.jpg");
     background-image: var(--bg-url);
 
     button,

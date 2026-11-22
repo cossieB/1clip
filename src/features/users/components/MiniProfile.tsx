@@ -47,7 +47,7 @@ export function UserMiniProfile(props: Props) {
                                 class={styles.miniProfile} 
                                 style={{
                                     "background-image": `url("${mediaSrc(user().banner)}")`,
-                                    "--bg-url": `"${mediaSrc(user().banner)}`
+                                    "--bg-url": `url("${mediaSrc(user().banner)}")`
                                 }}
                                 >
                                 <img class={styles.avatar} src={mediaSrc(user().image)} alt="" />
