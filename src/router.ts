@@ -39,6 +39,7 @@ import { AdminGamesRoute } from './features/games/pages/admin.games';
 import { AdminCompaniesRoute } from './features/companies/pages/admin.companies';
 import { AdminPlatformsRoute } from './features/platforms/pages/admin.platforms';
 import { AdminActorsRoute } from './features/actors/pages/admin.actors';
+import Landing from './components/Landing/Landing';
 
 // Link preloading is opt-in. intentPreload() is the hover/focus/touch
 // strategy: resting on a link warms its code and runs its preload, which is
@@ -163,7 +164,7 @@ export const Router = createRouter({
             }, {
                 path: "/games",
                 component: AdminGamesRoute
-            },{
+            }, {
                 path: "/games/add",
                 component: AdminGameCreateRoute
             }, {
@@ -208,10 +209,12 @@ export const Router = createRouter({
                 matchFilters: {
                     actorId: int
                 }
-            },
-            ]
+            }]
+        },
+        {
+            path: "/landing",
+            component: Landing
         }
-
     ]
 });
 

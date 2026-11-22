@@ -6,20 +6,22 @@ Show off your best gaming moments, epic screenshots, hilarious clips, jaw-droppi
 ## Stack
 - Typescript
 - Node JS
-- [Tanstack Start](https://tanstack.com/start/latest)
-- [SolidJS](https://www.solidjs.com/)
-- [Tanstack Query](https://tanstack.com/query/latest)
+- [SolidJS 2.0](https://www.solidjs.com/)
 - PostgreSQL 18 via [Neon](https://neon.com/)
 - Redis
 - [Drizzle ORM](https://orm.drizzle.team/)
 - [Cloudflare R2](https://developers.cloudflare.com/r2/)
-- [Nodemailer](https://nodemailer.com/)
+- [Resend](https://resend.com/)
 - [Railway](https://railway.com/)
 
 ### Auth
-[Better Auth](https://www.better-auth.com/) is used to handle authentication and Nodemailer to send confirmation emails. Users can change usernames, emails, passwords, reset passwords and delete their entire account. 
+[Better Auth](https://www.better-auth.com/) is used to handle authentication and Resnd to send confirmation emails. Users can change usernames, emails, passwords, reset passwords and delete their entire account. 
 
 ### Techniques
-Intersection Observer and Tanstack Query to implement infinite scrolling, combined with keyset database pagination to provide a seamless blazing fast user experience.
-Redis Pub/Sub and server-sent events to deliver realtime notifications to the user.
+Intersection Observer combined with keyset database pagination to provide a seamless blazing fast user experience.
+Redis pub/sub and server-sent events to deliver realtime notifications to the user.
 Client-side uploads using presigned URLS
+SolidJS 2.0's reactivity model makes async a breeze. I used the `broadcast()` function on the frontend and Redis sorted sets + hashes on the backend to broadcast online users and the game they're currently playing.
+
+### AI Usage
+**AI-assisted, not vibe-coded**. I created the overall architecture and used AI to speed up development. I read each line the agents wrote, tested the code and manually made changes when they hallucinated or I just didn't like their output.

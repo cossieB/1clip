@@ -1,10 +1,8 @@
-import { createMemo, For } from "solid-js";
+import { For } from "solid-js";
 import styles from "./Landing.module.css";
-import { query } from "@solidjs/router";
-import { redirect, getRequestEvent } from "@solidjs/web";
-import { createCookie, Cookie } from "@remix-run/cookie"
+import { httpHeader } from "@solidjs/web";
 import { paths } from "~/router";
-import { getCurrentUser } from "~/features/auth/serverFn";
+import { Title } from "@solidjs/meta";
 
 const features = [
     {
@@ -25,29 +23,12 @@ const features = [
     },
 ];
 
-const loader = query(async () => {
-    'use server'
-    const sessionCookie = createCookie("visited", {
-        path: "/",
-        maxAge: 31556926
-    })
-    const event = getRequestEvent()
-    if (!event) return
-    const cookieHeader = event.request.headers.get("Cookie")
-    if (!cookieHeader) return;
-    const visited = await sessionCookie.parse(cookieHeader)
-    if (visited) throw redirect(paths.posts())
-    event.response.headers.append("Set-Cookie", await  sessionCookie.serialize("1"))
-    const user = await getCurrentUser()
-    if (user) throw redirect(paths.posts())
-}, "firstLoad")
 
 export default function Landing() {
-    createMemo(() => loader(), {
-        deferStream: true
-    })
+    httpHeader("Cache-Control", "public, max-age=31536000")
     return (
         <main class={styles.landing}>
+            <Title>1Clip</Title>
             <section class={styles.hero}>
                 <span class={styles.brand}>1Clip</span>
                 <h1 class={styles.title}>Level Up Your Legacy</h1>
@@ -60,7 +41,7 @@ export default function Landing() {
                 </p>
                 <div class={styles.actions}>
                     <a class="button primary" href={paths.posts()}>Browse</a>
-                    <a class="button secondary" href="/auth/signup">Join the Community</a>
+                    <a class="button secondary" href="/?dialog=signup">Join the Community</a>
                 </div>
             </section>
 

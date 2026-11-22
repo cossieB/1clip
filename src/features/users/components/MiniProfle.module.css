@@ -5,7 +5,7 @@
 .miniProfile {
     padding: 1.25rem;
     position: relative;
-    isolation: isolate; /* keeps the banner's z-index inside this box */
+    isolation: isolate; 
     overflow: hidden;
     display: grid;
     gap: 0.5rem;
@@ -17,7 +17,6 @@
         grid-column: span 2;
     }
 
-    /* replaces background-color + background-blend-mode: darken */
     &::after {
         content: "";
         position: absolute;
@@ -59,3 +58,13 @@
     }
 }
 
+.wait {
+    height: 10rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+        animation: spin infinite 2s linear;
+    }
+}

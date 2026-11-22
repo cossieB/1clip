@@ -1,15 +1,15 @@
-[x] Search
+- [x] Search
 
-[ ] Mini profile
+- [x] Mini profile
 
-[x] Delete posts
+- [x] Delete posts
 
-[x] Admin pages
+- [x] Admin pages
 
-[ ] Steam widgets
+- [ ] Steam widgets
 
-[ ] DMs
+- [ ] DMs
 
-[ ] Daily Challenges & XP system
+- [x] Daily Challenges & XP system
 
-[ ] User Prefs
+- [ ] User Prefs
