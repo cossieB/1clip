@@ -43,7 +43,7 @@ export function UserMiniProfile(props: Props) {
                 >
                     <Show when={user()}>
                         {user => (
-                            <div class={styles.miniProfile} style={{"background-image": `url(${mediaSrc(user().banner)})`}}>
+                            <div class={styles.miniProfile} style={{"background-image": `url("${mediaSrc(user().banner)}")`}}>
                                 <img class={styles.avatar} src={mediaSrc(user().image)} alt="" />
                                 <div class={styles.name}>
                                     <span>{user().displayName}</span>
