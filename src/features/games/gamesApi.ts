@@ -4,7 +4,7 @@ import { redirect, respond } from "@solidjs/web";
 import z from "zod";
 import { GameCreateSchema, GameEditSchema, GetGamesSchema } from "./utils/zod";
 import { zodSafeParse } from "~/utils/zodSafeParse";
-import { ensureAdmin } from "../auth/utils/ensureAuth";
+import { ensureAdmin } from "../auth/authApi";
 import { orphanedFileService } from "~/services/orphanedFileService";
 import { storageService } from "~/integrations/storageService/index.server";
 import { cacheAside } from "~/utils/cacheAside";

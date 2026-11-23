@@ -13,7 +13,8 @@ export function CreatePostPage() {
     return (
         <form onSubmit={handleSubmit} class="form card">
             <TextField
-                label="Title" onChange={e => setInput(s => {
+                label="Title"
+                onChange={e => setInput(s => {
                     s.title = e.currentTarget.value.trim()
                 })}
                 required
@@ -41,12 +42,12 @@ export function CreatePostPage() {
             />
             <Editor
                 content={input.text}
-                setContent={(val) => setInput(s => {s.text = val})}
+                setContent={(val) => setInput(s => { s.text = val })}
                 maxlength={500}
                 placeholder="Add some detail"
             />
             <SearchAutocomplete
-                search={str => getGamesFn({title: str})}
+                search={str => getGamesFn({ title: str })}
                 getLabel={game => game.title}
                 onSelect={game => {
                     setInput(s => {

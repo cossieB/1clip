@@ -1,7 +1,7 @@
 import z from "zod";
 import * as notificationsRepository from "./notificationsRepository"
 import { GET } from "@solidjs/web/server-functions";
-import { ensureVerified } from "../auth/utils/ensureAuth";
+import { ensureVerified } from "../auth/authApi";
 import { createOptimisticStore } from "solid-js";
 import { getCurrentUser } from "../auth/serverFn";
 import { session } from "../auth/authApi";

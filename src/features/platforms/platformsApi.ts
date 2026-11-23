@@ -7,7 +7,7 @@ import { LimitOffsetSchema } from "~/utils/zod"
 import { zodSafeParse } from "~/utils/zodSafeParse"
 import z from "zod"
 import { redirect, respond } from "@solidjs/web"
-import { ensureAdmin } from "../auth/utils/ensureAuth"
+import { ensureAdmin } from "../auth/authApi"
 import { paths } from "~/router"
 
 export const getPlatformsFn = GET(async (arg: z.input<typeof LimitOffsetSchema>) => {

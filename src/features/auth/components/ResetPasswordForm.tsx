@@ -16,7 +16,7 @@ export function RequestPasswordRequestForm() {
         setSubmitting(true)
         authClient.requestPasswordReset({
             email: email(),
-            redirectTo: "/?dialog=reset"
+            redirectTo: paths.auth.reset()
         }, {
             onError({ error }) {
                 addToast({ text: error.message, type: "error" })
@@ -47,8 +47,8 @@ export function RequestPasswordRequestForm() {
                     "font-size": "small"
                 }}
             >
-                <a href="?dialog=signup" replace>Click here to create account</a>
-                <a href="?dialog=signin" replace>Remembered password?</a>
+                <a href={paths.auth.signup} replace>Click here to create account</a>
+                <a href={paths.auth.signin} replace>Remembered password?</a>
             </div>
             <button disabled={!z.email().safeParse(email()).success || submitting()} type="submit">Reset</button>
         </form>
@@ -73,7 +73,7 @@ export function ResetPasswordForm() {
         }, {
             onSuccess(context) {
                 addToast({ text: "Password changed. You can log in now.", type: "info" })
-                navigate(paths({ dialog: "signin" }))
+                navigate(paths.auth.signin)
             },
             onError({ error }) {
                 addToast({ text: error.message, type: "error" });

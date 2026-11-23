@@ -1,5 +1,5 @@
 // server/search.ts
-import { ensureVerified } from "~/features/auth/utils/ensureAuth";
+import { ensureVerified } from "~/features/auth/authApi";
 import { searchGames, searchSquads, searchPosts } from "./searchRepository";
 
 const MIN_LENGTH = 2;

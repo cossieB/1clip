@@ -66,7 +66,7 @@ export function SignupForm() {
                     "font-size": "small"
                 }}
             >
-                <a href="?dialog=signin" replace>Already have an account?</a>
+                <a href={paths.auth.signin} replace>Already have an account?</a>
             </div>
             <button
                 class="primary"

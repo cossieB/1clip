@@ -8,7 +8,7 @@ import { db } from "~/drizzle/db";
 import { GET } from "@solidjs/web/server-functions";
 import { zodSafeParse } from "~/utils/zodSafeParse";
 import { redirect, respond } from "@solidjs/web";
-import { ensureAdmin } from "../auth/utils/ensureAuth";
+import { ensureAdmin } from "../auth/authApi";
 import { paths } from "~/router";
 
 export const getActorFn = GET(async (id: number) => {

@@ -1,5 +1,5 @@
 import { createMemo, ParentProps } from "solid-js";
-import { ensureAdminOrRedirect } from "~/features/auth/utils/ensureAuth";
+import { ensureAdminOrRedirect } from "~/features/auth/authApi";
 import styles from "./AdminLayout.module.css"
 
 export default function AdminLayout(props: ParentProps) {

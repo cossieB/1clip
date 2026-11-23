@@ -3,7 +3,7 @@ import { AddCommentSchema, GetCommentsSchema } from "./utils/zod";
 import z from "zod";
 import { rateLimiter } from "~/utils/rateLimiter.server";
 import * as commentsRepository from "./commentRepository"
-import { ensureVerified } from "~/features/auth/utils/ensureAuth";
+import { ensureVerified } from "~/features/auth/authApi";
 import { addNotification } from "~/features/notifications/addNotification";
 import { getCurrentUser } from "~/features/auth/serverFn";
 import { respond } from "@solidjs/web";

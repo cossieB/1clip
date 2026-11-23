@@ -1,6 +1,6 @@
 import { NotificationsList } from "../components/NotificationsList";
 import { createMemo } from "solid-js";
-import { ensureAuthOrRedirect } from "~/features/auth/utils/ensureAuth";
+import { ensureAuthOrRedirect } from "~/features/auth/authApi";
 
 export function NotificationsRoute() {
     createMemo(() => ensureAuthOrRedirect(), {

@@ -9,7 +9,7 @@ import { extractTokens } from "./utils/parsePost";
 import { addNotification } from "../notifications/addNotification";
 import { getRequestEvent, respond } from "@solidjs/web";
 import { getCurrentUser } from "../auth/serverFn";
-import { ensureVerified } from "../auth/utils/ensureAuth";
+import { ensureVerified } from "../auth/authApi";
 import { redis } from "~/utils/redis";
 import { zodSafeParse } from "~/utils/zodSafeParse";
 import { GET } from "@solidjs/web/server-functions";

@@ -1,5 +1,5 @@
 import { GET } from "@solidjs/web/server-functions";
-import { ensureAuthed } from "../auth/utils/ensureAuth";
+import { ensureAuthed } from "../auth/authApi";
 import { getTodaysChallengeProgress } from "./challengesRepository";
 import { respond } from "@solidjs/web";
 

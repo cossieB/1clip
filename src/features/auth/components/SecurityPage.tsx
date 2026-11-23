@@ -7,8 +7,7 @@ import z from "zod";
 import { session } from "../authApi";
 import { DeleteAccountForm } from "./DeleteAccountForm";
 
-
-export default function SecurityPage() {
+export function SecurityPage() {
     const { addToast } = useContext(ToastContext)
     const [input, setInput] = createStore(() => ({
         email: session().data?.user.email ?? "",

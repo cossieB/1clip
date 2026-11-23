@@ -41,7 +41,7 @@ export default function Landing() {
                 </p>
                 <div class={styles.actions}>
                     <a class="button primary" href={paths.posts()}>Browse</a>
-                    <a class="button secondary" href="/?dialog=signup">Join the Community</a>
+                    <a class="button secondary" href={paths.auth.signup}>Join the Community</a>
                 </div>
             </section>
 

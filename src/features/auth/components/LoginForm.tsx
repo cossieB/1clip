@@ -7,10 +7,12 @@ export function LoginForm() {
 
     const { input, setInput, isSubmitting, signin } = useSignIn()
     return (
-        <form class="form" onSubmit={async e => {
-            e.preventDefault()
-            await signin()
-        }} >
+        <form
+            class="form"
+            onSubmit={async e => {
+                e.preventDefault()
+                await signin()
+            }} >
             <TextField
                 label="Username"
                 onInput={val => setInput(s => { s.username = val })}
@@ -30,8 +32,8 @@ export function LoginForm() {
                     "font-size": "small"
                 }}
             >
-                <a href="?dialog=signup"  replace>Click here to create account</a>
-                <a href="?dialog=reset"  replace>Forgot password?</a>
+                <a href={paths.auth.signup} replace>Click here to create account</a>
+                <a href={paths.auth.reset} replace>Forgot password?</a>
             </div>
             <button
                 class="primary"

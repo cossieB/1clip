@@ -1,7 +1,7 @@
-import { createEffect, createMemo, createSignal, Loading, Show, useContext } from "solid-js";
+import { createMemo, createSignal, Loading, Show, useContext } from "solid-js";
 import { session } from "~/features/auth/authApi";
 import { authClient } from "~/features/auth/authClient";
-import { ToastContext } from "../Toast/ToastProvider";
+import { ToastContext } from "../../Toast/ToastProvider";
 import styles from "./MainLayout.module.css"
 import { useSearchParams } from "@solidjs/router";
 

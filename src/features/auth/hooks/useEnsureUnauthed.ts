@@ -3,7 +3,7 @@ import { useSearchParams } from "@solidjs/router";
 import { paths } from "~/router";
 import { session } from "../authApi";
 
-export function ensureUnauthed() {
+export function useEnsureUnauthed() {
     const [_, setSearch] = useSearchParams(paths)
     createEffect(
         () => session().data,

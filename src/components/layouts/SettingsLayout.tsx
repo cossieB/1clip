@@ -1,12 +1,10 @@
-import { useNavigate } from "@solidjs/router";
-import { createEffect, createMemo, ParentProps } from "solid-js";
-import { session } from "~/features/auth/authApi";
+import { createMemo, ParentProps } from "solid-js";
+import { ensureAuthOrRedirect } from "~/features/auth/authApi";
 import { NavTabs } from "~/components/NavTabs/NavTabs";
 import { paths } from "~/router";
-import { getProfileFn } from "~/features/users/userApi";
 
 export function SettingsLayout(props: ParentProps) {
-    createMemo(() => getProfileFn(), {
+    createMemo(() => ensureAuthOrRedirect(), {
         deferStream: true
     })    
 

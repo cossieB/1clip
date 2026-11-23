@@ -5,17 +5,16 @@ import * as userRepository from "./userRepository"
 import { getCurrentUser } from "../auth/serverFn";
 import { paths } from "~/router";
 import { GetUserSchema, UpdateUserSchema } from "./utils/zod";
-import { GET } from "@solidjs/web/server-functions/server";
 import { storageService } from "~/integrations/storageService/index.server";
 import { orphanedFileService } from "~/services/orphanedFileService";
 import { zodSafeParse } from "~/utils/zodSafeParse";
-import { ensureVerified } from "../auth/utils/ensureAuth";
 import { OnlineUsersService } from "~/services/onlineUsersService";
 import { broadcast } from "@solidjs/web/server-functions";
 import { sleep } from "~/lib/sleep";
 import { rateLimiter } from "~/utils/rateLimiter.server";
-import { addNotification } from "../notifications/addNotification";
+import { addNotification } from "~/features/notifications/addNotification";
 import { db } from "~/drizzle/db";
+import { ensureAuthOrRedirect, ensureVerified } from "~/features/auth/authApi";
 
 export const getUserFn = query(async (input: z.input<typeof GetUserSchema>) => {
     'use server'
@@ -52,8 +51,7 @@ export async function updateUserFn(profile: z.input<typeof UpdateUserSchema>) {
 
 export const getProfileFn = query(async () => {
     'use server'
-    const session = await getCurrentUser()
-    if (!session) throw redirect(paths({ dialog: "signin" }))
+    const session = await ensureAuthOrRedirect()
     return getUserFn({ id: session.user.id })
 }, "profile")
 

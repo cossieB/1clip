@@ -1,45 +1,48 @@
 // The router lives in its own module so src/App.tsx (render) and
 // src/server-config.ts (single-flight collector) share one instance.
 import { createRouter, int } from '@solidjs/router';
-import Home from './routes/(home)';
-import z from 'zod';
-import NotFound from './routes/[...404]';
-import ProfilePage from './features/users/components/ProfilePage';
-import MainLayout from './components/MainLayout/MainLayout';
-import { SettingsLayout } from './components/layouts/SettingsLayout';
-import SecurityPage from './features/auth/components/SecurityPage';
-import { CreatePostLayout } from './components/layouts/CreatePostLayout';
-import { CreatePostPage } from './features/posts/components/CreatePostPage';
 import { clientOnly } from '@solidjs/web';
-import { PostsPage } from './features/posts/pages/posts';
-import { PostId } from './features/posts/pages/posts[id]';
-import { SquadsPage } from './features/squads/pages/squads';
-import { UserIdLayout } from './features/users/pages/user[id].layout';
-import { UserPosts } from './features/users/pages/user[id].posts';
-import { UserSquads } from './features/users/pages/user[id].squads';
-import { GameIdRoute } from './features/games/pages/game[id]';
-import { GetGamesSchema } from './features/games/utils/zod';
-import { GamesPage as GamesRoute } from './features/games/pages/games';
-import { CompanyIdRoute } from './features/companies/pages/company[id]';
-import { ActorIdRoute } from './features/actors/pages/actor[id]';
-import { PlatformIdRoute } from './features/platforms/pages/platform[id]';
-import { NotificationsRoute } from './features/notifications/pages/notifications';
-import { ensureAdminOrRedirect, ensureAuthOrRedirect } from './features/auth/utils/ensureAuth';
-import SearchRoute from './features/search/routes/search';
-import { SquadIdRoute } from './features/squads/pages/squad[id]';
-import { AdminGameRoute } from './features/games/pages/admin.game[id]';
-import { AdminGameCreateRoute } from './features/games/pages/admin.game.create';
-import { AdminCompanyRoute } from './features/companies/pages/admin.company[id]';
-import { AdminCompanyCreate } from './features/companies/pages/admin.company.new';
-import { AdminPlatformRoute } from './features/platforms/pages/admin.platform[id]';
-import { AdminPlatformCreate } from './features/platforms/pages/admin.platform.new';
-import { AdminActorCreate } from './features/actors/pages/admin.actor.new';
-import { AdminActorRoute } from './features/actors/pages/admin.actor[id]';
-import { AdminGamesRoute } from './features/games/pages/admin.games';
-import { AdminCompaniesRoute } from './features/companies/pages/admin.companies';
-import { AdminPlatformsRoute } from './features/platforms/pages/admin.platforms';
-import { AdminActorsRoute } from './features/actors/pages/admin.actors';
+import z from 'zod';
+import { ActorIdRoute } from '~/features/actors/routes/actor[id]';
+import { AdminActorCreate } from '~/features/actors/routes/admin.actor.new';
+import { AdminActorRoute } from '~/features/actors/routes/admin.actor[id]';
+import { AdminActorsRoute } from '~/features/actors/routes/admin.actors';
+import { ensureAdminOrRedirect, ensureAuthOrRedirect, ensureUnauthed } from '~/features/auth/authApi';
+import SecurityPage from '~/features/auth/routes/security';
+import { AdminCompaniesRoute } from '~/features/companies/routes/admin.companies';
+import { AdminCompanyCreate } from '~/features/companies/routes/admin.company.new';
+import { AdminCompanyRoute } from '~/features/companies/routes/admin.company[id]';
+import { CompanyIdRoute } from '~/features/companies/routes/company[id]';
+import { AdminGameCreateRoute } from '~/features/games/routes/admin.game.create';
+import { AdminGameRoute } from '~/features/games/routes/admin.game[id]';
+import { AdminGamesRoute } from '~/features/games/routes/admin.games';
+import { GameIdRoute } from '~/features/games/routes/game[id]';
+import { GamesRoute } from '~/features/games/routes/games';
+import { GetGamesSchema } from '~/features/games/utils/zod';
+import { NotificationsRoute } from '~/features/notifications/routes/notifications';
+import { AdminPlatformCreate } from '~/features/platforms/routes/admin.platform.new';
+import { AdminPlatformRoute } from '~/features/platforms/routes/admin.platform[id]';
+import { AdminPlatformsRoute } from '~/features/platforms/routes/admin.platforms';
+import { PlatformIdRoute } from '~/features/platforms/routes/platform[id]';
+import { CreatePostPage } from '~/features/posts/components/CreatePostPage';
+import { PostsPage } from '~/features/posts/routes/posts';
+import { PostId } from '~/features/posts/routes/posts[id]';
+import SearchRoute from '~/features/search/routes/search';
+import { SquadIdRoute } from '~/features/squads/routes/squad[id]';
+import { SquadsPage } from '~/features/squads/routes/squads';
+import ProfilePage from '~/features/users/routes/profile';
+import { UserIdLayout } from '~/features/users/routes/user[id].layout';
+import { UserPosts } from '~/features/users/routes/user[id].posts';
+import { UserSquads } from '~/features/users/routes/user[id].squads';
 import Landing from './components/Landing/Landing';
+import { CreatePostLayout } from './components/layouts/CreatePostLayout';
+import MainLayout from './components/layouts/MainLayout/MainLayout';
+import { SettingsLayout } from './components/layouts/SettingsLayout';
+import Home from './routes/(home)';
+import NotFound from './routes/[...404]';
+import { SignupRoute } from './features/auth/routes/signup';
+import { SigninRoute } from './features/auth/routes/signin';
+import { ResetPasswordRoute } from './features/auth/routes/reset';
 
 // Link preloading is opt-in. intentPreload() is the hover/focus/touch
 // strategy: resting on a link warms its code and runs its preload, which is
@@ -152,7 +155,26 @@ export const Router = createRouter({
                         type: z.enum(["posts", "games", "squads"]),
                         page: z.string(),
                     })
-                }
+                }, {
+                    path: "/auth",
+                    preload: () => void ensureUnauthed(),
+                    children: [{
+                        path: "/signup",
+                        component: SignupRoute
+                    }, {
+                        path: "/signin",
+                        component: SigninRoute,
+                        search: z.object({
+                            redirect: z.string().optional()
+                        })
+                    }, {
+                        path: "/reset",
+                        component: ResetPasswordRoute,
+                        search: z.object({
+                            token: z.string().optional()
+                        })
+                    }]
+                },
             ],
         }, {
             component: AdminLayout,

@@ -1,4 +1,4 @@
-import { isPending, Loading, Show } from "solid-js";
+import { Errored, isPending, Loading, Show } from "solid-js";
 import z from "zod";
 import { ItemList } from "~/components/Forms/ItemList";
 import { TextArea } from "~/components/Forms/Textarea";
@@ -11,12 +11,13 @@ import { HoldClickBtn } from "~/components/HoldClickBtn/HoldClickBtn";
 import styles from "./ProfilePage.module.css"
 import { ImageUpload } from "~/components/Forms/ImageUpload";
 
-export default function ProfilePage() {
+export function ProfilePage() {
     const { isSubmitting, updateUserAction, input, setInput, setFiles } = useProfile()
 
     const isDisabled = () => !UpdateUserSchema.safeParse(input).success || isSubmitting()
     const logout = useLogout()
     return (
+
         <Loading fallback={<Spinner />} >
             <form
                 class="form card"
@@ -43,7 +44,7 @@ export default function ProfilePage() {
                             })
                         })}
                         image={input.image}
-                        maxSize={2 * 1024*1024}
+                        maxSize={2 * 1024 * 1024}
                     />
                     <ImageUpload
                         setFile={file => setFiles(s => {
@@ -60,7 +61,7 @@ export default function ProfilePage() {
                             })
                         })}
                         image={input.banner}
-                        maxSize={2 * 1024*1024}
+                        maxSize={2 * 1024 * 1024}
                     />
                 </div>
                 <TextField

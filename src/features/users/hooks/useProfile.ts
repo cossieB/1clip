@@ -1,12 +1,11 @@
 import z from "zod";
 import { UpdateUserSchema } from "../utils/zod";
-import { action, affects, createMemo, createOptimistic, createStore, refresh, useContext } from "solid-js";
+import { action, affects, createEffect, createMemo, createOptimistic, createStore, refresh, useContext } from "solid-js";
 import { getProfileFn, updateUserFn } from "../userApi";
 import { useUpload } from "~/hooks/useUpload";
 import { useAbortController } from "~/hooks/useAbortController";
 import { getUsersSignedUrls } from "~/integrations/storageService/serverFn";
 import { useToastError } from "~/hooks/useToastError";
-import { revalidate } from "@solidjs/router";
 
 export function useProfile() {
     const abortController = useAbortController()

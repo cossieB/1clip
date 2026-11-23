@@ -5,7 +5,7 @@ import * as squadsRepository from "./squadsRepository"
 import { zodSafeParse } from "~/utils/zodSafeParse";
 import { getCurrentUser } from "../auth/serverFn";
 import { respond } from "@solidjs/web";
-import { ensureVerified } from "../auth/utils/ensureAuth";
+import { ensureVerified } from "../auth/authApi";
 import { DrizzleQueryError } from "drizzle-orm";
 import { rateLimiter } from "~/utils/rateLimiter.server";
 import { addNotification } from "../notifications/addNotification";
