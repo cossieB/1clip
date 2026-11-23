@@ -73,6 +73,13 @@ declare module "virtual:file-routes" {
       $GET: FileRouteLazyRef<Pick<typeof import("./src/routes/api/notifications"), Extract<"GET", keyof typeof import("./src/routes/api/notifications")>>>;
       $HEAD: FileRouteLazyRef<Pick<typeof import("./src/routes/api/notifications"), Extract<"GET", keyof typeof import("./src/routes/api/notifications")>>>;
       $$route?: undefined;
+    },
+    {
+      path: "/sitemap.xml";
+      page: false;
+      $GET: FileRouteLazyRef<Pick<typeof import("./src/routes/sitemap.xml"), Extract<"GET", keyof typeof import("./src/routes/sitemap.xml")>>>;
+      $HEAD: FileRouteLazyRef<Pick<typeof import("./src/routes/sitemap.xml"), Extract<"GET", keyof typeof import("./src/routes/sitemap.xml")>>>;
+      $$route?: undefined;
     }
   ];
   export default routes;

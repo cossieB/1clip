@@ -2,6 +2,7 @@ import { Show } from "@solidjs/web";
 import { PostList } from "../components/PostList";
 import { useSearchParams } from "@solidjs/router";
 import { paths } from "~/router";
+import { SiteTitle } from "~/components/CustomSiteTitle";
 
 export function PostsPage() {
     const [search] = useSearchParams(paths.posts)
@@ -14,7 +15,12 @@ export function PostsPage() {
     return (
         // remount the PostList component to reset the infinite scroll
         <Show when={filters()} keyed>
-            {(f) => <PostList filters={f} />}
+            {(f) => (
+                <>
+                <SiteTitle> Posts </SiteTitle>
+                <PostList filters={f} />
+                </>
+            )}
         </Show>
     )
 }
