@@ -2,6 +2,8 @@ import { action, affects, createMemo, createOptimistic, createStore, refresh, us
 import { authClient } from "./authClient";
 import { ToastContext } from "~/components/Toast/ToastProvider";
 import { ensureUnauthed } from "./hooks/useEnsureUnauthed";
+import { revalidate } from "@solidjs/router";
+import { getProfileFn } from "../users/userApi";
 
 export const session = createMemo(() => authClient.getSession(), { ssrSource: "client" })
 
@@ -73,7 +75,8 @@ export function useLogout() {
             text: error.message ?? "Something went wrong",
             type: "error"
         })    
-        refresh(session)    
+        yield refresh(session)    
+        yield revalidate(getProfileFn.key)
     })
     return logout
 }

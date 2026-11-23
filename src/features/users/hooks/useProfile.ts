@@ -6,6 +6,7 @@ import { useUpload } from "~/hooks/useUpload";
 import { useAbortController } from "~/hooks/useAbortController";
 import { getUsersSignedUrls } from "~/integrations/storageService/serverFn";
 import { useToastError } from "~/hooks/useToastError";
+import { revalidate } from "@solidjs/router";
 
 export function useProfile() {
     const abortController = useAbortController()
@@ -36,7 +37,7 @@ export function useProfile() {
                 if (newBanner) s.banner = newBanner.key
             })
             yield updateUserFn(input)
-            refresh(user)
+            
         }
         catch (error) {
             console.error(error)

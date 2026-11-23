@@ -50,12 +50,12 @@ export async function updateUserFn(profile: z.input<typeof UpdateUserSchema>) {
     }
 }
 
-export const getProfileFn = GET(async () => {
+export const getProfileFn = query(async () => {
     'use server'
     const session = await getCurrentUser()
     if (!session) throw redirect(paths({ dialog: "signin" }))
     return getUserFn({ id: session.user.id })
-})
+}, "profile")
 
 const G = z.object({
     gameId: z.int(),
