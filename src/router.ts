@@ -40,9 +40,9 @@ import MainLayout from './components/layouts/MainLayout/MainLayout';
 import { SettingsLayout } from './components/layouts/SettingsLayout';
 import Home from './routes/(home)';
 import NotFound from './routes/[...404]';
-import { SignupRoute } from './features/auth/routes/signup';
-import { SigninRoute } from './features/auth/routes/signin';
-import { ResetPasswordRoute } from './features/auth/routes/reset';
+import { SignupRoute } from '~/features/auth/routes/signup';
+import { SigninRoute } from '~/features/auth/routes/signin';
+import { ResetPasswordRoute } from '~/features/auth/routes/reset';
 
 // Link preloading is opt-in. intentPreload() is the hover/focus/touch
 // strategy: resting on a link warms its code and runs its preload, which is

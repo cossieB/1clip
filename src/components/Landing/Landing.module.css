@@ -1,7 +1,7 @@
 .landing {
     display: grid;
     gap: 2rem;
-
+    width: 100%;
 }
 
 /* ── Hero ── */
@@ -13,23 +13,12 @@
     padding-block: clamp(1rem, 4vw, 3rem);
     padding-inline: clamp(1rem, 4vw, 3rem);
     position: relative;
-    height: 60vh;
-
-    &::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        z-index: -1;
-        background-image: url("/image1.jpg");
-    }
-
-    &::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        z-index: -1;
-        background-color: rgba(0, 0, 0, 0.8);
-    }
+    height: 66vh;
+    background-color: rgba(0, 0, 0, 0.75);
+    background-image: url("/image2.jpg");
+    background-blend-mode: darken;
+    background-position: center;
+    background-size: cover;
 }
 
 .brand {
@@ -81,7 +70,8 @@
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-    gap: 1.25rem;
+    gap: 1rem;
+    width: 100%;
 }
 
 .index {
@@ -100,12 +90,13 @@
 
 .quote {
     padding-block: 2rem;
-    padding-inline: clamp(1rem, 4vw, 2.5rem);
+    padding-inline: clamp(1rem, 4cqi, 2.5rem);
     border-inline-start: 3px solid var(--accent);
     background: linear-gradient(90deg, var(--accent-tint, transparent), transparent 70%);
+    width: 100%;
 
     p {
-        width: max-content;
+        width: fit-content;
         font-family: var(--font-header);
         font-size: clamp(1.25rem, 3.5vw, 2rem);
         line-height: 1.35;
