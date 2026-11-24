@@ -1,6 +1,7 @@
 import { createMemo, ParentProps } from "solid-js";
 import { ensureAdminOrRedirect } from "~/features/auth/authApi";
 import styles from "./AdminLayout.module.css"
+import { Meta } from "@solidjs/meta";
 
 export default function AdminLayout(props: ParentProps) {
     createMemo(() => ensureAdminOrRedirect(), {
@@ -9,6 +10,7 @@ export default function AdminLayout(props: ParentProps) {
 
     return (
         <div class={styles.container}>
+            <Meta name="robots" content="noindex" />
             <AdminNav />
             <main>
                 {props.children}

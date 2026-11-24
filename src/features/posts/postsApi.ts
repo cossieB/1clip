@@ -109,7 +109,6 @@ export async function toggleLikeFn(postId: number) {
     await rateLimiter("post:react", userSession.user.id, 10, 60);
     const res = await db.transaction(async tx => {
         const res = await postRepository.toggleLike(tx, data, userSession.user.id)
-        await awardXp(tx, userSession.user.id, CHALLENGE.likePost)
         if (!res) return res;
         if (userSession.user.id != res.authorId && res.liked) {
             await awardXp(tx, userSession.user.id, CHALLENGE.likePost)
